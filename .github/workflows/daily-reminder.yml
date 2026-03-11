@@ -3,7 +3,7 @@ name: Daily Task Reminder
 on:
   schedule:
     - cron: '0 22 * * *'  # UTC 22:00 = KST 07:00
-  workflow_dispatch:  # 수동 실행도 가능
+  workflow_dispatch:
 
 jobs:
   send-reminder:
