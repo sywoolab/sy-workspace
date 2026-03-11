@@ -112,6 +112,52 @@ class TriathlonParser(HTMLParser):
             self.current_text += data
 
 
+class DetailParser(HTMLParser):
+    """대회 상세 페이지에서 접수기간 추출"""
+    def __init__(self):
+        super().__init__()
+        self.in_th = False
+        self.in_td = False
+        self.found_reg_th = False
+        self.reg_period = ''
+        self.current_text = ''
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'th':
+            self.in_th = True
+            self.current_text = ''
+        elif tag == 'td' and self.found_reg_th:
+            self.in_td = True
+            self.current_text = ''
+
+    def handle_endtag(self, tag):
+        if tag == 'th' and self.in_th:
+            self.in_th = False
+            if '접수기간' in self.current_text.strip():
+                self.found_reg_th = True
+        elif tag == 'td' and self.in_td and self.found_reg_th:
+            self.in_td = False
+            self.reg_period = self.current_text.strip()
+            self.found_reg_th = False  # stop after first match
+
+    def handle_data(self, data):
+        if self.in_th or self.in_td:
+            self.current_text += data
+
+
+def fetch_registration_period(url):
+    """대회 상세 페이지에서 접수기간 추출"""
+    try:
+        resp = requests.get(url, timeout=15, verify=False)
+        resp.encoding = 'utf-8'
+        parser = DetailParser()
+        parser.feed(resp.text)
+        return parser.reg_period if parser.reg_period else None
+    except Exception as e:
+        print(f"  상세페이지 에러: {e}")
+        return None
+
+
 def fetch_events():
     """철인3종협회 사이트에서 대회 목록 크롤링"""
     all_events = []
@@ -128,6 +174,14 @@ def fetch_events():
         except Exception as e:
             print(f"  페이지 {page} 에러: {e}")
             break
+
+    # 접수중/접수예정 대회만 상세 페이지에서 접수기간 가져오기
+    for event in all_events:
+        if event.get('status') in ('접수중', '접수예정') and event.get('url'):
+            reg = fetch_registration_period(event['url'])
+            if reg:
+                event['reg_period'] = reg
+                print(f"    접수기간: {event.get('name', '?')} → {reg}")
 
     return all_events
 
@@ -178,53 +232,60 @@ def format_triathlon_message(events):
         d = parse_event_date(e.get('date', ''))
         return d if d else datetime(2099, 12, 31, tzinfo=KST)
 
+    def format_event_block(e):
+        """개별 대회 메시지 블록 생성"""
+        name = e.get('name', '?')
+        date = e.get('date', '?')
+        location = e.get('location', '')
+        course = e.get('course', '')
+        reg_period = e.get('reg_period', '')
+
+        # 대회일까지 D-day
+        event_dt = parse_event_date(date)
+        dday = ''
+        if event_dt:
+            diff = (event_dt - NOW).days
+            dday = f' (D-{diff})' if diff >= 0 else ''
+
+        url = e.get('url', '')
+        block = []
+        if url:
+            name_escaped = name.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            block.append(f'  • <a href="{url}">{name_escaped}</a>')
+        else:
+            block.append(f'  • {name}')
+
+        detail = f'    {date}{dday} | {location} {course}'
+        block.append(detail)
+
+        if reg_period:
+            # 접수 마감까지 D-day 계산
+            reg_match = re.search(r'~\s*(\d{4}-\d{2}-\d{2})', reg_period)
+            reg_dday = ''
+            if reg_match:
+                try:
+                    end_dt = datetime.strptime(reg_match.group(1), '%Y-%m-%d').replace(tzinfo=KST)
+                    diff = (end_dt - NOW).days
+                    if diff >= 0:
+                        reg_dday = f' (마감 D-{diff})'
+                except ValueError:
+                    pass
+            block.append(f'    📝 접수: {reg_period}{reg_dday}')
+
+        return block
+
     if open_events:
         open_events.sort(key=sort_key)
         lines.append("🟢 접수중")
         for e in open_events:
-            name = e.get('name', '?')
-            date = e.get('date', '?')
-            location = e.get('location', '')
-            course = e.get('course', '')
-
-            # 대회일까지 D-day
-            event_dt = parse_event_date(date)
-            dday = ''
-            if event_dt:
-                diff = (event_dt - NOW).days
-                dday = f' (D-{diff})' if diff >= 0 else ''
-
-            info = f"{name} | {date}{dday}"
-            if location:
-                info += f" | {location}"
-            if course:
-                info += f" | {course}"
-
-            url = e.get('url', '')
-            if url:
-                name_escaped = name.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                lines.append(f'  • <a href="{url}">{name_escaped}</a>')
-                lines.append(f'    {date}{dday} | {location} {course}')
-            else:
-                lines.append(f'  • {info}')
+            lines.extend(format_event_block(e))
         lines.append("")
 
     if upcoming_events:
         upcoming_events.sort(key=sort_key)
         lines.append("🟡 접수예정")
         for e in upcoming_events:
-            name = e.get('name', '?')
-            date = e.get('date', '?')
-            location = e.get('location', '')
-            course = e.get('course', '')
-
-            url = e.get('url', '')
-            if url:
-                name_escaped = name.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                lines.append(f'  • <a href="{url}">{name_escaped}</a>')
-                lines.append(f'    {date} | {location} {course}')
-            else:
-                lines.append(f'  • {name} | {date} | {location} {course}')
+            lines.extend(format_event_block(e))
         lines.append("")
 
     # 접수중도 예정도 없으면
