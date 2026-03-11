@@ -2,7 +2,7 @@
 IB News Daily Clipping
 - 국내/해외 IB 관련 뉴스 RSS 수집
 - 키워드 필터링 + 관련도 순 정렬
-- 하루 1회 (아침 8시) 텔레그램 발송, 최대 30건
+- 하루 2회 (오전 8시, 오후 2시) 텔레그램 발송, 최대 20건
 """
 
 import os
@@ -21,7 +21,7 @@ BOT_TOKEN = os.environ['IB_BOT_TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
 
 SENT_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'news_sent.json')
-MAX_ARTICLES = 30
+MAX_ARTICLES = 20
 
 # ============================================================
 # RSS 소스 정의
@@ -163,22 +163,27 @@ def score_article(article):
 
 
 def format_message(kr_articles, en_articles):
-    """텔레그램 메시지 포맷"""
+    """텔레그램 메시지 포맷 — 번호 부여, 중요도순"""
     date_str = datetime.now(KST).strftime('%Y-%m-%d (%a)')
-    lines = [f"📰 IB Daily Brief ({date_str})\n"]
+    hour = datetime.now(KST).hour
+    session = "오전" if hour < 12 else "오후"
+    lines = [f"📰 IB Daily Brief ({date_str} {session})\n"]
 
+    num = 1
     if kr_articles:
         lines.append("🇰🇷 국내")
         for a in kr_articles:
-            lines.append(f"• [{a['source']}] {a['title']}")
-            lines.append(f"  {a['link']}")
+            lines.append(f"{num}. [{a['source']}] {a['title']}")
+            lines.append(f"   {a['link']}")
+            num += 1
         lines.append("")
 
     if en_articles:
         lines.append("🌏 해외")
         for a in en_articles:
-            lines.append(f"• [{a['source']}] {a['title']}")
-            lines.append(f"  {a['link']}")
+            lines.append(f"{num}. [{a['source']}] {a['title']}")
+            lines.append(f"   {a['link']}")
+            num += 1
         lines.append("")
 
     total = len(kr_articles) + len(en_articles)
@@ -262,9 +267,9 @@ def main():
     all_kr.sort(key=lambda x: x['score'], reverse=True)
     all_en.sort(key=lambda x: x['score'], reverse=True)
 
-    # 국내 15~20건, 해외 10~15건 (합계 30건 이내)
-    kr_pick = all_kr[:18]
-    en_pick = all_en[:12]
+    # 국내 12건, 해외 8건 (합계 20건 이내)
+    kr_pick = all_kr[:12]
+    en_pick = all_en[:8]
 
     print(f"\n  국내 필터: {len(all_kr)}건 → {len(kr_pick)}건 선별")
     print(f"  해외 필터: {len(all_en)}건 → {len(en_pick)}건 선별")

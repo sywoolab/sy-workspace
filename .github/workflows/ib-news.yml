@@ -2,7 +2,8 @@ name: ib-news
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # UTC 23:00 = KST 08:00
+    - cron: '0 23 * * 0-4'   # UTC 23:00 = KST 08:00 (월~금)
+    - cron: '0 5 * * 1-5'    # UTC 05:00 = KST 14:00 (월~금)
   workflow_dispatch:
 
 jobs:
