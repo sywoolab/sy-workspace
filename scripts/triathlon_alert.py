@@ -1,8 +1,8 @@
 """
 철인3종 대회 모니터링
 - 대한철인3종협회 사이트에서 대회 목록 크롤링
-- 접수중/접수예정 대회 알림
-- 접수일 다가오면 매일 리마인드
+- 모든 미래 대회를 대회일순 정렬
+- 접수 상태/기간을 한눈에 표시
 """
 
 import os
@@ -88,7 +88,7 @@ class TriathlonParser(HTMLParser):
             self.in_strong = False
         elif tag == 'em' and self.in_em:
             status = self.current_text.strip()
-            if status and '접수' in status:
+            if status:
                 self.current_event['status'] = status
             self.in_em = False
         elif tag == 'span' and self.in_span:
@@ -119,10 +119,13 @@ class DetailParser(HTMLParser):
         self.in_th = False
         self.in_td = False
         self.found_reg_th = False
+        self.done = False
         self.reg_period = ''
         self.current_text = ''
 
     def handle_starttag(self, tag, attrs):
+        if self.done:
+            return
         if tag == 'th':
             self.in_th = True
             self.current_text = ''
@@ -131,14 +134,19 @@ class DetailParser(HTMLParser):
             self.current_text = ''
 
     def handle_endtag(self, tag):
+        if self.done:
+            return
         if tag == 'th' and self.in_th:
             self.in_th = False
-            if '접수기간' in self.current_text.strip():
+            text = self.current_text.strip()
+            # "접수기간"에만 매칭, "심판 접수기간" 등은 제외
+            if text == '접수기간':
                 self.found_reg_th = True
         elif tag == 'td' and self.in_td and self.found_reg_th:
             self.in_td = False
             self.reg_period = self.current_text.strip()
-            self.found_reg_th = False  # stop after first match
+            self.found_reg_th = False
+            self.done = True
 
     def handle_data(self, data):
         if self.in_th or self.in_td:
@@ -161,7 +169,7 @@ def fetch_registration_period(url):
 def fetch_events():
     """철인3종협회 사이트에서 대회 목록 크롤링"""
     all_events = []
-    for page in range(1, 4):  # 최대 3페이지
+    for page in range(1, 4):
         url = f'{BASE_URL}?vType=list&sYear={NOW.year}&page={page}'
         try:
             resp = requests.get(url, timeout=15, verify=False)
@@ -175,9 +183,9 @@ def fetch_events():
             print(f"  페이지 {page} 에러: {e}")
             break
 
-    # 접수중/접수예정 대회만 상세 페이지에서 접수기간 가져오기
+    # 모든 대회의 상세 페이지에서 접수기간 가져오기
     for event in all_events:
-        if event.get('status') in ('접수중', '접수예정') and event.get('url'):
+        if event.get('url'):
             reg = fetch_registration_period(event['url'])
             if reg:
                 event['reg_period'] = reg
@@ -206,7 +214,6 @@ def parse_event_date(date_str):
     """대회 날짜 문자열 파싱 → datetime"""
     if not date_str:
         return None
-    # '2026.10.04' or '2026.05.16 ~ 17'
     match = re.match(r'(\d{4})\.(\d{2})\.(\d{2})', date_str)
     if match:
         try:
@@ -216,87 +223,173 @@ def parse_event_date(date_str):
     return None
 
 
+def parse_reg_dates(reg_period):
+    """접수기간 문자열에서 시작일/마감일 파싱"""
+    if not reg_period:
+        return None, None
+
+    # "2026-03-17 14:00 ~ 2026-03-26 18:00" 형태
+    dates = re.findall(r'(\d{4}-\d{2}-\d{2})', reg_period)
+    start_dt = None
+    end_dt = None
+    if len(dates) >= 1:
+        try:
+            start_dt = datetime.strptime(dates[0], '%Y-%m-%d').replace(tzinfo=KST)
+        except ValueError:
+            pass
+    if len(dates) >= 2:
+        try:
+            end_dt = datetime.strptime(dates[1], '%Y-%m-%d').replace(tzinfo=KST)
+        except ValueError:
+            pass
+    return start_dt, end_dt
+
+
+def compact_date(date_str):
+    """'2026.05.09 ~ 10' → '05.09~10', '2026.05.09' → '05.09'"""
+    if not date_str:
+        return '?'
+    # 연도 제거
+    text = re.sub(r'^\d{4}\.', '', date_str.strip())
+    # '~ 10' → '~10', 중간 '~ 2026.05.17' → '~05.17'
+    text = re.sub(r'\s*~\s*\d{4}\.', '~', text)
+    text = re.sub(r'\s*~\s*', '~', text)
+    return text
+
+
+def reg_status_label(status, reg_period):
+    """접수 상태를 이모지+라벨로 변환, 접수일정 요약 포함"""
+    reg_start, reg_end = parse_reg_dates(reg_period)
+    today_dt = NOW.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # 사이트 status 기준 분류
+    if status == '접수중':
+        if reg_end:
+            diff = (reg_end - today_dt).days
+            if diff <= 0:
+                return '🔴', f'오늘 마감!'
+            elif diff <= 3:
+                return '🟢', f'접수중 (마감 D-{diff} ⚠️)'
+            else:
+                end_short = reg_end.strftime('%m.%d')
+                return '🟢', f'접수중 (~{end_short}, D-{diff})'
+        return '🟢', '접수중'
+
+    elif status == '접수예정':
+        if reg_start:
+            diff = (reg_start - today_dt).days
+            if diff <= 0:
+                return '🟡', '곧 오픈'
+            else:
+                start_short = reg_start.strftime('%m.%d')
+                return '🟡', f'{start_short} 오픈 (D-{diff})'
+        return '🟡', '접수예정 (일정 미정)'
+
+    elif status == '접수마감':
+        return '🔴', '접수마감'
+
+    elif status == '대회종료':
+        return '⚫', '종료'
+
+    else:
+        return '⚪', status if status else '미정'
+
+
 def format_triathlon_message(events):
-    """텔레그램 메시지 포맷"""
+    """텔레그램 메시지 포맷 - 대회일순, 가독성 중심"""
     if not events:
         return None
 
-    lines = [f"🏊🚴🏃 철인3종 대회 알림 ({TODAY})\n"]
+    # 미래 대회만 (오늘 이후)
+    today_dt = NOW.replace(hour=0, minute=0, second=0, microsecond=0)
+    future = []
+    for e in events:
+        evt_dt = parse_event_date(e.get('date', ''))
+        if evt_dt and evt_dt >= today_dt:
+            future.append(e)
+        elif not evt_dt:
+            future.append(e)
 
-    # 접수중
-    open_events = [e for e in events if e.get('status') == '접수중']
-    upcoming_events = [e for e in events if e.get('status') == '접수예정']
+    if not future:
+        return None
 
     # 대회일 기준 정렬
     def sort_key(e):
         d = parse_event_date(e.get('date', ''))
         return d if d else datetime(2099, 12, 31, tzinfo=KST)
 
-    def format_event_block(e):
-        """개별 대회 메시지 블록 생성"""
+    future.sort(key=sort_key)
+
+    lines = [f'🏊🚴🏃 <b>철인3종 대회 일정</b> ({TODAY})']
+    lines.append('🟢접수중 🟡접수예정 🔴마감')
+    lines.append('')
+
+    current_month = None
+    count_open = 0
+    count_upcoming = 0
+    count_closed = 0
+
+    for e in future:
         name = e.get('name', '?')
-        date = e.get('date', '?')
-        location = e.get('location', '')
-        course = e.get('course', '')
+        date_str = e.get('date', '?')
+        status = e.get('status', '')
         reg_period = e.get('reg_period', '')
-
-        # 대회일까지 D-day
-        event_dt = parse_event_date(date)
-        dday = ''
-        if event_dt:
-            diff = (event_dt - NOW).days
-            dday = f' (D-{diff})' if diff >= 0 else ''
-
+        location = e.get('location', '')
         url = e.get('url', '')
-        block = []
+
+        # 통계
+        if status == '접수중':
+            count_open += 1
+        elif status == '접수예정':
+            count_upcoming += 1
+        elif status == '접수마감':
+            count_closed += 1
+
+        # 월 구분선
+        evt_dt = parse_event_date(date_str)
+        if evt_dt:
+            month = evt_dt.month
+            if month != current_month:
+                current_month = month
+                lines.append(f'━━━ 📅 {month}월 ━━━')
+
+        # 대회일 D-day
+        dday = ''
+        if evt_dt:
+            diff = (evt_dt - today_dt).days
+            dday = f'D-{diff}'
+
+        # 접수 상태
+        emoji, reg_label = reg_status_label(status, reg_period)
+
+        # 날짜 간결화
+        short_date = compact_date(date_str)
+
+        # 대회명 (링크)
+        name_escaped = name.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
         if url:
-            name_escaped = name.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-            block.append(f'  • <a href="{url}">{name_escaped}</a>')
+            name_line = f'<a href="{url}">{name_escaped}</a>'
         else:
-            block.append(f'  • {name}')
+            name_line = name_escaped
 
-        detail = f'    {date}{dday} | {location} {course}'
-        block.append(detail)
+        # 한 줄: 이모지 날짜 | 대회명
+        lines.append(f'{emoji} <b>{short_date}</b> ({dday}) {name_line}')
 
-        if reg_period:
-            # 접수 마감까지 D-day 계산
-            reg_match = re.search(r'~\s*(\d{4}-\d{2}-\d{2})', reg_period)
-            reg_dday = ''
-            if reg_match:
-                try:
-                    end_dt = datetime.strptime(reg_match.group(1), '%Y-%m-%d').replace(tzinfo=KST)
-                    diff = (end_dt - NOW).days
-                    if diff >= 0:
-                        reg_dday = f' (마감 D-{diff})'
-                except ValueError:
-                    pass
-            block.append(f'    📝 접수: {reg_period}{reg_dday}')
+        # 두번째 줄: 장소 + 접수 상태
+        detail_parts = []
+        if location:
+            # 장소 축약 (시/군/구까지만, 없으면 20자)
+            loc_short = re.match(r'[가-힣]+(?:특별자치도)?\s+[가-힣]+[시군구]', location)
+            detail_parts.append(loc_short.group() if loc_short else location[:20])
+        detail_parts.append(reg_label)
+        lines.append(f'   {" | ".join(detail_parts)}')
+        lines.append('')
 
-        return block
+    # 요약
+    lines.append(f'접수중 {count_open} / 예정 {count_upcoming} / 마감 {count_closed}')
+    lines.append(f'🔗 https://www.triathlon.or.kr/events/tour/')
 
-    if open_events:
-        open_events.sort(key=sort_key)
-        lines.append("🟢 접수중")
-        for e in open_events:
-            lines.extend(format_event_block(e))
-        lines.append("")
-
-    if upcoming_events:
-        upcoming_events.sort(key=sort_key)
-        lines.append("🟡 접수예정")
-        for e in upcoming_events:
-            lines.extend(format_event_block(e))
-        lines.append("")
-
-    # 접수중도 예정도 없으면
-    if not open_events and not upcoming_events:
-        return None
-
-    total = len(open_events) + len(upcoming_events)
-    lines.append(f"접수중 {len(open_events)}건 / 접수예정 {len(upcoming_events)}건")
-    lines.append(f"🔗 https://www.triathlon.or.kr/events/tour/")
-
-    return "\n".join(lines)
+    return '\n'.join(lines)
 
 
 def send_telegram(text):
@@ -326,11 +419,12 @@ def main():
     # 저장
     save_events(events)
 
-    # 접수중/예정만 필터
-    active = [e for e in events if e.get('status') in ('접수중', '접수예정')]
+    # 미래 대회가 있으면 전송 (접수 상태 무관)
+    today_dt = NOW.replace(hour=0, minute=0, second=0, microsecond=0)
+    future = [e for e in events if parse_event_date(e.get('date', '')) and parse_event_date(e.get('date', '')) >= today_dt]
 
-    if not active:
-        print("  접수중/예정 대회 없음")
+    if not future:
+        print("  미래 대회 없음")
         return
 
     # 메시지 생성 & 전송
@@ -338,6 +432,7 @@ def main():
     if msg:
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
+        print(f"\n--- 메시지 미리보기 ---\n{msg}")
     else:
         print("  전송할 내용 없음")
 
