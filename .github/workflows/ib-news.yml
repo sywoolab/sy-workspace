@@ -1,0 +1,31 @@
+name: ib-news
+
+on:
+  schedule:
+    - cron: '0 23 * * *'  # UTC 23:00 = KST 08:00
+  workflow_dispatch:
+
+jobs:
+  clip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Run IB news clipping
+        env:
+          IB_BOT_TOKEN: ${{ secrets.IB_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/ib_news.py
+
+      - name: Save sent history
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/news_sent.json
+          git diff --staged --quiet || git commit -m "update news_sent" && git push || true
