@@ -173,16 +173,16 @@ def format_message(kr_articles, en_articles):
     if kr_articles:
         lines.append("🇰🇷 국내")
         for a in kr_articles:
-            lines.append(f"{num}. [{a['source']}] {a['title']}")
-            lines.append(f"   {a['link']}")
+            title_escaped = a['title'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            lines.append(f'{num}. [{a["source"]}] <a href="{a["link"]}">{title_escaped}</a>')
             num += 1
         lines.append("")
 
     if en_articles:
         lines.append("🌏 해외")
         for a in en_articles:
-            lines.append(f"{num}. [{a['source']}] {a['title']}")
-            lines.append(f"   {a['link']}")
+            title_escaped = a['title'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            lines.append(f'{num}. [{a["source"]}] <a href="{a["link"]}">{title_escaped}</a>')
             num += 1
         lines.append("")
 
@@ -211,6 +211,7 @@ def send_telegram(text):
         resp = requests.post(url, data={
             'chat_id': CHAT_ID,
             'text': chunk,
+            'parse_mode': 'HTML',
             'disable_web_page_preview': 'true',
         }, timeout=30)
         if not resp.json().get('ok'):
