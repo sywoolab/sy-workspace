@@ -1,0 +1,14 @@
+{
+  "companies": [
+    {"name": "제이에스코퍼레이션", "dart_code": "00332927", "stock_code": "194370", "listed": true},
+    {"name": "솔루엠", "dart_code": "01159233", "stock_code": "248070", "listed": true},
+    {"name": "더존비즈온", "dart_code": "00172291", "stock_code": "012510", "listed": true},
+    {"name": "성호전자", "dart_code": "00317210", "stock_code": "043260", "listed": true},
+    {"name": "오스코텍", "dart_code": "00263654", "stock_code": "039200", "listed": true},
+    {"name": "부릉", "dart_code": "01246885", "stock_code": null, "listed": false},
+    {"name": "소울에너지", "dart_code": "01654640", "stock_code": null, "listed": false},
+    {"name": "수양켐텍", "dart_code": "00963684", "stock_code": null, "listed": false},
+    {"name": "에치와이", "dart_code": "00158644", "stock_code": null, "listed": false, "alias": ["HY", "한국야쿠르트", "에이치와이"]},
+    {"name": "제노스코", "dart_code": null, "stock_code": null, "listed": false, "note": "미국법인(오스코텍 자회사), DART 없음, 뉴스만 모니터링", "alias": ["Genosco", "제노스코"]}
+  ]
+}
