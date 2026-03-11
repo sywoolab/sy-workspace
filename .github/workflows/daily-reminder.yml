@@ -1,0 +1,37 @@
+name: Daily Task Reminder
+
+on:
+  schedule:
+    - cron: '0 22 * * *'  # UTC 22:00 = KST 07:00
+  workflow_dispatch:  # 수동 실행도 가능
+
+jobs:
+  send-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send Telegram message
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          # tasks.md에서 진행 중 항목만 추출
+          TASKS=$(awk '/^## 진행 중$/,/^## /' tasks.md | grep '^\- \[' | head -20)
+
+          if [ -z "$TASKS" ]; then
+            TASKS="등록된 할 일이 없습니다."
+          fi
+
+          DATE=$(TZ=Asia/Seoul date '+%Y-%m-%d (%a)')
+
+          MESSAGE="📋 *${DATE} 오늘의 할 일*
+
+${TASKS}
+
+_좋은 하루 되세요!_"
+
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d chat_id="${CHAT_ID}" \
+            -d parse_mode="Markdown" \
+            -d text="${MESSAGE}"
