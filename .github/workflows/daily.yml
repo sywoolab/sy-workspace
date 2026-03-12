@@ -22,7 +22,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          TASKS=$(awk '/^## 진행 중$/{flag=1; next} /^## /{flag=0} flag' tasks.md | grep '^\- \[' | head -20)
+          TASKS=$(awk '/^## 진행 중$/{flag=1; next} /^## /{flag=0} flag' tasks.md | grep '^\- \[' | sed 's/^- \[.\] //' | awk '{printf "%d. %s\n", NR, $0}' | head -20)
           if [ -z "$TASKS" ]; then
             TASKS="등록된 할 일이 없습니다."
           fi
