@@ -1,0 +1,38 @@
+name: precedent-daily
+
+on:
+  schedule:
+    - cron: '0 10 * * 1-5'  # UTC 10시 = KST 19시 (장 마감 후)
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Daily update
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python -m scripts.dart_precedent.main daily
+
+      - name: Export to CSV
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python -m scripts.dart_precedent.main export
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/precedent.db data/precedent_export/
+          if ! git diff --staged --quiet; then
+            git commit -m "daily precedent update"
+            git push
+          fi

@@ -1,0 +1,56 @@
+name: precedent-init
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_date:
+        description: '시작일 (YYYYMMDD)'
+        required: true
+        default: '20200101'
+      command:
+        description: '명령어 (backfill / enrich / stats / export)'
+        required: true
+        default: 'backfill'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Run precedent DB command
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          if [ "${{ inputs.command }}" = "backfill" ]; then
+            python -m scripts.dart_precedent.main backfill --from ${{ inputs.from_date }}
+          else
+            python -m scripts.dart_precedent.main ${{ inputs.command }}
+          fi
+
+      - name: Export to CSV
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python -m scripts.dart_precedent.main export
+
+      - name: Show stats
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python -m scripts.dart_precedent.main stats
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/precedent.db data/precedent_export/
+          if ! git diff --staged --quiet; then
+            git commit -m "update precedent DB (${{ inputs.command }})"
+            git push
+          fi
