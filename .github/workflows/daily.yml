@@ -2,11 +2,13 @@ name: daily-reminder
 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '0 22 * * *'   # UTC 22시 = KST 07시 (아침)
+    - cron: '0 9 * * *'    # UTC 09시 = KST 18시 (저녁)
   workflow_dispatch:
 
 jobs:
-  send:
+  morning:
+    if: github.event.schedule != '0 9 * * *'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,10 +29,16 @@ jobs:
             TASKS="등록된 할 일이 없습니다."
           fi
           DATE=$(TZ=Asia/Seoul date '+%Y-%m-%d (%a)')
-          TEXT=$(printf "📋 %s 오늘의 할 일\n\n%s\n\n좋은 하루 되세요!" "$DATE" "$TASKS")
+          TEXT=$(printf "📋 %s 오늘의 할 일\n\n%s" "$DATE" "$TASKS")
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
             -d chat_id="${CHAT_ID}" \
             -d text="${TEXT}"
+
+      - name: Send workout alert
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/workout_alert.py morning
 
       - name: Send triathlon alert
         env:
@@ -43,4 +51,25 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data/triathlon_events.json
-          git diff --staged --quiet || git commit -m "update triathlon events" && git push || true
+          if ! git diff --staged --quiet; then
+            git commit -m "update triathlon events"
+            git push
+          fi
+
+  evening:
+    if: github.event.schedule == '0 9 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Send workout reminder
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/workout_alert.py evening
