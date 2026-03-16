@@ -1,7 +1,7 @@
 """
 오늘의 운동 스케줄 알림
 - WORKOUT_MASTER.md의 8주 플랜 기반
-- 아침: 주간 전체 + 오늘 운동 + 주간 목표
+- 아침: 향후 2주 스케줄 + 오늘 운동 + 주간 목표
 - 저녁: 운동 리마인드
 """
 
@@ -18,28 +18,46 @@ DOW = NOW.weekday()  # 0=월 ~ 6=일
 BOT_TOKEN = os.environ['BOT_TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
 
-# 대회일
+# 대회일 & 훈련 시작일
 RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
+TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)  # 복귀일 (월요일)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 
-# Phase 판별
+# 주차 계산 (훈련 시작일 기준, 월요일 시작)
+def get_week_number(dt):
+    delta = (dt.date() - TRAIN_START.date()).days
+    return delta // 7
+
+CURRENT_WEEK = get_week_number(NOW)
+
+# Phase 판별 (날짜 기반)
 PHASE1_END = datetime(2026, 4, 6, tzinfo=KST).date()
 PHASE2_END = datetime(2026, 4, 27, tzinfo=KST).date()
-PHASE3_END = datetime(2026, 5, 8, tzinfo=KST).date()
+PHASE3_END = datetime(2026, 5, 9, tzinfo=KST).date()
 
-today_date = NOW.date()
-if today_date <= PHASE1_END:
-    phase = 1
-    phase_name = "Phase 1: 베이스"
-elif today_date <= PHASE2_END:
-    phase = 2
-    phase_name = "Phase 2: 빌드"
-elif today_date <= PHASE3_END:
-    phase = 3
-    phase_name = "Phase 3: 테이퍼"
-else:
-    phase = 0
-    phase_name = "대회 완료"
+def get_phase(dt):
+    d = dt.date() if hasattr(dt, 'date') else dt
+    if d <= PHASE1_END:
+        return 1, "Phase 1: 베이스"
+    elif d <= PHASE2_END:
+        return 2, "Phase 2: 빌드"
+    elif d <= PHASE3_END:
+        return 3, "Phase 3: 테이퍼"
+    return 0, "대회 완료"
+
+phase, phase_name = get_phase(NOW)
+
+# 주차별 이름
+WEEK_NAMES = {
+    0: "Week 0: 복귀 주",
+    1: "Week 1: 베이스 ①",
+    2: "Week 2: 베이스 ②",
+    3: "Week 3: 빌드 ①",
+    4: "Week 4: 빌드 ②",
+    5: "Week 5: 빌드 ③",
+    6: "Week 6: 테이퍼",
+    7: "Week 7: 대회 주",
+}
 
 # 요일별 운동 스케줄
 SCHEDULE = {
@@ -72,22 +90,33 @@ SCHEDULE = {
     },
 }
 
+# 대회 주 (Week 7) 특수 스케줄
+WEEK7_SCHEDULE = {
+    0: ("수영 가볍게", "1km"),
+    1: ("러닝", "3km 조깅"),
+    2: ("자전거 가볍게", "30분"),
+    3: ("완전 휴식", ""),
+    4: ("대회", "수영 1.5 + 자전거 40 + 러닝 10km"),
+    5: ("완전 휴식", ""),
+    6: ("완전 휴식", ""),
+}
+
 # Phase별 주간 목표 & 최소 기준
 PHASE_GOALS = {
     1: {
         "goal": "러닝 빈도 확보 + 자전거 감각 회복",
-        "weekly_volume": "수영 4회 / 러닝 3회(20~23km) / 자전거 1회(60분)",
-        "minimum": "러닝 최소 3회, 페이스 무관",
+        "volume": "수영 4 / 러닝 3(20~23km) / 자전거 1(60분)",
+        "min": "러닝 최소 3회, 페이스 무관",
     },
     2: {
-        "goal": "러닝 페이스 5:10 → 5:00 끌어올리기 + 브릭 적응",
-        "weekly_volume": "수영 3~4회 / 러닝 3회(21~25km) / 자전거 2회(150분)",
-        "minimum": "러닝 최소 3회 + 일요일 브릭 필수",
+        "goal": "페이스 5:10→5:00 + 브릭 적응",
+        "volume": "수영 3~4 / 러닝 3(21~25km) / 자전거 2(150분)",
+        "min": "러닝 최소 3회 + 일요일 브릭 필수",
     },
     3: {
         "goal": "볼륨 줄이고 컨디션 피킹",
-        "weekly_volume": "수영 2~3회 / 러닝 2회(10km) / 자전거 1회(30분)",
-        "minimum": "과훈련 금지, 감각 유지만",
+        "volume": "수영 2~3 / 러닝 2(10km) / 자전거 1(30분)",
+        "min": "과훈련 금지, 감각 유지만",
     },
 }
 
@@ -96,6 +125,7 @@ DOW_EMOJI = {
     '미니브릭': '🔥',
     '풀 브릭': '🔥',
     '브릭': '🔥',
+    '대회': '🏁',
     '오픈워터': '🌊',
     '러닝': '🏃',
     '자전거': '🚴',
@@ -111,54 +141,82 @@ def get_emoji(workout):
     return '▪️'
 
 
-def get_today_workout():
-    if phase == 0 or phase not in SCHEDULE:
-        return None, None
-    return SCHEDULE[phase].get(DOW, ("휴식", ""))
+def get_schedule_for_date(dt):
+    """특정 날짜의 운동 스케줄 반환"""
+    wk = get_week_number(dt)
+    if wk >= 7:
+        dow = dt.weekday()
+        return WEEK7_SCHEDULE.get(dow, ("완전 휴식", ""))
+    p, _ = get_phase(dt)
+    if p == 0 or p not in SCHEDULE:
+        return ("완전 휴식", "")
+    return SCHEDULE[p].get(dt.weekday(), ("휴식", ""))
 
 
-def format_morning():
-    if phase == 0 or phase not in SCHEDULE:
-        return None
-
+def format_week(week_num, is_current_week=False):
+    """한 주 스케줄을 포매팅"""
     lines = []
-    # 헤더
-    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT}")
-    lines.append(f"📍 {phase_name}")
-    lines.append("")
+    week_name = WEEK_NAMES.get(week_num, f"Week {week_num}")
 
-    # 주간 목표
-    goal_info = PHASE_GOALS.get(phase, {})
-    lines.append(f"[이번 주 목표]")
-    lines.append(f"  {goal_info.get('goal', '')}")
-    lines.append(f"  볼륨: {goal_info.get('weekly_volume', '')}")
-    lines.append("")
+    # 해당 주의 월요일 날짜 계산
+    mon = TRAIN_START + timedelta(days=week_num * 7)
+    sun = mon + timedelta(days=6)
+    p, p_name = get_phase(mon)
+    goal_info = PHASE_GOALS.get(p, {})
 
-    # 주간 스케줄 (오늘 표시)
-    lines.append("[주간 스케줄]")
-    week = SCHEDULE[phase]
+    header = f"{'▶ ' if is_current_week else ''}{week_name}"
+    lines.append(header)
+    lines.append(f"  {mon.strftime('%m/%d')}~{sun.strftime('%m/%d')} | {p_name}")
+    if goal_info:
+        lines.append(f"  목표: {goal_info.get('goal', '')}")
+        lines.append(f"  최소: {goal_info.get('min', '')}")
+
     for d in range(7):
-        workout, detail = week.get(d, ("휴식", ""))
+        dt = mon + timedelta(days=d)
+        if dt.date() > RACE_DAY.date():
+            break
+        workout, detail = get_schedule_for_date(dt)
         emoji = get_emoji(workout)
-        marker = " 👈 TODAY" if d == DOW else ""
-        day_str = f"  {DOW_NAMES[d]} {emoji} {workout}"
+        date_str = dt.strftime('%m/%d')
+        is_today = (dt.date() == NOW.date())
+        marker = " 👈" if is_today else ""
+        day_str = f"  {DOW_NAMES[d]}({date_str}) {emoji} {workout}"
         if detail:
             day_str += f" ({detail})"
         day_str += marker
         lines.append(day_str)
 
+    return "\n".join(lines)
+
+
+def get_today_workout():
+    return get_schedule_for_date(NOW)
+
+
+def format_morning():
+    if phase == 0:
+        return None
+
+    lines = []
+    # 헤더
+    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT}")
     lines.append("")
 
-    # 오늘의 운동 상세
+    # 이번 주
+    lines.append(format_week(CURRENT_WEEK, is_current_week=True))
+    lines.append("")
+
+    # 다음 주 (대회 후가 아니면)
+    next_week = CURRENT_WEEK + 1
+    if next_week <= 7:
+        lines.append(format_week(next_week, is_current_week=False))
+        lines.append("")
+
+    # 오늘의 운동
     workout, detail = get_today_workout()
-    lines.append(f"[오늘 할 운동]")
-    lines.append(f"  {get_emoji(workout)} {workout}")
+    lines.append(f"[오늘] {get_emoji(workout)} {workout}")
     if detail:
         lines.append(f"  → {detail}")
-
-    # 최소 기준
-    lines.append("")
-    lines.append(f"⚠️ 최소 기준: {goal_info.get('minimum', '')}")
 
     return "\n".join(lines)
 
