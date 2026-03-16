@@ -90,6 +90,17 @@ SCHEDULE = {
     },
 }
 
+# Week 0: 복귀 주 (3/16 월요일에 러닝 → 연속러닝 금지 적용)
+WEEK0_SCHEDULE = {
+    0: ("러닝 ✅", "7.57km @5:33 (완료)"),
+    1: ("수영", "연속러닝 금지 → 수영 대체"),
+    2: ("수영 수업", ""),
+    3: ("러닝 + 코어", "6~7km + 코어 15분"),
+    4: ("수영 수업 (회식 후 선택)", ""),
+    5: ("미니브릭 → 수영", "자전거 60분 → 러닝 2~3km → 개인교습"),
+    6: ("러닝 Long Run", "8~10km"),
+}
+
 # 대회 주 (Week 7) 특수 스케줄
 WEEK7_SCHEDULE = {
     0: ("수영 가볍게", "1km"),
@@ -144,13 +155,15 @@ def get_emoji(workout):
 def get_schedule_for_date(dt):
     """특정 날짜의 운동 스케줄 반환"""
     wk = get_week_number(dt)
+    dow = dt.weekday()
+    if wk == 0:
+        return WEEK0_SCHEDULE.get(dow, ("휴식", ""))
     if wk >= 7:
-        dow = dt.weekday()
         return WEEK7_SCHEDULE.get(dow, ("완전 휴식", ""))
     p, _ = get_phase(dt)
     if p == 0 or p not in SCHEDULE:
         return ("완전 휴식", "")
-    return SCHEDULE[p].get(dt.weekday(), ("휴식", ""))
+    return SCHEDULE[p].get(dow, ("휴식", ""))
 
 
 def format_week(week_num, is_current_week=False):
