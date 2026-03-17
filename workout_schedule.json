@@ -5,19 +5,37 @@
   "overrides": {},
   "last_analysis": {
     "date": "2026-03-17",
-    "estimated_finish": "2:51",
+    "estimated_finish": "2:53",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 1,
     "phase_name": "Phase 1: 베이스",
     "vdot": 37,
     "weekly_summary": {
-      "swim": {"count": 1, "target": 4},
-      "run": {"count": 1, "target": 3, "total_km": 7.6},
-      "bike": {"count": 0, "target": 1}
+      "swim": {
+        "count": 1,
+        "target": 4
+      },
+      "run": {
+        "count": 1,
+        "target": 3,
+        "total_km": 7.6
+      },
+      "bike": {
+        "count": 0,
+        "target": 1
+      }
     },
-    "intensity_split": {"easy_pct": 78, "hard_pct": 22},
-    "training_load": {"current": 95, "target": 300},
-    "adjustments": ["💡 Easy 런 5:33/km → 더 느리게 (6:16~6:57)"]
+    "intensity_split": {
+      "easy_pct": 78,
+      "hard_pct": 22
+    },
+    "training_load": {
+      "current": 95,
+      "target": 300
+    },
+    "adjustments": [
+      "💡 Easy 런 5:33/km → 더 느리게 (6:16~6:57)"
+    ]
   }
 }
