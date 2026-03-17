@@ -511,9 +511,191 @@ def check_plan_adherence(workout_log, schedule_data):
 
 
 # ============================================================
+# 운동 피드백 생성
+# ============================================================
+def generate_workout_feedback(parsed, schedule_data):
+    """개별 운동에 대한 피드백 (의미 판정 + 구체적 코멘트)"""
+    wtype = parsed['type']
+    vdot = schedule_data.get('current_vdot', 37)
+    zone = classify_zone(parsed, vdot)
+    feedback = []
+
+    # VDOT 기반 페이스 존 경계
+    vdot_zones = {
+        35: {'easy_lo': 394, 'easy_hi': 437, 'tempo': 347},
+        36: {'easy_lo': 385, 'easy_hi': 427, 'tempo': 339},
+        37: {'easy_lo': 376, 'easy_hi': 417, 'tempo': 331},
+        38: {'easy_lo': 367, 'easy_hi': 407, 'tempo': 323},
+        39: {'easy_lo': 359, 'easy_hi': 398, 'tempo': 316},
+    }
+    z = vdot_zones.get(vdot, vdot_zones[37])
+
+    if wtype == 'run':
+        dist = parsed.get('distance_km', 0)
+        pace = parsed.get('pace_sec', 0)
+        hr = parsed.get('avg_hr', 0)
+
+        # 거리 평가
+        if dist >= 10:
+            feedback.append("✅ 10km+ Long Run — 대회 거리 달성, 자신감 ↑")
+        elif dist >= 7:
+            feedback.append("✅ 7km+ — 충분한 거리, 좋습니다")
+        elif dist >= 5:
+            feedback.append("👍 5km+ — 기본 볼륨 충족")
+        else:
+            feedback.append("⚠️ 5km 미만 — 짧은 런, 다음엔 5km 이상 목표")
+
+        # 페이스 평가
+        if pace >= z['easy_lo']:
+            feedback.append(f"✅ Easy 존 정확히 준수 ({seconds_to_pace(pace)}/km)")
+        elif pace >= z['tempo'] + 10:
+            feedback.append(f"⚠️ Moderate 존 (Dead Zone) — {seconds_to_pace(pace)}/km")
+            feedback.append(f"  → Easy({seconds_to_pace(z['easy_lo'])}~) 또는 Tempo({seconds_to_pace(z['tempo'])})로 명확히")
+        elif pace >= z['tempo'] - 5:
+            feedback.append(f"✅ Tempo 존 — {seconds_to_pace(pace)}/km, 역치 훈련 효과 ○")
+        else:
+            feedback.append(f"🔥 고강도 — {seconds_to_pace(pace)}/km, 회복일 필요")
+
+        # 심박 vs 페이스 매칭
+        if hr and pace >= z['easy_lo'] and hr > 155:
+            feedback.append(f"⚠️ Easy 페이스인데 HR {hr} 높음 — 피로 누적 or 컨디션 체크")
+
+    elif wtype == 'swim':
+        dist = parsed.get('distance_m', 0)
+        pace_100m = parsed.get('pace_sec_100m', 0)
+
+        if dist >= 1500:
+            feedback.append("✅ 1.5km+ — 대회 거리 달성!")
+        elif dist >= 1000:
+            feedback.append("👍 1km+ — 좋은 볼륨")
+        elif dist >= 500:
+            feedback.append("👌 기본 유지 수준")
+        else:
+            feedback.append("⚠️ 500m 미만 — 볼륨 부족, 1km 이상 권장")
+
+        # Swolf
+        swolf = parsed.get('swolf')
+        if swolf:
+            if swolf <= 35:
+                feedback.append(f"✅ Swolf {swolf} — 효율 우수")
+            elif swolf <= 40:
+                feedback.append(f"👍 Swolf {swolf} — 양호")
+            else:
+                feedback.append(f"⚠️ Swolf {swolf} — 스트로크 효율 개선 필요")
+
+    elif wtype == 'bike':
+        dur_min = parsed.get('duration_sec', 0) / 60
+        speed = parsed.get('avg_speed_kmh', 0)
+
+        if dur_min >= 75:
+            feedback.append("✅ 75분+ — 대회 수준 볼륨")
+        elif dur_min >= 60:
+            feedback.append("👍 60분+ — 기본 볼륨 충족")
+        elif dur_min >= 30:
+            feedback.append("👌 감각 유지 수준")
+        else:
+            feedback.append("⚠️ 30분 미만 — 다음엔 더 길게")
+
+        if speed and speed >= 30:
+            feedback.append(f"✅ 평속 {speed}km/h — 대회 목표 속도 이상")
+
+    # 훈련 효과 평가
+    te = parsed.get('aerobic_te', 0) or 0
+    if te >= 3.0:
+        feedback.append(f"🔥 유산소 TE {round(te, 1)} — 체력 향상에 크게 기여")
+    elif te >= 2.0:
+        feedback.append(f"👍 유산소 TE {round(te, 1)} — 유지/소폭 향상")
+    elif te > 0:
+        feedback.append(f"💡 유산소 TE {round(te, 1)} — 가벼운 자극 (회복 운동)")
+
+    return feedback
+
+
+# ============================================================
+# 금주 스케줄 포매팅
+# ============================================================
+def format_week_schedule(workout_log):
+    """이번 주 스케줄 + 완료 현황"""
+    import sys as _sys
+    _scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    if _scripts_dir not in _sys.path:
+        _sys.path.insert(0, _scripts_dir)
+    from workout_alert import get_schedule_for_date, get_emoji, DOW_NAMES, WEEK_NAMES, PHASE_GOALS, get_phase
+
+    today = NOW.date()
+    monday = today - timedelta(days=today.weekday())
+    week_num = (monday - TRAIN_START.date()).days // 7
+
+    lines = []
+    week_name = WEEK_NAMES.get(week_num, f"Week {week_num}")
+    phase_num, phase_name = get_phase(NOW)
+    lines.append(f"📅 {week_name} ({phase_name})")
+
+    # 주간 목표
+    goals = PHASE_GOALS.get(phase_num, {})
+    if goals.get('min'):
+        lines.append(f"  최소: {goals['min']}")
+
+    # 주간 통계
+    run_count = 0
+    swim_count = 0
+    bike_count = 0
+    run_km = 0.0
+
+    for d in range(7):
+        dt = monday + timedelta(days=d)
+        date_str = dt.strftime('%Y-%m-%d')
+        dow_name = DOW_NAMES[dt.weekday()]
+        date_disp = dt.strftime('%m/%d')
+
+        workout, detail = get_schedule_for_date(datetime(dt.year, dt.month, dt.day, tzinfo=KST))
+        emoji = get_emoji(workout)
+
+        entry = workout_log.get(date_str)
+        is_today = (dt == today)
+
+        if entry and entry.get('done'):
+            status = "✅"
+            actual = entry.get('actual', '')
+            wtype = entry.get('metrics', {}).get('type', '')
+            if wtype == 'run':
+                run_count += 1
+                run_km += entry.get('metrics', {}).get('distance_km', 0)
+            elif wtype == 'swim':
+                swim_count += 1
+            elif wtype == 'bike':
+                bike_count += 1
+            line = f"  {dow_name}({date_disp}) {emoji} {actual} {status}"
+        elif dt < today:
+            if "휴식" in workout:
+                status = "😴"
+            else:
+                status = "❌"
+            line = f"  {dow_name}({date_disp}) {emoji} {workout} {status}"
+        elif is_today:
+            line = f"  {dow_name}({date_disp}) {emoji} {workout} 👈"
+        else:
+            line = f"  {dow_name}({date_disp}) {emoji} {workout}"
+
+        lines.append(line)
+
+    # 주간 진척 요약
+    targets = {1: (4, 3, 20), 2: (3, 3, 21), 3: (2, 2, 10)}
+    swim_t, run_t, km_t = targets.get(phase_num, (4, 3, 20))
+
+    swim_bar = "●" * swim_count + "○" * max(0, swim_t - swim_count)
+    run_bar = "●" * run_count + "○" * max(0, run_t - run_count)
+
+    lines.append("")
+    lines.append(f"  수영 {swim_bar} {swim_count}/{swim_t} | 러닝 {run_bar} {run_count}/{run_t} ({run_km:.0f}km/{km_t}km) | 자전거 {bike_count}회")
+
+    return "\n".join(lines)
+
+
+# ============================================================
 # 텔레그램 메시지 포매팅
 # ============================================================
-def format_workout_message(parsed_activities, health, plan_adjustments, schedule_data):
+def format_workout_message(parsed_activities, health, plan_adjustments, schedule_data, workout_log):
     """새 운동 감지 시 텔레그램 메시지"""
     lines = []
     lines.append("🏋️ 가민 운동 자동 감지")
@@ -535,8 +717,6 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
                 lines.append(f"  HR {p['avg_hr']}/{p['max_hr']}")
             if p.get('cadence'):
                 lines.append(f"  케이던스 {p['cadence']}spm | 보폭 {p.get('stride_m', '?')}m")
-            if p.get('vo2max'):
-                lines.append(f"  VO2 Max: {p['vo2max']}")
 
         elif wtype == 'swim':
             dur_str = seconds_to_hhmm(p['duration_sec'])
@@ -565,42 +745,48 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
             te_parts.append(f"무산소 {round(p['anaerobic_te'], 1)}")
         if te_parts:
             lines.append(f"  TE: {' / '.join(te_parts)}")
-        if p.get('training_load'):
-            lines.append(f"  운동 부하: {p['training_load']}")
 
-        zone = classify_zone(p, schedule_data.get('current_vdot', 37))
-        zone_kr = {'easy': 'Easy', 'moderate': 'Moderate', 'tempo': 'Tempo', 'interval': 'Interval'}
-        lines.append(f"  훈련 존: {zone_kr.get(zone, zone)}")
+        # 운동 피드백 (핵심 추가)
+        feedback = generate_workout_feedback(p, schedule_data)
+        if feedback:
+            lines.append("")
+            lines.append("  💬 피드백")
+            for fb in feedback:
+                lines.append(f"    {fb}")
         lines.append("")
 
-    # 컨디션 섹션
+    # 금주 스케줄 + 진척 현황
+    try:
+        week_schedule = format_week_schedule(workout_log)
+        lines.append(week_schedule)
+        lines.append("")
+    except Exception as e:
+        print(f"  [WARN] 주간 스케줄 포매팅 실패: {e}")
+
+    # 컨디션 섹션 (간결하게)
     lines.append("📊 컨디션")
+    condition_parts = []
     if health.get('body_battery'):
         bb = health['body_battery']
-        lines.append(f"  Body Battery: {bb.get('min', '?')} ~ {bb.get('max', '?')}")
+        icon = "🟢" if (bb.get('max') or 0) >= 60 else ("🟡" if (bb.get('max') or 0) >= 40 else "🔴")
+        condition_parts.append(f"BB {bb.get('min', '?')}~{bb.get('max', '?')} {icon}")
     if health.get('sleep'):
         sl = health['sleep']
-        dur_h = sl['duration_min'] // 60
-        dur_m = sl['duration_min'] % 60
+        h, m = sl['duration_min'] // 60, sl['duration_min'] % 60
         score = sl.get('score', '?')
-        lines.append(f"  수면: {dur_h}h {dur_m}m (점수 {score})")
-        lines.append(f"    깊은 {sl.get('deep_min', 0)}분 | REM {sl.get('rem_min', 0)}분 | 얕은 {sl.get('light_min', 0)}분")
+        icon = "🟢" if (score and score != '?' and score >= 70) else "🟡"
+        condition_parts.append(f"수면 {h}h{m}m({score}) {icon}")
     if health.get('hrv'):
         hrv = health['hrv']
-        lines.append(f"  HRV: 지난밤 {hrv.get('last_night', '?')}ms (주간평균 {hrv.get('weekly_avg', '?')}ms) [{hrv.get('status', '?')}]")
+        status = hrv.get('status', '?')
+        icon = "🟢" if status == 'BALANCED' else "🟡"
+        condition_parts.append(f"HRV {hrv.get('last_night', '?')}ms[{status}] {icon}")
     if health.get('training_readiness'):
         tr = health['training_readiness']
-        lines.append(f"  Training Readiness: {tr.get('score', '?')} ({tr.get('level', '?')})")
-    if health.get('training_status'):
-        ts = health['training_status']
-        lines.append(f"  Training Status: {ts.get('status', '?')}")
-        if ts.get('vo2max_run'):
-            lines.append(f"  VO2 Max (러닝): {ts['vo2max_run']}")
-    if health.get('resting_hr'):
-        lines.append(f"  안정시 심박: {health['resting_hr']}bpm")
-    if health.get('stress'):
-        st = health['stress']
-        lines.append(f"  스트레스: 평균 {st.get('avg', '?')}")
+        s = tr.get('score')
+        icon = "🟢" if (s and s >= 60) else ("🟡" if (s and s >= 40) else "🔴")
+        condition_parts.append(f"Readiness {s}({tr.get('level', '?')}) {icon}")
+    lines.append(f"  {' | '.join(condition_parts)}")
     lines.append("")
 
     # 계획 조정
@@ -706,7 +892,7 @@ def sync():
         plan_adjustments = check_plan_adherence(workout_log, schedule_data)
 
         # 8. 텔레그램 알림
-        msg = format_workout_message(new_activities, health, plan_adjustments, schedule_data)
+        msg = format_workout_message(new_activities, health, plan_adjustments, schedule_data, workout_log)
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 
