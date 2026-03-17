@@ -2,21 +2,25 @@
   "overrides": {},
   "last_analysis": {
     "date": "2026-03-17",
-    "estimated_finish": "2:58",
+    "estimated_finish": "2:52",
     "status": "yellow",
-    "status_text": "주의 — 러닝 복귀 초기, 데이터 부족",
+    "status_text": "주의 — 개선 필요",
     "phase": 1,
     "phase_name": "Phase 1: 베이스",
     "weekly_summary": {
-      "swim": {"count": 1, "target": 4},
-      "run": {"count": 1, "target": 3, "total_km": 7.57},
-      "bike": {"count": 0, "target": 1}
-    },
-    "benchmarks": {
-      "swim_pace": {"current": "1:57", "target": "1:55", "gap": "+2s"},
-      "run_10k": {"current": null, "target": "완주 (6:00 OK)", "gap": "데이터 부족"},
-      "run_frequency": {"current": 1, "target": 3, "gap": "-2회"},
-      "bike": {"current": null, "target": "60분 완주", "gap": "데이터 없음"}
+      "swim": {
+        "count": 1,
+        "target": 4
+      },
+      "run": {
+        "count": 1,
+        "target": 3,
+        "total_km": 7.6
+      },
+      "bike": {
+        "count": 0,
+        "target": 1
+      }
     },
     "adjustments": []
   }
