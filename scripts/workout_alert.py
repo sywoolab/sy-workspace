@@ -359,6 +359,62 @@ def load_last_analysis():
         return {}
 
 
+HEALTH_FILE = os.path.join(BASE_DIR, 'data', 'garmin_health.json')
+
+
+def load_condition():
+    """garmin_health.json에서 컨디션 요약 생성"""
+    try:
+        with open(HEALTH_FILE, 'r', encoding='utf-8') as f:
+            health_data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+    # 오늘 또는 가장 최근 데이터
+    today_str = NOW.strftime('%Y-%m-%d')
+    health = health_data.get(today_str)
+    if not health:
+        dates = sorted(health_data.keys(), reverse=True)
+        if dates:
+            health = health_data[dates[0]]
+    if not health:
+        return None
+
+    parts = ["📊 컨디션"]
+
+    bb = health.get('body_battery', {})
+    if bb.get('max') is not None:
+        icon = "🟢" if bb['max'] >= 60 else ("🟡" if bb['max'] >= 40 else "🔴")
+        parts.append(f"  BB {bb.get('min', '?')}~{bb['max']} {icon}")
+
+    sleep = health.get('sleep', {})
+    if sleep.get('duration_min'):
+        h, m = sleep['duration_min'] // 60, sleep['duration_min'] % 60
+        score = sleep.get('score', '?')
+        icon = "🟢" if (score and score != '?' and score >= 70) else "🟡"
+        parts.append(f"  수면 {h}h{m}m (점수 {score}) {icon}")
+
+    hrv = health.get('hrv', {})
+    if hrv.get('last_night'):
+        status = hrv.get('status', '?')
+        icon = "🟢" if status == 'BALANCED' else ("🟡" if status in ('UNBALANCED', 'LOW') else "⚪")
+        parts.append(f"  HRV {hrv['last_night']}ms [{status}] {icon}")
+
+    tr = health.get('training_readiness', {})
+    if tr.get('score') is not None:
+        s = tr['score']
+        icon = "🟢" if s >= 60 else ("🟡" if s >= 40 else "🔴")
+        parts.append(f"  Readiness {s} ({tr.get('level', '?')}) {icon}")
+
+    rhr = health.get('resting_hr')
+    if rhr:
+        parts.append(f"  안정시HR {rhr}bpm")
+
+    if len(parts) <= 1:
+        return None
+    return "\n".join(parts)
+
+
 def format_morning():
     if phase == 0:
         return None
@@ -407,6 +463,12 @@ def format_morning():
                 lines.append(f"  📊 Tempo: {tempo_p}/km | Easy: {easy_p}/km")
             else:
                 lines.append(f"  📊 Easy: {easy_p}/km (대화 가능 속도)")
+
+    # 컨디션 요약 (garmin_health.json)
+    condition = load_condition()
+    if condition:
+        lines.append("")
+        lines.append(condition)
 
     # 피로 관리 팁 (월요일 = 능동적 휴식 대체 가능일)
     if DOW == 0:  # 월요일

@@ -504,6 +504,118 @@ def check_adjustments(log, week_stats, phase, vdot):
             "message": f"🔴 주간 부하 {week_stats['total_load']} > 목표 {target_load}의 120% — 다음 일 Easy 권장",
         })
 
+    # 생체 데이터 기반 컨디션 점검
+    health_adj = check_health_adjustments()
+    adjustments.extend(health_adj)
+
+    return adjustments
+
+
+def check_health_adjustments():
+    """garmin_health.json 기반 컨디션 점검 → 스케줄 조정 제안"""
+    health_file = os.path.join(BASE_DIR, 'data', 'garmin_health.json')
+    health_data = load_json(health_file)
+    if not health_data:
+        return []
+
+    adjustments = []
+    today_health = health_data.get(TODAY, {})
+    if not today_health:
+        # 가장 최근 데이터
+        dates = sorted(health_data.keys(), reverse=True)
+        if dates:
+            today_health = health_data[dates[0]]
+
+    if not today_health:
+        return []
+
+    # 1. Body Battery 점검: 아침 최대값이 낮으면 회복 부족
+    bb = today_health.get('body_battery', {})
+    bb_max = bb.get('max')
+    if bb_max is not None and bb_max < 40:
+        adjustments.append({
+            "type": "low_body_battery",
+            "severity": "high",
+            "message": f"🔴 Body Battery 최대 {bb_max} — 회복 부족, 오늘 Easy 또는 휴식 권장",
+        })
+    elif bb_max is not None and bb_max < 60:
+        adjustments.append({
+            "type": "moderate_body_battery",
+            "severity": "medium",
+            "message": f"🟡 Body Battery 최대 {bb_max} — 고강도 운동 자제, Easy 권장",
+        })
+
+    # 2. 수면 점검
+    sleep = today_health.get('sleep', {})
+    sleep_score = sleep.get('score')
+    sleep_min = sleep.get('duration_min', 0)
+    if sleep_score is not None and sleep_score < 50:
+        adjustments.append({
+            "type": "poor_sleep",
+            "severity": "high",
+            "message": f"🔴 수면 점수 {sleep_score} — 수면 부족, 강도 낮추기 권장",
+        })
+    elif sleep_min > 0 and sleep_min < 360:  # 6시간 미만
+        adjustments.append({
+            "type": "short_sleep",
+            "severity": "medium",
+            "message": f"🟡 수면 {sleep_min // 60}h {sleep_min % 60}m — 6시간 미만, 컨디션 주의",
+        })
+
+    # 3. HRV 점검
+    hrv = today_health.get('hrv', {})
+    hrv_status = hrv.get('status', '')
+    hrv_last = hrv.get('last_night')
+    hrv_avg = hrv.get('weekly_avg')
+    if hrv_status == 'LOW' or hrv_status == 'POOR':
+        adjustments.append({
+            "type": "low_hrv",
+            "severity": "high",
+            "message": f"🔴 HRV 상태 {hrv_status} (지난밤 {hrv_last}ms / 주간 {hrv_avg}ms) — 과훈련 위험, 볼륨 축소",
+        })
+    elif hrv_last and hrv_avg and hrv_last < hrv_avg * 0.75:
+        adjustments.append({
+            "type": "hrv_drop",
+            "severity": "medium",
+            "message": f"🟡 HRV 급감 {hrv_last}ms (주간평균 {hrv_avg}ms) — 피로 누적 주의",
+        })
+
+    # 4. Training Readiness 점검
+    tr = today_health.get('training_readiness', {})
+    tr_score = tr.get('score')
+    tr_level = tr.get('level', '')
+    if tr_score is not None and tr_score < 30:
+        adjustments.append({
+            "type": "low_readiness",
+            "severity": "high",
+            "message": f"🔴 Training Readiness {tr_score} ({tr_level}) — 몸이 준비 안 됨, 휴식 권장",
+        })
+    elif tr_score is not None and tr_score < 50:
+        adjustments.append({
+            "type": "moderate_readiness",
+            "severity": "medium",
+            "message": f"🟡 Training Readiness {tr_score} ({tr_level}) — Easy 강도까지만 권장",
+        })
+
+    # 5. 안정시 심박 점검 (평소 대비 높으면 피로/질병 신호)
+    rhr = today_health.get('resting_hr')
+    if rhr and rhr > 55:  # 사용자 평소 안정시 45bpm 기준
+        adjustments.append({
+            "type": "elevated_rhr",
+            "severity": "medium",
+            "message": f"🟡 안정시 심박 {rhr}bpm (평소 ~45) — 피로/스트레스 주의",
+        })
+
+    # 6. 스트레스 점검
+    stress = today_health.get('stress', {})
+    stress_avg = stress.get('avg')
+    if stress_avg and stress_avg > 50:
+        adjustments.append({
+            "type": "high_stress",
+            "severity": "medium",
+            "message": f"🟡 스트레스 평균 {stress_avg} — 정신적 피로 주의, 운동으로 해소 or 휴식",
+        })
+
     return adjustments
 
 
