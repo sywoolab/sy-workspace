@@ -22,6 +22,7 @@ CHAT_ID = os.environ['CHAT_ID']
 
 BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
+SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
 # 대회일 & 훈련 시작일
 RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
@@ -177,6 +178,19 @@ def load_workout_log():
 WORKOUT_LOG = load_workout_log()
 
 
+def load_schedule_overrides():
+    """workout_schedule.json에서 스케줄 오버라이드 로드"""
+    try:
+        with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data.get('overrides', {})
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+SCHEDULE_OVERRIDES = load_schedule_overrides()
+
+
 def get_log_for_date(date_str):
     """특정 날짜의 운동 로그 반환"""
     return WORKOUT_LOG.get(date_str, None)
@@ -209,7 +223,19 @@ def get_emoji(workout):
 
 
 def get_schedule_for_date(dt):
-    """특정 날짜의 운동 스케줄 반환"""
+    """특정 날짜의 운동 스케줄 반환 (오버라이드 우선)"""
+    date_key = dt.strftime('%Y-%m-%d')
+
+    # 오버라이드가 있으면 우선 적용
+    override = SCHEDULE_OVERRIDES.get(date_key)
+    if override:
+        workout = override.get('workout', '휴식')
+        detail = override.get('detail', '')
+        reason = override.get('reason', '')
+        if reason:
+            detail = f"{detail} [{reason}]" if detail else f"[{reason}]"
+        return (workout, detail)
+
     wk = get_week_number(dt)
     dow = dt.weekday()
     if wk == 0:
@@ -323,13 +349,26 @@ def get_today_workout():
     return get_schedule_for_date(NOW)
 
 
+def load_last_analysis():
+    """workout_schedule.json에서 마지막 분석 결과 로드"""
+    try:
+        with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data.get('last_analysis', {})
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
 def format_morning():
     if phase == 0:
         return None
 
     lines = []
-    # 헤더
-    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT}")
+    # 헤더 + 예상 완주시간
+    analysis = load_last_analysis()
+    est = analysis.get('estimated_finish', '?')
+    status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
+    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT} | 예상 {est} {status_icon}")
     lines.append("")
 
     # 이번 주

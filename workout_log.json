@@ -3,12 +3,32 @@
     "planned": "러닝",
     "done": true,
     "actual": "러닝 7.57km @5:33",
+    "metrics": {
+      "type": "run",
+      "distance_km": 7.57,
+      "pace_per_km": "5:33",
+      "avg_hr": 130,
+      "max_hr": 148,
+      "cadence": null
+    },
     "note": "복귀런, 옆구리 통증"
   },
   "2026-03-17": {
     "planned": "수영",
     "done": true,
-    "actual": "수영 33:25 (이동 26:55), 페이스 1:57/100m",
+    "actual": "수영 33:25, 페이스 1:57/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1375,
+      "duration_min": 33.4,
+      "moving_min": 26.9,
+      "pace_per_100m": "1:57",
+      "avg_hr": 142,
+      "max_hr": 173,
+      "swolf": 39,
+      "strokes": 556,
+      "avg_spm": 21
+    },
     "note": ""
   }
 }
