@@ -352,6 +352,12 @@ def to_workout_log_entry(parsed, schedule_file_data):
     if parsed.get('training_load'):
         note += f" | 부하 {parsed['training_load']}"
 
+    # 수영 수업(수/금)은 장비 사용으로 자동 마킹
+    date_dt = datetime.strptime(parsed['date'], '%Y-%m-%d')
+    if wtype == 'swim' and date_dt.weekday() in (2, 4):  # 수=2, 금=4
+        metrics['swim_equipment'] = 'fins'  # 오리발 + 각종 기구
+        note = (note + " | 수업(장비)").strip(' | ')
+
     return {
         'planned': '',  # 나중에 스케줄과 매칭
         'done': True,
@@ -572,6 +578,11 @@ def generate_workout_feedback(parsed, schedule_data):
             feedback.append("👌 기본 유지 수준")
         else:
             feedback.append("⚠️ 500m 미만 — 볼륨 부족, 1km 이상 권장")
+
+        # 장비 사용 여부 (수/금 수업)
+        date_dt = datetime.strptime(parsed.get('date', TODAY), '%Y-%m-%d')
+        if date_dt.weekday() in (2, 4):
+            feedback.append("🔧 수업(장비) — 맨몸 대비 페이스/Swolf 보정 적용됨")
 
         # Swolf
         swolf = parsed.get('swolf')
