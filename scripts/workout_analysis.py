@@ -414,11 +414,16 @@ def estimate_finish_time(log):
 
     est_run_brick = standalone_10k_min * (1 + brick_slowdown) * (1 - taper_effect)
 
-    total = est_swim + 2.5 + est_bike + 1.5 + est_run_brick
+    # 트랜지션: 첫 대회 기준 T1 4.5분 + T2 2.5분 = 7분
+    t1 = 4.5
+    t2 = 2.5
+    total = est_swim + t1 + est_bike + t2 + est_run_brick
 
     return {
         "swim": round(est_swim, 1),
+        "t1": t1,
         "bike": round(est_bike, 1),
+        "t2": t2,
         "run_standalone": round(standalone_10k_min, 1),
         "run_brick": round(est_run_brick, 1),
         "brick_slowdown_pct": round(brick_slowdown * 100),
@@ -655,9 +660,9 @@ def format_analysis_message(log):
 
     lines.append(f"🏁 D-{DAYS_LEFT} | 목표 2:50 | 예상 {minutes_to_hhmm(total)} {status_emoji}")
     lines.append(f"  ({status_text})")
-    lines.append(f"  수영 {estimate['swim']:.0f}분 (OW+{estimate['ow_correction']}초) "
-                 f"+ 자전거 {estimate['bike']:.0f}분 "
-                 f"+ 러닝 {estimate['run_brick']:.0f}분 (브릭-{estimate['brick_slowdown_pct']}% 테이퍼+{estimate['taper_effect_pct']}%)")
+    lines.append(f"  수영 {estimate['swim']:.0f} + T1 {estimate['t1']:.0f} "
+                 f"+ 자전거 {estimate['bike']:.0f} + T2 {estimate['t2']:.0f} "
+                 f"+ 러닝 {estimate['run_brick']:.0f}분")
 
     # schedule 업데이트
     total_status = "green" if total <= 170 else ("yellow" if total <= 180 else "red")
