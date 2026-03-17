@@ -964,13 +964,13 @@ def sync():
 
 
 def resend_today():
-    """오늘 기록된 운동을 다시 알림 전송 (테스트/재전송용)"""
+    """오늘 기록된 운동을 다시 알림 전송 (가민 로그인 불필요, 저장된 데이터 사용)"""
     print(f"[{NOW.strftime('%Y-%m-%d %H:%M')}] 오늘 운동 재전송")
 
-    api = login_garmin()
     workout_log = load_json(LOG_FILE)
     schedule_data = load_json(SCHEDULE_FILE)
-    health = fetch_health_data(api, TODAY)
+    health_history = load_json(HEALTH_FILE)
+    health = health_history.get(TODAY, {})
 
     # 오늘 기록에서 parsed activity 재구성
     today_entry = workout_log.get(TODAY)
