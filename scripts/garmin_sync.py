@@ -288,8 +288,52 @@ def classify_zone(parsed, vdot=37):
             return 'interval'
 
 
-def to_workout_log_entry(parsed, schedule_file_data):
+def detect_swim_equipment(parsed, workout_log):
+    """수영 데이터가 최근 맨몸 평균 대비 확연히 좋으면 장비 사용 추정"""
+    pace_100m = parsed.get('pace_sec_100m', 0)
+    swolf = parsed.get('swolf', 0)
+    if not pace_100m:
+        return False
+
+    # 최근 수영 기록에서 맨몸(swim_equipment 없는) 데이터 수집
+    bare_paces = []
+    bare_swolfs = []
+    for entry in sorted(workout_log.values(), key=lambda e: e.get('garmin_id', 0), reverse=True):
+        if not entry.get('done'):
+            continue
+        m = entry.get('metrics', {})
+        if m.get('type') != 'swim':
+            continue
+        if m.get('swim_equipment') and m['swim_equipment'] != 'none':
+            continue  # 이미 장비로 판정된 건 제외
+        p = m.get('pace_per_100m')
+        if p:
+            parts = p.split(':')
+            if len(parts) == 2:
+                bare_paces.append(int(parts[0]) * 60 + int(parts[1]))
+        s = m.get('swolf')
+        if s:
+            bare_swolfs.append(s)
+        if len(bare_paces) >= 5:
+            break
+
+    if len(bare_paces) < 2:
+        return False  # 비교 데이터 부족
+
+    avg_pace = sum(bare_paces) / len(bare_paces)
+    avg_swolf = sum(bare_swolfs) / len(bare_swolfs) if bare_swolfs else 99
+
+    # 페이스가 맨몸 평균보다 10초/100m 이상 빠르거나, Swolf가 5 이상 낮으면 장비 추정
+    pace_diff = avg_pace - pace_100m
+    swolf_diff = avg_swolf - swolf if swolf else 0
+
+    return pace_diff >= 10 or swolf_diff >= 5
+
+
+def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
     """파싱된 활동 → workout_log.json 엔트리 형식"""
+    if workout_log_data is None:
+        workout_log_data = {}
     vdot = schedule_file_data.get('current_vdot', 37)
     zone = classify_zone(parsed, vdot)
     wtype = parsed['type']
@@ -352,11 +396,12 @@ def to_workout_log_entry(parsed, schedule_file_data):
     if parsed.get('training_load'):
         note += f" | 부하 {parsed['training_load']}"
 
-    # 수영 수업(수/금)은 장비 사용으로 자동 마킹
-    date_dt = datetime.strptime(parsed['date'], '%Y-%m-%d')
-    if wtype == 'swim' and date_dt.weekday() in (2, 4):  # 수=2, 금=4
-        metrics['swim_equipment'] = 'fins'  # 오리발 + 각종 기구
-        note = (note + " | 수업(장비)").strip(' | ')
+    # 수영 장비 사용 추정: 페이스/Swolf가 최근 평균 대비 확연히 좋으면 장비 가능성
+    if wtype == 'swim':
+        equipment_guess = detect_swim_equipment(parsed, workout_log_data)
+        if equipment_guess:
+            metrics['swim_equipment'] = 'fins'
+            note = (note + " | 장비 추정").strip(' | ')
 
     return {
         'planned': '',  # 나중에 스케줄과 매칭
@@ -579,11 +624,6 @@ def generate_workout_feedback(parsed, schedule_data):
         else:
             feedback.append("⚠️ 500m 미만 — 볼륨 부족, 1km 이상 권장")
 
-        # 장비 사용 여부 (수/금 수업)
-        date_dt = datetime.strptime(parsed.get('date', TODAY), '%Y-%m-%d')
-        if date_dt.weekday() in (2, 4):
-            feedback.append("🔧 수업(장비) — 맨몸 대비 페이스/Swolf 보정 적용됨")
-
         # Swolf
         swolf = parsed.get('swolf')
         if swolf:
@@ -593,6 +633,16 @@ def generate_workout_feedback(parsed, schedule_data):
                 feedback.append(f"👍 Swolf {swolf} — 양호")
             else:
                 feedback.append(f"⚠️ Swolf {swolf} — 스트로크 효율 개선 필요")
+
+        # 장비 사용 가능성 판정 (평소 대비 페이스/Swolf가 확연히 좋은 경우)
+        # 수업(수/금/토)에서 오리발·패들 등 사용 가능성 있음
+        if pace_100m and pace_100m > 0:
+            # 간이 판정: workout_log에서 최근 맨몸 평균과 비교는 detect_swim_equipment에서 처리
+            # 여기서는 결과만 표시
+            date_dt = datetime.strptime(parsed.get('date', TODAY), '%Y-%m-%d')
+            is_lesson_day = date_dt.weekday() in (2, 4, 5)  # 수/금/토
+            if is_lesson_day and pace_100m < 110:  # 1:50 미만이면 장비 가능성
+                feedback.append(f"💡 수업일 + 빠른 페이스 — 장비 사용 가능성 있음 (맨몸 환산 보정 적용)")
 
     elif wtype == 'bike':
         dur_min = parsed.get('duration_sec', 0) / 60
@@ -871,7 +921,7 @@ def sync():
     if new_activities:
         for parsed in new_activities:
             date_key = parsed['date']
-            entry = to_workout_log_entry(parsed, schedule_data)
+            entry = to_workout_log_entry(parsed, schedule_data, workout_log)
 
             # 같은 날 이미 기록이 있으면 → 기존 것에 추가 (멀티 스포츠)
             if date_key in workout_log:
