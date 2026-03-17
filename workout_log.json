@@ -17,7 +17,7 @@
   "2026-03-17": {
     "planned": "수영",
     "done": true,
-    "actual": "수영 33:25, 페이스 1:57/100m",
+    "actual": "수영 1375m 33분 @1:57/100m",
     "metrics": {
       "type": "swim",
       "distance_m": 1375,
@@ -31,6 +31,27 @@
       "avg_spm": 21
     },
     "training_zone": "moderate",
-    "note": "유산소 3.1 / 무산소 2.1"
+    "note": "유산소 3.1 / 무산소 2.1 | 부하 124",
+    "garmin_id": 22197070483
+  },
+  "2026-03-18": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "수영 950m 39분 @1:43/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 950,
+      "duration_min": 39.4,
+      "moving_min": 16.3,
+      "pace_per_100m": "1:43",
+      "avg_hr": 128,
+      "max_hr": 171,
+      "swolf": 34,
+      "strokes": 313,
+      "avg_spm": null
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.7 / 무산소 2.3 | 부하 105",
+    "garmin_id": 22208690872
   }
 }
