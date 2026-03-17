@@ -1,21 +1,21 @@
 """
 운동 기록 분석 + 텔레그램 전송
-- workout_log.json 기반으로 진척도 분석
-- Phase 벤치마크 대비 갭 분석
-- 스케줄 자동 조정 (workout_schedule.json)
-- 2:50 목표 예상 완주시간 재계산
-- 결과를 텔레그램으로 전송
+- WORKOUT_ALGORITHM.md 기반
+- VDOT 기반 러닝 예측, 80/20 강도 체크, 누적 부하, 브릭 적응
+- Banister Fitness-Fatigue 모델 참조
+- Bosquet 테이퍼 효과 반영
 """
 
 import os
 import json
+import math
 import requests
 from datetime import datetime, timezone, timedelta
 
 KST = timezone(timedelta(hours=9))
 NOW = datetime.now(KST)
 TODAY = NOW.strftime('%Y-%m-%d')
-DOW = NOW.weekday()  # 0=월 ~ 6=일
+DOW = NOW.weekday()
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
@@ -24,24 +24,59 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
-# 대회일 & 훈련 시작일
 RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 
-# 목표 스플릿 (분)
-TARGET_SWIM_MIN = 33.0      # 1.5km OW
-TARGET_T1_MIN = 2.5
-TARGET_BIKE_MIN = 75.0      # 40km
-TARGET_T2_MIN = 1.5
-TARGET_RUN_MIN = 58.0       # 10km
-TARGET_TOTAL_MIN = 170.0    # 2:50
+# ============================================================
+# VDOT Lookup Table (Jack Daniels)
+# pace_sec = seconds per km
+# ============================================================
+VDOT_TABLE = [
+    # (vdot, 10k_sec_per_km, easy_low, easy_high, tempo, interval)
+    (30, 414, 448, 496, 396, 362),  # 6:54, E 7:28-8:16, T 6:36, I 6:02
+    (31, 403, 436, 483, 385, 352),
+    (32, 393, 425, 471, 375, 342),
+    (33, 383, 414, 459, 365, 333),
+    (34, 374, 404, 448, 356, 324),
+    (35, 365, 394, 437, 347, 316),  # 6:05, E 6:34-7:17, T 5:47, I 5:16
+    (36, 356, 385, 427, 339, 308),  # 5:56, E 6:25-7:07, T 5:39, I 5:08
+    (37, 348, 376, 417, 331, 300),  # 5:48, E 6:16-6:57, T 5:31, I 5:00
+    (38, 340, 367, 407, 323, 293),  # 5:40, E 6:07-6:47, T 5:23, I 4:53
+    (39, 333, 359, 398, 316, 286),
+    (40, 326, 351, 389, 309, 280),  # 5:26, E 5:51-6:29, T 5:09, I 4:40
+    (41, 319, 344, 381, 302, 274),
+    (42, 312, 337, 373, 296, 268),
+    (43, 306, 330, 365, 290, 262),
+    (44, 300, 323, 358, 284, 257),
+    (45, 294, 317, 351, 278, 252),  # 4:54, E 5:17-5:51, T 4:38, I 4:12
+]
 
-# OW 보정 (초/100m)
-OW_CORRECTION_SEC = 15
 
-# 브릭 러닝 보정 (초/km)
-BRICK_CORRECTION_SEC = 30
+def pace_to_seconds(pace_str):
+    """'5:33' → 333"""
+    if not pace_str:
+        return None
+    parts = pace_str.split(':')
+    if len(parts) == 2:
+        return int(parts[0]) * 60 + int(parts[1])
+    return None
+
+
+def seconds_to_pace(secs):
+    """333 → '5:33'"""
+    if secs is None:
+        return '?'
+    m = int(secs) // 60
+    s = int(secs) % 60
+    return f"{m}:{s:02d}"
+
+
+def minutes_to_hhmm(mins):
+    """170.5 → '2:50'"""
+    h = int(mins) // 60
+    m = int(mins) % 60
+    return f"{h}:{m:02d}"
 
 
 def load_json(path):
@@ -57,14 +92,99 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def get_week_number(dt):
-    delta = (dt.date() - TRAIN_START.date()).days
-    return delta // 7
+# ============================================================
+# VDOT 추정
+# ============================================================
+def estimate_vdot(pace_sec_per_km, distance_km):
+    """러닝 페이스와 거리로 VDOT 추정 (보수적)"""
+    # VDOT는 올아웃 레이스 기준. 훈련 페이스는 과대평가 → 보수적 보정
+    # 짧은 거리일수록 보정 크게
+    if distance_km < 5:
+        pace_sec_per_km += 20
+    elif distance_km < 8:
+        pace_sec_per_km += 12
+    elif distance_km < 10:
+        pace_sec_per_km += 7
+    # 10km+ = 보정 없음 (레이스에 가까운 거리)
+
+    # 복귀 초기 (데이터 부족)는 추가 보수적 보정
+    # → update_vdot에서 가중평균으로 처리
+
+    best_vdot = 30
+    for vdot, race_pace, *_ in VDOT_TABLE:
+        if pace_sec_per_km <= race_pace:
+            best_vdot = vdot
+    return best_vdot
+
+
+def get_vdot_paces(vdot):
+    """VDOT에 해당하는 각 존별 페이스 반환"""
+    for v, race, easy_lo, easy_hi, tempo, interval in VDOT_TABLE:
+        if v == vdot:
+            return {
+                "race_10k": race,
+                "easy_low": easy_lo,
+                "easy_high": easy_hi,
+                "tempo": tempo,
+                "interval": interval,
+            }
+    # 범위 밖이면 가장 가까운 값
+    return {
+        "race_10k": 365, "easy_low": 394, "easy_high": 437,
+        "tempo": 347, "interval": 316,
+    }
+
+
+def predict_10k_time(vdot):
+    """VDOT로 10km 레이스 타임 예측 (분)"""
+    paces = get_vdot_paces(vdot)
+    return (paces['race_10k'] * 10) / 60
+
+
+# ============================================================
+# 훈련 존 판정
+# ============================================================
+def classify_training_zone(pace_sec, vdot):
+    """실제 페이스가 어떤 훈련 존인지 판정"""
+    paces = get_vdot_paces(vdot)
+    if pace_sec >= paces['easy_low']:
+        return 'easy'
+    elif pace_sec >= paces['tempo'] + 10:
+        return 'moderate'  # Dead zone — 가장 비효율적
+    elif pace_sec >= paces['tempo'] - 5:
+        return 'tempo'
+    elif pace_sec >= paces['interval'] - 5:
+        return 'interval'
+    else:
+        return 'repetition'
+
+
+# ============================================================
+# 누적 부하
+# ============================================================
+INTENSITY_MULTIPLIER = {'easy': 1.0, 'moderate': 1.2, 'tempo': 1.5, 'interval': 1.8, 'repetition': 2.0}
+TYPE_MULTIPLIER = {'run': 1.3, 'swim': 1.0, 'bike': 0.8, 'brick': 1.4}
+
+
+def calc_training_load(entry):
+    """일일 훈련 부하 계산"""
+    metrics = entry.get('metrics', {})
+    wtype = metrics.get('type', 'run')
+    duration = metrics.get('duration_min', 0)
+    if wtype == 'run':
+        pace = pace_to_seconds(metrics.get('pace_per_km'))
+        # 거리 기반으로 시간 추정
+        dist = metrics.get('distance_km', 0)
+        if pace and dist:
+            duration = (pace * dist) / 60
+    zone = entry.get('training_zone', 'moderate')
+    intensity = INTENSITY_MULTIPLIER.get(zone, 1.2)
+    type_mult = TYPE_MULTIPLIER.get(wtype, 1.0)
+    return round(duration * intensity * type_mult)
 
 
 def get_week_monday(dt):
-    """해당 날짜가 속한 주의 월요일"""
-    wk = get_week_number(dt)
+    wk = (dt.date() - TRAIN_START.date()).days // 7
     return TRAIN_START + timedelta(days=wk * 7)
 
 
@@ -81,72 +201,29 @@ def get_phase(dt):
 
 # Phase별 주간 목표
 PHASE_TARGETS = {
-    1: {"swim": 4, "run": 3, "run_km": 20, "bike": 1},
-    2: {"swim": 3, "run": 3, "run_km": 21, "bike": 2},
-    3: {"swim": 2, "run": 2, "run_km": 10, "bike": 1},
-}
-
-# Phase별 벤치마크 (종료 시점 기준)
-PHASE_BENCHMARKS = {
-    1: {
-        "swim_pace": "1:55",   # /100m
-        "run_10k_pace": "6:00",  # /km (완주만 하면 OK)
-        "run_freq": 3,
-        "bike_min": 60,
-    },
-    2: {
-        "swim_pace": "1:50",
-        "run_10k_pace": "5:24",
-        "run_freq": 3,
-        "bike_min": 75,
-    },
-    3: {
-        "swim_pace": "1:50",
-        "run_10k_pace": "5:10",
-        "run_freq": 2,
-        "bike_min": 30,
-    },
+    1: {"swim": 4, "run": 3, "run_km": 20, "bike": 1, "weekly_load": 300},
+    2: {"swim": 3, "run": 3, "run_km": 21, "bike": 2, "weekly_load": 380},
+    3: {"swim": 2, "run": 2, "run_km": 10, "bike": 1, "weekly_load": 200},
 }
 
 
-def pace_to_seconds(pace_str):
-    """'5:33' → 333초"""
-    if not pace_str:
-        return None
-    parts = pace_str.split(':')
-    if len(parts) == 2:
-        return int(parts[0]) * 60 + int(parts[1])
-    return None
-
-
-def seconds_to_pace(secs):
-    """333초 → '5:33'"""
-    if secs is None:
-        return None
-    m = int(secs) // 60
-    s = int(secs) % 60
-    return f"{m}:{s:02d}"
-
-
-def minutes_to_hhmm(mins):
-    """170.5 → '2:50'"""
-    h = int(mins) // 60
-    m = int(mins) % 60
-    return f"{h}:{m:02d}"
-
-
+# ============================================================
+# 분석
+# ============================================================
 def analyze_week(log, dt=None):
-    """이번 주 운동 집계"""
     if dt is None:
         dt = NOW
     mon = get_week_monday(dt)
 
-    swim_count = 0
-    run_count = 0
-    bike_count = 0
-    run_total_km = 0.0
-    swim_paces = []
-    run_paces = []
+    stats = {
+        'swim': {'count': 0, 'paces': []},
+        'run': {'count': 0, 'total_km': 0.0, 'paces': [], 'zones': []},
+        'bike': {'count': 0},
+        'brick': {'count': 0},
+        'total_load': 0,
+        'easy_minutes': 0,
+        'hard_minutes': 0,
+    }
 
     for d in range(7):
         day = mon + timedelta(days=d)
@@ -157,38 +234,51 @@ def analyze_week(log, dt=None):
 
         metrics = entry.get('metrics', {})
         wtype = metrics.get('type', '')
+        zone = entry.get('training_zone', 'moderate')
+        load = calc_training_load(entry)
+        stats['total_load'] += load
+
+        duration = metrics.get('duration_min', 0)
+        if wtype == 'run':
+            dist = metrics.get('distance_km', 0)
+            pace = pace_to_seconds(metrics.get('pace_per_km'))
+            if pace and dist:
+                duration = (pace * dist) / 60
+
+        if zone in ('easy',):
+            stats['easy_minutes'] += duration
+        elif zone in ('tempo', 'interval', 'repetition'):
+            stats['hard_minutes'] += duration
+        else:
+            stats['easy_minutes'] += duration * 0.5
+            stats['hard_minutes'] += duration * 0.5
 
         if wtype == 'swim':
-            swim_count += 1
+            stats['swim']['count'] += 1
             pace = metrics.get('pace_per_100m')
             if pace:
-                swim_paces.append(pace_to_seconds(pace))
+                stats['swim']['paces'].append(pace_to_seconds(pace))
         elif wtype == 'run':
-            run_count += 1
-            dist = metrics.get('distance_km', 0)
-            run_total_km += dist
+            stats['run']['count'] += 1
+            stats['run']['total_km'] += metrics.get('distance_km', 0)
             pace = metrics.get('pace_per_km')
             if pace:
-                run_paces.append(pace_to_seconds(pace))
+                stats['run']['paces'].append(pace_to_seconds(pace))
+            stats['run']['zones'].append(zone)
         elif wtype == 'bike':
-            bike_count += 1
+            stats['bike']['count'] += 1
         elif wtype == 'brick':
-            bike_count += 1
-            # 브릭의 러닝 부분도 카운트
-            run_km = metrics.get('run_km', 0)
-            if run_km >= 5:  # 풀 브릭만 러닝 1회로 카운트
-                run_count += 1
-                run_total_km += run_km
+            stats['brick']['count'] += 1
 
-    return {
-        "swim": {"count": swim_count, "paces": swim_paces},
-        "run": {"count": run_count, "total_km": round(run_total_km, 1), "paces": run_paces},
-        "bike": {"count": bike_count},
-    }
+    total_min = stats['easy_minutes'] + stats['hard_minutes']
+    stats['easy_pct'] = round(stats['easy_minutes'] / total_min * 100) if total_min > 0 else 0
+    stats['hard_pct'] = 100 - stats['easy_pct'] if total_min > 0 else 0
+    stats['run']['total_km'] = round(stats['run']['total_km'], 1)
+
+    return stats
 
 
 def get_latest_metrics(log, workout_type, n=3):
-    """최근 n회 특정 종목 메트릭 가져오기"""
     entries = []
     for date_key in sorted(log.keys(), reverse=True):
         entry = log[date_key]
@@ -196,126 +286,190 @@ def get_latest_metrics(log, workout_type, n=3):
             continue
         metrics = entry.get('metrics', {})
         if metrics.get('type') == workout_type:
-            entries.append((date_key, metrics))
+            entries.append((date_key, entry))
             if len(entries) >= n:
                 break
     return entries
 
 
+def count_bricks(log):
+    """누적 브릭 훈련 횟수"""
+    count = 0
+    for entry in log.values():
+        if not entry.get('done'):
+            continue
+        metrics = entry.get('metrics', {})
+        if metrics.get('type') == 'brick':
+            count += 1
+        # 미니브릭 (러닝 후 자전거 또는 그 반대)도 카운트
+        note = entry.get('note', '').lower()
+        if '브릭' in note or 'brick' in note:
+            count += 1
+    return count
+
+
+def count_ow(log):
+    """오픈워터 경험 횟수"""
+    count = 0
+    for entry in log.values():
+        if not entry.get('done'):
+            continue
+        note = (entry.get('note', '') + entry.get('actual', '')).lower()
+        if '오픈워터' in note or 'ow' in note or '아쿠아슬론' in note:
+            count += 1
+    return count
+
+
 def estimate_finish_time(log):
-    """현재 데이터 기반 예상 완주시간 계산"""
-    # 수영: 최근 풀 페이스 + OW 보정
+    """개선된 예상 완주시간 (VDOT + 브릭감속 + 테이퍼 반영)"""
+    schedule = load_json(SCHEDULE_FILE)
+    current_vdot = schedule.get('current_vdot', 35)
+    brick_count = count_bricks(log)
+    ow_count = count_ow(log)
+
+    # 수영
     swim_entries = get_latest_metrics(log, 'swim', 3)
     if swim_entries:
-        avg_pace_sec = sum(pace_to_seconds(e[1].get('pace_per_100m', '2:00'))
-                          for e in swim_entries if e[1].get('pace_per_100m')) / len(swim_entries)
-        ow_pace_sec = avg_pace_sec + OW_CORRECTION_SEC
-        est_swim = (ow_pace_sec * 15) / 60  # 1500m = 15 × 100m
+        swim_paces = [pace_to_seconds(e[1].get('metrics', {}).get('pace_per_100m', '2:00'))
+                      for e in swim_entries
+                      if e[1].get('metrics', {}).get('pace_per_100m')]
+        avg_swim_pace = sum(swim_paces) / len(swim_paces) if swim_paces else 120
     else:
-        est_swim = TARGET_SWIM_MIN  # 데이터 없으면 목표값 사용
+        avg_swim_pace = 117  # 1:57 기본값
 
-    # 자전거: 최근 평균속도
+    # OW 보정 (경험에 따라 차등)
+    if ow_count == 0:
+        ow_correction = 17
+    elif ow_count <= 2:
+        ow_correction = 12
+    else:
+        ow_correction = 8
+
+    est_swim = ((avg_swim_pace + ow_correction) * 15) / 60
+
+    # 자전거
     bike_entries = get_latest_metrics(log, 'bike', 3)
     if bike_entries:
-        speeds = [e[1].get('avg_speed_kmh', 32) for e in bike_entries]
-        avg_speed = sum(speeds) / len(speeds)
+        speeds = [e[1].get('metrics', {}).get('avg_speed_kmh', 32) for e in bike_entries]
+        avg_speed = sum(speeds) / len(speeds) if speeds else 32
         est_bike = (40 / avg_speed) * 60
     else:
-        est_bike = TARGET_BIKE_MIN  # 기본값
+        est_bike = 75  # 사이클 선수 기본값
 
-    # 러닝: 최근 단독 페이스 + 브릭 보정
-    run_entries = get_latest_metrics(log, 'run', 3)
-    if run_entries:
-        paces = [pace_to_seconds(e[1].get('pace_per_km', '5:48'))
-                 for e in run_entries if e[1].get('pace_per_km')]
-        if paces:
-            avg_pace_sec = sum(paces) / len(paces)
-            brick_pace_sec = avg_pace_sec + BRICK_CORRECTION_SEC
-            est_run = (brick_pace_sec * 10) / 60
-        else:
-            est_run = TARGET_RUN_MIN
+    # 러닝 (VDOT 기반)
+    standalone_10k_min = predict_10k_time(current_vdot)
+
+    # 브릭 감속률 (훈련 횟수에 따라)
+    if brick_count <= 2:
+        brick_slowdown = 0.08
+    elif brick_count <= 5:
+        brick_slowdown = 0.06
     else:
-        est_run = TARGET_RUN_MIN
+        brick_slowdown = 0.05
 
-    total = est_swim + TARGET_T1_MIN + est_bike + TARGET_T2_MIN + est_run
+    # 테이퍼 효과 (대회 2주 전 테이퍼 가정)
+    taper_effect = 0.03
+
+    est_run_brick = standalone_10k_min * (1 + brick_slowdown) * (1 - taper_effect)
+
+    total = est_swim + 2.5 + est_bike + 1.5 + est_run_brick
 
     return {
         "swim": round(est_swim, 1),
         "bike": round(est_bike, 1),
-        "run": round(est_run, 1),
-        "t1": TARGET_T1_MIN,
-        "t2": TARGET_T2_MIN,
+        "run_standalone": round(standalone_10k_min, 1),
+        "run_brick": round(est_run_brick, 1),
+        "brick_slowdown_pct": round(brick_slowdown * 100),
+        "taper_effect_pct": round(taper_effect * 100),
         "total": round(total, 1),
+        "vdot": current_vdot,
+        "brick_count": brick_count,
+        "ow_count": ow_count,
+        "ow_correction": ow_correction,
     }
 
 
-def check_adjustments(log, week_stats, phase):
-    """스케줄 자동 조정 판단"""
+def update_vdot(log):
+    """최근 러닝 데이터로 VDOT 재추정"""
+    run_entries = get_latest_metrics(log, 'run', 5)
+    if not run_entries:
+        return 35  # 기본값
+
+    vdots = []
+    for date_key, entry in run_entries:
+        metrics = entry.get('metrics', {})
+        pace = pace_to_seconds(metrics.get('pace_per_km'))
+        dist = metrics.get('distance_km', 0)
+        if pace and dist >= 3:  # 3km 이상만
+            v = estimate_vdot(pace, dist)
+            vdots.append(v)
+
+    if not vdots:
+        return 35
+    return round(sum(vdots) / len(vdots))
+
+
+def check_adjustments(log, week_stats, phase, vdot):
+    """스케줄 조정 판단"""
     adjustments = []
     targets = PHASE_TARGETS.get(phase, {})
+    paces = get_vdot_paces(vdot)
 
-    # 목요일(DOW=3) 이후인데 러닝 3회 미달
-    if DOW >= 3 and week_stats['run']['count'] < targets.get('run', 3):
-        remaining_days = 6 - DOW  # 남은 요일 수
+    # 러닝 빈도 (수요일 이후 체크)
+    if DOW >= 2 and week_stats['run']['count'] < targets.get('run', 3):
+        remaining = 6 - DOW
         deficit = targets.get('run', 3) - week_stats['run']['count']
-        if deficit > 0 and remaining_days > 0:
+        if deficit > 0 and remaining > 0:
             adjustments.append({
                 "type": "run_frequency",
                 "severity": "high" if deficit >= 2 else "medium",
-                "message": f"러닝 {week_stats['run']['count']}/{targets.get('run', 3)}회 — "
-                           f"남은 {remaining_days}일 내 {deficit}회 추가 필요",
+                "message": f"🔴 러닝 {week_stats['run']['count']}/{targets.get('run', 3)}회 "
+                           f"— {remaining}일 내 {deficit}회 추가 필요",
             })
 
-    # 러닝 페이스 확인 (최근 러닝 vs 벤치마크)
-    benchmarks = PHASE_BENCHMARKS.get(phase, {})
-    target_pace = pace_to_seconds(benchmarks.get('run_10k_pace'))
-    if target_pace and week_stats['run']['paces']:
-        latest_pace = week_stats['run']['paces'][-1]
-        if latest_pace and latest_pace > target_pace + 30:
-            adjustments.append({
-                "type": "run_pace_behind",
-                "severity": "low",
-                "message": f"러닝 페이스 {seconds_to_pace(latest_pace)} "
-                           f"(목표 {benchmarks.get('run_10k_pace')}, +{latest_pace - target_pace}초/km)",
-            })
-
-    # 주간 러닝 볼륨
-    target_km = targets.get('run_km', 20)
-    if DOW >= 4 and week_stats['run']['total_km'] < target_km * 0.5:
+    # 80/20 체크
+    if week_stats['hard_pct'] > 25 and (week_stats['easy_minutes'] + week_stats['hard_minutes']) > 60:
         adjustments.append({
-            "type": "run_volume_low",
+            "type": "intensity_too_high",
             "severity": "medium",
-            "message": f"주간 러닝 {week_stats['run']['total_km']}km "
-                       f"(목표 {target_km}km의 {int(week_stats['run']['total_km'] / target_km * 100)}%)",
+            "message": f"⚠️ 80/20 위반: Easy {week_stats['easy_pct']}% / 고강도 {week_stats['hard_pct']}% "
+                       f"(목표: 80/20)",
+        })
+
+    # Easy 러닝이 너무 빠른지 체크
+    easy_threshold = paces['easy_low']
+    for zone, pace in zip(week_stats['run']['zones'], week_stats['run']['paces']):
+        if zone == 'easy' and pace and pace < easy_threshold:
+            adjustments.append({
+                "type": "easy_too_fast",
+                "severity": "low",
+                "message": f"💡 Easy 런 {seconds_to_pace(pace)}/km → "
+                           f"더 느리게 ({seconds_to_pace(paces['easy_low'])}~{seconds_to_pace(paces['easy_high'])})",
+            })
+            break
+
+    # 주간 부하 체크
+    target_load = targets.get('weekly_load', 300)
+    if week_stats['total_load'] > target_load * 1.2:
+        adjustments.append({
+            "type": "overload",
+            "severity": "high",
+            "message": f"🔴 주간 부하 {week_stats['total_load']} > 목표 {target_load}의 120% — 다음 일 Easy 권장",
         })
 
     return adjustments
 
 
-def get_today_entry(log):
-    """오늘의 운동 로그"""
-    return log.get(TODAY)
-
-
 def format_today_workout(entry):
-    """오늘 운동 메시지 포매팅"""
     if not entry or not entry.get('done'):
         return None
 
     metrics = entry.get('metrics', {})
     wtype = metrics.get('type', '?')
+    type_emoji = {'swim': '🏊', 'run': '🏃', 'bike': '🚴', 'brick': '🔥'}
+    type_name = {'swim': '수영', 'run': '러닝', 'bike': '자전거', 'brick': '브릭'}
 
-    type_emoji = {
-        'swim': '🏊', 'run': '🏃', 'bike': '🚴', 'brick': '🔥'
-    }
-    type_name = {
-        'swim': '수영', 'run': '러닝', 'bike': '자전거', 'brick': '브릭'
-    }
-
-    emoji = type_emoji.get(wtype, '🏋️')
-    name = type_name.get(wtype, wtype)
-
-    lines = [f"{emoji} {name}"]
+    lines = [f"{type_emoji.get(wtype, '🏋️')} {type_name.get(wtype, wtype)}"]
 
     if wtype == 'swim':
         dist = metrics.get('distance_m', 0)
@@ -327,7 +481,6 @@ def format_today_workout(entry):
         lines.append(f"  {dist}m | {dur:.0f}분 | {pace}/100m")
         if hr:
             lines.append(f"  HR {hr}/{maxhr} | Swolf {swolf}")
-
     elif wtype == 'run':
         dist = metrics.get('distance_km', 0)
         pace = metrics.get('pace_per_km', '')
@@ -336,42 +489,41 @@ def format_today_workout(entry):
         lines.append(f"  {dist}km | {pace}/km")
         if hr:
             lines.append(f"  HR {hr}/{maxhr}")
-
     elif wtype == 'bike':
         dur = metrics.get('duration_min', 0)
         dist = metrics.get('distance_km', 0)
         speed = metrics.get('avg_speed_kmh', 0)
-        hr = metrics.get('avg_hr', '')
         if dist:
             lines.append(f"  {dist}km | {dur:.0f}분 | {speed}km/h")
         else:
             lines.append(f"  {dur:.0f}분")
-        if hr:
-            lines.append(f"  HR {hr}")
 
     note = entry.get('note', '')
     if note:
         lines.append(f"  📝 {note}")
-
     return "\n".join(lines)
 
 
 def format_analysis_message(log):
-    """전체 분석 메시지 생성"""
     phase, phase_name = get_phase(NOW)
     if phase == 0:
         return None
 
+    # VDOT 업데이트
+    current_vdot = update_vdot(log)
+    schedule = load_json(SCHEDULE_FILE)
+    schedule['current_vdot'] = current_vdot
+    schedule['brick_count'] = count_bricks(log)
+    schedule['ow_count'] = count_ow(log)
+
     week_stats = analyze_week(log)
     estimate = estimate_finish_time(log)
-    adjustments = check_adjustments(log, week_stats, phase)
-    today_entry = get_today_entry(log)
+    adjustments = check_adjustments(log, week_stats, phase, current_vdot)
+    today_entry = log.get(TODAY)
     targets = PHASE_TARGETS.get(phase, {})
-    benchmarks = PHASE_BENCHMARKS.get(phase, {})
+    paces = get_vdot_paces(current_vdot)
 
     lines = []
-
-    # 헤더
     lines.append("🏋️ 운동 기록 업데이트")
     lines.append("")
 
@@ -381,54 +533,28 @@ def format_analysis_message(log):
         if today_msg:
             lines.append("📊 오늘의 운동")
             lines.append(today_msg)
+            zone = today_entry.get('training_zone', '?')
+            zone_kr = {'easy': 'Easy', 'moderate': '⚠️ Moderate (Dead Zone)',
+                       'tempo': 'Tempo', 'interval': 'Interval'}.get(zone, zone)
+            lines.append(f"  훈련 존: {zone_kr}")
             lines.append("")
 
-    # Phase 벤치마크 진척
-    lines.append(f"📈 {phase_name} 벤치마크")
+    # Phase 진척
+    lines.append(f"📈 {phase_name} (VDOT {current_vdot})")
 
-    # 수영
-    swim_latest = get_latest_metrics(log, 'swim', 1)
-    if swim_latest:
-        cur_pace = swim_latest[0][1].get('pace_per_100m', '?')
-        tgt_pace = benchmarks.get('swim_pace', '?')
-        cur_sec = pace_to_seconds(cur_pace)
-        tgt_sec = pace_to_seconds(tgt_pace)
-        if cur_sec and tgt_sec:
-            diff = cur_sec - tgt_sec
-            symbol = "✅" if diff <= 0 else f"⚠️ +{diff}초"
-            lines.append(f"  수영: {cur_pace}/100m (목표 {tgt_pace}) {symbol}")
-        else:
-            lines.append(f"  수영: {cur_pace}/100m (목표 {tgt_pace})")
-    else:
-        lines.append(f"  수영: 데이터 없음 (목표 {benchmarks.get('swim_pace', '?')})")
+    # 러닝 존 가이드
+    lines.append(f"  Easy: {seconds_to_pace(paces['easy_low'])}~{seconds_to_pace(paces['easy_high'])}/km")
+    lines.append(f"  Tempo: {seconds_to_pace(paces['tempo'])}/km")
+    lines.append(f"  10km 예측: {predict_10k_time(current_vdot):.0f}분 (단독)")
 
-    # 러닝
-    run_latest = get_latest_metrics(log, 'run', 1)
-    if run_latest:
-        cur_pace = run_latest[0][1].get('pace_per_km', '?')
-        tgt_pace = benchmarks.get('run_10k_pace', '?')
-        cur_sec = pace_to_seconds(cur_pace)
-        tgt_sec = pace_to_seconds(tgt_pace)
-        if cur_sec and tgt_sec:
-            diff = cur_sec - tgt_sec
-            symbol = "✅" if diff <= 0 else f"⚠️ +{diff}초"
-            lines.append(f"  러닝: {cur_pace}/km (목표 {tgt_pace}) {symbol}")
-        else:
-            lines.append(f"  러닝: {cur_pace}/km (목표 {tgt_pace})")
-    else:
-        lines.append(f"  러닝: 데이터 없음 (목표 {benchmarks.get('run_10k_pace', '?')})")
-
-    # 자전거
-    bike_latest = get_latest_metrics(log, 'bike', 1)
-    if bike_latest:
-        speed = bike_latest[0][1].get('avg_speed_kmh', '?')
-        lines.append(f"  자전거: {speed}km/h")
-    else:
-        lines.append("  자전거: 데이터 없음")
+    # 브릭 적응
+    bc = estimate['brick_count']
+    bp = estimate['brick_slowdown_pct']
+    lines.append(f"  브릭 적응: {bc}회 (감속률 {bp}%)")
     lines.append("")
 
     # 주간 현황
-    lines.append("📅 이번 주 현황")
+    lines.append("📅 이번 주")
     run_target = targets.get('run', 3)
     swim_target = targets.get('swim', 4)
     bike_target = targets.get('bike', 1)
@@ -439,16 +565,26 @@ def format_analysis_message(log):
     bike_bar = "●" * week_stats['bike']['count'] + "○" * max(0, bike_target - week_stats['bike']['count'])
 
     lines.append(f"  수영 {swim_bar} {week_stats['swim']['count']}/{swim_target}")
-    lines.append(f"  러닝 {run_bar} {week_stats['run']['count']}/{run_target} ({week_stats['run']['total_km']}km/{run_km_target}km)")
+    lines.append(f"  러닝 {run_bar} {week_stats['run']['count']}/{run_target} "
+                 f"({week_stats['run']['total_km']}km/{run_km_target}km)")
     lines.append(f"  자전거 {bike_bar} {week_stats['bike']['count']}/{bike_target}")
+
+    # 80/20
+    total_min = week_stats['easy_minutes'] + week_stats['hard_minutes']
+    if total_min > 0:
+        e_icon = "✅" if week_stats['easy_pct'] >= 75 else "⚠️"
+        lines.append(f"  80/20: Easy {week_stats['easy_pct']}% / 고강도 {week_stats['hard_pct']}% {e_icon}")
+
+    # 부하
+    tgt_load = targets.get('weekly_load', 300)
+    lines.append(f"  부하: {week_stats['total_load']}/{tgt_load}")
     lines.append("")
 
     # 스케줄 조정
     if adjustments:
         lines.append("🔄 스케줄 조정")
         for adj in adjustments:
-            severity_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(adj['severity'], "⚪")
-            lines.append(f"  {severity_icon} {adj['message']}")
+            lines.append(f"  {adj['message']}")
         lines.append("")
     else:
         lines.append("🔄 변경 없음 — 계획대로 진행")
@@ -456,7 +592,7 @@ def format_analysis_message(log):
 
     # 예상 완주시간
     total = estimate['total']
-    if total <= TARGET_TOTAL_MIN:
+    if total <= 170:
         status_emoji = "🟢"
         status_text = "목표 달성 가능"
     elif total <= 180:
@@ -466,54 +602,35 @@ def format_analysis_message(log):
         status_emoji = "🔴"
         status_text = "경고 — 스케줄 강화 필요"
 
-    est_str = minutes_to_hhmm(total)
-    lines.append(f"🏁 D-{DAYS_LEFT} | 목표 2:50 | 예상 {est_str} {status_emoji}")
+    lines.append(f"🏁 D-{DAYS_LEFT} | 목표 2:50 | 예상 {minutes_to_hhmm(total)} {status_emoji}")
     lines.append(f"  ({status_text})")
-    lines.append(f"  수영 {estimate['swim']:.0f}분 + T1 + 자전거 {estimate['bike']:.0f}분 + T2 + 러닝 {estimate['run']:.0f}분")
+    lines.append(f"  수영 {estimate['swim']:.0f}분 (OW+{estimate['ow_correction']}초) "
+                 f"+ 자전거 {estimate['bike']:.0f}분 "
+                 f"+ 러닝 {estimate['run_brick']:.0f}분 (브릭-{estimate['brick_slowdown_pct']}% 테이퍼+{estimate['taper_effect_pct']}%)")
 
-    return "\n".join(lines)
-
-
-def update_schedule_json(log, analysis_msg):
-    """workout_schedule.json 업데이트"""
-    schedule = load_json(SCHEDULE_FILE)
-    phase, phase_name = get_phase(NOW)
-    week_stats = analyze_week(log)
-    estimate = estimate_finish_time(log)
-    adjustments = check_adjustments(log, week_stats, phase)
-    targets = PHASE_TARGETS.get(phase, {})
-
-    total = estimate['total']
-    if total <= TARGET_TOTAL_MIN:
-        status = "green"
-        status_text = "목표 달성 가능"
-    elif total <= 180:
-        status = "yellow"
-        status_text = "주의 — 개선 필요"
-    else:
-        status = "red"
-        status_text = "경고 — 스케줄 강화 필요"
-
+    # schedule 업데이트
+    total_status = "green" if total <= 170 else ("yellow" if total <= 180 else "red")
     schedule['last_analysis'] = {
         "date": TODAY,
         "estimated_finish": minutes_to_hhmm(total),
-        "status": status,
+        "status": total_status,
         "status_text": status_text,
         "phase": phase,
         "phase_name": phase_name,
+        "vdot": current_vdot,
         "weekly_summary": {
-            "swim": {"count": week_stats['swim']['count'], "target": targets.get('swim', 4)},
-            "run": {
-                "count": week_stats['run']['count'],
-                "target": targets.get('run', 3),
-                "total_km": week_stats['run']['total_km'],
-            },
-            "bike": {"count": week_stats['bike']['count'], "target": targets.get('bike', 1)},
+            "swim": {"count": week_stats['swim']['count'], "target": swim_target},
+            "run": {"count": week_stats['run']['count'], "target": run_target,
+                    "total_km": week_stats['run']['total_km']},
+            "bike": {"count": week_stats['bike']['count'], "target": bike_target},
         },
+        "intensity_split": {"easy_pct": week_stats['easy_pct'], "hard_pct": week_stats['hard_pct']},
+        "training_load": {"current": week_stats['total_load'], "target": tgt_load},
         "adjustments": [a['message'] for a in adjustments],
     }
-
     save_json(SCHEDULE_FILE, schedule)
+
+    return "\n".join(lines)
 
 
 def send_telegram(text):
@@ -530,19 +647,13 @@ def main():
         print("  workout_log.json 비어있음")
         return
 
-    # 분석 메시지 생성
     msg = format_analysis_message(log)
     if not msg:
-        print("  분석 메시지 없음 (대회 완료)")
+        print("  분석 메시지 없음")
         return
 
     print(f"\n--- 메시지 미리보기 ---\n{msg}\n")
 
-    # workout_schedule.json 업데이트
-    update_schedule_json(log, msg)
-    print("  workout_schedule.json 업데이트 완료")
-
-    # 텔레그램 전송
     ok = send_telegram(msg)
     print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 

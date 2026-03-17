@@ -368,7 +368,8 @@ def format_morning():
     analysis = load_last_analysis()
     est = analysis.get('estimated_finish', '?')
     status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
-    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT} | 예상 {est} {status_icon}")
+    vdot = analysis.get('vdot', '?')
+    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT} | 예상 {est} {status_icon} | VDOT {vdot}")
     lines.append("")
 
     # 이번 주
@@ -393,6 +394,19 @@ def format_morning():
         lines.append(f"[오늘] {get_emoji(workout)} {workout}")
         if detail:
             lines.append(f"  → {detail}")
+        # 러닝이면 페이스 존 가이드 표시
+        if "러닝" in workout and "휴식" not in workout:
+            # VDOT 기반 페이스 존 (workout_analysis.py의 VDOT_TABLE 참조)
+            v = analysis.get('vdot', 36)
+            # 간이 lookup
+            easy_paces = {35: "6:34~7:17", 36: "6:25~7:07", 37: "6:16~6:57", 38: "6:07~6:47"}
+            tempo_paces = {35: "5:47", 36: "5:39", 37: "5:31", 38: "5:23"}
+            easy_p = easy_paces.get(v, "6:16~6:57")
+            tempo_p = tempo_paces.get(v, "5:31")
+            if "템포" in workout or "Long" in workout:
+                lines.append(f"  📊 Tempo: {tempo_p}/km | Easy: {easy_p}/km")
+            else:
+                lines.append(f"  📊 Easy: {easy_p}/km (대화 가능 속도)")
 
     # 피로 관리 팁 (월요일 = 능동적 휴식 대체 가능일)
     if DOW == 0:  # 월요일

@@ -11,7 +11,8 @@
       "max_hr": 148,
       "cadence": null
     },
-    "note": "복귀런, 옆구리 통증"
+    "training_zone": "easy",
+    "note": "복귀런, 옆구리 통증. HR 130 = 확실한 Easy zone"
   },
   "2026-03-17": {
     "planned": "수영",
@@ -29,6 +30,7 @@
       "strokes": 556,
       "avg_spm": 21
     },
-    "note": ""
+    "training_zone": "moderate",
+    "note": "유산소 3.1 / 무산소 2.1"
   }
 }
