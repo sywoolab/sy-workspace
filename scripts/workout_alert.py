@@ -1,12 +1,14 @@
 """
 오늘의 운동 스케줄 알림
 - WORKOUT_MASTER.md의 8주 플랜 기반
-- 아침: 향후 2주 스케줄 + 오늘 운동 + 주간 목표
-- 저녁: 운동 리마인드
+- workout_log.json으로 운동 완료 추적
+- 아침: 이번 주 현황(✅/❌) + 오늘 운동 + 주간 목표
+- 저녁: 미완료 시만 리마인드
 """
 
 import os
 import sys
+import json
 import requests
 from datetime import datetime, timezone, timedelta
 
@@ -17,6 +19,9 @@ DOW = NOW.weekday()  # 0=월 ~ 6=일
 
 BOT_TOKEN = os.environ['BOT_TOKEN']
 CHAT_ID = os.environ['CHAT_ID']
+
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 
 # 대회일 & 훈련 시작일
 RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
@@ -30,10 +35,10 @@ def get_week_number(dt):
 
 CURRENT_WEEK = get_week_number(NOW)
 
-# Phase 판별 (날짜 기반)
-PHASE1_END = datetime(2026, 4, 6, tzinfo=KST).date()
-PHASE2_END = datetime(2026, 4, 27, tzinfo=KST).date()
-PHASE3_END = datetime(2026, 5, 9, tzinfo=KST).date()
+# Phase 판별 (날짜 기반, 주 단위 경계 = 일요일)
+PHASE1_END = datetime(2026, 4, 5, tzinfo=KST).date()   # 일요일 (Week 2 끝)
+PHASE2_END = datetime(2026, 4, 26, tzinfo=KST).date()  # 일요일 (Week 5 끝)
+PHASE3_END = datetime(2026, 5, 9, tzinfo=KST).date()   # 토요일 (대회일)
 
 def get_phase(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
@@ -53,7 +58,7 @@ WEEK_NAMES = {
     1: "Week 1: 베이스 ①",
     2: "Week 2: 베이스 ②",
     3: "Week 3: 빌드 ①",
-    4: "Week 4: 빌드 ②",
+    4: "Week 4: 빌드 ② (아쿠아슬론)",
     5: "Week 5: 빌드 ③",
     6: "Week 6: 테이퍼",
     7: "Week 7: 대회 주",
@@ -85,14 +90,14 @@ SCHEDULE = {
         2: ("수영 수업", ""),
         3: ("러닝", "4km Easy + 스트라이드"),
         4: ("수영 가볍게", "1km"),
-        5: ("오픈워터", "수성못"),
+        5: ("수영 개인교습", "가볍게 (사이팅 연습)"),
         6: ("완전 휴식", ""),
     },
 }
 
-# Week 0: 복귀 주 (3/16 월요일에 러닝 → 연속러닝 금지 적용)
+# Week 0: 복귀 주
 WEEK0_SCHEDULE = {
-    0: ("러닝 ✅", "7.57km @5:33 (완료)"),
+    0: ("러닝", "복귀런"),
     1: ("수영", "연속러닝 금지 → 수영 대체"),
     2: ("수영 수업", ""),
     3: ("러닝 + 코어", "6~7km + 코어 15분"),
@@ -101,14 +106,25 @@ WEEK0_SCHEDULE = {
     6: ("러닝 Long Run", "8~10km"),
 }
 
-# 대회 주 (Week 7) 특수 스케줄
+# Week 4: 아쿠아슬론 대회 주 (4/13~4/19)
+WEEK4_SCHEDULE = {
+    0: ("수영 수업", ""),
+    1: ("러닝 템포", "7km (2up→3@5:10→2dn)"),
+    2: ("수영 수업", ""),
+    3: ("러닝 Easy", "5km (대회 전 볼륨 축소)"),
+    4: ("수영 가볍게 or 휴식", "대회 전날 — 컨디션 우선"),
+    5: ("아쿠아슬론 대회", "인천체육고"),
+    6: ("완전 휴식 or 자전거 가볍게", "회복일"),
+}
+
+# 대회 주 (Week 7: 5/4~5/10, 대회일 5/9=토요일=weekday 5)
 WEEK7_SCHEDULE = {
     0: ("수영 가볍게", "1km"),
     1: ("러닝", "3km 조깅"),
     2: ("자전거 가볍게", "30분"),
     3: ("완전 휴식", ""),
-    4: ("대회", "수영 1.5 + 자전거 40 + 러닝 10km"),
-    5: ("완전 휴식", ""),
+    4: ("수성못 사전 입수", "대구 이동 + 200~300m 가볍게 (수온·감각 확인)"),
+    5: ("대회", "수영 1.5km + 자전거 40km + 러닝 10km"),
     6: ("완전 휴식", ""),
 }
 
@@ -137,6 +153,7 @@ DOW_EMOJI = {
     '풀 브릭': '🔥',
     '브릭': '🔥',
     '대회': '🏁',
+    '아쿠아슬론': '🏁',
     '오픈워터': '🌊',
     '러닝': '🏃',
     '자전거': '🚴',
@@ -145,6 +162,45 @@ DOW_EMOJI = {
 }
 
 
+# ============================================================
+# 운동 로그 (workout_log.json)
+# ============================================================
+def load_workout_log():
+    """workout_log.json 로드"""
+    try:
+        with open(LOG_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+WORKOUT_LOG = load_workout_log()
+
+
+def get_log_for_date(date_str):
+    """특정 날짜의 운동 로그 반환"""
+    return WORKOUT_LOG.get(date_str, None)
+
+
+def is_done(date_str):
+    """해당 날짜 운동 완료 여부"""
+    log = get_log_for_date(date_str)
+    if log is None:
+        return None  # 기록 없음
+    return log.get('done', False)
+
+
+def get_actual(date_str):
+    """해당 날짜 실제 운동 내용"""
+    log = get_log_for_date(date_str)
+    if log is None:
+        return None
+    return log.get('actual', '')
+
+
+# ============================================================
+# 스케줄
+# ============================================================
 def get_emoji(workout):
     for key, emoji in DOW_EMOJI.items():
         if key in workout:
@@ -158,12 +214,62 @@ def get_schedule_for_date(dt):
     dow = dt.weekday()
     if wk == 0:
         return WEEK0_SCHEDULE.get(dow, ("휴식", ""))
+    if wk == 4:
+        return WEEK4_SCHEDULE.get(dow, ("휴식", ""))
     if wk >= 7:
         return WEEK7_SCHEDULE.get(dow, ("완전 휴식", ""))
     p, _ = get_phase(dt)
     if p == 0 or p not in SCHEDULE:
         return ("완전 휴식", "")
     return SCHEDULE[p].get(dow, ("휴식", ""))
+
+
+def format_day_line(dt, is_current_week=False):
+    """한 날짜의 스케줄 라인 포매팅 (완료 여부 포함)"""
+    dow = dt.weekday()
+    date_str = dt.strftime('%m/%d')
+    date_key = dt.strftime('%Y-%m-%d')
+    workout, detail = get_schedule_for_date(dt)
+    emoji = get_emoji(workout)
+    is_today = (dt.date() == NOW.date())
+
+    # 완료 여부 표시 (지난 날 또는 오늘)
+    done = is_done(date_key)
+    actual = get_actual(date_key)
+
+    if dt.date() < NOW.date():
+        # 지난 날: 완료/미완료 표시
+        if done is True:
+            status = "✅"
+            # 실제 운동 내용이 있으면 표시
+            if actual:
+                workout = f"{workout} → {actual}"
+        elif done is False:
+            status = "❌"
+        else:
+            # 로그 없음 = 미기록 (휴식일이면 무시)
+            if "휴식" in workout:
+                status = "😴"
+            else:
+                status = "⬜"  # 미기록
+    elif is_today:
+        if done is True:
+            status = "✅"
+            if actual:
+                workout = f"{workout} → {actual}"
+        else:
+            status = "👈"
+    else:
+        # 미래
+        status = ""
+
+    day_str = f"  {DOW_NAMES[dow]}({date_str}) {emoji} {workout}"
+    if detail and done is not True:
+        day_str += f" ({detail})"
+    if status:
+        day_str += f" {status}"
+
+    return day_str
 
 
 def format_week(week_num, is_current_week=False):
@@ -184,20 +290,31 @@ def format_week(week_num, is_current_week=False):
         lines.append(f"  목표: {goal_info.get('goal', '')}")
         lines.append(f"  최소: {goal_info.get('min', '')}")
 
+    # 이번 주 완료 통계 (현재 주만)
+    if is_current_week:
+        done_count = 0
+        total_count = 0
+        run_count = 0
+        for d in range(7):
+            dt = mon + timedelta(days=d)
+            if dt.date() > RACE_DAY.date():
+                break
+            w, _ = get_schedule_for_date(dt)
+            if "휴식" not in w:
+                total_count += 1
+                date_key = dt.strftime('%Y-%m-%d')
+                if is_done(date_key):
+                    done_count += 1
+                    actual = get_actual(date_key) or w
+                    if "러닝" in w or "러닝" in actual:
+                        run_count += 1
+        lines.append(f"  진행: {done_count}/{total_count} 완료 | 러닝 {run_count}회")
+
     for d in range(7):
         dt = mon + timedelta(days=d)
         if dt.date() > RACE_DAY.date():
             break
-        workout, detail = get_schedule_for_date(dt)
-        emoji = get_emoji(workout)
-        date_str = dt.strftime('%m/%d')
-        is_today = (dt.date() == NOW.date())
-        marker = " 👈" if is_today else ""
-        day_str = f"  {DOW_NAMES[d]}({date_str}) {emoji} {workout}"
-        if detail:
-            day_str += f" ({detail})"
-        day_str += marker
-        lines.append(day_str)
+        lines.append(format_day_line(dt, is_current_week))
 
     return "\n".join(lines)
 
@@ -227,9 +344,21 @@ def format_morning():
 
     # 오늘의 운동
     workout, detail = get_today_workout()
-    lines.append(f"[오늘] {get_emoji(workout)} {workout}")
-    if detail:
-        lines.append(f"  → {detail}")
+    today_done = is_done(TODAY)
+    if today_done:
+        actual = get_actual(TODAY)
+        lines.append(f"[오늘] ✅ {workout} 완료!")
+        if actual:
+            lines.append(f"  → {actual}")
+    else:
+        lines.append(f"[오늘] {get_emoji(workout)} {workout}")
+        if detail:
+            lines.append(f"  → {detail}")
+
+    # 피로 관리 팁 (월요일 = 능동적 휴식 대체 가능일)
+    if DOW == 0:  # 월요일
+        lines.append("")
+        lines.append("💡 피로 누적 시 월요일 수영 → 완전 휴식 대체 가능 (주 1회 한정)")
 
     return "\n".join(lines)
 
@@ -241,8 +370,23 @@ def format_evening():
     if "휴식" in workout:
         return None
 
+    # 오늘 운동 완료했으면 칭찬 메시지
+    today_done = is_done(TODAY)
+    if today_done:
+        actual = get_actual(TODAY)
+        lines = []
+        lines.append(f"🏁 D-{DAYS_LEFT} | ✅ 오늘 운동 완료!")
+        lines.append("")
+        lines.append(f"{get_emoji(workout)} {workout}")
+        if actual:
+            lines.append(f"  → {actual}")
+        lines.append("")
+        lines.append("💪 잘했습니다. 내일도 화이팅!")
+        return "\n".join(lines)
+
+    # 미완료 → 리마인드
     lines = []
-    lines.append(f"🏁 D-{DAYS_LEFT} | 오늘 운동 했나요?")
+    lines.append(f"🏁 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")
     lines.append("")
     lines.append(f"{get_emoji(workout)} {workout}")
     if detail:

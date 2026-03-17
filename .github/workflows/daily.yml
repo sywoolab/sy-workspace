@@ -6,6 +6,9 @@ on:
     - cron: '0 9 * * *'    # UTC 09시 = KST 18시 (저녁)
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   morning:
     if: github.event.schedule != '0 9 * * *'
