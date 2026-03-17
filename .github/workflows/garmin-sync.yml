@@ -8,6 +8,10 @@ on:
     - cron: '0 7 * * *'
     - cron: '0 11 * * *'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'sync (기본) 또는 resend (오늘 운동 재전송)'
+        default: 'sync'
 
 permissions:
   contents: write
@@ -30,7 +34,7 @@ jobs:
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/garmin_sync.py
+        run: python scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
 
       - name: Commit changes
         run: |

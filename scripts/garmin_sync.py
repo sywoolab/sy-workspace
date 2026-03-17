@@ -963,9 +963,95 @@ def sync():
         return False  # 변경 없음
 
 
+def resend_today():
+    """오늘 기록된 운동을 다시 알림 전송 (테스트/재전송용)"""
+    print(f"[{NOW.strftime('%Y-%m-%d %H:%M')}] 오늘 운동 재전송")
+
+    api = login_garmin()
+    workout_log = load_json(LOG_FILE)
+    schedule_data = load_json(SCHEDULE_FILE)
+    health = fetch_health_data(api, TODAY)
+
+    # 오늘 기록에서 parsed activity 재구성
+    today_entry = workout_log.get(TODAY)
+    if not today_entry or not today_entry.get('done'):
+        print("  오늘 운동 기록 없음")
+        return
+
+    m = today_entry.get('metrics', {})
+    wtype = m.get('type', '')
+
+    parsed = {
+        'type': wtype,
+        'date': TODAY,
+        'duration_sec': int(m.get('duration_min', 0) * 60) if m.get('duration_min') else 0,
+        'moving_sec': int(m.get('moving_min', 0) * 60) if m.get('moving_min') else 0,
+        'avg_hr': m.get('avg_hr'),
+        'max_hr': m.get('max_hr'),
+        'aerobic_te': None,
+        'anaerobic_te': None,
+        'training_load': None,
+    }
+
+    # TE/부하 파싱 from note
+    note = today_entry.get('note', '')
+    import re
+    ae_match = re.search(r'유산소 ([\d.]+)', note)
+    an_match = re.search(r'무산소 ([\d.]+)', note)
+    load_match = re.search(r'부하 (\d+)', note)
+    if ae_match:
+        parsed['aerobic_te'] = float(ae_match.group(1))
+    if an_match:
+        parsed['anaerobic_te'] = float(an_match.group(1))
+    if load_match:
+        parsed['training_load'] = int(load_match.group(1))
+
+    if wtype == 'swim':
+        pace_str = m.get('pace_per_100m', '0:00')
+        parts = pace_str.split(':')
+        pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
+        parsed.update({
+            'distance_m': m.get('distance_m', 0),
+            'pace_per_100m': pace_str,
+            'pace_sec_100m': pace_sec,
+            'swolf': m.get('swolf'),
+            'total_strokes': m.get('strokes'),
+        })
+        if not parsed['duration_sec']:
+            parsed['duration_sec'] = int(pace_sec * m.get('distance_m', 0) / 100)
+    elif wtype == 'run':
+        pace_str = m.get('pace_per_km', '0:00')
+        parts = pace_str.split(':')
+        pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
+        parsed.update({
+            'distance_km': m.get('distance_km', 0),
+            'pace_per_km': pace_str,
+            'pace_sec': pace_sec,
+        })
+        if not parsed['duration_sec']:
+            parsed['duration_sec'] = int(pace_sec * m.get('distance_km', 0))
+    elif wtype == 'bike':
+        parsed.update({
+            'distance_km': m.get('distance_km'),
+            'avg_speed_kmh': m.get('avg_speed_kmh'),
+            'avg_power': m.get('avg_power'),
+        })
+        if not parsed['duration_sec']:
+            parsed['duration_sec'] = int(m.get('duration_min', 0) * 60)
+
+    plan_adj = check_plan_adherence(workout_log, schedule_data)
+    msg = format_workout_message([parsed], health, plan_adj, schedule_data, workout_log)
+    ok = send_telegram(msg)
+    print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
+
+
 if __name__ == '__main__':
+    mode = sys.argv[1] if len(sys.argv) > 1 else 'sync'
     try:
-        changed = sync()
+        if mode == 'resend':
+            resend_today()
+        else:
+            changed = sync()
         sys.exit(0)
     except Exception as e:
         error_msg = f"❌ 가민 동기화 오류\n{traceback.format_exc()}"
