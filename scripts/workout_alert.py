@@ -416,39 +416,111 @@ def format_morning():
     return "\n".join(lines)
 
 
+def format_tomorrow_coaching():
+    """내일 운동에 대한 코칭 코멘트 생성"""
+    tomorrow = NOW + timedelta(days=1)
+    tomorrow_workout, tomorrow_detail = get_schedule_for_date(tomorrow)
+
+    if "휴식" in tomorrow_workout:
+        return None
+
+    analysis = load_last_analysis()
+    v = analysis.get('vdot', 36)
+    easy_paces = {35: "6:34~7:17", 36: "6:25~7:07", 37: "6:16~6:57", 38: "6:07~6:47"}
+    tempo_paces = {35: "5:47", 36: "5:39", 37: "5:31", 38: "5:23"}
+
+    lines = []
+    dow_name = DOW_NAMES[tomorrow.weekday()]
+    lines.append(f"📋 내일({dow_name}) 코칭")
+    lines.append(f"  {get_emoji(tomorrow_workout)} {tomorrow_workout}")
+
+    if "브릭" in tomorrow_workout or "미니브릭" in tomorrow_workout:
+        easy_p = easy_paces.get(v, "6:16~6:57")
+        lines.append(f"  자전거 → 러닝 전환을 최대한 빠르게")
+        lines.append(f"  러닝: 처음 2분 다리 무거워도 정상 (전환기)")
+        lines.append(f"  러닝 페이스: {easy_p}/km (Easy)")
+        if "수영" in tomorrow_workout:
+            lines.append(f"  수영: 개인교습 커리큘럼 따라가기")
+
+    elif "러닝" in tomorrow_workout:
+        easy_p = easy_paces.get(v, "6:16~6:57")
+        tempo_p = tempo_paces.get(v, "5:31")
+
+        if "템포" in tomorrow_workout:
+            lines.append(f"  워밍업 2km Easy({easy_p})")
+            lines.append(f"  → 템포 3km @ {tempo_p}/km")
+            lines.append(f"  → 쿨다운 2km Easy")
+            lines.append(f"  ⚠️ 워밍업/쿨다운은 반드시 느리게")
+        elif "Long" in tomorrow_workout or "long" in tomorrow_workout:
+            lines.append(f"  Easy {easy_p}/km — 대화 가능 속도")
+            lines.append(f"  거리 채우기가 목표, 페이스 ❌")
+        elif "코어" in tomorrow_workout:
+            lines.append(f"  러닝 Easy {easy_p}/km + 코어 15분")
+            lines.append(f"  코어: 플랭크/사이드/버드독 각 30초×3")
+        else:
+            lines.append(f"  Easy {easy_p}/km — 절대 빨리 뛰지 말 것")
+
+    elif "수영" in tomorrow_workout:
+        if "수업" in tomorrow_workout:
+            lines.append(f"  수업 커리큘럼 따라가기")
+            lines.append(f"  장비 사용 시 나중에 알려주세요 (강도 보정)")
+        elif "개인교습" in tomorrow_workout:
+            lines.append(f"  코치 지시 따라가기")
+            lines.append(f"  장비/드릴 내용 공유해주시면 반영합니다")
+        else:
+            lines.append(f"  맨몸 추천 (벤치마크 측정용)")
+
+    elif "자전거" in tomorrow_workout:
+        lines.append(f"  에어로 포지션 최대한 유지")
+        if "가볍게" in tomorrow_workout:
+            lines.append(f"  HR Zone 1-2, 회복 목적")
+
+    return "\n".join(lines)
+
+
 def format_evening():
     workout, detail = get_today_workout()
     if workout is None:
         return None
     if "휴식" in workout:
+        # 휴식일이어도 내일 코칭은 보내기
+        coaching = format_tomorrow_coaching()
+        if coaching:
+            lines = [f"🏁 D-{DAYS_LEFT} | 😴 오늘은 휴식"]
+            lines.append("")
+            lines.append(coaching)
+            return "\n".join(lines)
         return None
+
+    lines = []
 
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
         actual = get_actual(TODAY)
-        lines = []
         lines.append(f"🏁 D-{DAYS_LEFT} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if actual:
             lines.append(f"  → {actual}")
-        lines.append("")
-        lines.append("💪 잘했습니다. 내일도 화이팅!")
-        return "\n".join(lines)
-
-    # 미완료 → 리마인드
-    lines = []
-    lines.append(f"🏁 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")
-    lines.append("")
-    lines.append(f"{get_emoji(workout)} {workout}")
-    if detail:
-        lines.append(f"  → {detail}")
-    lines.append("")
-    if "러닝" in workout or "브릭" in workout:
-        lines.append("🔴 러닝은 절대 빠지면 안 됩니다!")
     else:
-        lines.append("꾸준함이 실력입니다.")
+        # 미완료 → 리마인드
+        lines.append(f"🏁 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")
+        lines.append("")
+        lines.append(f"{get_emoji(workout)} {workout}")
+        if detail:
+            lines.append(f"  → {detail}")
+        lines.append("")
+        if "러닝" in workout or "브릭" in workout:
+            lines.append("🔴 러닝은 절대 빠지면 안 됩니다!")
+        else:
+            lines.append("꾸준함이 실력입니다.")
+
+    # 내일 코칭 (항상 추가)
+    coaching = format_tomorrow_coaching()
+    if coaching:
+        lines.append("")
+        lines.append(coaching)
 
     return "\n".join(lines)
 

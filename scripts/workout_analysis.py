@@ -165,9 +165,46 @@ def classify_training_zone(pace_sec, vdot):
 INTENSITY_MULTIPLIER = {'easy': 1.0, 'moderate': 1.2, 'tempo': 1.5, 'interval': 1.8, 'repetition': 2.0}
 TYPE_MULTIPLIER = {'run': 1.3, 'swim': 1.0, 'bike': 0.8, 'brick': 1.4}
 
+# 수영 장비별 부하 보정계수
+SWIM_EQUIPMENT_MULTIPLIER = {
+    'none': 1.0,       # 맨몸 = 기준
+    'fins': 0.7,       # 오리발: 하체 부담 감소
+    'paddles': 1.2,    # 패들: 상체 부하 증가
+    'pull_buoy': 0.8,  # 풀부이: 하체 비활성
+    'fins_paddles': 0.9,  # 오리발+패들
+    'kickboard': 0.9,  # 킥보드: 하체 드릴
+}
+
+# 수영 장비별 페이스 보정 (초/100m, 맨몸 환산 시 더하기)
+SWIM_EQUIPMENT_PACE_CORRECTION = {
+    'none': 0,
+    'fins': 12,        # 오리발 착용 시 맨몸보다 ~12초 빠름
+    'paddles': 6,      # 패들 착용 시 ~6초 빠름
+    'pull_buoy': 4,    # 풀부이 ~4초 빠름
+    'fins_paddles': 15, # 오리발+패들 ~15초 빠름
+    'kickboard': -20,  # 킥보드는 오히려 느림
+}
+
+
+def get_swim_equipment(entry):
+    """수영 장비 타입 반환"""
+    metrics = entry.get('metrics', {})
+    return metrics.get('swim_equipment', 'none')
+
+
+def get_bare_swim_pace(entry):
+    """장비 보정 후 맨몸 환산 페이스 반환"""
+    metrics = entry.get('metrics', {})
+    pace = pace_to_seconds(metrics.get('pace_per_100m'))
+    if pace is None:
+        return None
+    equipment = get_swim_equipment(entry)
+    correction = SWIM_EQUIPMENT_PACE_CORRECTION.get(equipment, 0)
+    return pace + correction
+
 
 def calc_training_load(entry):
-    """일일 훈련 부하 계산"""
+    """일일 훈련 부하 계산 (수영 장비 보정 포함)"""
     metrics = entry.get('metrics', {})
     wtype = metrics.get('type', 'run')
     duration = metrics.get('duration_min', 0)
@@ -180,7 +217,12 @@ def calc_training_load(entry):
     zone = entry.get('training_zone', 'moderate')
     intensity = INTENSITY_MULTIPLIER.get(zone, 1.2)
     type_mult = TYPE_MULTIPLIER.get(wtype, 1.0)
-    return round(duration * intensity * type_mult)
+    # 수영 장비 보정
+    equip_mult = 1.0
+    if wtype == 'swim':
+        equipment = get_swim_equipment(entry)
+        equip_mult = SWIM_EQUIPMENT_MULTIPLIER.get(equipment, 1.0)
+    return round(duration * intensity * type_mult * equip_mult)
 
 
 def get_week_monday(dt):
@@ -327,13 +369,13 @@ def estimate_finish_time(log):
     brick_count = count_bricks(log)
     ow_count = count_ow(log)
 
-    # 수영
-    swim_entries = get_latest_metrics(log, 'swim', 3)
+    # 수영 (장비 보정 → 맨몸 환산 페이스 사용)
+    swim_entries = get_latest_metrics(log, 'swim', 5)
     if swim_entries:
-        swim_paces = [pace_to_seconds(e[1].get('metrics', {}).get('pace_per_100m', '2:00'))
-                      for e in swim_entries
-                      if e[1].get('metrics', {}).get('pace_per_100m')]
-        avg_swim_pace = sum(swim_paces) / len(swim_paces) if swim_paces else 120
+        # 맨몸 환산 페이스로 변환
+        bare_paces = [get_bare_swim_pace(e[1]) for e in swim_entries]
+        bare_paces = [p for p in bare_paces if p is not None]
+        avg_swim_pace = sum(bare_paces) / len(bare_paces) if bare_paces else 120
     else:
         avg_swim_pace = 117  # 1:57 기본값
 
@@ -478,7 +520,16 @@ def format_today_workout(entry):
         hr = metrics.get('avg_hr', '')
         maxhr = metrics.get('max_hr', '')
         swolf = metrics.get('swolf', '')
+        equipment = metrics.get('swim_equipment', 'none')
+        equip_names = {
+            'none': '맨몸', 'fins': '오리발', 'paddles': '패들',
+            'pull_buoy': '풀부이', 'fins_paddles': '오리발+패들', 'kickboard': '킥보드'
+        }
+        equip_str = equip_names.get(equipment, equipment)
         lines.append(f"  {dist}m | {dur:.0f}분 | {pace}/100m")
+        if equipment != 'none':
+            bare_pace = get_bare_swim_pace(entry)
+            lines.append(f"  🔧 {equip_str} → 맨몸 환산 ~{seconds_to_pace(bare_pace)}/100m")
         if hr:
             lines.append(f"  HR {hr}/{maxhr} | Swolf {swolf}")
     elif wtype == 'run':
