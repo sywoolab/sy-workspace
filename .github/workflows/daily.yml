@@ -6,13 +6,20 @@ on:
     - cron: '40 20 * * *'   # UTC 20:40 = KST 05:40 (운동 아침 알림)
     - cron: '0 9 * * *'     # UTC 09시 = KST 18시 (운동 저녁 리마인드)
   workflow_dispatch:
+    inputs:
+      job:
+        description: 'task / morning / evening / all'
+        default: 'all'
 
 permissions:
   contents: write
 
 jobs:
   task-reminder:
-    if: github.event.schedule == '0 22 * * *'
+    if: >-
+      github.event.schedule == '0 22 * * *' ||
+      github.event.inputs.job == 'task' ||
+      github.event.inputs.job == 'all'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +40,10 @@ jobs:
             -d text="${TEXT}"
 
   morning-workout:
-    if: github.event.schedule == '40 20 * * *'
+    if: >-
+      github.event.schedule == '40 20 * * *' ||
+      github.event.inputs.job == 'morning' ||
+      github.event.inputs.job == 'all'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +77,10 @@ jobs:
           fi
 
   evening:
-    if: github.event.schedule == '0 9 * * *'
+    if: >-
+      github.event.schedule == '0 9 * * *' ||
+      github.event.inputs.job == 'evening' ||
+      github.event.inputs.job == 'all'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
