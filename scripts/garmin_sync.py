@@ -1160,11 +1160,23 @@ def resend_today():
     health_history = load_json(HEALTH_FILE)
     health = health_history.get(TODAY, {})
 
-    # 오늘 기록에서 parsed activity 재구성
+    # 오늘 또는 가장 최근 운동 기록 찾기
+    target_date = TODAY
     today_entry = workout_log.get(TODAY)
     if not today_entry or not today_entry.get('done'):
-        print("  오늘 운동 기록 없음")
-        return
+        # 오늘 기록 없으면 가장 최근 완료 기록
+        recent_dates = sorted(
+            [d for d, e in workout_log.items() if e.get('done')],
+            reverse=True
+        )
+        if not recent_dates:
+            print("  운동 기록 없음")
+            return
+        target_date = recent_dates[0]
+        today_entry = workout_log[target_date]
+        print(f"  오늘 기록 없음 → 최근 기록 사용: {target_date}")
+    if not health:
+        health = health_history.get(target_date, {})
 
     m = today_entry.get('metrics', {})
     wtype = m.get('type', '')
