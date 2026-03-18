@@ -2,25 +2,20 @@ name: daily-reminder
 
 on:
   schedule:
-    - cron: '40 20 * * *'   # UTC 20:40 = KST 05:40 (아침)
-    - cron: '0 9 * * *'    # UTC 09시 = KST 18시 (저녁)
+    - cron: '0 22 * * *'    # UTC 22시 = KST 07시 (할일 리마인드)
+    - cron: '40 20 * * *'   # UTC 20:40 = KST 05:40 (운동 아침 알림)
+    - cron: '0 9 * * *'     # UTC 09시 = KST 18시 (운동 저녁 리마인드)
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  morning:
-    if: github.event.schedule != '0 9 * * *'
+  task-reminder:
+    if: github.event.schedule == '0 22 * * *'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - run: pip install requests urllib3
 
       - name: Send task reminder
         env:
@@ -36,6 +31,18 @@ jobs:
           curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
             -d chat_id="${CHAT_ID}" \
             -d text="${TEXT}"
+
+  morning-workout:
+    if: github.event.schedule == '40 20 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests urllib3
 
       - name: Send workout alert
         env:
