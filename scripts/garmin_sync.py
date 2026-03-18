@@ -40,7 +40,7 @@ GARMIN_PASSWORD = os.environ.get('GARMIN_PASSWORD', '')
 BOT_TOKEN = os.environ.get('BOT_TOKEN', os.environ.get('TELEGRAM_BOT_TOKEN', ''))
 CHAT_ID = os.environ.get('CHAT_ID', os.environ.get('TELEGRAM_CHAT_ID', ''))
 
-RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
+RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 
@@ -754,6 +754,83 @@ def format_week_schedule(workout_log):
 
 
 # ============================================================
+# 온트랙 판정
+# ============================================================
+def format_on_track(workout_log, schedule_data, plan_adjustments):
+    """전체 훈련이 목표 달성 궤도에 있는지 종합 판정"""
+    lines = []
+    last_analysis = schedule_data.get('last_analysis', {})
+    est = last_analysis.get('estimated_finish', '?')
+    status = last_analysis.get('status', '')
+    vdot = schedule_data.get('current_vdot', 37)
+    brick_count = schedule_data.get('brick_count', 0)
+    ow_count = schedule_data.get('ow_count', 0)
+
+    # 이번 주 러닝 현황
+    today = NOW.date()
+    monday = today - timedelta(days=today.weekday())
+    days_passed = today.weekday()
+    remaining = 6 - days_passed
+
+    run_count = 0
+    run_km = 0.0
+    for d in range(days_passed + 1):
+        dt = monday + timedelta(days=d)
+        key = dt.strftime('%Y-%m-%d')
+        entry = workout_log.get(key)
+        if entry and entry.get('done'):
+            m = entry.get('metrics', {})
+            if m.get('type') == 'run':
+                run_count += 1
+                run_km += m.get('distance_km', 0)
+
+    run_target = 3
+    run_deficit = max(0, run_target - run_count)
+
+    # 종합 판정
+    issues = []
+    if run_deficit > remaining:
+        issues.append(f"러닝 {run_count}/{run_target}회 — 이번 주 목표 달성 불가")
+    elif run_deficit > 0 and days_passed >= 3:
+        issues.append(f"러닝 {run_count}/{run_target}회 — 남은 {remaining}일 내 {run_deficit}회 필요")
+    if vdot < 39 and DAYS_LEFT < 30:
+        issues.append(f"VDOT {vdot} → 목표 39 (D-{DAYS_LEFT}, 시간 촉박)")
+    if brick_count == 0 and DAYS_LEFT < 45:
+        issues.append(f"브릭 0회 — 빨리 시작 필요")
+    if ow_count == 0 and DAYS_LEFT < 30:
+        issues.append(f"OW 0회 — 대회 전 최소 2~3회 필요")
+
+    # 판정 결과
+    if status == 'green' and not issues:
+        verdict = "🟢 ON TRACK"
+        comment = "현재 페이스 유지하면 목표 달성 가능"
+    elif status == 'red' or len(issues) >= 3:
+        verdict = "🔴 OFF TRACK"
+        comment = "스케줄 강화 필요"
+    else:
+        verdict = "🟡 CAUTION"
+        comment = "개선 포인트 있음"
+
+    lines.append(f"{'─' * 20}")
+    lines.append(f"{verdict} | D-{DAYS_LEFT} | 예상 {est}")
+    lines.append(f"  {comment}")
+
+    # 핵심 지표
+    vdot_icon = "✅" if vdot >= 39 else ("⚠️" if vdot >= 37 else "🔴")
+    brick_icon = "✅" if brick_count >= 6 else ("⚠️" if brick_count >= 3 else "🔴")
+    ow_icon = "✅" if ow_count >= 3 else ("⚠️" if ow_count >= 1 else "🔴")
+    lines.append(f"  {vdot_icon} VDOT {vdot}→39 | {brick_icon} 브릭 {brick_count}/6 | {ow_icon} OW {ow_count}/3")
+
+    # 이번 주 핵심 할 일
+    if run_deficit > 0:
+        lines.append(f"  📌 이번 주: 러닝 {run_deficit}회 더 채우기")
+    elif run_count >= run_target:
+        lines.append(f"  ✅ 이번 주 러닝 목표 달성!")
+
+    return "\n".join(lines)
+
+
+# ============================================================
 # 텔레그램 메시지 포매팅
 # ============================================================
 def format_workout_message(parsed_activities, health, plan_adjustments, schedule_data, workout_log):
@@ -850,19 +927,11 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
     lines.append(f"  {' | '.join(condition_parts)}")
     lines.append("")
 
-    # 계획 조정
-    if plan_adjustments:
-        lines.append("🔄 계획 조정")
-        for adj in plan_adjustments:
-            lines.append(f"  {adj}")
-        lines.append("")
+    # 온트랙 판정
+    on_track = format_on_track(workout_log, schedule_data, plan_adjustments)
+    lines.append(on_track)
 
-    # D-day
-    last_analysis = schedule_data.get('last_analysis', {})
-    est = last_analysis.get('estimated_finish', '?')
-    status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(
-        last_analysis.get('status', ''), '⚪')
-    lines.append(f"🏁 D-{DAYS_LEFT} | 목표 2:50 | 예상 {est} {status_icon}")
+    return "\n".join(lines)
 
     return "\n".join(lines)
 
