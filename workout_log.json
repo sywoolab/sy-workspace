@@ -53,5 +53,21 @@
     "training_zone": "easy",
     "note": "유산소 2.7 / 무산소 2.3 | 부하 105",
     "garmin_id": 22208690872
+  },
+  "2026-03-19": {
+    "planned": "",
+    "done": true,
+    "actual": "러닝 5.59km @6:00",
+    "metrics": {
+      "type": "run",
+      "distance_km": 5.59,
+      "pace_per_km": "6:00",
+      "avg_hr": 136,
+      "max_hr": 151,
+      "cadence": 168
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.7 | 부하 62",
+    "garmin_id": 22220408340
   }
 }
