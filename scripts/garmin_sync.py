@@ -149,6 +149,16 @@ def fetch_activities(api, start_date, end_date):
         return []
 
 
+def fetch_laps(api, activity_id):
+    """활동의 랩/스플릿 데이터 가져오기"""
+    try:
+        splits = api.get_activity_splits(activity_id)
+        laps = splits.get('lapDTOs', [])
+        return laps
+    except Exception:
+        return []
+
+
 def parse_activity(activity):
     """가민 활동 데이터 → workout_log.json 형식으로 변환"""
     # 활동 종류 판별
@@ -248,6 +258,102 @@ def parse_activity(activity):
         })
 
     return result
+
+
+def parse_laps(laps, wtype):
+    """랩 데이터를 간결한 형태로 파싱"""
+    result = []
+    for lap in laps:
+        dist = lap.get('distance', 0)
+        dur = lap.get('duration', 0)
+        if dist <= 0 or dur <= 0:
+            continue
+
+        entry = {
+            'distance': round(dist),
+            'duration': round(dur),
+            'avg_hr': round(lap.get('averageHR', 0)) if lap.get('averageHR') else None,
+            'max_hr': round(lap.get('maxHR', 0)) if lap.get('maxHR') else None,
+        }
+
+        if wtype == 'run':
+            pace = dur / (dist / 1000) if dist > 0 else 0
+            entry['pace_sec'] = round(pace)
+            entry['pace_str'] = seconds_to_pace(pace)
+        elif wtype == 'bike':
+            speed = (dist / 1000) / (dur / 3600) if dur > 0 else 0
+            entry['speed_kmh'] = round(speed, 1)
+
+        result.append(entry)
+    return result
+
+
+def analyze_splits(laps, wtype, vdot=37):
+    """구간별 페이스 분석 → 피드백"""
+    if not laps or len(laps) < 2:
+        return []
+
+    feedback = []
+
+    if wtype == 'run':
+        paces = [l['pace_sec'] for l in laps if l.get('pace_sec')]
+        if len(paces) < 2:
+            return []
+
+        avg_pace = sum(paces) / len(paces)
+        first_half = paces[:len(paces)//2]
+        second_half = paces[len(paces)//2:]
+        first_avg = sum(first_half) / len(first_half)
+        second_avg = sum(second_half) / len(second_half)
+
+        # 네거티브/포지티브 스플릿
+        diff = first_avg - second_avg  # 양수면 네거티브(후반 빠름)
+        if diff > 5:
+            feedback.append(f"✅ 네거티브 스플릿 — 후반 {abs(diff):.0f}초/km 빠름 (이상적)")
+        elif diff < -10:
+            feedback.append(f"⚠️ 포지티브 스플릿 — 후반 {abs(diff):.0f}초/km 느려짐 (초반 오버페이스)")
+        else:
+            feedback.append(f"👍 이븐 스플릿 — 페이스 안정적")
+
+        # 페이스 편차
+        import statistics
+        if len(paces) >= 3:
+            stdev = statistics.stdev(paces)
+            if stdev < 10:
+                feedback.append(f"✅ 페이스 편차 {stdev:.0f}초 — 매우 일관적")
+            elif stdev < 20:
+                feedback.append(f"👍 페이스 편차 {stdev:.0f}초 — 양호")
+            else:
+                feedback.append(f"⚠️ 페이스 편차 {stdev:.0f}초 — 들쭉날쭉, 일정 페이스 연습 필요")
+
+        # 구간별 존 이탈 체크 (Easy런인데 후반 템포 진입 등)
+        vdot_zones = {
+            35: {'easy': 394, 'tempo': 347},
+            36: {'easy': 385, 'tempo': 339},
+            37: {'easy': 376, 'tempo': 331},
+            38: {'easy': 367, 'tempo': 323},
+            39: {'easy': 359, 'tempo': 316},
+        }
+        z = vdot_zones.get(vdot, vdot_zones[37])
+
+        # 전체 Easy인데 특정 구간만 빠른 경우
+        if avg_pace >= z['easy']:  # 전체 Easy
+            fast_laps = [i+1 for i, p in enumerate(paces) if p < z['easy'] - 15]
+            if fast_laps:
+                feedback.append(f"💡 Lap {','.join(map(str, fast_laps))}에서 Easy 존 이탈 — 의식적으로 억제 필요")
+
+        # 최고/최저 페이스
+        best = min(paces)
+        worst = max(paces)
+        feedback.append(f"  구간: {seconds_to_pace(best)}~{seconds_to_pace(worst)}/km (최고~최저)")
+
+    elif wtype == 'bike':
+        speeds = [l['speed_kmh'] for l in laps if l.get('speed_kmh')]
+        if len(speeds) >= 2:
+            avg_spd = sum(speeds) / len(speeds)
+            feedback.append(f"  구간 평속: {min(speeds):.0f}~{max(speeds):.0f}km/h")
+
+    return feedback
 
 
 def classify_zone(parsed, vdot=37):
@@ -669,6 +775,15 @@ def generate_workout_feedback(parsed, schedule_data):
     elif te > 0:
         feedback.append(f"💡 유산소 TE {round(te, 1)} — 가벼운 자극 (회복 운동)")
 
+    # 구간별 페이스 분석
+    laps = parsed.get('laps', [])
+    if laps:
+        split_feedback = analyze_splits(laps, wtype, vdot)
+        if split_feedback:
+            feedback.append("")
+            feedback.append("📊 구간 분석")
+            feedback.extend(split_feedback)
+
     return feedback
 
 
@@ -968,6 +1083,10 @@ def sync():
 
         parsed = parse_activity(act)
         if parsed['type'] in ('run', 'swim', 'bike', 'brick', 'strength'):
+            # 랩/스플릿 데이터 추가
+            if parsed['type'] in ('run', 'bike'):
+                laps = fetch_laps(api, act_id)
+                parsed['laps'] = parse_laps(laps, parsed['type'])
             new_activities.append(parsed)
 
     print(f"  새 활동: {len(new_activities)}건")
