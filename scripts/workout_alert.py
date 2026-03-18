@@ -362,6 +362,61 @@ def load_last_analysis():
 HEALTH_FILE = os.path.join(BASE_DIR, 'data', 'garmin_health.json')
 
 
+def format_training_progress(analysis):
+    """전체 훈련 진척도 — 대회 목표 달성 트래킹"""
+    lines = []
+    lines.append("📈 훈련 진척도")
+
+    # 전체 진행률 (훈련 시작 ~ 대회)
+    total_days = (RACE_DAY.date() - TRAIN_START.date()).days
+    elapsed = (NOW.date() - TRAIN_START.date()).days
+    pct = min(100, round(elapsed / total_days * 100)) if total_days > 0 else 0
+    bar_filled = pct // 10
+    bar_empty = 10 - bar_filled
+    progress_bar = "█" * bar_filled + "░" * bar_empty
+    lines.append(f"  [{progress_bar}] {pct}% ({elapsed}/{total_days}일)")
+
+    # 핵심 지표 현황 vs 목표
+    vdot = analysis.get('vdot', '?')
+    vdot_icon = "🟢" if isinstance(vdot, (int, float)) and vdot >= 39 else (
+        "🟡" if isinstance(vdot, (int, float)) and vdot >= 37 else "🔴")
+    lines.append(f"  VDOT: {vdot} → 목표 39 {vdot_icon}")
+
+    # workout_schedule.json에서 브릭/OW 카운트
+    try:
+        with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
+            schedule = json.load(f)
+        brick_count = schedule.get('brick_count', 0)
+        ow_count = schedule.get('ow_count', 0)
+    except (FileNotFoundError, json.JSONDecodeError):
+        brick_count = 0
+        ow_count = 0
+
+    brick_icon = "🟢" if brick_count >= 6 else ("🟡" if brick_count >= 3 else "🔴")
+    ow_icon = "🟢" if ow_count >= 3 else ("🟡" if ow_count >= 1 else "🔴")
+    lines.append(f"  브릭: {brick_count}/6회 {brick_icon} | OW: {ow_count}/3회 {ow_icon}")
+
+    # 러닝 주간 빈도 (이번 주)
+    weekly = analysis.get('weekly_summary', {})
+    run_info = weekly.get('run', {})
+    run_count = run_info.get('count', 0)
+    run_target = run_info.get('target', 3)
+    run_icon = "🟢" if run_count >= run_target else ("🟡" if run_count >= run_target - 1 else "🔴")
+    lines.append(f"  금주 러닝: {run_count}/{run_target}회 {run_icon}")
+
+    # 목표 달성 전망
+    est = analysis.get('estimated_finish', '?')
+    status = analysis.get('status', '')
+    if status == 'green':
+        lines.append(f"  ✅ 현재 페이스 유지하면 목표 달성 가능")
+    elif status == 'yellow':
+        lines.append(f"  ⚠️ 예상 {est} — 러닝 빈도+브릭 쌓으면 🟢 전환 가능")
+    elif status == 'red':
+        lines.append(f"  🔴 예상 {est} — 스케줄 강화 필요")
+
+    return "\n".join(lines)
+
+
 def load_condition():
     """garmin_health.json에서 컨디션 요약 생성"""
     try:
@@ -427,6 +482,12 @@ def format_morning():
     vdot = analysis.get('vdot', '?')
     lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT} | 예상 {est} {status_icon} | VDOT {vdot}")
     lines.append("")
+
+    # 훈련 진척도
+    progress = format_training_progress(analysis)
+    if progress:
+        lines.append(progress)
+        lines.append("")
 
     # 이번 주
     lines.append(format_week(CURRENT_WEEK, is_current_week=True))
