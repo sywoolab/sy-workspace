@@ -602,6 +602,75 @@ def format_tomorrow_coaching():
     return "\n".join(lines)
 
 
+def format_recovery_scenario(missed_workout):
+    """운동 못한 날 복구 시나리오 제안"""
+    lines = []
+    lines.append("📊 복구 시나리오")
+
+    today = NOW.date()
+    monday = today - timedelta(days=today.weekday())
+    days_passed = today.weekday() + 1
+    remaining = 7 - days_passed
+
+    # 이번 주 실적
+    run_count = 0
+    swim_count = 0
+    bike_count = 0
+    run_km = 0.0
+
+    for d in range(days_passed):
+        dt = monday + timedelta(days=d)
+        key = dt.strftime('%Y-%m-%d')
+        entry = WORKOUT_LOG.get(key)
+        if entry and entry.get('done'):
+            wtype = entry.get('metrics', {}).get('type', '')
+            if wtype == 'run':
+                run_count += 1
+                run_km += entry.get('metrics', {}).get('distance_km', 0)
+            elif wtype == 'swim':
+                swim_count += 1
+            elif wtype == 'bike':
+                bike_count += 1
+
+    run_need = max(0, 3 - run_count)
+
+    lines.append(f"  현재: 러닝 {run_count}/3 | 수영 {swim_count}/4 | 자전거 {bike_count}/1")
+
+    if remaining <= 0:
+        lines.append(f"  🔴 이번 주 마감 — 다음 주 볼륨 보충 필요")
+        return "\n".join(lines)
+
+    # 러닝 미달 시 복구 방법
+    if '러닝' in missed_workout or '브릭' in missed_workout:
+        if run_need > remaining:
+            lines.append(f"  🔴 러닝 {run_need}회 필요한데 남은 {remaining}일 — 주간 목표 미달 예상")
+            lines.append(f"  → 다음 주 초반 러닝 1회 추가로 보충")
+        elif run_need > 0:
+            lines.append(f"  ✅ 복구 가능 — 남은 {remaining}일 내 러닝 {run_need}회")
+            # 구체적 복구 계획
+            tomorrow = NOW + timedelta(days=1)
+            for d in range(1, remaining + 1):
+                future = NOW + timedelta(days=d)
+                fw, fd = get_schedule_for_date(future)
+                if '러닝' in fw or '브릭' in fw:
+                    dow = DOW_NAMES[future.weekday()]
+                    lines.append(f"  → {dow}({future.strftime('%m/%d')}) {fw} — 여기서 만회")
+                    break
+    elif '수영' in missed_workout:
+        lines.append(f"  💡 수영 스킵 — 러닝 빈도 확보가 우선이므로 영향 적음")
+    else:
+        lines.append(f"  💡 오늘 못 해도 주간 목표에 큰 영향 없음")
+
+    # 야근/음주 대응
+    lines.append("")
+    if DOW in (3, 4):  # 목/금 — 회식 가능성
+        lines.append("  💡 야근/회식이었다면:")
+        lines.append("    → 내일 Easy로 전환하거나 수영 대체 가능")
+        lines.append("    → 음주 다음날: 무리하지 말 것 (탈수 + 수면질 저하)")
+
+    return "\n".join(lines)
+
+
 def format_evening():
     workout, detail = get_today_workout()
     if workout is None:
@@ -628,23 +697,29 @@ def format_evening():
         if actual:
             lines.append(f"  → {actual}")
     else:
-        # 미완료 → 리마인드
+        # 미완료 → 리마인드 + 복구 시나리오
         lines.append(f"🏁 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if detail:
             lines.append(f"  → {detail}")
         lines.append("")
-        if "러닝" in workout or "브릭" in workout:
-            lines.append("🔴 러닝은 절대 빠지면 안 됩니다!")
-        else:
-            lines.append("꾸준함이 실력입니다.")
+
+        # 복구 시나리오 생성
+        recovery = format_recovery_scenario(workout)
+        if recovery:
+            lines.append(recovery)
 
     # 내일 코칭 (항상 추가)
     coaching = format_tomorrow_coaching()
     if coaching:
         lines.append("")
         lines.append(coaching)
+
+    # 저녁 운동 가능성 안내
+    if not today_done and "휴식" not in workout:
+        lines.append("")
+        lines.append("💡 저녁에 운동하면 자동 감지되어 업데이트됩니다")
 
     return "\n".join(lines)
 
