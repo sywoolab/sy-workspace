@@ -25,7 +25,7 @@ LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
 # 대회일 & 훈련 시작일
-RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
+RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)  # 복귀일 (월요일)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 
@@ -39,7 +39,7 @@ CURRENT_WEEK = get_week_number(NOW)
 # Phase 판별 (날짜 기반, 주 단위 경계 = 일요일)
 PHASE1_END = datetime(2026, 4, 5, tzinfo=KST).date()   # 일요일 (Week 2 끝)
 PHASE2_END = datetime(2026, 4, 26, tzinfo=KST).date()  # 일요일 (Week 5 끝)
-PHASE3_END = datetime(2026, 5, 9, tzinfo=KST).date()  # 일요일 (대회일)
+PHASE3_END = datetime(2026, 5, 10, tzinfo=KST).date()  # 일요일 (대회일)
 
 def get_phase(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
@@ -118,16 +118,16 @@ WEEK4_SCHEDULE = {
     6: ("완전 휴식 or 자전거 가볍게", "회복일"),
 }
 
-# 대회 주 (Week 7: 5/4~5/9, 대회일 5/9=금요일=weekday 4)
-# 마스터: 월 수영 / 화 러닝 / 수 자전거 / 목 휴식 / 금 대구이동+입수 / 토 대회
+# 대회 주 (Week 7: 5/4~5/10, 대회일 5/10=일요일=weekday 6)
+# 5/9(토) 대구 이동+검수, 5/10(일) 대회
 WEEK7_SCHEDULE = {
     0: ("수영 가볍게", "1km"),
     1: ("러닝", "3km 조깅"),
     2: ("자전거 가볍게", "30분"),
     3: ("완전 휴식", ""),
-    4: ("수성못 사전 입수", "대구 이동 + 200~300m 가볍게 (수온·감각 확인)"),
-    5: ("대회", "수영 1.5km + 자전거 40km + 러닝 10km"),
-    6: ("완전 휴식", ""),
+    4: ("수영 가볍게", "1km (감각 유지)"),
+    5: ("수성못 사전 입수", "대구 이동 + 검수 + 200~300m 가볍게 (수온·감각 확인)"),
+    6: ("대회", "수영 1.5km + 자전거 40km + 러닝 10km"),
 }
 
 # Phase별 주간 목표 & 최소 기준

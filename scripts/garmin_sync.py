@@ -41,7 +41,7 @@ GARMIN_PASSWORD = os.environ.get('GARMIN_PASSWORD', '')
 BOT_TOKEN = os.environ.get('BOT_TOKEN', os.environ.get('TELEGRAM_BOT_TOKEN', ''))
 CHAT_ID = os.environ.get('CHAT_ID', os.environ.get('TELEGRAM_CHAT_ID', ''))
 
-RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
+RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 

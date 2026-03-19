@@ -24,7 +24,7 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
-RACE_DAY = datetime(2026, 5, 9, tzinfo=KST)
+RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 
@@ -236,7 +236,7 @@ def get_phase(dt):
         return 1, "Phase 1: 베이스"
     elif d <= datetime(2026, 4, 26, tzinfo=KST).date():
         return 2, "Phase 2: 빌드"
-    elif d <= datetime(2026, 5, 9, tzinfo=KST).date():
+    elif d <= datetime(2026, 5, 10, tzinfo=KST).date():
         return 3, "Phase 3: 테이퍼"
     return 0, "대회 완료"
 
