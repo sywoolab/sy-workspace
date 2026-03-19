@@ -736,134 +736,351 @@ def check_plan_adherence(workout_log, schedule_data):
 
 
 # ============================================================
-# 운동 피드백 생성
+# 운동 피드백 생성 (종합 판정 + 주간 경과)
 # ============================================================
-def generate_workout_feedback(parsed, schedule_data):
-    """개별 운동에 대한 피드백 (의미 판정 + 구체적 코멘트)"""
+VDOT_ZONES = {
+    35: {'easy_lo': 394, 'easy_hi': 437, 'tempo': 347},
+    36: {'easy_lo': 385, 'easy_hi': 427, 'tempo': 339},
+    37: {'easy_lo': 376, 'easy_hi': 417, 'tempo': 331},
+    38: {'easy_lo': 367, 'easy_hi': 407, 'tempo': 323},
+    39: {'easy_lo': 359, 'easy_hi': 398, 'tempo': 316},
+}
+
+# Phase별 주간 목표
+PHASE_WEEKLY_TARGETS = {
+    1: {'swim': 4, 'run': 3, 'run_km': (20, 23), 'bike': 1, 'desc': '베이스 — Easy 90% / Tempo 10%'},
+    2: {'swim': 3, 'run': 3, 'run_km': (21, 25), 'bike': 2, 'desc': '빌드 — Easy 80% / Tempo 15% / Interval 5%'},
+    3: {'swim': 2, 'run': 2, 'run_km': (10, 10), 'bike': 1, 'desc': '테이퍼 — 볼륨 감소, 강도 유지'},
+}
+
+
+def generate_workout_feedback(parsed, schedule_data, workout_log=None):
+    """종합 운동 판정: 계획 준수 + 강도 적절성 + 볼륨 + 추이 + 주간 경과"""
+    if workout_log is None:
+        workout_log = {}
+
     wtype = parsed['type']
     vdot = schedule_data.get('current_vdot', 37)
-    zone = classify_zone(parsed, vdot)
-    feedback = []
+    z = VDOT_ZONES.get(vdot, VDOT_ZONES[37])
+    date_str = parsed.get('date', TODAY)
 
-    # VDOT 기반 페이스 존 경계
-    vdot_zones = {
-        35: {'easy_lo': 394, 'easy_hi': 437, 'tempo': 347},
-        36: {'easy_lo': 385, 'easy_hi': 427, 'tempo': 339},
-        37: {'easy_lo': 376, 'easy_hi': 417, 'tempo': 331},
-        38: {'easy_lo': 367, 'easy_hi': 407, 'tempo': 323},
-        39: {'easy_lo': 359, 'easy_hi': 398, 'tempo': 316},
-    }
-    z = vdot_zones.get(vdot, vdot_zones[37])
+    lines = []
+    score = 0  # 100점 만점
+    max_score = 0
+
+    # ─── 1. 계획 준수 ───
+    max_score += 25
+    try:
+        import sys as _sys
+        _scripts_dir = os.path.dirname(os.path.abspath(__file__))
+        if _scripts_dir not in _sys.path:
+            _sys.path.insert(0, _scripts_dir)
+        from workout_alert import get_schedule_for_date, get_phase, WEEK_NAMES, PHASE_GOALS
+        dt = datetime.strptime(date_str, '%Y-%m-%d').replace(tzinfo=KST)
+        planned, detail = get_schedule_for_date(dt)
+        phase_num, phase_name = get_phase(dt)
+
+        type_name = {'run': '러닝', 'swim': '수영', 'bike': '자전거', 'brick': '브릭'}
+        actual_name = type_name.get(wtype, wtype)
+
+        if wtype == 'run' and '러닝' in planned:
+            lines.append(f"✅ 계획 준수 — {planned} 예정 → {actual_name} 완료")
+            score += 25
+        elif wtype == 'swim' and '수영' in planned:
+            lines.append(f"✅ 계획 준수 — {planned} 예정 → {actual_name} 완료")
+            score += 25
+        elif wtype == 'bike' and ('자전거' in planned or '브릭' in planned):
+            lines.append(f"✅ 계획 준수 — {planned} 예정 → {actual_name} 완료")
+            score += 25
+        elif '휴식' in planned:
+            lines.append(f"💡 휴식일인데 운동 — 컨디션 괜찮으면 OK")
+            score += 15
+        else:
+            lines.append(f"🔄 계획 변경 — {planned} 예정 → {actual_name} 수행")
+            score += 15
+    except Exception:
+        planned = ''
+        phase_num = 1
+
+    # ─── 2. 강도 적절성 ───
+    max_score += 25
+    laps = parsed.get('laps', [])
+    is_buildup = False
+    if laps and len(laps) >= 3:
+        lap_paces = [l['pace_sec'] for l in laps if l.get('pace_sec')]
+        if lap_paces:
+            accel = sum(1 for i in range(1, len(lap_paces)) if lap_paces[i] < lap_paces[i-1] - 3)
+            is_buildup = accel >= len(lap_paces) * 0.6 and (max(lap_paces) - min(lap_paces)) > 30
 
     if wtype == 'run':
-        dist = parsed.get('distance_km', 0)
         pace = parsed.get('pace_sec', 0)
-        hr = parsed.get('avg_hr', 0)
+        # Easy Day 판정: Phase 1에서 Easy 비율 90%, 주 3회 중 2회는 Easy
+        is_easy_day = 'Easy' in (detail or '') or 'Long' in (detail or '') or '+' in (planned or '')
+        is_tempo_day = '템포' in (planned or '') or 'Tempo' in (detail or '')
 
-        # 거리 평가
-        if dist >= 10:
-            feedback.append("✅ 10km+ Long Run — 대회 거리 달성, 자신감 ↑")
-        elif dist >= 7:
-            feedback.append("✅ 7km+ — 충분한 거리, 좋습니다")
-        elif dist >= 5:
-            feedback.append("👍 5km+ — 기본 볼륨 충족")
-        else:
-            feedback.append("⚠️ 5km 미만 — 짧은 런, 다음엔 5km 이상 목표")
-
-        # 빌드업 여부 사전 체크 (빌드업이면 평균 페이스 경고 억제)
-        laps = parsed.get('laps', [])
-        is_buildup = False
-        if laps and len(laps) >= 3:
-            lap_paces = [l['pace_sec'] for l in laps if l.get('pace_sec')]
-            if lap_paces:
-                accel = sum(1 for i in range(1, len(lap_paces)) if lap_paces[i] < lap_paces[i-1] - 3)
-                is_buildup = accel >= len(lap_paces) * 0.6 and (max(lap_paces) - min(lap_paces)) > 30
-
-        # 페이스 평가
         if is_buildup:
-            feedback.append(f"👍 빌드업 — 평균 {seconds_to_pace(pace)}/km (구간 분석 참조)")
+            lines.append(f"👍 강도 — 빌드업 (유산소+역치 복합 자극)")
+            score += 20
+        elif is_easy_day and pace >= z['easy_lo']:
+            lines.append(f"✅ 강도 — Easy Day에 Easy 페이스 ({seconds_to_pace(pace)}/km) 정확")
+            score += 25
+        elif is_easy_day and pace < z['easy_lo']:
+            lines.append(f"⚠️ 강도 — Easy Day인데 {seconds_to_pace(pace)}/km (6:16+ 권장)")
+            score += 10
+        elif is_tempo_day and z['tempo'] - 5 <= pace <= z['tempo'] + 10:
+            lines.append(f"✅ 강도 — Tempo Day에 Tempo 페이스 ({seconds_to_pace(pace)}/km) 정확")
+            score += 25
         elif pace >= z['easy_lo']:
-            feedback.append(f"✅ Easy 존 정확히 준수 ({seconds_to_pace(pace)}/km)")
+            lines.append(f"✅ 강도 — Easy 존 ({seconds_to_pace(pace)}/km)")
+            score += 22
         elif pace >= z['tempo'] + 10:
-            feedback.append(f"⚠️ Moderate 존 (Dead Zone) — {seconds_to_pace(pace)}/km")
-            feedback.append(f"  → Easy({seconds_to_pace(z['easy_lo'])}~) 또는 Tempo({seconds_to_pace(z['tempo'])})로 명확히")
-        elif pace >= z['tempo'] - 5:
-            feedback.append(f"✅ Tempo 존 — {seconds_to_pace(pace)}/km, 역치 훈련 효과 ○")
+            lines.append(f"⚠️ 강도 — Dead Zone ({seconds_to_pace(pace)}/km), Easy 또는 Tempo로 명확히")
+            score += 10
         else:
-            feedback.append(f"🔥 고강도 — {seconds_to_pace(pace)}/km, 회복일 필요")
+            lines.append(f"✅ 강도 — Tempo+ ({seconds_to_pace(pace)}/km)")
+            score += 20
+    elif wtype == 'swim':
+        lines.append(f"✅ 강도 — 수영 (코치/수업 기반)")
+        score += 22
+    elif wtype == 'bike':
+        lines.append(f"✅ 강도 — 자전거")
+        score += 22
 
-        # 심박 vs 페이스 매칭
-        if hr and pace >= z['easy_lo'] and hr > 155:
-            feedback.append(f"⚠️ Easy 페이스인데 HR {hr} 높음 — 피로 누적 or 컨디션 체크")
-
+    # ─── 3. 볼륨 ───
+    max_score += 25
+    if wtype == 'run':
+        dist = parsed.get('distance_km', 0)
+        # 목표 거리 (계획에서 추출)
+        import re
+        target_dist = 6  # 기본
+        if detail:
+            m = re.search(r'(\d+)[~\-](\d+)km', detail)
+            if m:
+                target_dist = (int(m.group(1)) + int(m.group(2))) / 2
+            else:
+                m2 = re.search(r'(\d+)km', detail)
+                if m2:
+                    target_dist = int(m2.group(1))
+        pct = round(dist / target_dist * 100) if target_dist > 0 else 0
+        if pct >= 90:
+            lines.append(f"✅ 볼륨 — {dist}km / 목표 {target_dist:.0f}km ({pct}%)")
+            score += 25
+        elif pct >= 70:
+            lines.append(f"👍 볼륨 — {dist}km / 목표 {target_dist:.0f}km ({pct}%)")
+            score += 18
+        else:
+            lines.append(f"⚠️ 볼륨 — {dist}km / 목표 {target_dist:.0f}km ({pct}%) 부족")
+            score += 10
     elif wtype == 'swim':
         dist = parsed.get('distance_m', 0)
-        pace_100m = parsed.get('pace_sec_100m', 0)
-
         if dist >= 1500:
-            feedback.append("✅ 1.5km+ — 대회 거리 달성!")
+            lines.append(f"✅ 볼륨 — {dist}m (대회 거리!)")
+            score += 25
         elif dist >= 1000:
-            feedback.append("👍 1km+ — 좋은 볼륨")
+            lines.append(f"👍 볼륨 — {dist}m")
+            score += 20
         elif dist >= 500:
-            feedback.append("👌 기본 유지 수준")
+            lines.append(f"👌 볼륨 — {dist}m (기본)")
+            score += 15
         else:
-            feedback.append("⚠️ 500m 미만 — 볼륨 부족, 1km 이상 권장")
-
-        # Swolf
-        swolf = parsed.get('swolf')
-        if swolf:
-            if swolf <= 35:
-                feedback.append(f"✅ Swolf {swolf} — 효율 우수")
-            elif swolf <= 40:
-                feedback.append(f"👍 Swolf {swolf} — 양호")
-            else:
-                feedback.append(f"⚠️ Swolf {swolf} — 스트로크 효율 개선 필요")
-
-        # 장비 사용 가능성 판정 (평소 대비 페이스/Swolf가 확연히 좋은 경우)
-        # 수업(수/금/토)에서 오리발·패들 등 사용 가능성 있음
-        if pace_100m and pace_100m > 0:
-            # 간이 판정: workout_log에서 최근 맨몸 평균과 비교는 detect_swim_equipment에서 처리
-            # 여기서는 결과만 표시
-            date_dt = datetime.strptime(parsed.get('date', TODAY), '%Y-%m-%d')
-            is_lesson_day = date_dt.weekday() in (2, 4, 5)  # 수/금/토
-            if is_lesson_day and pace_100m < 110:  # 1:50 미만이면 장비 가능성
-                feedback.append(f"💡 수업일 + 빠른 페이스 — 장비 사용 가능성 있음 (맨몸 환산 보정 적용)")
-
+            lines.append(f"⚠️ 볼륨 — {dist}m (1km+ 권장)")
+            score += 8
     elif wtype == 'bike':
-        dur_min = parsed.get('duration_sec', 0) / 60
-        speed = parsed.get('avg_speed_kmh', 0)
-
-        if dur_min >= 75:
-            feedback.append("✅ 75분+ — 대회 수준 볼륨")
-        elif dur_min >= 60:
-            feedback.append("👍 60분+ — 기본 볼륨 충족")
-        elif dur_min >= 30:
-            feedback.append("👌 감각 유지 수준")
+        dur = parsed.get('duration_sec', 0) / 60
+        if dur >= 60:
+            lines.append(f"✅ 볼륨 — {dur:.0f}분")
+            score += 25
+        elif dur >= 30:
+            lines.append(f"👍 볼륨 — {dur:.0f}분")
+            score += 18
         else:
-            feedback.append("⚠️ 30분 미만 — 다음엔 더 길게")
+            lines.append(f"⚠️ 볼륨 — {dur:.0f}분 (30분+ 권장)")
+            score += 10
 
-        if speed and speed >= 30:
-            feedback.append(f"✅ 평속 {speed}km/h — 대회 목표 속도 이상")
+    # ─── 4. 추이 (직전 같은 종목 대비) ───
+    max_score += 25
+    prev_entries = []
+    for dk in sorted(workout_log.keys(), reverse=True):
+        if dk >= date_str:
+            continue
+        entry = workout_log.get(dk, {})
+        if entry.get('done') and entry.get('metrics', {}).get('type') == wtype:
+            prev_entries.append((dk, entry))
+            if len(prev_entries) >= 1:
+                break
 
-    # 훈련 효과 평가
-    te = parsed.get('aerobic_te', 0) or 0
-    if te >= 3.0:
-        feedback.append(f"🔥 유산소 TE {round(te, 1)} — 체력 향상에 크게 기여")
-    elif te >= 2.0:
-        feedback.append(f"👍 유산소 TE {round(te, 1)} — 유지/소폭 향상")
-    elif te > 0:
-        feedback.append(f"💡 유산소 TE {round(te, 1)} — 가벼운 자극 (회복 운동)")
+    if prev_entries:
+        prev_date, prev = prev_entries[0]
+        pm = prev.get('metrics', {})
+        if wtype == 'run':
+            prev_pace_str = pm.get('pace_per_km', '')
+            if prev_pace_str:
+                pp = prev_pace_str.split(':')
+                prev_pace = int(pp[0]) * 60 + int(pp[1]) if len(pp) == 2 else 0
+                curr_pace = parsed.get('pace_sec', 0)
+                diff = prev_pace - curr_pace
+                prev_dist = pm.get('distance_km', 0)
+                if is_buildup:
+                    lines.append(f"✅ 추이 — 빌드업으로 최고 {seconds_to_pace(min(lap_paces))}/km 도달 (직전 {prev_date[-5:]} 평균 {prev_pace_str})")
+                    score += 22
+                elif diff > 5:
+                    lines.append(f"✅ 추이 — {prev_date[-5:]} {prev_pace_str} → 오늘 {seconds_to_pace(curr_pace)}/km (향상)")
+                    score += 25
+                elif diff > -5:
+                    lines.append(f"👍 추이 — {prev_date[-5:]} {prev_pace_str} → 오늘 {seconds_to_pace(curr_pace)}/km (유지)")
+                    score += 20
+                else:
+                    lines.append(f"💡 추이 — {prev_date[-5:]} {prev_pace_str} → 오늘 {seconds_to_pace(curr_pace)}/km (느려짐, 컨디션 체크)")
+                    score += 12
+            else:
+                score += 15
+        elif wtype == 'swim':
+            prev_swolf = pm.get('swolf')
+            curr_swolf = parsed.get('swolf')
+            if prev_swolf and curr_swolf:
+                diff = prev_swolf - curr_swolf
+                if diff > 0:
+                    lines.append(f"✅ 추이 — Swolf {prev_swolf} → {curr_swolf} (향상)")
+                    score += 25
+                elif diff == 0:
+                    lines.append(f"👍 추이 — Swolf {curr_swolf} (유지)")
+                    score += 20
+                else:
+                    lines.append(f"💡 추이 — Swolf {prev_swolf} → {curr_swolf}")
+                    score += 15
+            else:
+                score += 15
+        else:
+            score += 15
+    else:
+        lines.append(f"💡 추이 — 첫 기록 (비교 데이터 없음)")
+        score += 15
 
-    # 구간별 페이스 분석
-    laps = parsed.get('laps', [])
+    # ─── 종합 판정 ───
+    pct_score = round(score / max_score * 100) if max_score > 0 else 0
+    if pct_score >= 85:
+        grade = "🟢 GREAT"
+    elif pct_score >= 65:
+        grade = "👍 GOOD"
+    elif pct_score >= 45:
+        grade = "👌 OK"
+    else:
+        grade = "⚠️ 부족"
+
+    header = f"📊 오늘 운동 판정: {grade}"
+
+    # ─── 구간 분석 (있으면) ───
+    split_lines = []
     if laps:
-        split_feedback = analyze_splits(laps, wtype, vdot)
-        if split_feedback:
-            feedback.append("")
-            feedback.append("📊 구간 분석")
-            feedback.extend(split_feedback)
+        split_fb = analyze_splits(laps, wtype, vdot)
+        if split_fb:
+            split_lines = split_fb
 
-    return feedback
+    # ─── 조합 ───
+    result = [header, ""]
+    result.extend(lines)
+    if split_lines:
+        result.append("")
+        result.extend(split_lines)
+
+    return result
+
+
+def generate_weekly_progress(workout_log, schedule_data):
+    """이번 주 경과 피드백: 주간 목표 대비 진행률"""
+    try:
+        import sys as _sys
+        _scripts_dir = os.path.dirname(os.path.abspath(__file__))
+        if _scripts_dir not in _sys.path:
+            _sys.path.insert(0, _scripts_dir)
+        from workout_alert import get_phase, WEEK_NAMES
+    except Exception:
+        return []
+
+    today = NOW.date()
+    monday = today - timedelta(days=today.weekday())
+    week_num = (monday - TRAIN_START.date()).days // 7
+    days_passed = today.weekday() + 1  # 1=월 ~ 7=일
+    remaining = 7 - days_passed
+
+    phase_num, phase_name = get_phase(NOW)
+    targets = PHASE_WEEKLY_TARGETS.get(phase_num, PHASE_WEEKLY_TARGETS[1])
+    week_name = WEEK_NAMES.get(week_num, f"Week {week_num}")
+
+    # 주간 실적 집계
+    run_count = 0
+    swim_count = 0
+    bike_count = 0
+    run_km = 0.0
+    easy_runs = 0
+    hard_runs = 0
+
+    for d in range(days_passed):
+        dt = monday + timedelta(days=d)
+        key = dt.strftime('%Y-%m-%d')
+        entry = workout_log.get(key)
+        if not entry or not entry.get('done'):
+            continue
+        m = entry.get('metrics', {})
+        wtype = m.get('type', '')
+        if wtype == 'run':
+            run_count += 1
+            run_km += m.get('distance_km', 0)
+            zone = entry.get('training_zone', 'moderate')
+            if zone == 'easy':
+                easy_runs += 1
+            else:
+                hard_runs += 1
+        elif wtype == 'swim':
+            swim_count += 1
+        elif wtype == 'bike':
+            bike_count += 1
+
+    lines = []
+    lines.append(f"📅 {week_name} 경과 ({days_passed}/7일)")
+    lines.append(f"  목표: {targets['desc']}")
+
+    # 종목별 진행률
+    run_t = targets['run']
+    swim_t = targets['swim']
+    bike_t = targets['bike']
+    km_lo, km_hi = targets['run_km']
+
+    run_bar = "●" * run_count + "○" * max(0, run_t - run_count)
+    swim_bar = "●" * swim_count + "○" * max(0, swim_t - swim_count)
+    bike_bar = "●" * bike_count + "○" * max(0, bike_t - bike_count)
+
+    run_icon = "✅" if run_count >= run_t else ("🟡" if run_count >= run_t - 1 else "🔴")
+    swim_icon = "✅" if swim_count >= swim_t else "🟡"
+    bike_icon = "✅" if bike_count >= bike_t else "🟡"
+
+    lines.append(f"  러닝 {run_bar} {run_count}/{run_t}회 ({run_km:.1f}km/{km_lo}~{km_hi}km) {run_icon}")
+    lines.append(f"  수영 {swim_bar} {swim_count}/{swim_t}회 {swim_icon}")
+    lines.append(f"  자전거 {bike_bar} {bike_count}/{bike_t}회 {bike_icon}")
+
+    # 80/20 체크
+    if run_count >= 2:
+        total = easy_runs + hard_runs
+        easy_pct = round(easy_runs / total * 100) if total > 0 else 0
+        if easy_pct >= 60:
+            lines.append(f"  80/20: Easy {easy_runs}회 / 고강도 {hard_runs}회 ✅")
+        else:
+            lines.append(f"  80/20: Easy {easy_runs}회 / 고강도 {hard_runs}회 ⚠️ Easy 비율 부족")
+
+    # 남은 일정 가이드
+    if remaining > 0:
+        todos = []
+        run_need = max(0, run_t - run_count)
+        if run_need > 0:
+            todos.append(f"러닝 {run_need}회")
+        if bike_count < bike_t:
+            todos.append(f"자전거 {bike_t - bike_count}회")
+        if todos:
+            lines.append(f"  📌 남은 {remaining}일: {', '.join(todos)} 필요")
+        else:
+            lines.append(f"  ✅ 이번 주 핵심 목표 달성!")
+
+    return lines
 
 
 # ============================================================
@@ -1078,14 +1295,22 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
         if te_parts:
             lines.append(f"  TE: {' / '.join(te_parts)}")
 
-        # 운동 피드백 (핵심 추가)
-        feedback = generate_workout_feedback(p, schedule_data)
+        # 운동 종합 판정
+        feedback = generate_workout_feedback(p, schedule_data, workout_log)
         if feedback:
             lines.append("")
-            lines.append("  💬 피드백")
             for fb in feedback:
-                lines.append(f"    {fb}")
+                lines.append(f"  {fb}")
         lines.append("")
+
+    # 주간 경과 피드백
+    try:
+        weekly = generate_weekly_progress(workout_log, schedule_data)
+        if weekly:
+            lines.extend(weekly)
+            lines.append("")
+    except Exception as e:
+        print(f"  [WARN] 주간 경과 포매팅 실패: {e}")
 
     # 금주 스케줄 + 진척 현황
     try:
