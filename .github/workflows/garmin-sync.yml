@@ -2,11 +2,15 @@ name: garmin-sync
 
 on:
   schedule:
-    # KST 08:00, 12:00, 16:00, 20:00 → UTC 23:00(전날), 03:00, 07:00, 11:00
+    # KST 08~22시 2시간마다 → UTC 23,01,03,05,07,09,11,13
     - cron: '0 23 * * *'
+    - cron: '0 1 * * *'
     - cron: '0 3 * * *'
+    - cron: '0 5 * * *'
     - cron: '0 7 * * *'
+    - cron: '0 9 * * *'
     - cron: '0 11 * * *'
+    - cron: '0 13 * * *'
   workflow_dispatch:
     inputs:
       mode:
