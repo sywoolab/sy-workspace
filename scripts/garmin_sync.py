@@ -11,6 +11,7 @@
 import os
 import sys
 import json
+import base64
 import traceback
 from datetime import datetime, timezone, timedelta
 from garminconnect import Garmin
@@ -110,11 +111,44 @@ def send_telegram(text):
 # ============================================================
 # 가민 로그인
 # ============================================================
+def _restore_tokens_from_env():
+    """GARMIN_TOKENS 환경변수(base64 tar.gz)에서 토큰 파일 복원 (GitHub Actions용)
+
+    로컬에서 생성:
+        tar -czf - -C data garmin_tokens | base64 | gh secret set GARMIN_TOKENS
+    """
+    import subprocess
+    import tempfile
+
+    tokens_b64 = os.environ.get('GARMIN_TOKENS', '')
+    if not tokens_b64:
+        return False
+    try:
+        tar_bytes = base64.b64decode(tokens_b64)
+        os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
+        with tempfile.NamedTemporaryFile(suffix='.tar.gz', delete=False) as tmp:
+            tmp.write(tar_bytes)
+            tmp_path = tmp.name
+        subprocess.run(
+            ['tar', '-xzf', tmp_path, '-C', os.path.join(BASE_DIR, 'data')],
+            check=True,
+        )
+        os.unlink(tmp_path)
+        print("[OK] GARMIN_TOKENS 환경변수에서 토큰 복원 완료 (tar.gz)")
+        return True
+    except Exception as e:
+        print(f"[WARN] GARMIN_TOKENS 복원 실패: {e}")
+        return False
+
+
 def login_garmin():
-    """가민 커넥트 로그인 (토큰 캐시 활용)"""
+    """가민 커넥트 로그인 (토큰 캐시 활용, GitHub Actions는 Secret에서 복원)"""
     if not GARMIN_EMAIL or not GARMIN_PASSWORD:
         print("[ERROR] GARMIN_EMAIL / GARMIN_PASSWORD 환경변수 필요")
         sys.exit(1)
+
+    # GitHub Actions: 환경변수에서 토큰 복원
+    _restore_tokens_from_env()
 
     api = Garmin(GARMIN_EMAIL, GARMIN_PASSWORD)
 
@@ -1223,71 +1257,127 @@ def resend_today():
     if not health:
         health = health_history.get(target_date, {})
 
-    m = today_entry.get('metrics', {})
-    wtype = m.get('type', '')
-
-    parsed = {
-        'type': wtype,
-        'date': TODAY,
-        'duration_sec': int(m.get('duration_min', 0) * 60) if m.get('duration_min') else 0,
-        'moving_sec': int(m.get('moving_min', 0) * 60) if m.get('moving_min') else 0,
-        'avg_hr': m.get('avg_hr'),
-        'max_hr': m.get('max_hr'),
-        'aerobic_te': None,
-        'anaerobic_te': None,
-        'training_load': None,
-    }
-
-    # TE/부하 파싱 from note
-    note = today_entry.get('note', '')
     import re
-    ae_match = re.search(r'유산소 ([\d.]+)', note)
-    an_match = re.search(r'무산소 ([\d.]+)', note)
-    load_match = re.search(r'부하 (\d+)', note)
-    if ae_match:
-        parsed['aerobic_te'] = float(ae_match.group(1))
-    if an_match:
-        parsed['anaerobic_te'] = float(an_match.group(1))
-    if load_match:
-        parsed['training_load'] = int(load_match.group(1))
 
-    if wtype == 'swim':
-        pace_str = m.get('pace_per_100m', '0:00')
-        parts = pace_str.split(':')
-        pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
-        parsed.update({
-            'distance_m': m.get('distance_m', 0),
-            'pace_per_100m': pace_str,
-            'pace_sec_100m': pace_sec,
-            'swolf': m.get('swolf'),
-            'total_strokes': m.get('strokes'),
-        })
-        if not parsed['duration_sec']:
-            parsed['duration_sec'] = int(pace_sec * m.get('distance_m', 0) / 100)
-    elif wtype == 'run':
-        pace_str = m.get('pace_per_km', '0:00')
-        parts = pace_str.split(':')
-        pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
-        parsed.update({
-            'distance_km': m.get('distance_km', 0),
-            'pace_per_km': pace_str,
-            'pace_sec': pace_sec,
-        })
-        if not parsed['duration_sec']:
-            parsed['duration_sec'] = int(pace_sec * m.get('distance_km', 0))
-    elif wtype == 'bike':
-        parsed.update({
-            'distance_km': m.get('distance_km'),
-            'avg_speed_kmh': m.get('avg_speed_kmh'),
-            'avg_power': m.get('avg_power'),
-        })
-        if not parsed['duration_sec']:
-            parsed['duration_sec'] = int(m.get('duration_min', 0) * 60)
+    def _build_parsed(m, note=''):
+        """metrics dict에서 parsed activity 하나를 생성"""
+        wtype = m.get('type', '')
+        p = {
+            'type': wtype,
+            'date': target_date,
+            'duration_sec': int(m.get('duration_min', 0) * 60) if m.get('duration_min') else 0,
+            'moving_sec': int(m.get('moving_min', 0) * 60) if m.get('moving_min') else 0,
+            'avg_hr': m.get('avg_hr'),
+            'max_hr': m.get('max_hr'),
+            'aerobic_te': None,
+            'anaerobic_te': None,
+            'training_load': None,
+        }
+
+        # TE/부하 파싱 from note
+        ae_match = re.search(r'유산소 ([\d.]+)', note)
+        an_match = re.search(r'무산소 ([\d.]+)', note)
+        load_match = re.search(r'부하 (\d+)', note)
+        if ae_match:
+            p['aerobic_te'] = float(ae_match.group(1))
+        if an_match:
+            p['anaerobic_te'] = float(an_match.group(1))
+        if load_match:
+            p['training_load'] = int(load_match.group(1))
+
+        if wtype == 'swim':
+            pace_str = m.get('pace_per_100m', '0:00')
+            parts = pace_str.split(':')
+            pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
+            p.update({
+                'distance_m': m.get('distance_m', 0),
+                'pace_per_100m': pace_str,
+                'pace_sec_100m': pace_sec,
+                'swolf': m.get('swolf'),
+                'total_strokes': m.get('strokes'),
+            })
+            if not p['duration_sec']:
+                p['duration_sec'] = int(pace_sec * m.get('distance_m', 0) / 100)
+        elif wtype == 'run':
+            pace_str = m.get('pace_per_km', '0:00')
+            parts = pace_str.split(':')
+            pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 0
+            p.update({
+                'distance_km': m.get('distance_km', 0),
+                'pace_per_km': pace_str,
+                'pace_sec': pace_sec,
+            })
+            if not p['duration_sec']:
+                p['duration_sec'] = int(pace_sec * m.get('distance_km', 0))
+        elif wtype == 'bike':
+            p.update({
+                'distance_km': m.get('distance_km'),
+                'avg_speed_kmh': m.get('avg_speed_kmh'),
+                'avg_power': m.get('avg_power'),
+            })
+            if not p['duration_sec']:
+                p['duration_sec'] = int(m.get('duration_min', 0) * 60)
+        return p
+
+    note = today_entry.get('note', '')
+    actual = today_entry.get('actual', '')
+    parsed_list = []
+
+    # 복수 운동 판별: actual에 "+"가 있으면 metrics가 리스트이거나 개별 type으로 분리
+    metrics_raw = today_entry.get('metrics', {})
+    if '+' in actual and isinstance(metrics_raw, list):
+        # metrics가 리스트인 경우: 각각 parsed activity 생성
+        for m in metrics_raw:
+            parsed_list.append(_build_parsed(m, note))
+    elif '+' in actual and isinstance(metrics_raw, dict):
+        # metrics가 단일 dict이지만 actual에 "+"가 있는 경우
+        # actual 문자열을 파싱하여 각 운동별 parsed activity를 생성
+        parts = [p.strip() for p in actual.split('+')]
+        type_keywords = {
+            '러닝': 'run', '달리기': 'run',
+            '수영': 'swim',
+            '자전거': 'bike', '바이크': 'bike', '사이클': 'bike',
+            '근력': 'strength',
+        }
+        for part in parts:
+            sub_type = metrics_raw.get('type', '')
+            for kw, t in type_keywords.items():
+                if kw in part:
+                    sub_type = t
+                    break
+
+            sub_metrics = dict(metrics_raw)
+            sub_metrics['type'] = sub_type
+
+            # actual 파트에서 거리/페이스 추출
+            dist_km = re.search(r'([\d.]+)\s*km', part)
+            dist_m = re.search(r'([\d.]+)\s*m(?!in)', part)
+            pace_km = re.search(r'@\s*([\d]+:[\d]+)/km', part)
+            pace_100m = re.search(r'@\s*([\d]+:[\d]+)/100m', part)
+            speed_kmh = re.search(r'([\d.]+)\s*km/h', part)
+
+            if sub_type == 'run' and dist_km:
+                sub_metrics['distance_km'] = float(dist_km.group(1))
+                if pace_km:
+                    sub_metrics['pace_per_km'] = pace_km.group(1)
+            elif sub_type == 'swim' and dist_m:
+                sub_metrics['distance_m'] = float(dist_m.group(1))
+                if pace_100m:
+                    sub_metrics['pace_per_100m'] = pace_100m.group(1)
+            elif sub_type == 'bike' and dist_km:
+                sub_metrics['distance_km'] = float(dist_km.group(1))
+                if speed_kmh:
+                    sub_metrics['avg_speed_kmh'] = float(speed_kmh.group(1))
+
+            parsed_list.append(_build_parsed(sub_metrics, note))
+    else:
+        # 단일 운동
+        parsed_list.append(_build_parsed(metrics_raw, note))
 
     plan_adj = check_plan_adherence(workout_log, schedule_data)
-    msg = format_workout_message([parsed], health, plan_adj, schedule_data, workout_log)
+    msg = format_workout_message(parsed_list, health, plan_adj, schedule_data, workout_log)
     ok = send_telegram(msg)
-    print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
+    print(f"  텔레그램 전송: {'성공' if ok else '실패'} ({len(parsed_list)}건)")
 
 
 if __name__ == '__main__':
