@@ -475,7 +475,7 @@ def check_adjustments(log, week_stats, phase, vdot):
             })
 
     # 80/20 체크
-    if week_stats['hard_pct'] > 25 and (week_stats['easy_minutes'] + week_stats['hard_minutes']) > 60:
+    if week_stats['hard_pct'] > 22 and (week_stats['easy_minutes'] + week_stats['hard_minutes']) > 60:
         adjustments.append({
             "type": "intensity_too_high",
             "severity": "medium",
@@ -504,9 +504,69 @@ def check_adjustments(log, week_stats, phase, vdot):
             "message": f"🔴 주간 부하 {week_stats['total_load']} > 목표 {target_load}의 120% — 다음 일 Easy 권장",
         })
 
+    # 연속 러닝 규칙 (마스터: 복귀 2주 이내 연속 2일 금지, 이후 연속 2일 허용, 연속 3일 항상 금지)
+    consecutive_run_adj = check_consecutive_running(log)
+    adjustments.extend(consecutive_run_adj)
+
     # 생체 데이터 기반 컨디션 점검
     health_adj = check_health_adjustments()
     adjustments.extend(health_adj)
+
+    return adjustments
+
+
+def check_consecutive_running(log):
+    """연속 러닝 규칙 점검 (WORKOUT_MASTER.md 105-108행)"""
+    adjustments = []
+    today = NOW.date()
+
+    # 최근 3일 러닝 여부
+    recent_runs = []
+    for d in range(3):
+        dt = today - timedelta(days=d)
+        key = dt.strftime('%Y-%m-%d')
+        entry = log.get(key, {})
+        if entry.get('done'):
+            wtype = entry.get('metrics', {}).get('type', '')
+            # 미니브릭(2~3km)은 연속 러닝에 포함하지 않음
+            dist = entry.get('metrics', {}).get('distance_km', 0)
+            is_run = wtype == 'run' or (wtype == 'brick' and dist >= 5)
+            recent_runs.append(is_run)
+        else:
+            recent_runs.append(False)
+
+    # recent_runs[0]=오늘, [1]=어제, [2]=그저께
+
+    # 연속 3일 러닝 금지
+    if all(recent_runs):
+        adjustments.append({
+            "type": "consecutive_run_3days",
+            "severity": "high",
+            "message": "🔴 연속 3일 러닝 — 내일은 반드시 수영/자전거/휴식으로 대체",
+        })
+    # 연속 2일 체크
+    elif recent_runs[0] and recent_runs[1]:
+        # 복귀 2주 이내 (3/16~3/30)
+        recovery_end = TRAIN_START.date() + timedelta(days=14)
+        if today <= recovery_end:
+            adjustments.append({
+                "type": "consecutive_run_recovery",
+                "severity": "high",
+                "message": "🔴 복귀 2주 이내 연속 러닝 — 내일은 수영/자전거로 대체 필수",
+            })
+        else:
+            # 3주차 이후: 허용하되 둘째 날은 Easy 필수
+            today_entry = log.get(today.strftime('%Y-%m-%d'), {})
+            pace = today_entry.get('metrics', {}).get('pace_per_km', '')
+            if pace:
+                parts = pace.split(':')
+                pace_sec = int(parts[0]) * 60 + int(parts[1]) if len(parts) == 2 else 999
+                if pace_sec < 360:  # 6:00 미만이면 Easy 아님
+                    adjustments.append({
+                        "type": "consecutive_run_not_easy",
+                        "severity": "medium",
+                        "message": f"⚠️ 연속 러닝 둘째 날 — {pace}/km은 Easy 아님, 6:00+/km 필요",
+                    })
 
     return adjustments
 
