@@ -17,6 +17,15 @@
     "reg_period": "2026-01-28 14:00 ~ 2026-06-30 18:00"
   },
   {
+    "status": "접수예정",
+    "name": "제18회 전국해양스포츠제전",
+    "location": "경남 거제시 구조라해수욕장 일원",
+    "course": "전문체육(엘리트/U23: 스프린트), 학생부(고등부: 스프린트, 중등부: 슈퍼스프린트, 초등부: 아쿠아슬론), 생활체육(스탠다드, 릴레이)",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2041&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.08.28 ~ 31",
+    "reg_period": "2026-06-02 14:00 ~ 2025-07-16 18:00"
+  },
+  {
     "status": "접수중",
     "name": "2026 챌린지 군산-새만금",
     "location": "전북특별자치도 군산시 새만금방조제 일원",
@@ -109,7 +118,7 @@
     "course": "고등부: 슈퍼스프린트, 아쿠아슬론 / 중등부: 슈퍼스프린트, 아쿠아슬론 / 초등부: 슈퍼스프린트(4~6학년), 아쿠아슬론(1~6학년) / 유치부: 아쿠아슬론",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2075&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.03",
-    "reg_period": "2026-03-20 14:00 ~ 2026-04-10 23:59"
+    "reg_period": "2026-03-27 10:00 ~ 2026-04-15 23:59"
   },
   {
     "status": "접수중",
@@ -166,9 +175,9 @@
     "status": "접수중",
     "name": "2026 인천광역시철인3종협회장배 전국 엘리트·생활체육 아쿠아슬론 대회",
     "location": "인천체육고등학교",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2056&page=1&sYear=2026&vType=list&field=&keyword=",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2056&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.18 ~ 19",
-    "reg_period": "2026-02-12 14:00 ~ 2026-03-22 23:59"
+    "reg_period": "2026-02-12 14:00 ~ 2026-03-29 23:59"
   },
   {
     "status": "접수예정",
