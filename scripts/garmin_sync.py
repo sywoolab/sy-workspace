@@ -1372,6 +1372,66 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
 
 
 # ============================================================
+# 브릭 자동 감지
+# ============================================================
+def _detect_brick(entry, parsed_activities):
+    """같은 날 자전거→러닝이 30분 이내면 브릭 태깅.
+    parsed_activities: 해당 날짜에 파싱된 활동 리스트 (start_time 포함)
+    """
+    all_m = entry.get('all_metrics', [])
+
+    # 해당 날짜의 파싱된 활동에서 start_time 가져오기
+    bike_times = []
+    run_times = []
+
+    for p in parsed_activities:
+        st = p.get('start_time')
+        dur = p.get('duration_sec', 0)
+        if not st:
+            continue
+        try:
+            t_start = datetime.strptime(st, '%H:%M')
+        except (ValueError, TypeError):
+            continue
+
+        if p['type'] == 'bike':
+            t_end = t_start + timedelta(seconds=dur)
+            bike_times.append((t_start, t_end))
+        elif p['type'] == 'run':
+            run_times.append(t_start)
+
+    # start_time이 없으면 all_metrics의 순서로 대략 추정 (타입 순서만 체크)
+    if not bike_times or not run_times:
+        # all_metrics 순서 기반 fallback: 자전거→러닝 순서면 브릭 가능성
+        types_seq = [m.get('type') for m in all_m]
+        has_bike = 'bike' in types_seq
+        has_run = 'run' in types_seq
+        if has_bike and has_run:
+            bike_idx = types_seq.index('bike')
+            run_indices = [i for i, t in enumerate(types_seq) if t == 'run']
+            for ri in run_indices:
+                if ri > bike_idx:
+                    # 순서상 자전거→러닝이지만 시간 확인 불가 → 플래그만 표시
+                    entry['is_brick'] = True
+                    if 'note' in entry:
+                        if '브릭' not in entry.get('note', '') and '브릭' not in entry.get('planned', ''):
+                            entry['note'] = entry['note'] + ' | 브릭(순서 추정)'
+                    return
+        return
+
+    # 시간 기반 브릭 판정: 자전거 종료 → 러닝 시작이 30분 이내
+    for bike_start, bike_end in bike_times:
+        for run_start in run_times:
+            gap_min = (run_start - bike_end).total_seconds() / 60
+            if 0 <= gap_min <= 30:
+                entry['is_brick'] = True
+                gap_str = f"{int(gap_min)}분"
+                if '브릭' not in entry.get('note', '') and '브릭' not in entry.get('planned', ''):
+                    entry['note'] = (entry.get('note', '') + f' | 브릭(T2 {gap_str})').strip(' | ')
+                return
+
+
+# ============================================================
 # 메인 동기화 로직
 # ============================================================
 def sync():
@@ -1384,12 +1444,18 @@ def sync():
     workout_log = load_json(LOG_FILE)
     schedule_data = load_json(SCHEDULE_FILE)
 
-    # 기존 garmin_id 목록 (중복 방지)
+    # 기존 garmin_id 목록 (중복 방지) — 단일 garmin_id + garmin_ids 리스트 + all_metrics 모두 체크
     existing_ids = set()
     for entry in workout_log.values():
         gid = entry.get('garmin_id')
         if gid:
             existing_ids.add(gid)
+        for gid in entry.get('garmin_ids', []):
+            existing_ids.add(gid)
+        for am in entry.get('all_metrics', []):
+            amid = am.get('garmin_id')
+            if amid:
+                existing_ids.add(amid)
 
     # 3. 최근 2일간 활동 조회
     activities = fetch_activities(api, YESTERDAY, TODAY)
@@ -1430,26 +1496,51 @@ def sync():
         for parsed in new_activities:
             date_key = parsed['date']
             entry = to_workout_log_entry(parsed, schedule_data, workout_log)
+            new_gid = entry.get('garmin_id')
 
             # 같은 날 이미 기록이 있으면 → 기존 것에 추가 (멀티 스포츠)
             if date_key in workout_log:
                 existing = workout_log[date_key]
-                # 기존 기록의 actual에 추가
-                existing['actual'] = existing.get('actual', '') + ' + ' + entry['actual']
-                existing['garmin_id'] = entry['garmin_id']
+
+                # garmin_ids 리스트 관리 (기존 단일 garmin_id → 리스트 마이그레이션)
+                if 'garmin_ids' not in existing:
+                    old_gid = existing.get('garmin_id')
+                    existing['garmin_ids'] = [old_gid] if old_gid else []
+
+                # 이미 이 garmin_id가 기록되어 있으면 skip (중복 머징 방지)
+                if new_gid and new_gid in existing['garmin_ids']:
+                    print(f"  [SKIP] garmin_id {new_gid} 이미 {date_key}에 존재 — 머징 생략")
+                    continue
+
+                # 새 garmin_id 추가
+                if new_gid:
+                    existing['garmin_ids'].append(new_gid)
+                existing['garmin_id'] = new_gid
                 existing['done'] = True
 
-                # all_metrics: 모든 운동의 metrics를 배열로 보존
+                # 기존 기록의 actual에 추가
+                existing['actual'] = existing.get('actual', '') + ' + ' + entry['actual']
+
+                # all_metrics: 모든 운동의 metrics를 배열로 보존 (garmin_id 포함)
                 if 'all_metrics' not in existing:
-                    existing['all_metrics'] = [dict(existing['metrics'])]
-                existing['all_metrics'].append(dict(entry['metrics']))
+                    first_m = dict(existing['metrics'])
+                    first_m['garmin_id'] = existing['garmin_ids'][0] if existing['garmin_ids'] else None
+                    existing['all_metrics'] = [first_m]
+                new_m = dict(entry['metrics'])
+                new_m['garmin_id'] = new_gid
+                existing['all_metrics'].append(new_m)
 
                 # 주 운동(러닝 우선) 기준으로 단일 metrics 유지 (호환성)
                 if entry['metrics']['type'] == 'run' or existing['metrics']['type'] not in ('run',):
                     existing['metrics'] = entry['metrics']
                     existing['training_zone'] = entry['training_zone']
-                if entry['note']:
+                if entry.get('note'):
                     existing['note'] = (existing.get('note', '') + ' | ' + entry['note']).strip(' | ')
+
+                # start_time 보존 (가장 이른 시각)
+                if entry.get('start_time'):
+                    if not existing.get('start_time') or entry['start_time'] < existing['start_time']:
+                        existing['start_time'] = entry['start_time']
             else:
                 # 스케줄에서 planned 가져오기
                 try:
@@ -1457,7 +1548,18 @@ def sync():
                     entry['planned'] = planned
                 except Exception:
                     entry['planned'] = ''
+                # garmin_ids 리스트 초기화
+                entry['garmin_ids'] = [new_gid] if new_gid else []
                 workout_log[date_key] = entry
+
+        # 브릭 자동 감지: 같은 날 자전거→러닝 30분 이내
+        affected_dates = set(p['date'] for p in new_activities)
+        for date_key in affected_dates:
+            entry = workout_log.get(date_key)
+            if not entry or not entry.get('all_metrics') or len(entry['all_metrics']) < 2:
+                continue
+            date_activities = [p for p in new_activities if p['date'] == date_key]
+            _detect_brick(entry, date_activities)
 
         save_json(LOG_FILE, workout_log)
         print(f"  workout_log.json 업데이트 완료")
