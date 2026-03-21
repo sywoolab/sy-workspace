@@ -205,12 +205,17 @@ def parse_activity(activity):
         parent_map = {1: 'run', 2: 'bike', 5: 'swim', 4: 'strength'}
         wtype = parent_map.get(parent_type, 'other')
 
-    # 활동 시작 시각 → 날짜 (KST)
+    # 활동 시작 시각 → 날짜 (KST) + 시작 시간(HH:MM)
     start_local = activity.get('startTimeLocal', '')
     if start_local:
         date_key = start_local[:10]  # 'YYYY-MM-DD'
     else:
         date_key = TODAY
+
+    # 시작 시각 (HH:MM) 추출
+    start_time = None
+    if start_local and len(start_local) >= 16:
+        start_time = start_local[11:16]  # 'HH:MM'
 
     # 기본 메트릭스
     duration_sec = activity.get('duration', 0) or 0
@@ -229,6 +234,7 @@ def parse_activity(activity):
     result = {
         'garmin_id': activity.get('activityId'),
         'date': date_key,
+        'start_time': start_time,
         'type': wtype,
         'activity_name': activity.get('activityName', ''),
         'duration_sec': round(duration_sec),
@@ -570,6 +576,10 @@ def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
     if parsed.get('training_load'):
         note += f" | 부하 {parsed['training_load']}"
 
+    # laps 데이터가 있으면 metrics에 포함 (빌드업 판정 등에 사용)
+    if parsed.get('laps'):
+        metrics['laps'] = parsed['laps']
+
     # 수영 장비 사용 추정: 페이스/Swolf가 최근 평균 대비 확연히 좋으면 장비 가능성
     if wtype == 'swim':
         equipment_guess = detect_swim_equipment(parsed, workout_log_data)
@@ -577,7 +587,7 @@ def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
             metrics['swim_equipment'] = 'fins'
             note = (note + " | 장비 추정").strip(' | ')
 
-    return {
+    entry = {
         'planned': '',  # 나중에 스케줄과 매칭
         'done': True,
         'actual': actual,
@@ -586,6 +596,12 @@ def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
         'note': note,
         'garmin_id': parsed.get('garmin_id'),
     }
+
+    # 운동 시작 시각 저장
+    if parsed.get('start_time'):
+        entry['start_time'] = parsed['start_time']
+
+    return entry
 
 
 # ============================================================
@@ -1422,8 +1438,13 @@ def sync():
                 existing['actual'] = existing.get('actual', '') + ' + ' + entry['actual']
                 existing['garmin_id'] = entry['garmin_id']
                 existing['done'] = True
-                # 메트릭스는 마지막 운동 기준 (또는 주 운동)
-                # 러닝이 있으면 러닝 우선
+
+                # all_metrics: 모든 운동의 metrics를 배열로 보존
+                if 'all_metrics' not in existing:
+                    existing['all_metrics'] = [dict(existing['metrics'])]
+                existing['all_metrics'].append(dict(entry['metrics']))
+
+                # 주 운동(러닝 우선) 기준으로 단일 metrics 유지 (호환성)
                 if entry['metrics']['type'] == 'run' or existing['metrics']['type'] not in ('run',):
                     existing['metrics'] = entry['metrics']
                     existing['training_zone'] = entry['training_zone']
