@@ -405,8 +405,8 @@ def rule_a2_missed_workout(today_date_str, log):
     return None  # 내일이 이미 러닝이면 자연 보충
 
 
-def rule_a3_condition_check(target_date_str, health_data):
-    """A3: 컨디션 불량 시 오늘/내일 전환"""
+def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
+    """A3: 컨디션 불량 시 오늘/내일 전환. 이미 운동 완료면 내일 회복 권고."""
     health = health_data.get(target_date_str)
     if not health:
         # 가장 최근 데이터 사용
@@ -472,7 +472,28 @@ def rule_a3_condition_check(target_date_str, health_data):
 
     reason_str = ", ".join(reasons)
 
+    # 오늘 이미 운동 완료했는지 확인
+    already_done = False
+    if workout_log:
+        entry = workout_log.get(target_date_str, {})
+        already_done = entry.get('done', False)
+
     if high_count >= 1:
+        if already_done:
+            # 이미 운동함 → 오늘 override 무의미, 내일 회복 권고
+            tomorrow = (datetime.strptime(target_date_str, '%Y-%m-%d') + timedelta(days=1))
+            if tomorrow.weekday() == 6:  # 일요일 불가침
+                return {"warning_only": True, "reason": f"⚠️ 컨디션 적색({reason_str})에서 운동함 — 일요일 충분히 쉬세요"}
+            return {
+                "date": tomorrow.strftime('%Y-%m-%d'),
+                "workout": "Easy 또는 완전 휴식",
+                "detail": "어제 컨디션 불량에서 고강도 → 반드시 회복",
+                "reason": f"컨디션 적색 사후 회복: {reason_str}",
+                "source": "adaptive_A3",
+                "auto": True,
+                "rule": "A3-high",
+                "created_at": NOW.isoformat(),
+            }
         return {
             "date": target_date_str,
             "workout": "Easy 또는 완전 휴식",
@@ -484,6 +505,8 @@ def rule_a3_condition_check(target_date_str, health_data):
             "created_at": NOW.isoformat(),
         }
     elif medium_count >= 2:
+        if already_done:
+            return {"warning_only": True, "reason": f"💡 컨디션 황색({reason_str})에서 운동함 — 내일 Easy 권장"}
         return {
             "date": target_date_str,
             "workout": "Easy only",
@@ -984,8 +1007,8 @@ def adjust_daily(workout_log, schedule_data, health_data):
     if ov:
         overrides.append(ov)
 
-    # A3: 컨디션 체크
-    ov = rule_a3_condition_check(TODAY, health_data)
+    # A3: 컨디션 체크 (운동 완료 여부도 확인)
+    ov = rule_a3_condition_check(TODAY, health_data, workout_log)
     if ov:
         if ov.get('warning_only'):
             warnings.append(ov['reason'])
