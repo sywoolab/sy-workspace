@@ -208,6 +208,9 @@ def calc_training_load(entry):
     metrics = entry.get('metrics', {})
     wtype = metrics.get('type', 'run')
     duration = metrics.get('duration_min', 0)
+    # 수영: moving_min이 있으면 실제 운동 시간 사용 (elapsed time 대기 포함 과대평가 방지)
+    if wtype == 'swim':
+        duration = metrics.get('moving_min', duration)
     if wtype == 'run':
         pace = pace_to_seconds(metrics.get('pace_per_km'))
         # 거리 기반으로 시간 추정
@@ -274,43 +277,56 @@ def analyze_week(log, dt=None):
         if not entry or not entry.get('done'):
             continue
 
-        metrics = entry.get('metrics', {})
-        wtype = metrics.get('type', '')
-        zone = entry.get('training_zone', 'moderate')
-        load = calc_training_load(entry)
-        stats['total_load'] += load
-
-        duration = metrics.get('duration_min', 0)
-        if wtype == 'run':
-            dist = metrics.get('distance_km', 0)
-            pace = pace_to_seconds(metrics.get('pace_per_km'))
-            if pace and dist:
-                duration = (pace * dist) / 60
-
-        if zone in ('easy',):
-            stats['easy_minutes'] += duration
-        elif zone in ('tempo', 'interval', 'repetition'):
-            stats['hard_minutes'] += duration
+        # all_metrics가 있으면 각 운동별로 개별 집계, 없으면 기존 metrics 하나만 사용
+        all_metrics = entry.get('all_metrics', None)
+        if all_metrics and isinstance(all_metrics, list) and len(all_metrics) > 0:
+            metrics_list = all_metrics
         else:
-            stats['easy_minutes'] += duration * 0.5
-            stats['hard_minutes'] += duration * 0.5
+            metrics_list = [entry.get('metrics', {})]
 
-        if wtype == 'swim':
-            stats['swim']['count'] += 1
-            pace = metrics.get('pace_per_100m')
-            if pace:
-                stats['swim']['paces'].append(pace_to_seconds(pace))
-        elif wtype == 'run':
-            stats['run']['count'] += 1
-            stats['run']['total_km'] += metrics.get('distance_km', 0)
-            pace = metrics.get('pace_per_km')
-            if pace:
-                stats['run']['paces'].append(pace_to_seconds(pace))
-            stats['run']['zones'].append(zone)
-        elif wtype == 'bike':
-            stats['bike']['count'] += 1
-        elif wtype == 'brick':
-            stats['brick']['count'] += 1
+        for m_item in metrics_list:
+            # all_metrics 항목으로 임시 entry 구성하여 부하 계산
+            tmp_entry = dict(entry)
+            tmp_entry['metrics'] = m_item
+            wtype = m_item.get('type', '')
+            zone = m_item.get('training_zone', entry.get('training_zone', 'moderate'))
+            load = calc_training_load(tmp_entry)
+            stats['total_load'] += load
+
+            duration = m_item.get('duration_min', 0)
+            # 수영: moving_min 우선
+            if wtype == 'swim':
+                duration = m_item.get('moving_min', duration)
+            if wtype == 'run':
+                dist = m_item.get('distance_km', 0)
+                pace = pace_to_seconds(m_item.get('pace_per_km'))
+                if pace and dist:
+                    duration = (pace * dist) / 60
+
+            if zone in ('easy',):
+                stats['easy_minutes'] += duration
+            elif zone in ('tempo', 'interval', 'repetition'):
+                stats['hard_minutes'] += duration
+            else:
+                # moderate(Dead Zone)는 고강도로 100% 분류
+                stats['hard_minutes'] += duration
+
+            if wtype == 'swim':
+                stats['swim']['count'] += 1
+                pace = m_item.get('pace_per_100m')
+                if pace:
+                    stats['swim']['paces'].append(pace_to_seconds(pace))
+            elif wtype == 'run':
+                stats['run']['count'] += 1
+                stats['run']['total_km'] += m_item.get('distance_km', 0)
+                pace = m_item.get('pace_per_km')
+                if pace:
+                    stats['run']['paces'].append(pace_to_seconds(pace))
+                stats['run']['zones'].append(zone)
+            elif wtype == 'bike':
+                stats['bike']['count'] += 1
+            elif wtype == 'brick':
+                stats['brick']['count'] += 1
 
     total_min = stats['easy_minutes'] + stats['hard_minutes']
     stats['easy_pct'] = round(stats['easy_minutes'] / total_min * 100) if total_min > 0 else 0
@@ -335,7 +351,7 @@ def get_latest_metrics(log, workout_type, n=3):
 
 
 def count_bricks(log):
-    """누적 브릭 훈련 횟수"""
+    """누적 브릭 훈련 횟수 (이중 카운트 방지)"""
     count = 0
     for entry in log.values():
         if not entry.get('done'):
@@ -343,9 +359,11 @@ def count_bricks(log):
         metrics = entry.get('metrics', {})
         if metrics.get('type') == 'brick':
             count += 1
+            continue  # type이 brick이면 note/planned 중복 검사 skip
         # 미니브릭 (러닝 후 자전거 또는 그 반대)도 카운트
         note = entry.get('note', '').lower()
-        if '브릭' in note or 'brick' in note:
+        planned = entry.get('planned', '').lower() if isinstance(entry.get('planned'), str) else ''
+        if '브릭' in note or 'brick' in note or '브릭' in planned or 'brick' in planned:
             count += 1
     return count
 
