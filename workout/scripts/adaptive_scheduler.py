@@ -381,6 +381,16 @@ def rule_a2_missed_workout(today_date_str, log):
 
     tomorrow_base = get_base_schedule(tomorrow)
     if tomorrow_base['type'] == 'swim':
+        # 연속 러닝 체크: 어제 러닝했거나 모레도 러닝 예정이면 복귀 2주 이내 금지
+        yesterday = today_date - timedelta(days=1)
+        day_after = tomorrow + timedelta(days=1)
+        if is_recovery_period():
+            if is_run_day(yesterday, log):
+                return None  # 복귀 2주 내 연속 러닝 금지
+            day_after_base = get_base_schedule(day_after)
+            if day_after_base['type'] in ('run', 'brick'):
+                return None  # 복귀 2주 내 연속 러닝 금지
+
         return {
             "date": tomorrow.strftime('%Y-%m-%d'),
             "workout": "러닝 Easy",
@@ -491,7 +501,7 @@ def rule_a3_condition_check(target_date_str, health_data):
     return None
 
 
-def rule_a4_outperformance(today_entry, schedule):
+def rule_a4_outperformance(today_entry, schedule, log=None):
     """A4: 예상보다 좋은 성과 시 다음 고강도 세션 목표 상향"""
     if not today_entry or not today_entry.get('done'):
         return None
@@ -500,7 +510,21 @@ def rule_a4_outperformance(today_entry, schedule):
     if zone not in ('tempo', 'interval'):
         return None
 
-    metrics = today_entry.get('metrics', {})
+    # 주간 부하 확인: total_load > target * 1.2이면 발동 안 함
+    if log is not None:
+        phase, _ = get_phase(NOW)
+        week_monday = get_week_monday(NOW)
+        weekly_stats = get_weekly_stats(log, week_monday)
+        target_load = PHASE_TARGETS.get(phase, {}).get('weekly_load', 300)
+        if weekly_stats['total_load'] > target_load * 1.2:
+            return None
+
+    # all_metrics에서 러닝 metrics 찾기
+    all_metrics = today_entry.get('all_metrics')
+    if all_metrics and isinstance(all_metrics, list):
+        metrics = next((m for m in all_metrics if m.get('type') == 'run'), {})
+    else:
+        metrics = today_entry.get('metrics', {})
     pace_sec = pace_to_seconds(metrics.get('pace_per_km'))
     if not pace_sec:
         return None
@@ -559,6 +583,14 @@ def rule_b1_run_frequency(log, week_monday):
     overrides = []
     swim_replaced = 0
 
+    # 이미 러닝인 날짜와 새로 배치한 날짜를 추적
+    tracked_dates = set()
+    for dow in range(7):
+        day_date = week_monday + timedelta(days=dow)
+        base = get_base_schedule(day_date)
+        if base['type'] in ('run', 'brick') or is_run_day(day_date, log):
+            tracked_dates.add(day_date)
+
     for dow in range(today_dow + 1, 6):  # 일요일(6) 제외
         if deficit <= 0:
             break
@@ -574,10 +606,12 @@ def rule_b1_run_frequency(log, week_monday):
         if base['type'] != 'swim':
             continue
 
-        # 연속 러닝 규칙 체크
+        # 연속 러닝 규칙 체크 (기존 + 새로 배치한 날짜 포함)
         prev_day = day_date - timedelta(days=1)
-        if is_run_day(prev_day, log) and is_recovery_period():
-            continue  # 복귀 2주 내 연속 러닝 금지
+        next_day = day_date + timedelta(days=1)
+        if prev_day in tracked_dates or next_day in tracked_dates:
+            if is_recovery_period():
+                continue  # 복귀 2주 내 연속 러닝 금지
 
         ov = {
             "date": day_date.strftime('%Y-%m-%d'),
@@ -589,6 +623,7 @@ def rule_b1_run_frequency(log, week_monday):
             "rule": "B1",
             "created_at": NOW.isoformat(),
         }
+        tracked_dates.add(day_date)  # 새로 배치한 날짜도 추적
         swim_replaced += 1
         if swim_replaced >= 2:
             ov['warning'] = "수영 2회 대체 — 수영 볼륨 부족 가능"
@@ -691,9 +726,14 @@ def _has_10k_nonstop(log):
     for entry in log.values():
         if not entry.get('done'):
             continue
-        m = entry.get('metrics', {})
-        if m.get('type') == 'run' and m.get('distance_km', 0) >= 9.5:
-            return True
+        all_metrics = entry.get('all_metrics')
+        if all_metrics and isinstance(all_metrics, list):
+            metrics_list = all_metrics
+        else:
+            metrics_list = [entry.get('metrics', {})]
+        for m in metrics_list:
+            if m.get('type') == 'run' and m.get('distance_km', 0) >= 9.5:
+                return True
     return False
 
 
@@ -715,9 +755,16 @@ def _has_tempo_pace(log, max_pace_sec):
         if not entry.get('done'):
             continue
         if entry.get('training_zone') in ('tempo', 'interval'):
-            pace = pace_to_seconds(entry.get('metrics', {}).get('pace_per_km'))
-            if pace and pace <= max_pace_sec:
-                return True
+            all_metrics = entry.get('all_metrics')
+            if all_metrics and isinstance(all_metrics, list):
+                metrics_list = all_metrics
+            else:
+                metrics_list = [entry.get('metrics', {})]
+            for m in metrics_list:
+                if m.get('type') == 'run':
+                    pace = pace_to_seconds(m.get('pace_per_km'))
+                    if pace and pace <= max_pace_sec:
+                        return True
     return False
 
 
@@ -727,9 +774,14 @@ def _has_brick_run(log, min_km):
         if not entry.get('done'):
             continue
         if entry.get('is_brick'):
-            m = entry.get('metrics', {})
-            if m.get('type') == 'run' and m.get('distance_km', 0) >= min_km:
-                return True
+            all_metrics = entry.get('all_metrics')
+            if all_metrics and isinstance(all_metrics, list):
+                metrics_list = all_metrics
+            else:
+                metrics_list = [entry.get('metrics', {})]
+            for m in metrics_list:
+                if m.get('type') == 'run' and m.get('distance_km', 0) >= min_km:
+                    return True
     return False
 
 
@@ -776,13 +828,13 @@ def rule_c3_injury_detection(log, health_data):
     today_health = health_data.get(TODAY, {})
     rhr = today_health.get('resting_hr', 0)
 
-    if len(injury_mentions) == 0 and rhr < 60:
+    if len(injury_mentions) == 0 and rhr < 54:
         return []
 
     severity = "medium"
     if len(injury_mentions) >= 2:
         severity = "high"
-    if rhr >= 60:  # 평소 45 대비 +15
+    if rhr >= 54:  # 평소 45 * 1.2 = 54
         severity = "high"
 
     if severity != "high":
@@ -907,6 +959,10 @@ def format_stagnation_report(result):
 
 def adjust_daily(workout_log, schedule_data, health_data):
     """일일 조정 → overrides dict 반환"""
+    global NOW, TODAY
+    NOW = datetime.now(KST)
+    TODAY = NOW.strftime('%Y-%m-%d')
+
     overrides = []
     warnings = []
     phase, _ = get_phase(NOW)
@@ -938,7 +994,7 @@ def adjust_daily(workout_log, schedule_data, health_data):
 
     # A4: 성과 상향
     if today_entry and today_entry.get('done'):
-        ov = rule_a4_outperformance(today_entry, schedule_data)
+        ov = rule_a4_outperformance(today_entry, schedule_data, workout_log)
         if ov:
             overrides.append(ov)
 
@@ -947,6 +1003,10 @@ def adjust_daily(workout_log, schedule_data, health_data):
 
 def adjust_weekly(workout_log, schedule_data):
     """주간 조정 → overrides dict 반환"""
+    global NOW, TODAY
+    NOW = datetime.now(KST)
+    TODAY = NOW.strftime('%Y-%m-%d')
+
     overrides = []
     phase, _ = get_phase(NOW)
     dow = NOW.date().weekday()
@@ -1001,6 +1061,10 @@ def run(workout_log, schedule_data, health_data):
     통합 실행: 일일 + 주간 + Phase 조정
     반환: (overrides dict, report 문자열)
     """
+    global NOW, TODAY
+    NOW = datetime.now(KST)
+    TODAY = NOW.strftime('%Y-%m-%d')
+
     phase, _ = get_phase(NOW)
     if phase == 0:
         return {}, ""
@@ -1070,6 +1134,10 @@ def adjust_schedule():
     적응형 스케줄 조정 메인 — garmin_sync.py에서 호출
     workout_schedule.json의 overrides를 업데이트하고 텔레그램 알림
     """
+    global NOW, TODAY
+    NOW = datetime.now(KST)
+    TODAY = NOW.strftime('%Y-%m-%d')
+
     workout_log = load_json(LOG_FILE)
     schedule_data = load_json(SCHEDULE_FILE)
     health_data = load_json(HEALTH_FILE)
