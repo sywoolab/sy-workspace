@@ -20,18 +20,18 @@ jobs:
       - name: Daily update
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
-        run: python -m scripts.dart_precedent.main daily
+        run: python -m ib.scripts.dart_precedent.main daily
 
       - name: Export to CSV
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
-        run: python -m scripts.dart_precedent.main export
+        run: python -m ib.scripts.dart_precedent.main export
 
       - name: Commit results
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/precedent.db data/precedent_export/
+          git add ib/data/precedent.db ib/data/precedent_export/
           if ! git diff --staged --quiet; then
             git commit -m "daily precedent update"
             git push

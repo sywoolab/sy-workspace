@@ -1,0 +1,182 @@
+[2026-03-20 00:04:51] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 00:04] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 00:04:55] 완료 (exit=1)
+[2026-03-20 08:00:03] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 08:00] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 08:00:07] 완료 (exit=1)
+[2026-03-20 09:00:02] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 09:00] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 09:00:05] 완료 (exit=1)
+[2026-03-20 10:00:02] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 10:00] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[main 7e95a9d] garmin sync: local auto update
+ Committer: SY <sywoo@SYui-MacBookAir.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 40 insertions(+)
+To https://github.com/sywoolab/sy-workspace.git
+   8db2788..7e95a9d  main -> main
+[2026-03-20 10:00:10] 완료 (exit=0)
+[2026-03-20 11:00:45] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 11:00] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 11:00:48] 완료 (exit=1)
+[2026-03-20 12:00:05] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 12:00] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 12:00:08] 완료 (exit=1)
+[2026-03-20 13:00:08] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 13:00] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 13:00:11] 완료 (exit=1)
+[2026-03-20 14:05:56] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 14:05] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 14:06:00] 완료 (exit=1)
+[2026-03-20 15:00:01] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 15:00] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[main 8190c78] garmin sync: local auto update
+ Committer: SY <sywoo@SYui-MacBookAir.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+To https://github.com/sywoolab/sy-workspace.git
+   7e95a9d..8190c78  main -> main
+[2026-03-20 15:00:10] 완료 (exit=0)
+[2026-03-20 16:00:01] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 16:00] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[main acda0f2] garmin sync: local auto update
+ Committer: SY <sywoo@SYui-MacBookAir.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+To https://github.com/sywoolab/sy-workspace.git
+   8190c78..acda0f2  main -> main
+[2026-03-20 16:00:10] 완료 (exit=0)
+[2026-03-20 17:00:46] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 17:00] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 17:00:50] 완료 (exit=1)
+[2026-03-20 18:01:39] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 18:01] 가민 동기화 시작
+[ERROR] 가민 로그인 실패: HTTPSConnectionPool(host='sso.garmin.com', port=443): Max retries exceeded with url: /sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso (Caused by NameResolutionError("HTTPSConnection(host='sso.garmin.com', port=443): Failed to resolve 'sso.garmin.com' ([Errno 8] nodename nor servname provided, or not known)"))
+[2026-03-20 18:01:43] 완료 (exit=1)
+[2026-03-20 19:16:00] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 19:16] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[2026-03-20 19:16:11] 완료 (exit=0)
+[2026-03-20 20:01:09] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 20:01] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[2026-03-20 20:01:14] 완료 (exit=0)
+[2026-03-20 21:02:30] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 21:02] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[2026-03-20 21:02:34] 완료 (exit=0)
+[2026-03-20 22:02:43] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 22:02] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[2026-03-20 22:02:47] 완료 (exit=0)
+[2026-03-20 23:05:48] 로컬 가민 동기화 시작
+/Users/sywoo/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[2026-03-20 23:05] 가민 동기화 시작
+[OK] 가민 토큰 캐시로 로그인
+[OK] 활동 1건 조회 (2026-03-19 ~ 2026-03-20)
+  새 활동: 0건
+  건강 데이터 수집 완료
+  새 활동 없음 — 조용히 종료
+[2026-03-20 23:05:52] 완료 (exit=0)

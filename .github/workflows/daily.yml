@@ -29,7 +29,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          TASKS=$(awk '/^## 진행 중$/{flag=1; next} /^## /{flag=0} flag' tasks.md | grep '^\- \[' | sed 's/^- \[.\] //' | awk '{printf "%d. %s\n", NR, $0}' | head -20)
+          TASKS=$(awk '/^## 진행 중$/{flag=1; next} /^## /{flag=0} flag' ib/tasks.md | grep '^\- \[' | sed 's/^- \[.\] //' | awk '{printf "%d. %s\n", NR, $0}' | head -20)
           if [ -z "$TASKS" ]; then
             TASKS="등록된 할 일이 없습니다."
           fi
@@ -58,19 +58,19 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/workout_alert.py morning
+        run: python workout/scripts/workout_alert.py morning
 
       - name: Send triathlon alert
         env:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/triathlon_alert.py
+        run: python workout/scripts/triathlon_alert.py
 
       - name: Save triathlon data
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/triathlon_events.json
+          git add workout/data/triathlon_events.json
           if ! git diff --staged --quiet; then
             git commit -m "update triathlon events"
             git push
@@ -95,4 +95,4 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/workout_alert.py evening
+        run: python workout/scripts/workout_alert.py evening

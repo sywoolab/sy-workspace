@@ -33,13 +33,13 @@ jobs:
           GARMIN_TOKENS: ${{ secrets.GARMIN_TOKENS }}
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
+        run: python workout/scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
 
       - name: Commit changes
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add workout_log.json data/garmin_health.json
+          git add workout/workout_log.json workout/data/garmin_health.json
           if ! git diff --staged --quiet; then
             git commit -m "garmin sync: update workout log & health data"
             git push
@@ -52,8 +52,8 @@ jobs:
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if git log -1 --pretty=%B | grep -q "garmin sync"; then
-            python scripts/workout_analysis.py
-            git add workout_schedule.json
+            python workout/scripts/workout_analysis.py
+            git add workout/workout_schedule.json
             if ! git diff --staged --quiet; then
               git commit -m "update workout analysis"
               git push

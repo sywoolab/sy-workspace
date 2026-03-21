@@ -30,26 +30,26 @@ jobs:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: |
           if [ "${{ inputs.command }}" = "backfill" ]; then
-            python -m scripts.dart_precedent.main backfill --from ${{ inputs.from_date }}
+            python -m ib.scripts.dart_precedent.main backfill --from ${{ inputs.from_date }}
           else
-            python -m scripts.dart_precedent.main ${{ inputs.command }}
+            python -m ib.scripts.dart_precedent.main ${{ inputs.command }}
           fi
 
       - name: Export to CSV
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
-        run: python -m scripts.dart_precedent.main export
+        run: python -m ib.scripts.dart_precedent.main export
 
       - name: Show stats
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
-        run: python -m scripts.dart_precedent.main stats
+        run: python -m ib.scripts.dart_precedent.main stats
 
       - name: Commit results
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/precedent.db data/precedent_export/
+          git add ib/data/precedent.db ib/data/precedent_export/
           if ! git diff --staged --quiet; then
             git commit -m "update precedent DB (${{ inputs.command }})"
             git push

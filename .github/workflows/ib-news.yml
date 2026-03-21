@@ -22,11 +22,11 @@ jobs:
         env:
           IB_BOT_TOKEN: ${{ secrets.IB_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/ib_news.py
+        run: python ib/scripts/ib_news.py
 
       - name: Save sent history
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/news_sent.json
+          git add ib/data/news_sent.json
           git diff --staged --quiet || git commit -m "update news_sent" && git push || true
