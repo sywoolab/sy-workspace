@@ -714,52 +714,83 @@ def check_health_adjustments():
     return adjustments
 
 
-def format_today_workout(entry):
-    if not entry or not entry.get('done'):
-        return None
-
-    metrics = entry.get('metrics', {})
+def format_single_activity(metrics):
+    """단일 활동 포매팅 (시간순 표시용)"""
     wtype = metrics.get('type', '?')
-    type_emoji = {'swim': '🏊', 'run': '🏃', 'bike': '🚴', 'brick': '🔥'}
-    type_name = {'swim': '수영', 'run': '러닝', 'bike': '자전거', 'brick': '브릭'}
+    type_emoji = {'swim': '🏊', 'run': '🏃', 'bike': '🚴'}
+    type_name = {'swim': '수영', 'run': '러닝', 'bike': '자전거'}
 
-    lines = [f"{type_emoji.get(wtype, '🏋️')} {type_name.get(wtype, wtype)}"]
+    start = metrics.get('start_time', '')
+    prefix = f"  [{start}]" if start else " "
+    header = f"{prefix} {type_emoji.get(wtype, '🏋️')} {type_name.get(wtype, wtype)}"
+    lines = [header]
 
     if wtype == 'swim':
         dist = metrics.get('distance_m', 0)
         pace = metrics.get('pace_per_100m', '')
         dur = metrics.get('duration_min', 0)
+        mov = metrics.get('moving_min')
         hr = metrics.get('avg_hr', '')
         maxhr = metrics.get('max_hr', '')
         swolf = metrics.get('swolf', '')
-        equipment = metrics.get('swim_equipment', 'none')
-        equip_names = {
-            'none': '맨몸', 'fins': '오리발', 'paddles': '패들',
-            'pull_buoy': '풀부이', 'fins_paddles': '오리발+패들', 'kickboard': '킥보드'
-        }
-        equip_str = equip_names.get(equipment, equipment)
-        lines.append(f"  {dist}m | {dur:.0f}분 | {pace}/100m")
-        if equipment != 'none':
-            bare_pace = get_bare_swim_pace(entry)
-            lines.append(f"  🔧 {equip_str} → 맨몸 환산 ~{seconds_to_pace(bare_pace)}/100m")
+        time_str = f"{dur:.0f}분"
+        if mov:
+            time_str += f" (이동 {mov:.0f}분)"
+        lines.append(f"    {dist}m | {time_str} | {pace}/100m")
         if hr:
-            lines.append(f"  HR {hr}/{maxhr} | Swolf {swolf}")
+            lines.append(f"    HR {hr}/{maxhr} | Swolf {swolf}")
     elif wtype == 'run':
         dist = metrics.get('distance_km', 0)
         pace = metrics.get('pace_per_km', '')
         hr = metrics.get('avg_hr', '')
         maxhr = metrics.get('max_hr', '')
-        lines.append(f"  {dist}km | {pace}/km")
+        lines.append(f"    {dist}km | {pace}/km")
         if hr:
-            lines.append(f"  HR {hr}/{maxhr}")
+            lines.append(f"    HR {hr}/{maxhr}")
+        # 랩 스플릿 (네거티브/빌드업 표시)
+        laps = metrics.get('laps', [])
+        if laps and len(laps) >= 3:
+            lap_strs = [seconds_to_pace(l.get('pace_sec', 0)) for l in laps if l.get('distance', 0) >= 500]
+            if lap_strs:
+                lines.append(f"    스플릿: {' → '.join(lap_strs)}")
     elif wtype == 'bike':
         dur = metrics.get('duration_min', 0)
         dist = metrics.get('distance_km', 0)
         speed = metrics.get('avg_speed_kmh', 0)
+        hr = metrics.get('avg_hr', '')
+        maxhr = metrics.get('max_hr', '')
         if dist:
-            lines.append(f"  {dist}km | {dur:.0f}분 | {speed}km/h")
+            lines.append(f"    {dist}km | {dur:.0f}분 | {speed}km/h")
         else:
-            lines.append(f"  {dur:.0f}분")
+            lines.append(f"    {dur:.0f}분")
+        if hr:
+            lines.append(f"    HR {hr}/{maxhr}")
+
+    return "\n".join(lines)
+
+
+def format_today_workout(entry):
+    if not entry or not entry.get('done'):
+        return None
+
+    all_metrics = entry.get('all_metrics')
+    lines = []
+
+    # 복수 활동 (브릭 등): all_metrics를 시간순으로 표시
+    if all_metrics and isinstance(all_metrics, list) and len(all_metrics) > 1:
+        # start_time 기준 시간순 정렬
+        sorted_metrics = sorted(all_metrics, key=lambda m: m.get('start_time', ''))
+        is_brick = entry.get('is_brick', False)
+        if is_brick:
+            lines.append("🔥 브릭 트레이닝")
+        else:
+            lines.append("📊 복합 운동")
+        for m in sorted_metrics:
+            lines.append(format_single_activity(m))
+    else:
+        # 단일 활동
+        metrics = entry.get('metrics', {})
+        lines.append(format_single_activity(metrics))
 
     note = entry.get('note', '')
     if note:
