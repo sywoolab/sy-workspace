@@ -1525,9 +1525,13 @@ def sync():
                 if 'all_metrics' not in existing:
                     first_m = dict(existing['metrics'])
                     first_m['garmin_id'] = existing['garmin_ids'][0] if existing['garmin_ids'] else None
+                    if existing.get('start_time'):
+                        first_m['start_time'] = existing['start_time']
                     existing['all_metrics'] = [first_m]
                 new_m = dict(entry['metrics'])
                 new_m['garmin_id'] = new_gid
+                if entry.get('start_time'):
+                    new_m['start_time'] = entry['start_time']
                 existing['all_metrics'].append(new_m)
 
                 # 주 운동(러닝 우선) 기준으로 단일 metrics 유지 (호환성)
