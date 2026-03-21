@@ -73,17 +73,195 @@
   "2026-03-21": {
     "planned": "브릭 → 수영",
     "done": true,
-    "actual": "수영 2275m 85분 @1:47/100m + 러닝 5.22km @5:28 + 자전거 31.98km 66분 + 러닝 5.22km @5:28 + 수영 2275m 85분 @1:47/100m",
+    "actual": "수영 2275m 85분 @1:47/100m + 러닝 5.22km @5:28 + 자전거 31.98km 66분 + 러닝 5.22km @5:28 + 수영 2275m 85분 @1:47/100m + 러닝 5.22km @5:28 + 자전거 31.98km 66분",
     "metrics": {
       "type": "run",
       "distance_km": 5.22,
       "pace_per_km": "5:28",
       "avg_hr": 149,
       "max_hr": 171,
-      "cadence": 169
+      "cadence": 169,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 361,
+          "avg_hr": 133,
+          "max_hr": 146,
+          "pace_sec": 361,
+          "pace_str": "6:01"
+        },
+        {
+          "distance": 1000,
+          "duration": 343,
+          "avg_hr": 142,
+          "max_hr": 147,
+          "pace_sec": 343,
+          "pace_str": "5:43"
+        },
+        {
+          "distance": 1000,
+          "duration": 331,
+          "avg_hr": 147,
+          "max_hr": 153,
+          "pace_sec": 331,
+          "pace_str": "5:30"
+        },
+        {
+          "distance": 1000,
+          "duration": 313,
+          "avg_hr": 155,
+          "max_hr": 161,
+          "pace_sec": 313,
+          "pace_str": "5:12"
+        },
+        {
+          "distance": 1000,
+          "duration": 301,
+          "avg_hr": 167,
+          "max_hr": 171,
+          "pace_sec": 301,
+          "pace_str": "5:00"
+        },
+        {
+          "distance": 217,
+          "duration": 64,
+          "avg_hr": 168,
+          "max_hr": 169,
+          "pace_sec": 294,
+          "pace_str": "4:54"
+        }
+      ]
     },
-    "training_zone": "interval",
-    "note": "유산소 3.2 / 무산소 2.8 | 부하 162 | 유산소 3.1 / 무산소 0.1 | 부하 94 | 유산소 3.9 / 무산소 2.4 | 부하 213 | 유산소 3.1 / 무산소 0.1 | 부하 94 | 유산소 3.2 / 무산소 2.8 | 부하 162",
-    "garmin_id": 22244068922
+    "training_zone": "tempo",
+    "note": "유산소 3.2 / 무산소 2.8 | 부하 162 | 유산소 3.1 / 무산소 0.1 | 부하 94 | 유산소 3.9 / 무산소 2.4 | 부하 213 | 유산소 3.1 / 무산소 0.1 | 부하 94 | 유산소 3.2 / 무산소 2.8 | 부하 162 | 유산소 3.1 / 무산소 0.1 | 부하 94 | 유산소 3.9 / 무산소 2.4 | 부하 213",
+    "garmin_id": 22244393614,
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_km": 5.22,
+        "pace_per_km": "5:28",
+        "avg_hr": 149,
+        "max_hr": 171,
+        "cadence": 169
+      },
+      {
+        "type": "run",
+        "distance_km": 5.22,
+        "pace_per_km": "5:28",
+        "avg_hr": 149,
+        "max_hr": 171,
+        "cadence": 169,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 361,
+            "avg_hr": 133,
+            "max_hr": 146,
+            "pace_sec": 361,
+            "pace_str": "6:01"
+          },
+          {
+            "distance": 1000,
+            "duration": 343,
+            "avg_hr": 142,
+            "max_hr": 147,
+            "pace_sec": 343,
+            "pace_str": "5:43"
+          },
+          {
+            "distance": 1000,
+            "duration": 331,
+            "avg_hr": 147,
+            "max_hr": 153,
+            "pace_sec": 331,
+            "pace_str": "5:30"
+          },
+          {
+            "distance": 1000,
+            "duration": 313,
+            "avg_hr": 155,
+            "max_hr": 161,
+            "pace_sec": 313,
+            "pace_str": "5:12"
+          },
+          {
+            "distance": 1000,
+            "duration": 301,
+            "avg_hr": 167,
+            "max_hr": 171,
+            "pace_sec": 301,
+            "pace_str": "5:00"
+          },
+          {
+            "distance": 217,
+            "duration": 64,
+            "avg_hr": 168,
+            "max_hr": 169,
+            "pace_sec": 294,
+            "pace_str": "4:54"
+          }
+        ]
+      },
+      {
+        "type": "bike",
+        "distance_km": 31.98,
+        "duration_min": 65.8,
+        "avg_speed_kmh": 29.2,
+        "avg_hr": 149,
+        "max_hr": 187,
+        "avg_power": null,
+        "laps": [
+          {
+            "distance": 5000,
+            "duration": 676,
+            "avg_hr": 127,
+            "max_hr": 156,
+            "speed_kmh": 26.6
+          },
+          {
+            "distance": 5000,
+            "duration": 550,
+            "avg_hr": 153,
+            "max_hr": 163,
+            "speed_kmh": 32.7
+          },
+          {
+            "distance": 5000,
+            "duration": 573,
+            "avg_hr": 155,
+            "max_hr": 164,
+            "speed_kmh": 31.4
+          },
+          {
+            "distance": 5000,
+            "duration": 651,
+            "avg_hr": 150,
+            "max_hr": 177,
+            "speed_kmh": 27.7
+          },
+          {
+            "distance": 5000,
+            "duration": 580,
+            "avg_hr": 159,
+            "max_hr": 174,
+            "speed_kmh": 31.0
+          },
+          {
+            "distance": 5000,
+            "duration": 652,
+            "avg_hr": 154,
+            "max_hr": 187,
+            "speed_kmh": 27.6
+          },
+          {
+            "distance": 1984,
+            "duration": 266,
+            "avg_hr": 149,
+            "max_hr": 164,
+            "speed_kmh": 26.9
+          }
+        ]
+      }
+    ]
   }
 }
