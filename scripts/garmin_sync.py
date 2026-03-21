@@ -707,6 +707,30 @@ def get_planned_workout(date_str, schedule_data):
     return workout
 
 
+def _count_types_from_entry(entry):
+    """하나의 workout_log 엔트리에서 모든 운동 종목을 집계.
+    all_metrics가 있으면 각 종목별로 카운트, 없으면 metrics.type 하나만."""
+    counts = {'run': 0, 'swim': 0, 'bike': 0, 'brick': 0}
+    run_km = 0.0
+    all_m = entry.get('all_metrics', [])
+    if all_m:
+        seen_types = set()
+        for m in all_m:
+            t = m.get('type', '')
+            if t in counts and t not in seen_types:
+                counts[t] += 1
+                seen_types.add(t)
+            if t == 'run':
+                run_km += m.get('distance_km', 0)
+    else:
+        t = entry.get('metrics', {}).get('type', '')
+        if t in counts:
+            counts[t] += 1
+        if t == 'run':
+            run_km += entry.get('metrics', {}).get('distance_km', 0)
+    return counts, run_km
+
+
 def check_plan_adherence(workout_log, schedule_data):
     """계획 대비 실제 실행 상태 점검 → 조정 제안"""
     adjustments = []
@@ -727,14 +751,11 @@ def check_plan_adherence(workout_log, schedule_data):
         entry = workout_log.get(key)
         if not entry or not entry.get('done'):
             continue
-        wtype = entry.get('metrics', {}).get('type', '')
-        if wtype == 'run':
-            run_count += 1
-            total_run_km += entry.get('metrics', {}).get('distance_km', 0)
-        elif wtype == 'swim':
-            swim_count += 1
-        elif wtype == 'bike':
-            bike_count += 1
+        counts, km = _count_types_from_entry(entry)
+        run_count += counts['run']
+        swim_count += counts['swim']
+        bike_count += counts['bike']
+        total_run_km += km
 
     remaining_days = 6 - days_passed
 
@@ -1037,20 +1058,18 @@ def generate_weekly_progress(workout_log, schedule_data):
         entry = workout_log.get(key)
         if not entry or not entry.get('done'):
             continue
-        m = entry.get('metrics', {})
-        wtype = m.get('type', '')
-        if wtype == 'run':
-            run_count += 1
-            run_km += m.get('distance_km', 0)
+        counts, km = _count_types_from_entry(entry)
+        run_count += counts['run']
+        swim_count += counts['swim']
+        bike_count += counts['bike']
+        run_km += km
+        # 80/20 분류 (러닝만)
+        if counts['run'] > 0:
             zone = entry.get('training_zone', 'moderate')
             if zone == 'easy':
                 easy_runs += 1
             else:
                 hard_runs += 1
-        elif wtype == 'swim':
-            swim_count += 1
-        elif wtype == 'bike':
-            bike_count += 1
 
     lines = []
     lines.append(f"📅 {week_name} 경과 ({days_passed}/7일)")
@@ -1145,14 +1164,11 @@ def format_week_schedule(workout_log):
         if entry and entry.get('done'):
             status = "✅"
             actual = entry.get('actual', '')
-            wtype = entry.get('metrics', {}).get('type', '')
-            if wtype == 'run':
-                run_count += 1
-                run_km += entry.get('metrics', {}).get('distance_km', 0)
-            elif wtype == 'swim':
-                swim_count += 1
-            elif wtype == 'bike':
-                bike_count += 1
+            counts, km = _count_types_from_entry(entry)
+            run_count += counts['run']
+            swim_count += counts['swim']
+            bike_count += counts['bike']
+            run_km += km
             line = f"  {dow_name}({date_disp}) {emoji} {actual} {status}"
         elif dt < today:
             if "휴식" in workout:
@@ -1206,10 +1222,9 @@ def format_on_track(workout_log, schedule_data, plan_adjustments):
         key = dt.strftime('%Y-%m-%d')
         entry = workout_log.get(key)
         if entry and entry.get('done'):
-            m = entry.get('metrics', {})
-            if m.get('type') == 'run':
-                run_count += 1
-                run_km += m.get('distance_km', 0)
+            counts, km = _count_types_from_entry(entry)
+            run_count += counts['run']
+            run_km += km
 
     run_target = 3
     run_deficit = max(0, run_target - run_count)
