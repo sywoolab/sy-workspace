@@ -73,21 +73,17 @@
   "2026-03-21": {
     "planned": "브릭 → 수영",
     "done": true,
-    "actual": "수영 2275m 85분 @1:47/100m",
+    "actual": "수영 2275m 85분 @1:47/100m + 러닝 5.22km @5:28 + 자전거 31.98km 66분",
     "metrics": {
-      "type": "swim",
-      "distance_m": 2275,
-      "duration_min": 85.1,
-      "moving_min": 40.7,
-      "pace_per_100m": "1:47",
-      "avg_hr": 129,
-      "max_hr": 167,
-      "swolf": 37,
-      "strokes": 897,
-      "avg_spm": null
+      "type": "run",
+      "distance_km": 5.22,
+      "pace_per_km": "5:28",
+      "avg_hr": 149,
+      "max_hr": 171,
+      "cadence": 169
     },
-    "training_zone": "easy",
-    "note": "유산소 3.2 / 무산소 2.8 | 부하 162",
-    "garmin_id": 22244068922
+    "training_zone": "interval",
+    "note": "유산소 3.2 / 무산소 2.8 | 부하 162 | 유산소 3.1 / 무산소 0.1 | 부하 94 | 유산소 3.9 / 무산소 2.4 | 부하 213",
+    "garmin_id": 22244393614
   }
 }
