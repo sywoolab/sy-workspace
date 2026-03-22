@@ -1530,6 +1530,11 @@ def sync():
 
         parsed = parse_activity(act)
         if parsed['type'] in ('run', 'swim', 'bike', 'brick', 'strength'):
+            # 10분 미만 활동 필터 (가민 자동 감지 잡음 제거)
+            duration = parsed.get('duration_sec', 0) or 0
+            if duration < 600 and parsed['type'] != 'brick':
+                print(f"  [SKIP] {parsed['type']} {duration}초 — 10분 미만 무시")
+                continue
             # 랩/스플릿 데이터 추가
             if parsed['type'] in ('run', 'bike'):
                 laps = fetch_laps(api, act_id)

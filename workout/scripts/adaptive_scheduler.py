@@ -473,22 +473,37 @@ def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
 
     reason_str = ", ".join(reasons)
 
-    # 오늘 이미 운동 완료했는지 확인
+    # 오늘 이미 운동 완료했는지 + 운동 강도 확인
     already_done = False
+    today_zone = 'rest'
     if workout_log:
         entry = workout_log.get(target_date_str, {})
         already_done = entry.get('done', False)
+        today_zone = entry.get('training_zone', 'rest')
 
-    if high_count >= 1:
+    # 종합 판정: 단일 지표가 아닌 다수 지표 종합
+    # 적색: high 2개 이상, 또는 high 1개 + medium 2개 이상
+    # 황색: high 1개 (단독), 또는 medium 2개 이상
+    # 주의: medium 1개 (경고만)
+    is_red = (high_count >= 2) or (high_count >= 1 and medium_count >= 2)
+    is_yellow = (not is_red) and (high_count >= 1 or medium_count >= 2)
+    is_caution = (not is_red and not is_yellow) and medium_count >= 1
+
+    # easy 운동은 회복에 방해 안 됨 → 이미 easy로 운동한 경우 내일 override 불필요
+    easy_done = already_done and today_zone in ('easy', 'rest')
+
+    if is_red:
         if already_done:
-            # 이미 운동함 → 오늘 override 무의미, 내일 회복 권고
+            if easy_done:
+                # easy 운동 완료 → 경고만 (내일 override 불필요)
+                return {"warning_only": True, "reason": f"⚠️ 컨디션 적색({reason_str}) — Easy 운동은 OK, 내일 고강도 금지"}
             tomorrow = (datetime.strptime(target_date_str, '%Y-%m-%d') + timedelta(days=1))
-            if tomorrow.weekday() == 6:  # 일요일 불가침
-                return {"warning_only": True, "reason": f"⚠️ 컨디션 적색({reason_str})에서 운동함 — 일요일 충분히 쉬세요"}
+            if tomorrow.weekday() == 6:
+                return {"warning_only": True, "reason": f"⚠️ 컨디션 적색({reason_str})에서 고강도 운동함 — 일요일 충분히 쉬세요"}
             return {
                 "date": tomorrow.strftime('%Y-%m-%d'),
                 "workout": "Easy 또는 완전 휴식",
-                "detail": f"오늘({target_date_str}) 컨디션 불량 상태에서 운동함 → 회복 필요",
+                "detail": f"오늘({target_date_str}) 컨디션 불량에서 고강도 운동 → 회복 필요",
                 "reason": f"컨디션 적색 사후 회복: {reason_str}",
                 "source": "adaptive_A3",
                 "auto": True,
@@ -505,8 +520,10 @@ def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
             "rule": "A3-high",
             "created_at": NOW.isoformat(),
         }
-    elif medium_count >= 2:
+    elif is_yellow:
         if already_done:
+            if easy_done:
+                return {"warning_only": True, "reason": f"💡 컨디션 황색({reason_str}) — Easy 운동은 OK"}
             return {"warning_only": True, "reason": f"💡 컨디션 황색({reason_str})에서 운동함 — 내일 Easy 권장"}
         return {
             "date": target_date_str,
@@ -519,8 +536,7 @@ def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
             "created_at": NOW.isoformat(),
         }
 
-    # medium 1개 → 경고만 (override 없음, 경고 메시지만 반환)
-    if medium_count == 1:
+    if is_caution:
         return {"warning_only": True, "reason": f"컨디션 주의: {reason_str}"}
     return None
 
