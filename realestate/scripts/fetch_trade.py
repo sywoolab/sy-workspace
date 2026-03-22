@@ -1,8 +1,8 @@
 """
-부동산 실거래가 주간 수집 + 전략별 TOP 20 스크립트
+부동산 실거래가 주간 수집 + 점수화 + 전략별 TOP 20
 - 서울 25개구 전체 수집
-- 단지별 매매/전세 집계 → 전략 1(갭투자) / 2(실거주) / 3(전월세) TOP 20
-- 텔레그램 주간 리포트
+- 단지별 8개 변수 점수화 (추세/가격대/거래량/통근/독립문/연식/할인율/전세가율)
+- 전략 1(갭투자) / 2(실거주) / 3(전월세) 각각 가중치 적용 → TOP 20
 """
 
 import csv
@@ -21,10 +21,9 @@ API_KEY = os.environ.get("DATA_GO_KR_API_KEY", "")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 CHAT_ID = os.environ.get("CHAT_ID", "")
 
-# ── 상수 ──────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent / "data"
 
-# 서울 25개구
+# ── 서울 25개구 ──────────────────────────────────────────
 DISTRICTS = {
     "11110": "종로구", "11140": "중구", "11170": "용산구",
     "11200": "성동구", "11215": "광진구", "11230": "동대문구",
@@ -37,36 +36,48 @@ DISTRICTS = {
     "11740": "강동구",
 }
 
-# ── 매수자 제약조건 (L1 CLAUDE.md 기준) ──────────────────
-CASH = 6.0          # 현금 가용 (억)
-MAX_MONTHLY = 500   # 월 주거비 한도 (만원)
-LTV = 0.70          # 생애최초 LTV
-LOAN_CAP = 6.0      # 대출 절대한도 (억)
-
-# 전략1 갭투자: 필요현금 ≤ 5.5억 (잔여 5천만 확보)
-GAP_CASH_LIMIT = 5.5
-# 전략2 실거주: 매매가 ≤ 12억 (현금6 + 대출6)
-LIVE_PRICE_LIMIT = 12.0
-
-# 면적 타입 범위 (59타입: 55~62, 84타입: 80~86)
-AREA_TYPES = {
-    "59㎡": (55.0, 62.0),
-    "84㎡": (80.0, 86.0),
+# ── 구별 통근 시간 (여의도, 청계산입구, 독립문) 단위: 분 ──
+COMMUTE = {
+    '종로구': (14, 32, 6), '중구': (20, 29, 9), '용산구': (9, 30, 22),
+    '성동구': (26, 31, 20), '광진구': (27, 28, 28), '동대문구': (29, 35, 20),
+    '중랑구': (39, 39, 33), '성북구': (31, 42, 21), '강북구': (38, 51, 28),
+    '도봉구': (53, 59, 48), '노원구': (47, 52, 38), '은평구': (32, 49, 10),
+    '서대문구': (13, 41, 22), '마포구': (5, 36, 21), '양천구': (8, 40, 35),
+    '강서구': (20, 52, 48), '구로구': (13, 38, 34), '금천구': (17, 42, 45),
+    '영등포구': (3, 30, 30), '동작구': (13, 20, 36), '관악구': (20, 28, 43),
+    '서초구': (23, 15, 34), '강남구': (18, 9, 30), '송파구': (27, 23, 37),
+    '강동구': (40, 35, 39),
 }
 
-# 최소 세대수 (유동성 확보)
-MIN_TRADE_COUNT = 1  # 최근 3개월 내 최소 거래 건수
+# ── 구별 KB 전세가율 (%) ──
+KB_RATIO = {
+    '종로구': 57.1, '중구': 52.5, '용산구': 38.8, '성동구': 41.5, '광진구': 45.9,
+    '동대문구': 54.7, '중랑구': 63.0, '성북구': 58.5, '강북구': 61.7, '도봉구': 59.4,
+    '노원구': 55.3, '은평구': 59.5, '서대문구': 55.1, '마포구': 47.4, '양천구': 45.2,
+    '강서구': 54.6, '구로구': 58.9, '금천구': 62.8, '영등포구': 47.5, '동작구': 47.8,
+    '관악구': 57.2, '서초구': 41.5, '강남구': 37.7, '송파구': 38.9, '강동구': 46.4,
+}
 
-# API 엔드포인트
+# ── 매수자 제약 ──────────────────────────────────────────
+CASH = 6.0
+LTV = 0.70
+LOAN_CAP = 6.0
+COMMUTE_LIMIT = 60  # 각 직장 60분 이내
+
+# ── 스코어링 가중치 ──────────────────────────────────────
+# S1:추세 S2:가격대 S3:거래량 S4:통근가중 S5:독립문 S6:연식 S7:할인율 S8:KB전세가율
+GAP_WEIGHTS = {'S1': 30, 'S2': 15, 'S3': 10, 'S4': 15, 'S5': 5, 'S6': 5, 'S7': 5, 'S8': 15}
+LIVE_WEIGHTS = {'S1': 25, 'S2': 10, 'S3': 10, 'S4': 25, 'S5': 10, 'S6': 10, 'S7': 10, 'S8': 0}
+WAIT_WEIGHTS = {'S1': 10, 'S2': 5, 'S3': 10, 'S4': 30, 'S5': 15, 'S6': 10, 'S7': 5, 'S8': 15}
+
+# ── API/파싱 ─────────────────────────────────────────────
 TRADE_URL = "http://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
 RENT_URL = "http://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent"
 
-# CSV 컬럼
 TRADE_COLUMNS = [
-    "시군구코드", "법정동", "단지명", "전용면적", "층",
-    "건축년도", "계약년도", "계약월", "계약일",
-    "거래금액", "해제여부", "해제사유발생일",
-    "거래유형", "도로명", "지번",
+    "시군구코드", "법정동", "단지명", "전용면적", "층", "건축년도",
+    "계약년도", "계약월", "계약일", "거래금액", "해제여부",
+    "해제사유발생일", "거래유형", "도로명", "지번",
 ]
 TRADE_TAG_MAP = {
     "sggCd": "시군구코드", "umdNm": "법정동", "aptNm": "단지명",
@@ -77,10 +88,9 @@ TRADE_TAG_MAP = {
     "roadNm": "도로명", "jibun": "지번",
 }
 RENT_COLUMNS = [
-    "시군구코드", "법정동", "단지명", "전용면적", "층",
-    "건축년도", "계약년도", "계약월", "계약일",
-    "보증금액", "월세금액", "계약구분", "계약기간",
-    "종전보증금", "종전월세", "지번",
+    "시군구코드", "법정동", "단지명", "전용면적", "층", "건축년도",
+    "계약년도", "계약월", "계약일", "보증금액", "월세금액",
+    "계약구분", "계약기간", "종전보증금", "종전월세", "지번",
 ]
 RENT_TAG_MAP = {
     "sggCd": "시군구코드", "umdNm": "법정동", "aptNm": "단지명",
@@ -93,90 +103,44 @@ RENT_TAG_MAP = {
 }
 
 
-# ── 유틸 ──────────────────────────────────────────────────
-
-def get_area_type(area_val):
-    """전용면적 → 면적 타입 라벨 반환. 해당 없으면 None"""
+def get_area_type(val):
     try:
-        area = float(area_val)
+        a = float(val)
     except (ValueError, TypeError):
         return None
-    for label, (lo, hi) in AREA_TYPES.items():
-        if lo <= area < hi:
-            return label
+    if 55.0 <= a < 62.0:
+        return "59㎡"
+    if 80.0 <= a < 86.0:
+        return "84㎡"
     return None
 
 
 def get_months(n=3):
-    """최근 n개월의 YYYYMM 리스트"""
     today = datetime.now()
     months = set()
     for i in range(n + 1):
-        dt = today - timedelta(days=30 * i)
-        months.add(dt.strftime("%Y%m"))
+        months.add((today - timedelta(days=30 * i)).strftime("%Y%m"))
     return sorted(months)[-n:]
 
 
-def calc_loan(price, strategy="gap", jeonse=0):
-    """대출 한도 계산 (억)"""
-    raw = min(price * LTV, LOAN_CAP)
-    if strategy == "gap":
-        return max(raw - jeonse, 0)
-    return raw  # 실거주
-
-
-def calc_required_cash(price, strategy, jeonse=0):
-    """필요현금 계산 (억). 취득세는 간이 산정"""
-    # 취득세: 6억이하 1.1%, 9억이하 2.2%, 9억초과 3.3% (간이)
-    if price <= 6:
-        tax_rate = 0.011
-    elif price <= 9:
-        tax_rate = 0.022
-    else:
-        tax_rate = 0.033
-    tax = price * tax_rate
-
-    if strategy == "gap":
-        gap = price - jeonse
-        loan = calc_loan(price, "gap", jeonse)
-        return gap - loan + tax
-    else:  # 실거주
-        loan = calc_loan(price, "live")
-        return price - loan + tax
-
-
-# ── API ──────────────────────────────────────────────────
-
 def fetch_api(url, lawd_cd, deal_ymd):
-    """API 호출 → item 리스트"""
     params = {
-        "serviceKey": API_KEY,
-        "LAWD_CD": lawd_cd,
-        "DEAL_YMD": deal_ymd,
-        "numOfRows": "99999",
-        "pageNo": "1",
+        "serviceKey": API_KEY, "LAWD_CD": lawd_cd,
+        "DEAL_YMD": deal_ymd, "numOfRows": "99999", "pageNo": "1",
     }
     try:
         resp = requests.get(url, params=params, timeout=30)
         resp.raise_for_status()
-    except requests.RequestException as e:
-        print(f"  [ERROR] {lawd_cd}/{deal_ymd}: {e}")
-        return []
-
-    try:
         root = ET.fromstring(resp.content)
-    except ET.ParseError:
+        code = root.findtext(".//resultCode")
+        if code and code not in ("00", "000"):
+            return []
+        return root.findall(".//item")
+    except Exception:
         return []
-
-    result_code = root.findtext(".//resultCode")
-    if result_code and result_code not in ("00", "000"):
-        return []
-
-    return root.findall(".//item")
 
 
 def parse_items(items, tag_map):
-    """XML items → dict 리스트"""
     rows = []
     for item in items:
         row = {}
@@ -195,106 +159,95 @@ def parse_items(items, tag_map):
 def save_csv(rows, columns, filepath):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
-        writer = csv.DictWriter(f, fieldnames=columns)
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({c: row.get(c, "") for c in columns})
+        w = csv.DictWriter(f, fieldnames=columns)
+        w.writeheader()
+        for r in rows:
+            w.writerow({c: r.get(c, "") for c in columns})
 
 
 # ── 수집 ──────────────────────────────────────────────────
 
 def collect_all():
-    """서울 25개구 전체 수집"""
     months = get_months(3)
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    print(f"수집 시작: {today_str}")
-    print(f"대상 월: {months}")
-    print(f"대상: 서울 25개구 전체\n")
+    print(f"수집: {datetime.now():%Y-%m-%d} | 월: {months} | 서울 25개구\n")
 
-    all_trade = {}
-    all_rent = {}
-
+    all_trade, all_rent = {}, {}
     for code, name in DISTRICTS.items():
-        trade_rows = []
-        rent_rows = []
-
+        trade_rows, rent_rows = [], []
         for ym in months:
-            items = fetch_api(TRADE_URL, code, ym)
-            trade_rows.extend(parse_items(items, TRADE_TAG_MAP))
+            trade_rows.extend(parse_items(fetch_api(TRADE_URL, code, ym), TRADE_TAG_MAP))
+            rent_rows.extend(parse_items(fetch_api(RENT_URL, code, ym), RENT_TAG_MAP))
 
-            items = fetch_api(RENT_URL, code, ym)
-            rent_rows.extend(parse_items(items, RENT_TAG_MAP))
-
-        # 매매: 해제 건 제외
-        valid_trade = [r for r in trade_rows if r.get("해제여부") != "O"]
-        # 전세만 (월세=0)
+        valid = [r for r in trade_rows if r.get("해제여부") != "O"]
         jeonse = [r for r in rent_rows if r.get("월세금액", "0") == "0"]
-
-        all_trade[code] = valid_trade
+        all_trade[code] = valid
         all_rent[code] = jeonse
 
-        # CSV 저장
-        save_csv(valid_trade, TRADE_COLUMNS, BASE_DIR / "trade" / f"{code}_{name}.csv")
+        save_csv(valid, TRADE_COLUMNS, BASE_DIR / "trade" / f"{code}_{name}.csv")
         save_csv(jeonse, RENT_COLUMNS, BASE_DIR / "jeonse" / f"{code}_{name}.csv")
-
-        t_cnt = len(valid_trade)
-        j_cnt = len(jeonse)
-        print(f"  {name}: 매매 {t_cnt}건, 전세 {j_cnt}건")
+        print(f"  {name}: 매매 {len(valid)}, 전세 {len(jeonse)}")
 
     return all_trade, all_rent
 
 
-# ── 단지별 집계 ──────────────────────────────────────────
+# ── 집계 + 점수화 ────────────────────────────────────────
 
-def aggregate_complexes(all_trade, all_rent):
-    """
-    단지+면적타입 단위로 집계.
-    반환: {(구, 단지명, 면적타입): {매매가, 전세가, 괴리율, ...}}
-    """
+def aggregate_and_score(all_trade, all_rent):
     today = datetime.now()
     two_months_ago = today - timedelta(days=60)
 
-    # 단지별 매매 거래 모으기
-    trade_by_complex = defaultdict(list)  # key: (구코드, 단지명, 면적타입)
+    # 단지별 매매/전세 모으기
+    trade_map = defaultdict(list)  # (구, 단지, 면적) → [{date, amount, year}]
+    rent_map = defaultdict(list)   # (구, 단지, 면적) → [deposit]
+
     for code, rows in all_trade.items():
         gu = DISTRICTS[code]
         for r in rows:
-            area_type = get_area_type(r.get("전용면적"))
-            if not area_type:
+            at = get_area_type(r.get("전용면적"))
+            if not at:
                 continue
             try:
-                amount = int(r["거래금액"]) / 10000
-                y, m, d = int(r["계약년도"]), int(r["계약월"]), int(r["계약일"])
-                dt = datetime(y, m, d)
+                amt = int(r["거래금액"]) / 10000
+                dt = datetime(int(r["계약년도"]), int(r["계약월"]), int(r["계약일"]))
+                by = int(r["건축년도"]) if r.get("건축년도") else None
             except (ValueError, KeyError):
                 continue
-            key = (gu, r["단지명"], area_type)
-            trade_by_complex[key].append({"date": dt, "amount": amount})
+            trade_map[(gu, r["단지명"], at)].append({"date": dt, "amount": amt, "build_year": by})
 
-    # 단지별 전세 모으기
-    rent_by_complex = defaultdict(list)
     for code, rows in all_rent.items():
         gu = DISTRICTS[code]
         for r in rows:
-            area_type = get_area_type(r.get("전용면적"))
-            if not area_type:
+            at = get_area_type(r.get("전용면적"))
+            if not at:
                 continue
             try:
-                deposit = int(r["보증금액"]) / 10000
+                dep = int(r["보증금액"]) / 10000
             except (ValueError, KeyError):
                 continue
-            key = (gu, r["단지명"], area_type)
-            rent_by_complex[key].append(deposit)
+            rent_map[(gu, r["단지명"], at)].append(dep)
 
-    # 집계
+    # 구+면적별 평균가격 (할인율 계산용)
+    gu_area_prices = defaultdict(list)
+    for (gu, name, at), trades in trade_map.items():
+        if len(trades) >= 2:
+            avg = sum(t["amount"] for t in trades) / len(trades)
+            gu_area_prices[(gu, at)].append(avg)
+    gu_area_avg = {}
+    for key, prices in gu_area_prices.items():
+        gu_area_avg[key] = sum(prices) / len(prices)
+
+    # 단지별 집계 + 스코어
     results = []
-    for key, trades in trade_by_complex.items():
-        gu, name, area_type = key
-        if len(trades) < MIN_TRADE_COUNT:
+    for (gu, name, area_type), trades in trade_map.items():
+        if len(trades) < 2:
+            continue
+
+        # 통근 필터
+        yeouido, cheongye, doklip = COMMUTE.get(gu, (99, 99, 99))
+        if yeouido > COMMUTE_LIMIT or cheongye > COMMUTE_LIMIT:
             continue
 
         trades.sort(key=lambda x: x["date"])
-
         older = [t for t in trades if t["date"] < two_months_ago]
         recent = [t for t in trades if t["date"] >= two_months_ago]
         latest = trades[-1]
@@ -302,38 +255,101 @@ def aggregate_complexes(all_trade, all_rent):
         price_2m_ago = older[-1]["amount"] if older else None
         price_2m_avg = round(sum(t["amount"] for t in recent) / len(recent), 2) if recent else None
         price_latest = latest["amount"]
-        latest_date = latest["date"].strftime("%m.%d")
+        price = price_2m_avg if price_2m_avg else price_latest
 
         gap_pct = None
         if price_2m_ago and price_2m_ago > 0:
             gap_pct = round((price_latest - price_2m_ago) / price_2m_ago * 100, 1)
 
-        # 대표 매매가 = 최근 2개월 평균 or 최근 거래
-        price = price_2m_avg if price_2m_avg else price_latest
+        # 추세: 전반부 vs 후반부
+        n = len(trades)
+        first_half = trades[:max(n // 2, 1)]
+        second_half = trades[max(n // 2, 1):]
+        avg_first = sum(t["amount"] for t in first_half) / len(first_half)
+        avg_second = sum(t["amount"] for t in second_half) / len(second_half) if second_half else avg_first
+        trend = round((avg_second - avg_first) / avg_first * 100, 1) if avg_first > 0 else 0
+
+        # 건축년도
+        years = [t["build_year"] for t in trades if t["build_year"]]
+        build_year = max(set(years), key=years.count) if years else None
+        age = (2026 - build_year) if build_year else None
 
         # 전세
-        rents = rent_by_complex.get(key, [])
-        jeonse_median = None
-        jeonse_range = ""
-        if rents:
-            rents_sorted = sorted(rents)
-            jeonse_median = rents_sorted[len(rents_sorted) // 2]
-            jeonse_range = f"{min(rents):.1f}~{max(rents):.1f}"
+        rents = rent_map.get((gu, name, area_type), [])
+        jeonse_avg = round(sum(rents) / len(rents), 2) if len(rents) >= 2 else None
+        jeonse_range = f"{min(rents):.1f}~{max(rents):.1f}" if rents else ""
+
+        # 할인율
+        gu_avg = gu_area_avg.get((gu, area_type), price)
+        discount = round((gu_avg - price) / gu_avg * 100, 1) if gu_avg > 0 else 0
+
+        # 통근 가중
+        commute_w = round(yeouido * 0.4 + cheongye * 0.6, 1)
+
+        # ── S1~S8 스코어 ──
+        s1 = 10 if trend >= 10 else (9 if trend >= 7 else (8 if trend >= 4 else (6 if trend >= 1 else (4 if trend >= 0 else 2))))
+        s2 = 10 if price >= 12 else (8 if price >= 10 else (6 if price >= 8 else 4))
+        s3 = 10 if len(trades) >= 15 else (8 if len(trades) >= 8 else (6 if len(trades) >= 4 else 3))
+        s4 = 10 if commute_w <= 18 else (9 if commute_w <= 24 else (8 if commute_w <= 30 else (7 if commute_w <= 36 else (5 if commute_w <= 45 else 3))))
+        s5 = 10 if doklip <= 15 else (8 if doklip <= 25 else (6 if doklip <= 35 else 4))
+        if age is None:
+            s6 = 5
+        elif age <= 5:
+            s6 = 10
+        elif age <= 10:
+            s6 = 9
+        elif age <= 15:
+            s6 = 7
+        elif age <= 20:
+            s6 = 6
+        elif age >= 35:
+            s6 = 7  # 재건축 기대
+        else:
+            s6 = 5
+        s7 = 10 if discount >= 15 else (8 if discount >= 5 else (6 if discount >= 0 else 4))
+        kb_ratio = KB_RATIO.get(gu, 50)
+        s8 = 10 if kb_ratio >= 60 else (8 if kb_ratio >= 55 else (6 if kb_ratio >= 50 else 4))
+
+        scores = {'S1': s1, 'S2': s2, 'S3': s3, 'S4': s4, 'S5': s5, 'S6': s6, 'S7': s7, 'S8': s8}
+
+        # 전략별 총점
+        gap_score = sum(scores[k] * v / 100 for k, v in GAP_WEIGHTS.items())
+        live_score = sum(scores[k] * v / 100 for k, v in LIVE_WEIGHTS.items())
+        wait_score = sum(scores[k] * v / 100 for k, v in WAIT_WEIGHTS.items())
+
+        # 갭투자 필요현금
+        gap_val = round(price - jeonse_avg, 2) if jeonse_avg else None
+        if jeonse_avg:
+            loan_gap = max(min(price * LTV, LOAN_CAP) - jeonse_avg, 0)
+            tax = price * (0.011 if price <= 6 else (0.022 if price <= 9 else 0.033))
+            need_gap = round(gap_val - loan_gap + tax, 2)
+        else:
+            loan_gap = None
+            need_gap = None
+
+        # 실거주 필요현금
+        loan_live = min(price * LTV, LOAN_CAP)
+        tax = price * (0.011 if price <= 6 else (0.022 if price <= 9 else 0.033))
+        need_live = round(price - loan_live + tax, 2)
 
         results.append({
-            "구": gu,
-            "단지명": name,
-            "면적": area_type,
-            "매매가": price,
-            "2개월전": price_2m_ago,
-            "2개월평균": price_2m_avg,
-            "최근거래": price_latest,
-            "최근일자": latest_date,
-            "괴리율": gap_pct,
-            "전세중위": jeonse_median,
-            "전세범위": jeonse_range,
-            "매매건수": len(trades),
-            "전세건수": len(rents),
+            "구": gu, "단지명": name, "면적": area_type,
+            "매매가": price, "2개월전": price_2m_ago, "2개월평균": price_2m_avg,
+            "최근거래": price_latest, "최근일자": latest["date"].strftime("%m.%d"),
+            "괴리율": gap_pct, "추세": trend,
+            "전세평균": jeonse_avg, "전세범위": jeonse_range,
+            "매매건수": len(trades), "전세건수": len(rents),
+            "준공": build_year, "연식": age,
+            "여의도": yeouido, "청계산": cheongye, "독립문": doklip,
+            "통근가중": commute_w, "KB전세가율": kb_ratio,
+            "할인율": discount,
+            "갭": gap_val, "갭대출": round(loan_gap, 2) if loan_gap else None,
+            "갭필요현금": need_gap, "실거주대출": round(loan_live, 2),
+            "실거주필요현금": need_live,
+            "총점_갭": round(gap_score, 2),
+            "총점_실거주": round(live_score, 2),
+            "총점_전월세": round(wait_score, 2),
+            **scores,
         })
 
     return results
@@ -341,198 +357,130 @@ def aggregate_complexes(all_trade, all_rent):
 
 # ── 전략별 TOP 20 ────────────────────────────────────────
 
-def strategy1_gap(complexes):
-    """전략1 갭투자: 갭 최소 + 필요현금 ≤ 5.5억"""
-    ranked = []
-    for c in complexes:
-        if not c["전세중위"]:
-            continue
-        price = c["매매가"]
-        jeonse = c["전세중위"]
-        gap = price - jeonse
-        if gap <= 0:
-            continue
-        required = calc_required_cash(price, "gap", jeonse)
-        if required > GAP_CASH_LIMIT:
-            continue
-        remaining = CASH - required
-        c_copy = dict(c)
-        c_copy["갭"] = round(gap, 2)
-        c_copy["필요현금"] = round(required, 2)
-        c_copy["잔여현금"] = round(remaining, 2)
-        c_copy["전세가율"] = round(jeonse / price * 100, 1) if price > 0 else 0
-        ranked.append(c_copy)
-
-    # 정렬: 필요현금 낮은 순 → 전세가율 높은 순
-    ranked.sort(key=lambda x: (x["필요현금"], -x["전세가율"]))
-    return ranked[:20]
+def top20_gap(data):
+    """전략1: 갭필요현금 ≤ 5.5억, 매매 8억+, 전세 2건+, 총점순"""
+    pool = [d for d in data
+            if d["갭필요현금"] is not None
+            and 0 < d["갭필요현금"] <= 5.5
+            and d["매매가"] >= 8
+            and d["전세건수"] >= 2]
+    pool.sort(key=lambda x: -x["총점_갭"])
+    return pool[:20]
 
 
-def strategy2_live(complexes):
-    """전략2 실거주: 매매가 ≤ 12억 + 필요현금 기준"""
-    ranked = []
-    for c in complexes:
-        price = c["매매가"]
-        if price > LIVE_PRICE_LIMIT:
-            continue
-        required = calc_required_cash(price, "live")
-        if required > CASH:
-            continue
-        loan = calc_loan(price, "live")
-        remaining = CASH - required
-        # 월 상환 추정 (4%, 30년 원리금균등)
-        if loan > 0:
-            r_monthly = 0.04 / 12
-            n_months = 360
-            monthly = loan * 10000 * r_monthly / (1 - (1 + r_monthly) ** -n_months)
-            monthly_man = round(monthly)  # 만원
-        else:
-            monthly_man = 0
-
-        if monthly_man > MAX_MONTHLY:
-            continue
-
-        c_copy = dict(c)
-        c_copy["대출"] = round(loan, 2)
-        c_copy["필요현금"] = round(required, 2)
-        c_copy["잔여현금"] = round(remaining, 2)
-        c_copy["월상환"] = monthly_man
-        ranked.append(c_copy)
-
-    # 정렬: 잔여현금 많은 순 → 매매가 낮은 순
-    ranked.sort(key=lambda x: (-x["잔여현금"], x["매매가"]))
-    return ranked[:20]
+def top20_live(data):
+    """전략2: 실거주필요현금 ≤ 6.0억, 매매 8억+, 전세 2건+, 총점순"""
+    pool = [d for d in data
+            if d["실거주필요현금"] <= 6.0
+            and d["매매가"] >= 8
+            and d["전세건수"] >= 2]
+    pool.sort(key=lambda x: -x["총점_실거주"])
+    return pool[:20]
 
 
-def strategy3_wait(complexes):
-    """전략3 전월세 거주: 전세 보증금 낮은 순 (현금 보존)"""
-    ranked = []
-    for c in complexes:
-        if not c["전세중위"]:
-            continue
-        jeonse = c["전세중위"]
-        if jeonse > CASH:  # 보증금이 가용 현금 초과
-            continue
-        remaining = CASH - jeonse
-        # 연간 기회비용 (3.5%)
-        opp_cost = round(jeonse * 0.035, 2)
-        # 잔여현금 운용수익
-        invest_return = round(remaining * 0.035, 2)
-        net_cost = round(opp_cost - invest_return, 2)
-
-        c_copy = dict(c)
-        c_copy["보증금"] = round(jeonse, 2)
-        c_copy["잔여현금"] = round(remaining, 2)
-        c_copy["기회비용"] = opp_cost
-        c_copy["운용수익"] = invest_return
-        c_copy["순비용"] = net_cost
-        ranked.append(c_copy)
-
-    # 정렬: 순비용 낮은 순 → 보증금 낮은 순
-    ranked.sort(key=lambda x: (x["순비용"], x["보증금"]))
-    return ranked[:20]
+def top20_wait(data):
+    """전략3: 전세평균 ≤ 5억, 전세 2건+, 총점순"""
+    pool = [d for d in data
+            if d["전세평균"] is not None
+            and d["전세평균"] <= 5.0
+            and d["전세건수"] >= 2]
+    pool.sort(key=lambda x: -x["총점_전월세"])
+    return pool[:20]
 
 
-# ── 텔레그램 메시지 ──────────────────────────────────────
+# ── 텔레그램 ─────────────────────────────────────────────
 
-def format_strategy_message(top1, top2, top3):
-    """전략별 TOP 20 텔레그램 메시지"""
+def format_message(top1, top2, top3):
     today_str = datetime.now().strftime("%Y.%m.%d")
-    messages = []
+    msgs = []
 
-    # 전략1: 갭투자
-    lines = [f"🏠 주간 부동산 리포트 ({today_str})", "", "━━ 전략1: 갭투자 TOP 20 ━━"]
-    lines.append("(필요현금 ≤ 5.5억, 갭 작은 순)")
-    lines.append("")
+    # 전략1
+    lines = [f"🏠 주간 부동산 리포트 ({today_str})", "",
+             "━━ 전략1: 갭투자 TOP 20 ━━",
+             "매매8억+, 갭필요현금≤5.5억, 점수순", ""]
     for i, c in enumerate(top1, 1):
-        g = c.get("괴리율")
-        trend = f"📈+{g}%" if g and g > 0 else (f"📉{g}%" if g and g < 0 else "")
+        t = f"{'📈' if (c['추세'] or 0) > 0 else '📉'}{c['추세']:+.0f}%" if c['추세'] else ""
         lines.append(
-            f"{i}. [{c['구']}] {c['단지명']} {c['면적']}\n"
-            f"   매매 {c['매매가']:.1f} 전세 {c['전세중위']:.1f} "
-            f"갭 {c['갭']:.1f} 필요 {c['필요현금']:.1f}억 {trend}"
-        )
-    messages.append("\n".join(lines))
+            f"{i}. [{c['구']}] {c['단지명']} {c['면적']} "
+            f"({c['총점_갭']:.1f}점)\n"
+            f"   매매{c['매매가']:.1f} 전세{c['전세평균']:.1f} "
+            f"갭{c['갭']:.1f} 필요{c['갭필요현금']:.1f}억 "
+            f"통근{c['통근가중']:.0f}분 {t}")
+    msgs.append("\n".join(lines))
 
-    # 전략2: 실거주
-    lines = ["", "━━ 전략2: 실거주 TOP 20 ━━"]
-    lines.append("(매매 ≤ 12억, 잔여현금 많은 순)")
-    lines.append("")
+    # 전략2
+    lines = ["", "━━ 전략2: 실거주 TOP 20 ━━",
+             "매매8억+, 필요현금≤6억, 점수순", ""]
     for i, c in enumerate(top2, 1):
-        g = c.get("괴리율")
-        trend = f"📈+{g}%" if g and g > 0 else (f"📉{g}%" if g and g < 0 else "")
+        t = f"{'📈' if (c['추세'] or 0) > 0 else '📉'}{c['추세']:+.0f}%" if c['추세'] else ""
         lines.append(
-            f"{i}. [{c['구']}] {c['단지명']} {c['면적']}\n"
-            f"   매매 {c['매매가']:.1f} 대출 {c['대출']:.1f} "
-            f"필요 {c['필요현금']:.1f} 잔여 {c['잔여현금']:.1f}억 "
-            f"월{c['월상환']}만 {trend}"
-        )
-    messages.append("\n".join(lines))
+            f"{i}. [{c['구']}] {c['단지명']} {c['면적']} "
+            f"({c['총점_실거주']:.1f}점)\n"
+            f"   매매{c['매매가']:.1f} 대출{c['실거주대출']:.1f} "
+            f"필요{c['실거주필요현금']:.1f}억 "
+            f"통근{c['통근가중']:.0f}분 {t}")
+    msgs.append("\n".join(lines))
 
-    # 전략3: 전월세 대기
-    lines = ["", "━━ 전략3: 전월세 거주 TOP 20 ━━"]
-    lines.append("(순비용 낮은 순, 현금 보존)")
-    lines.append("")
+    # 전략3
+    lines = ["", "━━ 전략3: 전월세 거주 TOP 20 ━━",
+             "전세≤5억, 점수순 (통근·독립문 가중)", ""]
     for i, c in enumerate(top3, 1):
         lines.append(
-            f"{i}. [{c['구']}] {c['단지명']} {c['면적']}\n"
-            f"   보증금 {c['보증금']:.1f}억 잔여 {c['잔여현금']:.1f}억 "
-            f"순비용 {c['순비용']:.1f}억/년"
-        )
-    messages.append("\n".join(lines))
+            f"{i}. [{c['구']}] {c['단지명']} {c['면적']} "
+            f"({c['총점_전월세']:.1f}점)\n"
+            f"   전세{c['전세평균']:.1f}억 "
+            f"통근{c['통근가중']:.0f}분 독립문{c['독립문']}분")
+    msgs.append("\n".join(lines))
 
-    return "\n".join(messages)
+    return "\n".join(msgs)
 
 
 def send_telegram(text):
-    """텔레그램 발송 (4096자 분할)"""
     if not BOT_TOKEN or not CHAT_ID:
-        print("[SKIP] 텔레그램 환경변수 미설정")
+        print("[SKIP] 텔레그램 미설정")
         return
-
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    chunks = []
-    current = ""
+    chunks, cur = [], ""
     for line in text.split("\n"):
-        if len(current) + len(line) + 1 > 4000:
-            chunks.append(current)
-            current = line
+        if len(cur) + len(line) + 1 > 4000:
+            chunks.append(cur)
+            cur = line
         else:
-            current = current + "\n" + line if current else line
-    if current:
-        chunks.append(current)
-
+            cur = cur + "\n" + line if cur else line
+    if cur:
+        chunks.append(cur)
     for chunk in chunks:
         try:
-            resp = requests.post(url, data={
-                "chat_id": CHAT_ID,
-                "text": chunk,
+            requests.post(url, data={
+                "chat_id": CHAT_ID, "text": chunk,
                 "disable_web_page_preview": "true",
             }, timeout=30)
-            if resp.status_code != 200:
-                print(f"[WARN] 텔레그램: {resp.status_code}")
-        except requests.RequestException as e:
+        except Exception as e:
             print(f"[WARN] 텔레그램: {e}")
 
 
-def save_summary(top1, top2, top3):
-    """전략별 TOP 20 JSON 저장"""
+def save_results(data, top1, top2, top3):
+    # 전체 데이터 CSV
+    if data:
+        keys = data[0].keys()
+        path = BASE_DIR / "scored_all.csv"
+        with open(path, "w", newline="", encoding="utf-8-sig") as f:
+            w = csv.DictWriter(f, fieldnames=keys)
+            w.writeheader()
+            w.writerows(data)
+        print(f"전체 저장: {path} ({len(data)}건)")
+
+    # TOP 20 JSON
     summary = {
         "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "strategy1_gap": [
-            {k: v for k, v in c.items() if not callable(v)} for c in top1
-        ],
-        "strategy2_live": [
-            {k: v for k, v in c.items() if not callable(v)} for c in top2
-        ],
-        "strategy3_wait": [
-            {k: v for k, v in c.items() if not callable(v)} for c in top3
-        ],
+        "strategy1_gap": top1,
+        "strategy2_live": top2,
+        "strategy3_wait": top3,
     }
     path = BASE_DIR / "strategy_top20.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
-    print(f"요약 저장: {path}")
+    print(f"TOP20 저장: {path}")
 
 
 # ── 메인 ──────────────────────────────────────────────────
@@ -542,28 +490,22 @@ def main():
         print("[ERROR] DATA_GO_KR_API_KEY 미설정")
         sys.exit(0)
 
-    # 1. 서울 25개구 전체 수집
     all_trade, all_rent = collect_all()
+    total_t = sum(len(v) for v in all_trade.values())
+    total_r = sum(len(v) for v in all_rent.values())
+    print(f"\n수집 완료: 매매 {total_t}, 전세 {total_r}")
 
-    total_trade = sum(len(v) for v in all_trade.values())
-    total_rent = sum(len(v) for v in all_rent.values())
-    print(f"\n수집 완료: 매매 {total_trade}건, 전세 {total_rent}건")
+    data = aggregate_and_score(all_trade, all_rent)
+    print(f"집계+스코어: {len(data)}건 (통근 필터 적용)")
 
-    # 2. 단지별 집계
-    complexes = aggregate_complexes(all_trade, all_rent)
-    print(f"집계 단지 수: {len(complexes)}")
+    top1 = top20_gap(data)
+    top2 = top20_live(data)
+    top3 = top20_wait(data)
+    print(f"전략1: {len(top1)} / 전략2: {len(top2)} / 전략3: {len(top3)}")
 
-    # 3. 전략별 TOP 20
-    top1 = strategy1_gap(complexes)
-    top2 = strategy2_live(complexes)
-    top3 = strategy3_wait(complexes)
-    print(f"전략1(갭투자): {len(top1)}건 / 전략2(실거주): {len(top2)}건 / 전략3(전월세): {len(top3)}건")
+    save_results(data, top1, top2, top3)
 
-    # 4. 저장
-    save_summary(top1, top2, top3)
-
-    # 5. 텔레그램
-    msg = format_strategy_message(top1, top2, top3)
+    msg = format_message(top1, top2, top3)
     print(f"\n{msg}")
     send_telegram(msg)
 
