@@ -49,6 +49,7 @@
 | SY Workspace | @SY_workspace_bot | TELEGRAM_BOT_TOKEN | 할일, DART, watchlist |
 | SY IB News | @SY_IB_News_bot | IB_BOT_TOKEN | IB 뉴스 클리핑 |
 | SY Training | @SY_workout_bot | TRAINING_BOT_TOKEN | 운동, 철인3종, 운동 분석 |
+| SY Real Estate | @SY_realestate_bot | REALESTATE_BOT_TOKEN | 부동산 주간 리포트 |
 
 - Chat ID: `TELEGRAM_CHAT_ID` (모든 봇 공통)
 - GitHub repo: https://github.com/sywoolab/sy-workspace
