@@ -5,10 +5,11 @@ on:
     - cron: '0 22 * * *'    # UTC 22시 = KST 07시 (할일 리마인드)
     - cron: '40 20 * * *'   # UTC 20:40 = KST 05:40 (운동 아침 알림)
     - cron: '0 9 * * *'     # UTC 09시 = KST 18시 (운동 저녁 리마인드)
+    - cron: '17 13 * * 0'   # UTC 13:17 일요일 = KST 22:17 (주간 리뷰)
   workflow_dispatch:
     inputs:
       job:
-        description: 'task / morning / evening / all'
+        description: 'task / morning / evening / weekly / all'
         default: 'all'
 
 permissions:
@@ -96,3 +97,23 @@ jobs:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python workout/scripts/workout_alert.py evening
+
+  weekly-review:
+    if: >-
+      github.event.schedule == '17 13 * * 0' ||
+      github.event.inputs.job == 'weekly'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Weekly review + improvement queue
+        env:
+          BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python workout/scripts/adaptive_scheduler.py --weekly-review

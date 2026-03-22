@@ -49,6 +49,19 @@ jobs:
             git push
           fi
 
+      - name: Adaptive schedule adjustment
+        if: success()
+        env:
+          BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python workout/scripts/adaptive_scheduler.py
+          git add workout/workout_schedule.json workout/data/improvement_queue.json
+          if ! git diff --staged --quiet; then
+            git commit -m "adaptive: schedule adjustment"
+            git push
+          fi
+
       - name: Run workout analysis (if workout_log changed)
         if: success()
         env:

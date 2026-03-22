@@ -21,6 +21,7 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 HEALTH_FILE = os.path.join(BASE_DIR, 'data', 'garmin_health.json')
+QUEUE_FILE = os.path.join(BASE_DIR, 'data', 'improvement_queue.json')
 
 RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
@@ -1152,6 +1153,115 @@ def run(workout_log, schedule_data, health_data):
     return all_overrides, report
 
 
+def _detect_improvement_items(workout_log, schedule_data, health_data):
+    """코드만으로 자동 판단 불가한 패턴을 감지하여 improvement_queue에 축적"""
+    items = []
+    phase, _ = get_phase(NOW)
+    week_monday = get_week_monday(NOW)
+
+    # 1. 80/20 위반 3주 연속 → 구조 변경 필요할 수 있음
+    violation_weeks = 0
+    for w_offset in range(3):
+        w_start = week_monday - timedelta(weeks=w_offset)
+        w_end = w_start + timedelta(days=6)
+        hard_count = 0
+        total_count = 0
+        for d_offset in range(7):
+            d = (w_start + timedelta(days=d_offset)).strftime('%Y-%m-%d')
+            entry = workout_log.get(d)
+            if entry and entry.get('done') and entry.get('training_zone'):
+                total_count += 1
+                if entry['training_zone'] not in ('easy', 'rest'):
+                    hard_count += 1
+        if total_count >= 3 and hard_count / total_count > 0.3:
+            violation_weeks += 1
+    if violation_weeks >= 3:
+        items.append({
+            "type": "structure",
+            "priority": "high",
+            "message": "80/20 강도 배분 3주 연속 위반 — 스케줄 구조 재검토 필요",
+            "detected_at": TODAY,
+        })
+
+    # 2. VDOT 3주 정체 → 훈련 자극 변경 필요
+    vdot_history = schedule_data.get('vdot_history', [])
+    if len(vdot_history) >= 3:
+        recent_3 = [v['vdot'] for v in vdot_history[-3:]]
+        if max(recent_3) - min(recent_3) <= 1:
+            items.append({
+                "type": "plateau",
+                "priority": "medium",
+                "message": f"VDOT {recent_3[-1]} — 3주간 정체. 인터벌/템포 비율 조정 검토",
+                "detected_at": TODAY,
+            })
+
+    # 3. 수면 품질 지속 저하 → 훈련 볼륨 재검토
+    sleep_scores = []
+    for d_offset in range(7):
+        d = (NOW.date() - timedelta(days=d_offset)).strftime('%Y-%m-%d')
+        h = health_data.get(d, {})
+        score = h.get('sleep', {}).get('score')
+        if score:
+            sleep_scores.append(score)
+    if len(sleep_scores) >= 5 and sum(sleep_scores) / len(sleep_scores) < 60:
+        items.append({
+            "type": "recovery",
+            "priority": "high",
+            "message": f"주간 평균 수면 점수 {sum(sleep_scores)//len(sleep_scores)}점 — 볼륨 감량 검토 필요",
+            "detected_at": TODAY,
+        })
+
+    # 4. 같은 규칙이 주 3회 이상 트리거 → 근본 원인 검토
+    overrides = schedule_data.get('overrides', {})
+    rule_counts = {}
+    for d_offset in range(7):
+        d = (NOW.date() - timedelta(days=d_offset)).strftime('%Y-%m-%d')
+        ov = overrides.get(d)
+        if ov and ov.get('auto'):
+            rule = ov.get('rule', '')
+            rule_counts[rule] = rule_counts.get(rule, 0) + 1
+    for rule, count in rule_counts.items():
+        if count >= 3:
+            items.append({
+                "type": "recurring_override",
+                "priority": "medium",
+                "message": f"규칙 {rule}이 주 {count}회 트리거 — 근본 원인 검토 필요",
+                "detected_at": TODAY,
+            })
+
+    return items
+
+
+def _update_improvement_queue(new_items):
+    """improvement_queue.json에 새 항목 축적 (중복 방지, 30일 보관)"""
+    queue = load_json(QUEUE_FILE)
+    if not isinstance(queue, dict):
+        queue = {"items": [], "resolved": []}
+    if "items" not in queue:
+        queue["items"] = []
+    if "resolved" not in queue:
+        queue["resolved"] = []
+
+    existing_messages = {item['message'] for item in queue['items']}
+
+    added = 0
+    for item in new_items:
+        if item['message'] not in existing_messages:
+            queue['items'].append(item)
+            added += 1
+
+    # 30일 이전 항목 정리
+    cutoff = (NOW - timedelta(days=30)).strftime('%Y-%m-%d')
+    queue['items'] = [i for i in queue['items'] if i.get('detected_at', '') >= cutoff]
+    queue['resolved'] = [i for i in queue['resolved'] if i.get('resolved_at', '') >= cutoff]
+
+    if added > 0:
+        save_json(QUEUE_FILE, queue)
+        print(f"[adaptive] improvement_queue: {added}건 추가 (총 {len(queue['items'])}건)")
+
+    return added, queue
+
+
 def adjust_schedule():
     """
     적응형 스케줄 조정 메인 — garmin_sync.py에서 호출
@@ -1173,8 +1283,37 @@ def adjust_schedule():
         save_json(SCHEDULE_FILE, schedule_data)
         print(f"[adaptive] overrides 업데이트: {len(overrides)}건")
 
+    # VDOT 히스토리 축적
+    current_vdot = schedule_data.get('current_vdot')
+    if current_vdot and NOW.date().weekday() == 6:  # 일요일마다 기록
+        if 'vdot_history' not in schedule_data:
+            schedule_data['vdot_history'] = []
+        last_entry = schedule_data['vdot_history'][-1] if schedule_data['vdot_history'] else {}
+        if last_entry.get('date') != TODAY:
+            schedule_data['vdot_history'].append({'date': TODAY, 'vdot': current_vdot})
+            # 최근 12주만 보관
+            schedule_data['vdot_history'] = schedule_data['vdot_history'][-12:]
+            save_json(SCHEDULE_FILE, schedule_data)
+
+    # improvement_queue 축적
+    improvement_items = _detect_improvement_items(workout_log, schedule_data, health_data)
+    added, queue = _update_improvement_queue(improvement_items)
+
+    # 텔레그램 보고
+    report_parts = []
     if report:
-        send_telegram(report)
+        report_parts.append(report)
+
+    # improvement_queue에 high priority 항목이 있으면 알림
+    high_items = [i for i in queue.get('items', []) if i.get('priority') == 'high']
+    if high_items:
+        lines = ["🔍 검토 필요 사항:"]
+        for item in high_items:
+            lines.append(f"  ⚠️ {item['message']}")
+        report_parts.append("\n".join(lines))
+
+    if report_parts:
+        send_telegram("\n\n".join(report_parts))
         print(f"[adaptive] 보고 전송 완료")
 
     return overrides, report
@@ -1186,7 +1325,80 @@ def adjust_schedule():
 if __name__ == '__main__':
     mode = sys.argv[1] if len(sys.argv) > 1 else 'full'
 
-    if mode == '--morning':
+    if mode == '--weekly-review':
+        # 일요일 주간 종합 리뷰
+        workout_log = load_json(LOG_FILE)
+        schedule_data = load_json(SCHEDULE_FILE)
+        health_data = load_json(HEALTH_FILE)
+        queue = load_json(QUEUE_FILE)
+
+        # 주간 통계
+        week_monday = get_week_monday(NOW)
+        swim_count = run_count = bike_count = 0
+        total_run_km = 0.0
+        total_load = 0
+        for d_offset in range(7):
+            d = (week_monday + timedelta(days=d_offset)).strftime('%Y-%m-%d')
+            entry = workout_log.get(d)
+            if not entry or not entry.get('done'):
+                continue
+            m = entry.get('metrics', {})
+            t = m.get('type', '')
+            if t == 'swim':
+                swim_count += 1
+            elif t == 'run':
+                run_count += 1
+                total_run_km += m.get('distance_km', 0)
+            elif t == 'bike':
+                bike_count += 1
+            # all_metrics도 카운트
+            for am in entry.get('all_metrics', []):
+                at = am.get('type', '')
+                if at == 'swim' and t != 'swim':
+                    swim_count += 1
+                elif at == 'run' and t != 'run':
+                    run_count += 1
+                    total_run_km += am.get('distance_km', 0)
+                elif at == 'bike' and t != 'bike':
+                    bike_count += 1
+
+        phase, phase_name = get_phase(NOW)
+        targets = PHASE_TARGETS.get(phase, {})
+        vdot = schedule_data.get('current_vdot', '?')
+
+        lines = [
+            f"📊 주간 리뷰 ({week_monday.strftime('%m/%d')}~{(week_monday + timedelta(days=6)).strftime('%m/%d')})",
+            f"Phase {phase} ({phase_name}) | VDOT {vdot} | D-{(RACE_DAY.date() - NOW.date()).days}",
+            "",
+            f"🏊 수영 {swim_count}/{targets.get('swim', '?')}회",
+            f"🏃 러닝 {run_count}/{targets.get('run', '?')}회 ({total_run_km:.1f}/{targets.get('run_km', '?')}km)",
+            f"🚴 자전거 {bike_count}/{targets.get('bike', '?')}회",
+        ]
+
+        # VDOT 추이
+        vdot_history = schedule_data.get('vdot_history', [])
+        if len(vdot_history) >= 2:
+            prev = vdot_history[-2]['vdot']
+            curr = vdot_history[-1]['vdot']
+            diff = curr - prev
+            arrow = "↑" if diff > 0 else "↓" if diff < 0 else "→"
+            lines.append(f"\nVDOT 추이: {prev} {arrow} {curr}")
+
+        # improvement_queue 요약
+        items = queue.get('items', [])
+        if items:
+            lines.append(f"\n🔍 검토 필요 ({len(items)}건):")
+            for item in items:
+                icon = "🔴" if item.get('priority') == 'high' else "🟡"
+                lines.append(f"  {icon} {item['message']}")
+            lines.append("\n→ 다음 대화에서 검토하겠습니다")
+        else:
+            lines.append("\n✅ 검토 필요 사항 없음 — 알고리즘 정상 작동 중")
+
+        send_telegram("\n".join(lines))
+        print("[adaptive] 주간 리뷰 전송 완료")
+
+    elif mode == '--morning':
         # 아침 컨디션 체크만 (A3 규칙)
         health_data = load_json(HEALTH_FILE)
         schedule_data = load_json(SCHEDULE_FILE)
