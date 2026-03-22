@@ -296,20 +296,5 @@
     "garmin_ids": [
       22266012629
     ]
-  },
-  "2026-03-22": {
-    "planned": "완전 휴식",
-    "done": true,
-    "actual": "근력 훈련 8분",
-    "metrics": {
-      "type": "strength"
-    },
-    "training_zone": "easy",
-    "note": " | 부하 1",
-    "garmin_id": 22255298354,
-    "start_time": "12:37",
-    "garmin_ids": [
-      22255298354
-    ]
   }
 }
