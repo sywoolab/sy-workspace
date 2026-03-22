@@ -1801,6 +1801,14 @@ if __name__ == '__main__':
         else:
             changed = sync()
         sys.exit(0)
+    except SystemExit as e:
+        # login_garmin()의 sys.exit(0)은 429 graceful exit → 그대로 종료
+        # sys.exit(1)은 진짜 오류 → 텔레그램 알림 후 종료
+        if e.code != 0:
+            error_msg = f"❌ 가민 동기화 실패 (exit {e.code})"
+            print(error_msg)
+            send_telegram(error_msg)
+        sys.exit(e.code)
     except Exception as e:
         error_msg = f"❌ 가민 동기화 오류\n{traceback.format_exc()}"
         print(error_msg)
