@@ -1,0 +1,32 @@
+name: realestate-weekly
+
+on:
+  schedule:
+    - cron: '0 0 * * 6'  # UTC 토요일 00시 = KST 토요일 09시
+  workflow_dispatch:
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Fetch real estate data
+        env:
+          DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python realestate/scripts/fetch_trade.py
+
+      - name: Save collected data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add realestate/data/
+          git diff --staged --quiet || git commit -m "weekly realestate data update" && git push || true

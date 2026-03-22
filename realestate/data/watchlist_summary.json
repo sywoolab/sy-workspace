@@ -1,0 +1,101 @@
+{
+  "updated": "2026-03-23 08:34",
+  "complexes": [
+    {
+      "name": "래미안상도3차",
+      "area": "84㎡",
+      "district": "동작구",
+      "price_2m_ago": 17.1,
+      "price_2m_avg": 16.91,
+      "price_latest": 16.88,
+      "latest_date": "02.14",
+      "gap_pct": -1.3,
+      "jeonse_range": "5.0~8.0",
+      "trade_count": 3
+    },
+    {
+      "name": "신동아리버파크",
+      "area": "59㎡",
+      "district": "동작구",
+      "price_2m_ago": null,
+      "price_2m_avg": 14.49,
+      "price_latest": 14.5,
+      "latest_date": "02.21",
+      "gap_pct": null,
+      "jeonse_range": "4.2~5.7",
+      "trade_count": 6
+    },
+    {
+      "name": "e편한세상서울대입구",
+      "area": "84㎡",
+      "district": "관악구",
+      "price_2m_ago": 13.0,
+      "price_2m_avg": 14.61,
+      "price_latest": 15.2,
+      "latest_date": "03.15",
+      "gap_pct": 16.9,
+      "jeonse_range": "5.3~8.2",
+      "trade_count": 10
+    },
+    {
+      "name": "관악푸르지오",
+      "area": "84㎡",
+      "district": "관악구",
+      "price_2m_ago": 11.5,
+      "price_2m_avg": 12.02,
+      "price_latest": 12.4,
+      "latest_date": "03.14",
+      "gap_pct": 7.8,
+      "jeonse_range": "4.9~6.8",
+      "trade_count": 12
+    },
+    {
+      "name": "래미안에스티움",
+      "area": "59㎡",
+      "district": "영등포구",
+      "price_2m_ago": null,
+      "price_2m_avg": 16.83,
+      "price_latest": 16.83,
+      "latest_date": "01.31",
+      "gap_pct": null,
+      "jeonse_range": "6.0~7.5",
+      "trade_count": 1
+    },
+    {
+      "name": "사당자이",
+      "area": "59㎡",
+      "district": "동작구",
+      "price_2m_ago": null,
+      "price_2m_avg": 11.75,
+      "price_latest": 12.15,
+      "latest_date": "02.28",
+      "gap_pct": null,
+      "jeonse_range": "4.8~5.5",
+      "trade_count": 3
+    },
+    {
+      "name": "관악파크푸르지오",
+      "area": "84㎡",
+      "district": "관악구",
+      "price_2m_ago": 9.8,
+      "price_2m_avg": 10.03,
+      "price_latest": 10.7,
+      "latest_date": "03.18",
+      "gap_pct": 9.2,
+      "jeonse_range": "5.7~6.3",
+      "trade_count": 8
+    },
+    {
+      "name": "왕십리자이",
+      "area": "84㎡",
+      "district": "성동구",
+      "price_2m_ago": null,
+      "price_2m_avg": 18.75,
+      "price_latest": 19.0,
+      "latest_date": "03.05",
+      "gap_pct": null,
+      "jeonse_range": "8.6~8.6",
+      "trade_count": 2
+    }
+  ]
+}
