@@ -56,7 +56,8 @@ jobs:
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python workout/scripts/adaptive_scheduler.py
-          git add workout/workout_schedule.json workout/data/improvement_queue.json
+          git add workout/workout_schedule.json
+          git add workout/data/improvement_queue.json 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "adaptive: schedule adjustment"
             git push
