@@ -272,5 +272,44 @@
     "is_brick": true,
     "training_zone": "tempo",
     "note": "swim TE 3.2 | bike TE 3.9 | run TE 3.1 | 브릭 자동 판정 | 러닝 네거티브 스플릿 6:01→5:01"
+  },
+  "2026-03-23": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "수영 1000m 43분 @1:59/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1000,
+      "duration_min": 43.2,
+      "moving_min": 19.9,
+      "pace_per_100m": "1:59",
+      "avg_hr": 118,
+      "max_hr": 161,
+      "swolf": 38,
+      "strokes": 330,
+      "avg_spm": null
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.3 / 무산소 2.1 | 부하 78",
+    "garmin_id": 22266012629,
+    "start_time": "06:18",
+    "garmin_ids": [
+      22266012629
+    ]
+  },
+  "2026-03-22": {
+    "planned": "완전 휴식",
+    "done": true,
+    "actual": "근력 훈련 8분",
+    "metrics": {
+      "type": "strength"
+    },
+    "training_zone": "easy",
+    "note": " | 부하 1",
+    "garmin_id": 22255298354,
+    "start_time": "12:37",
+    "garmin_ids": [
+      22255298354
+    ]
   }
 }
