@@ -141,8 +141,47 @@ def _restore_tokens_from_env():
         return False
 
 
+def _update_tokens_secret():
+    """갱신된 토큰을 GitHub Secret에 자동 업데이트 (GitHub Actions 환경에서만)"""
+    import subprocess
+    if not os.environ.get('GITHUB_ACTIONS'):
+        return  # 로컬 실행 시 skip
+    try:
+        gh_token = os.environ.get('GH_TOKEN', '')
+        if not gh_token:
+            print("[SKIP] GH_TOKEN 없음 — Secret 자동 업데이트 불가")
+            return
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix='.tar.gz', delete=False) as tmp:
+            tmp_path = tmp.name
+        subprocess.run(
+            ['tar', '-czf', tmp_path, '-C', os.path.join(BASE_DIR, 'data'), 'garmin_tokens'],
+            check=True,
+        )
+        with open(tmp_path, 'rb') as f:
+            b64 = base64.b64encode(f.read()).decode()
+        os.unlink(tmp_path)
+        result = subprocess.run(
+            ['gh', 'secret', 'set', 'GARMIN_TOKENS',
+             '-R', os.environ.get('GITHUB_REPOSITORY', 'sywoolab/sy-workspace'),
+             '--body', b64],
+            capture_output=True, text=True, timeout=30,
+            env={**os.environ, 'GH_TOKEN': gh_token},
+        )
+        if result.returncode == 0:
+            print("[OK] GARMIN_TOKENS Secret 자동 갱신 완료")
+        else:
+            print(f"[WARN] Secret 갱신 실패: {result.stderr[:200]}")
+    except Exception as e:
+        print(f"[WARN] Secret 자동 갱신 중 오류: {e}")
+
+
 def login_garmin():
-    """가민 커넥트 로그인 (토큰 캐시 활용, GitHub Actions는 Secret에서 복원)"""
+    """가민 커넥트 로그인 (토큰 캐시 활용, GitHub Actions는 Secret에서 복원)
+
+    Rate limit(429) 발생 시 exit(0)으로 조용히 종료하여
+    다음 스케줄까지 대기한다 (exit(1)은 불필요한 알림 유발).
+    """
     if not GARMIN_EMAIL or not GARMIN_PASSWORD:
         print("[ERROR] GARMIN_EMAIL / GARMIN_PASSWORD 환경변수 필요")
         sys.exit(1)
@@ -156,13 +195,20 @@ def login_garmin():
     os.makedirs(TOKEN_DIR, exist_ok=True)
     try:
         api.login(TOKEN_DIR)
-        print("[OK] 가민 토큰 캐시로 로그인")
+        api.garth.dump(TOKEN_DIR)
+        _update_tokens_secret()
+        print("[OK] 가민 토큰 캐시로 로그인 (토큰 갱신됨)")
     except Exception:
         try:
             api.login()
             api.garth.dump(TOKEN_DIR)
+            _update_tokens_secret()
             print("[OK] 가민 신규 로그인 + 토큰 저장")
         except Exception as e:
+            err_str = str(e)
+            if '429' in err_str or 'Too Many Requests' in err_str or 'Rate limit' in err_str:
+                print(f"[RATE_LIMIT] 가민 429 — 다음 실행까지 대기: {e}")
+                sys.exit(0)  # 조용히 종료 (GitHub Actions failure 방지)
             print(f"[ERROR] 가민 로그인 실패: {e}")
             sys.exit(1)
 

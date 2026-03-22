@@ -2,9 +2,11 @@ name: garmin-sync
 
 on:
   schedule:
-    # KST 08~24시 매시 정각 → UTC 23~15
+    # KST 08, 12, 18, 22시 (4회/일) → 429 방지
     - cron: '0 23 * * *'
-    - cron: '0 0-15 * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 9 * * *'
+    - cron: '0 13 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -33,6 +35,8 @@ jobs:
           GARMIN_TOKENS: ${{ secrets.GARMIN_TOKENS }}
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: python workout/scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
 
       - name: Commit changes
