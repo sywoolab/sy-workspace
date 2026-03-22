@@ -488,7 +488,7 @@ def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
             return {
                 "date": tomorrow.strftime('%Y-%m-%d'),
                 "workout": "Easy 또는 완전 휴식",
-                "detail": "어제 컨디션 불량에서 고강도 → 반드시 회복",
+                "detail": f"오늘({target_date_str}) 컨디션 불량 상태에서 운동함 → 회복 필요",
                 "reason": f"컨디션 적색 사후 회복: {reason_str}",
                 "source": "adaptive_A3",
                 "auto": True,
