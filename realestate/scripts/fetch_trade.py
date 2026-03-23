@@ -63,6 +63,7 @@ CASH = 6.0
 LTV = 0.70
 LOAN_CAP = 6.0
 COMMUTE_LIMIT = 60  # 각 직장 60분 이내
+MAX_PRICE = 11.6    # 매수 가능 상한 (현금 6억 올인 시, 취득세 포함)
 
 # 독립문 동쪽 구 (노도강 제외) — 양육 지원 접근성 우선 탐색 영역
 EAST_GU = {'종로구', '중구', '성동구', '동대문구', '성북구', '광진구'}
@@ -425,11 +426,11 @@ def aggregate_and_score(all_trade, all_rent):
 # ── 전략별 TOP 10 ────────────────────────────────────────
 
 def top10_gap(data):
-    """전략1: 갭필요현금 ≤ 5.5억, 매매 8억+, 전세 2건+, 총점순"""
+    """전략1: 갭필요현금 ≤ CASH, 매매 8~MAX_PRICE억, 전세 2건+, 총점순"""
     pool = [d for d in data
             if d["갭필요현금"] is not None
-            and 0 < d["갭필요현금"] <= 5.5
-            and d["매매가"] >= 8
+            and 0 < d["갭필요현금"] <= CASH
+            and 8 <= d["매매가"] <= MAX_PRICE
             and d["전세건수"] >= 2]
     pool.sort(key=lambda x: -x["총점_갭"])
     return pool[:10]
@@ -446,10 +447,10 @@ def _monthly_payment(loan_eok):
 
 
 def top10_live(data):
-    """전략2: 실거주필요현금 ≤ 6.0억, 매매 8억+, 전세 2건+, DSR 월500만 이내, 총점순"""
+    """전략2: 실거주필요현금 ≤ CASH, 매매 8~MAX_PRICE억, 전세 2건+, DSR 월500만 이내, 총점순"""
     pool = []
     for d in data:
-        if d["실거주필요현금"] > 6.0 or d["매매가"] < 8 or d["전세건수"] < 2:
+        if d["실거주필요현금"] > CASH or not (8 <= d["매매가"] <= MAX_PRICE) or d["전세건수"] < 2:
             continue
         # DSR 체크: 월 상환액 ≤ 500만원
         monthly = _monthly_payment(d["실거주대출"])
@@ -513,7 +514,7 @@ def format_gap_message(top, pool_size, region_tag=""):
     tag = f" ({region_tag})" if region_tag else ""
     lines = [
         f"🏠 <b>갭투자 TOP {len(top)}{tag}</b>",
-        f"<i>{today} | 필요현금 ≤5.5억 | 비과세 6년</i>",
+        f"<i>{today} | 매매≤11.6억 | 필요현금≤6억 | 비과세 6년</i>",
         "",
     ]
     for i, c in enumerate(top, 1):
@@ -694,8 +695,8 @@ def main():
     print(f"집계+스코어: {len(data)}건 (통근 필터 적용)")
 
     # 전략별 풀 크기 (메시지 하단 표시용)
-    gap_pool = [d for d in data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= 5.5 and d["매매가"] >= 8 and d["전세건수"] >= 2]
-    live_pool = [d for d in data if d["실거주필요현금"] <= 6.0 and d["매매가"] >= 8 and d["전세건수"] >= 2]
+    gap_pool = [d for d in data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= CASH and 8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2]
+    live_pool = [d for d in data if d["실거주필요현금"] <= CASH and 8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2]
     wait_pool = [d for d in data if d["전세평균"] is not None and d["전세평균"] <= 5.0 and d["전세건수"] >= 2]
 
     top1 = top10_gap(data)
@@ -720,8 +721,8 @@ def main():
     east_top2 = top10_live(east_data)
     east_top3 = top10_wait(east_data)
 
-    east_gap_pool = [d for d in east_data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= 5.5 and d["매매가"] >= 8 and d["전세건수"] >= 2]
-    east_live_pool = [d for d in east_data if d["실거주필요현금"] <= 6.0 and d["매매가"] >= 8 and d["전세건수"] >= 2]
+    east_gap_pool = [d for d in east_data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= CASH and 8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2]
+    east_live_pool = [d for d in east_data if d["실거주필요현금"] <= CASH and 8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2]
     east_wait_pool = [d for d in east_data if d["전세평균"] is not None and d["전세평균"] <= 5.0 and d["전세건수"] >= 2]
 
     print(f"\n동쪽: 전략1 {len(east_top1)}/{len(east_gap_pool)} / 전략2 {len(east_top2)}/{len(east_live_pool)} / 전략3 {len(east_top3)}/{len(east_wait_pool)}")
