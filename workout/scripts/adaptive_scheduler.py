@@ -473,13 +473,19 @@ def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
 
     reason_str = ", ".join(reasons)
 
-    # 오늘 이미 운동 완료했는지 + 운동 강도 확인
+    # 오늘 이미 운동 완료했는지 + 운동 강도/종목 확인
     already_done = False
     today_zone = 'rest'
+    today_type = ''
     if workout_log:
         entry = workout_log.get(target_date_str, {})
         already_done = entry.get('done', False)
         today_zone = entry.get('training_zone') or 'rest'
+        today_type = entry.get('metrics', {}).get('type', '')
+
+    # 근력 운동(strength)은 심폐 부하 아님 → 컨디션 판정에서 "운동 안 한 것"과 동일 취급
+    if today_type == 'strength':
+        already_done = False
 
     # 종합 판정: 단일 지표가 아닌 다수 지표 종합
     # 적색: high 2개 이상, 또는 high 1개 + medium 2개 이상
