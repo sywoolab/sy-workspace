@@ -64,6 +64,9 @@ LTV = 0.70
 LOAN_CAP = 6.0
 COMMUTE_LIMIT = 60  # 각 직장 60분 이내
 
+# 독립문 동쪽 구 (노도강 제외) — 양육 지원 접근성 우선 탐색 영역
+EAST_GU = {'종로구', '중구', '성동구', '동대문구', '성북구', '광진구'}
+
 # ── 스코어링 가중치 ──────────────────────────────────────
 # S1:추세 S2:가격대 S3:거래량 S4:통근가중 S5:독립문 S6:연식 S7:할인율 S8:KB전세가율
 GAP_WEIGHTS = {'S1': 30, 'S2': 15, 'S3': 10, 'S4': 15, 'S5': 5, 'S6': 5, 'S7': 5, 'S8': 15}
@@ -140,6 +143,7 @@ def get_months(n=3):
 
 
 def fetch_api(url, lawd_cd, deal_ymd):
+    """API 호출. 성공 시 list[Element], 실패 시 None 반환 (빈 리스트 = 정상 0건)"""
     params = {
         "serviceKey": API_KEY, "LAWD_CD": lawd_cd,
         "DEAL_YMD": deal_ymd, "numOfRows": "99999", "pageNo": "1",
@@ -150,10 +154,13 @@ def fetch_api(url, lawd_cd, deal_ymd):
         root = ET.fromstring(resp.content)
         code = root.findtext(".//resultCode")
         if code and code not in ("00", "000"):
-            return []
+            msg = root.findtext(".//resultMsg") or "unknown"
+            print(f"  [API ERR] {lawd_cd}/{deal_ymd}: code={code} msg={msg}")
+            return None
         return root.findall(".//item")
-    except Exception:
-        return []
+    except Exception as e:
+        print(f"  [API ERR] {lawd_cd}/{deal_ymd}: {type(e).__name__}: {e}")
+        return None
 
 
 def parse_items(items, tag_map):
@@ -188,11 +195,23 @@ def collect_all():
     print(f"수집: {datetime.now():%Y-%m-%d} | 월: {months} | 서울 25개구\n")
 
     all_trade, all_rent = {}, {}
+    failed_districts = []  # (구이름, 에러유형) 추적
+
     for code, name in DISTRICTS.items():
         trade_rows, rent_rows = [], []
+        trade_err, rent_err = False, False
+
         for ym in months:
-            trade_rows.extend(parse_items(fetch_api(TRADE_URL, code, ym), TRADE_TAG_MAP))
-            rent_rows.extend(parse_items(fetch_api(RENT_URL, code, ym), RENT_TAG_MAP))
+            t_items = fetch_api(TRADE_URL, code, ym)
+            r_items = fetch_api(RENT_URL, code, ym)
+            if t_items is None:
+                trade_err = True
+            else:
+                trade_rows.extend(parse_items(t_items, TRADE_TAG_MAP))
+            if r_items is None:
+                rent_err = True
+            else:
+                rent_rows.extend(parse_items(r_items, RENT_TAG_MAP))
 
         valid = [r for r in trade_rows if r.get("해제여부") != "O"]
         jeonse = [r for r in rent_rows if r.get("월세금액", "0") == "0"]
@@ -201,9 +220,20 @@ def collect_all():
 
         save_csv(valid, TRADE_COLUMNS, BASE_DIR / "trade" / f"{code}_{name}.csv")
         save_csv(jeonse, RENT_COLUMNS, BASE_DIR / "jeonse" / f"{code}_{name}.csv")
-        print(f"  {name}: 매매 {len(valid)}, 전세 {len(jeonse)}")
 
-    return all_trade, all_rent
+        err_tag = ""
+        if trade_err or rent_err:
+            parts = []
+            if trade_err:
+                parts.append("매매")
+            if rent_err:
+                parts.append("전세")
+            err_tag = f" ⚠ {'+'.join(parts)} 일부 실패"
+            failed_districts.append((name, "+".join(parts)))
+
+        print(f"  {name}: 매매 {len(valid)}, 전세 {len(jeonse)}{err_tag}")
+
+    return all_trade, all_rent, failed_districts
 
 
 # ── 집계 + 점수화 ────────────────────────────────────────
@@ -384,12 +414,27 @@ def top10_gap(data):
     return pool[:10]
 
 
+def _monthly_payment(loan_eok):
+    """월 상환액 계산 (원리금균등, 금리4%, 30년). loan_eok=억원 단위, 반환=만원"""
+    principal = loan_eok * 10000  # 억 → 만원
+    r = 0.04 / 12  # 월 이율
+    n = 360  # 30년
+    if principal <= 0:
+        return 0
+    return principal * (r / (1 - (1 + r) ** -n))
+
+
 def top10_live(data):
-    """전략2: 실거주필요현금 ≤ 6.0억, 매매 8억+, 전세 2건+, 총점순"""
-    pool = [d for d in data
-            if d["실거주필요현금"] <= 6.0
-            and d["매매가"] >= 8
-            and d["전세건수"] >= 2]
+    """전략2: 실거주필요현금 ≤ 6.0억, 매매 8억+, 전세 2건+, DSR 월500만 이내, 총점순"""
+    pool = []
+    for d in data:
+        if d["실거주필요현금"] > 6.0 or d["매매가"] < 8 or d["전세건수"] < 2:
+            continue
+        # DSR 체크: 월 상환액 ≤ 500만원
+        monthly = _monthly_payment(d["실거주대출"])
+        if monthly > 500:
+            continue
+        pool.append(d)
     pool.sort(key=lambda x: -x["총점_실거주"])
     return pool[:10]
 
@@ -417,11 +462,12 @@ def _trend_str(trend):
     return f"+{trend:.0f}%" if trend > 0 else f"{trend:.0f}%"
 
 
-def format_gap_message(top, pool_size):
+def format_gap_message(top, pool_size, region_tag=""):
     """전략1 갭투자 메시지 (HTML)"""
     today = datetime.now().strftime("%Y-%m-%d")
+    tag = f" ({region_tag})" if region_tag else ""
     lines = [
-        f"🏠 <b>갭투자 TOP {len(top)}</b>",
+        f"🏠 <b>갭투자 TOP {len(top)}{tag}</b>",
         f"<i>{today} | 필요현금 ≤5.5억 | 비과세 6년</i>",
         "",
     ]
@@ -447,11 +493,12 @@ def format_gap_message(top, pool_size):
     return "\n".join(lines)
 
 
-def format_live_message(top, pool_size):
+def format_live_message(top, pool_size, region_tag=""):
     """전략2 실거주 메시지 (HTML)"""
     today = datetime.now().strftime("%Y-%m-%d")
+    tag = f" ({region_tag})" if region_tag else ""
     lines = [
-        f"🔑 <b>실거주 TOP {len(top)}</b>",
+        f"🔑 <b>실거주 TOP {len(top)}{tag}</b>",
         f"<i>{today} | 대출 최대6억 | 비과세 2년</i>",
         "",
     ]
@@ -475,11 +522,12 @@ def format_live_message(top, pool_size):
     return "\n".join(lines)
 
 
-def format_wait_message(top, pool_size):
+def format_wait_message(top, pool_size, region_tag=""):
     """전략3 전월세 메시지 (HTML)"""
     today = datetime.now().strftime("%Y-%m-%d")
+    tag = f" ({region_tag})" if region_tag else ""
     lines = [
-        f"📋 <b>전월세 거주 TOP {len(top)}</b>",
+        f"📋 <b>전월세 거주 TOP {len(top)}{tag}</b>",
         f"<i>{today} | 전세≤5억 | 현금 축적 후 매수</i>",
         "",
     ]
@@ -555,10 +603,16 @@ def main():
         print("[ERROR] DATA_GO_KR_API_KEY 미설정")
         sys.exit(0)
 
-    all_trade, all_rent = collect_all()
+    all_trade, all_rent, failed_districts = collect_all()
     total_t = sum(len(v) for v in all_trade.values())
     total_r = sum(len(v) for v in all_rent.values())
     print(f"\n수집 완료: 매매 {total_t}, 전세 {total_r}")
+
+    if failed_districts:
+        print(f"\n⚠ API 실패 {len(failed_districts)}건:")
+        for gu_name, err_type in failed_districts:
+            print(f"  - {gu_name}: {err_type} API 일부 호출 실패 (해당 월 데이터 누락 가능)")
+        print("  → 해당 구의 점수/순위가 부정확할 수 있습니다.")
 
     data = aggregate_and_score(all_trade, all_rent)
     print(f"집계+스코어: {len(data)}건 (통근 필터 적용)")
@@ -575,12 +629,33 @@ def main():
 
     save_results(data, top1, top2, top3)
 
-    # 전략별 별도 메시지 발송
-    msg1 = format_gap_message(top1, len(gap_pool))
-    msg2 = format_live_message(top2, len(live_pool))
-    msg3 = format_wait_message(top3, len(wait_pool))
+    # ── 전체 서울 메시지 (3개) ──
+    msg1 = format_gap_message(top1, len(gap_pool), "서울 전체")
+    msg2 = format_live_message(top2, len(live_pool), "서울 전체")
+    msg3 = format_wait_message(top3, len(wait_pool), "서울 전체")
 
     for msg in [msg1, msg2, msg3]:
+        print(f"\n{msg}")
+        send_telegram(msg)
+
+    # ── 독립문 동쪽 구 메시지 (3개) ──
+    east_data = [d for d in data if d["구"] in EAST_GU]
+    east_top1 = top10_gap(east_data)
+    east_top2 = top10_live(east_data)
+    east_top3 = top10_wait(east_data)
+
+    east_gap_pool = [d for d in east_data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= 5.5 and d["매매가"] >= 8 and d["전세건수"] >= 2]
+    east_live_pool = [d for d in east_data if d["실거주필요현금"] <= 6.0 and d["매매가"] >= 8 and d["전세건수"] >= 2]
+    east_wait_pool = [d for d in east_data if d["전세평균"] is not None and d["전세평균"] <= 5.0 and d["전세건수"] >= 2]
+
+    print(f"\n동쪽: 전략1 {len(east_top1)}/{len(east_gap_pool)} / 전략2 {len(east_top2)}/{len(east_live_pool)} / 전략3 {len(east_top3)}/{len(east_wait_pool)}")
+
+    tag = "독립문 동쪽"
+    emsg1 = format_gap_message(east_top1, len(east_gap_pool), tag)
+    emsg2 = format_live_message(east_top2, len(east_live_pool), tag)
+    emsg3 = format_wait_message(east_top3, len(east_wait_pool), tag)
+
+    for msg in [emsg1, emsg2, emsg3]:
         print(f"\n{msg}")
         send_telegram(msg)
 
