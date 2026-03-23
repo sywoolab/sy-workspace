@@ -495,6 +495,94 @@ def top5_tight_live(data):
     return pool[:5]
 
 
+def ai_pick(data):
+    """AI 추천: 내가 진짜 이 집을 산다면.
+    기존 스코어(100점) + 실질 의사결정 보정(±점) → 최종 점수
+    """
+    candidates = []
+    for d in data:
+        # 기본 자격: 매매 8~11.6억, 전세 2건+
+        if not (8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2):
+            continue
+
+        # 갭/실거주 중 유리한 전략 자동 판단
+        gap_ok = d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= CASH
+        live_ok = d["실거주필요현금"] <= CASH and _monthly_payment(d["실거주대출"]) <= 500
+        if not (gap_ok or live_ok):
+            continue
+
+        base = max(d["총점_갭"], d["총점_실거주"])  # 둘 중 높은 점수
+        bonus = 0
+
+        # ── 가산 ──
+        # 84㎡ 가산 (출산 계획, 넓은 집 선호)
+        if d["면적"] == "84㎡":
+            bonus += 3
+
+        # 청계산 30분 이내 가산 (양재 선호)
+        if d["청계산"] <= 30:
+            bonus += 3
+        elif d["청계산"] <= 40:
+            bonus += 1
+
+        # 잔여현금 1억+ 안전마진
+        need = min(d.get("갭필요현금") or 99, d["실거주필요현금"])
+        remain = CASH - need
+        if remain >= 1.5:
+            bonus += 2
+        elif remain >= 1.0:
+            bonus += 1
+
+        # 거래량 풍부 (유동성 = 팔기 쉬움)
+        if d["매매건수"] >= 10:
+            bonus += 2
+        elif d["매매건수"] >= 5:
+            bonus += 1
+
+        # 전세 수요 풍부 (역전세 리스크 낮음)
+        if d["전세건수"] >= 10:
+            bonus += 2
+        elif d["전세건수"] >= 5:
+            bonus += 1
+
+        # 독립문 30분 이내 (양육 지원)
+        if d["독립문"] <= 20:
+            bonus += 2
+        elif d["독립문"] <= 30:
+            bonus += 1
+
+        # ── 감점 ──
+        # 주상복합
+        if d.get("주상복합"):
+            bonus -= 3
+
+        # 추세 마이너스 (하락 중)
+        if d["추세"] < 0:
+            bonus -= 3
+        elif d["추세"] < 2:
+            bonus -= 1
+
+        # 잔여 현금 0.5억 미만 (위험)
+        if remain < 0.5:
+            bonus -= 3
+
+        # 통근 45분 초과
+        if d["통근가중"] > 45:
+            bonus -= 2
+
+        final = round(base + bonus, 1)
+        strategy = "갭" if gap_ok and (not live_ok or d["총점_갭"] >= d["총점_실거주"]) else "실거주"
+
+        c = dict(d)
+        c["AI점수"] = final
+        c["AI전략"] = strategy
+        c["AI잔여"] = round(remain, 1)
+        candidates.append(c)
+
+    candidates.sort(key=lambda x: -x["AI점수"])
+    return candidates[:5]
+
+
 # ── 텔레그램 (양식 C: 하이브리드) ────────────────────────
 
 def _shorten_gu(gu):
@@ -625,6 +713,32 @@ def format_tight_message(tight_gap, tight_live, region_tag=""):
     return "\n".join(lines)
 
 
+def format_ai_pick_message(picks):
+    """AI 추천 매물 메시지 (HTML)"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    lines = [
+        f"🤖 <b>AI 추천 매물 TOP {len(picks)}</b>",
+        f"<i>{today} | 제약조건 종합 판단 | 100점+보정</i>",
+        "",
+    ]
+    for i, c in enumerate(picks, 1):
+        gu = _shorten_gu(c['구'])
+        t = _trend_str(c['추세'])
+        lines.append(
+            f"<b>{i}. [{gu} {c['법정동']}] {c['단지명']}</b> {c['면적']} "
+            f"🏆{c['AI점수']:.0f}점\n"
+            f"  매매 {c['매매가']:.1f} | 전략: {c['AI전략']} | "
+            f"잔여 {c['AI잔여']:.1f}억\n"
+            f"  통근 {c['통근가중']:.0f}분 | 청계산 {c['청계산']}분 | "
+            f"독립문 {c['독립문']}분 | {t}"
+        )
+        lines.append("")
+
+    lines.append("<i>가산: 84㎡+3 / 청계산30분↓+3 / 잔여1억++2 / 거래량+2 / 독립문20분↓+2</i>")
+    lines.append("<i>감점: 주상복합-3 / 하락추세-3 / 잔여0.5억↓-3 / 통근45분+-2</i>")
+    return "\n".join(lines)
+
+
 def send_telegram(text, parse_mode="HTML"):
     """텔레그램 발송 (전략별 별도 메시지)"""
     if not BOT_TOKEN or not CHAT_ID:
@@ -706,48 +820,28 @@ def main():
 
     save_results(data, top1, top2, top3)
 
-    # ── 전체 서울 메시지 (3개) ──
-    msg1 = format_gap_message(top1, len(gap_pool), "서울 전체")
-    msg2 = format_live_message(top2, len(live_pool), "서울 전체")
-    msg3 = format_wait_message(top3, len(wait_pool), "서울 전체")
+    # ── 서울 TOP 10 (3개 메시지) ──
+    msg1 = format_gap_message(top1, len(gap_pool))
+    msg2 = format_live_message(top2, len(live_pool))
+    msg3 = format_wait_message(top3, len(wait_pool))
 
     for msg in [msg1, msg2, msg3]:
         print(f"\n{msg}")
         send_telegram(msg)
 
-    # ── 독립문 동쪽 구 메시지 (3개) ──
-    east_data = [d for d in data if d["구"] in EAST_GU]
-    east_top1 = top10_gap(east_data)
-    east_top2 = top10_live(east_data)
-    east_top3 = top10_wait(east_data)
-
-    east_gap_pool = [d for d in east_data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= CASH and 8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2]
-    east_live_pool = [d for d in east_data if d["실거주필요현금"] <= CASH and 8 <= d["매매가"] <= MAX_PRICE and d["전세건수"] >= 2]
-    east_wait_pool = [d for d in east_data if d["전세평균"] is not None and d["전세평균"] <= 5.0 and d["전세건수"] >= 2]
-
-    print(f"\n동쪽: 전략1 {len(east_top1)}/{len(east_gap_pool)} / 전략2 {len(east_top2)}/{len(east_live_pool)} / 전략3 {len(east_top3)}/{len(east_wait_pool)}")
-
-    tag = "독립문 동쪽"
-    emsg1 = format_gap_message(east_top1, len(east_gap_pool), tag)
-    emsg2 = format_live_message(east_top2, len(east_live_pool), tag)
-    emsg3 = format_wait_message(east_top3, len(east_wait_pool), tag)
-
-    for msg in [emsg1, emsg2, emsg3]:
-        print(f"\n{msg}")
-        send_telegram(msg)
-
-    # ── 타이트 운용 TOP 5 (서울 전체 + 동쪽) ──
+    # ── 타이트 운용 TOP 5 ──
     tight_gap = top5_tight_gap(data)
     tight_live = top5_tight_live(data)
-    tight_msg = format_tight_message(tight_gap, tight_live, "서울 전체")
+    tight_msg = format_tight_message(tight_gap, tight_live)
     print(f"\n{tight_msg}")
     send_telegram(tight_msg)
 
-    east_tight_gap = top5_tight_gap(east_data)
-    east_tight_live = top5_tight_live(east_data)
-    east_tight_msg = format_tight_message(east_tight_gap, east_tight_live, "독립문 동쪽")
-    print(f"\n{east_tight_msg}")
-    send_telegram(east_tight_msg)
+    # ── AI 추천 매물 TOP 5 ──
+    picks = ai_pick(data)
+    print(f"AI 추천: {len(picks)}건")
+    ai_msg = format_ai_pick_message(picks)
+    print(f"\n{ai_msg}")
+    send_telegram(ai_msg)
 
 
 if __name__ == "__main__":
