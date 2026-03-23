@@ -355,9 +355,9 @@ def aggregate_and_score(all_trade, all_rent):
     return results
 
 
-# ── 전략별 TOP 20 ────────────────────────────────────────
+# ── 전략별 TOP 10 ────────────────────────────────────────
 
-def top20_gap(data):
+def top10_gap(data):
     """전략1: 갭필요현금 ≤ 5.5억, 매매 8억+, 전세 2건+, 총점순"""
     pool = [d for d in data
             if d["갭필요현금"] is not None
@@ -365,98 +365,147 @@ def top20_gap(data):
             and d["매매가"] >= 8
             and d["전세건수"] >= 2]
     pool.sort(key=lambda x: -x["총점_갭"])
-    return pool[:20]
+    return pool[:10]
 
 
-def top20_live(data):
+def top10_live(data):
     """전략2: 실거주필요현금 ≤ 6.0억, 매매 8억+, 전세 2건+, 총점순"""
     pool = [d for d in data
             if d["실거주필요현금"] <= 6.0
             and d["매매가"] >= 8
             and d["전세건수"] >= 2]
     pool.sort(key=lambda x: -x["총점_실거주"])
-    return pool[:20]
+    return pool[:10]
 
 
-def top20_wait(data):
+def top10_wait(data):
     """전략3: 전세평균 ≤ 5억, 전세 2건+, 총점순"""
     pool = [d for d in data
             if d["전세평균"] is not None
             and d["전세평균"] <= 5.0
             and d["전세건수"] >= 2]
     pool.sort(key=lambda x: -x["총점_전월세"])
-    return pool[:20]
+    return pool[:10]
 
 
-# ── 텔레그램 ─────────────────────────────────────────────
+# ── 텔레그램 (양식 C: 하이브리드) ────────────────────────
 
-def format_message(top1, top2, top3):
-    today_str = datetime.now().strftime("%Y.%m.%d")
-    msgs = []
-
-    # 전략1
-    lines = [f"🏠 주간 부동산 리포트 ({today_str})", "",
-             "━━ 전략1: 갭투자 TOP 20 ━━",
-             "매매8억+, 갭필요현금≤5.5억, 점수순", ""]
-    for i, c in enumerate(top1, 1):
-        t = f"{'📈' if (c['추세'] or 0) > 0 else '📉'}{c['추세']:+.0f}%" if c['추세'] else ""
-        lines.append(
-            f"{i}. [{c['구']}] {c['단지명']} {c['면적']} "
-            f"({c['총점_갭']:.1f}점)\n"
-            f"   매매{c['매매가']:.1f} 전세{c['전세평균']:.1f} "
-            f"갭{c['갭']:.1f} 필요{c['갭필요현금']:.1f}억 "
-            f"통근{c['통근가중']:.0f}분 {t}")
-    msgs.append("\n".join(lines))
-
-    # 전략2
-    lines = ["", "━━ 전략2: 실거주 TOP 20 ━━",
-             "매매8억+, 필요현금≤6억, 점수순", ""]
-    for i, c in enumerate(top2, 1):
-        t = f"{'📈' if (c['추세'] or 0) > 0 else '📉'}{c['추세']:+.0f}%" if c['추세'] else ""
-        lines.append(
-            f"{i}. [{c['구']}] {c['단지명']} {c['면적']} "
-            f"({c['총점_실거주']:.1f}점)\n"
-            f"   매매{c['매매가']:.1f} 대출{c['실거주대출']:.1f} "
-            f"필요{c['실거주필요현금']:.1f}억 "
-            f"통근{c['통근가중']:.0f}분 {t}")
-    msgs.append("\n".join(lines))
-
-    # 전략3
-    lines = ["", "━━ 전략3: 전월세 거주 TOP 20 ━━",
-             "전세≤5억, 점수순 (통근·독립문 가중)", ""]
-    for i, c in enumerate(top3, 1):
-        lines.append(
-            f"{i}. [{c['구']}] {c['단지명']} {c['면적']} "
-            f"({c['총점_전월세']:.1f}점)\n"
-            f"   전세{c['전세평균']:.1f}억 "
-            f"통근{c['통근가중']:.0f}분 독립문{c['독립문']}분")
-    msgs.append("\n".join(lines))
-
-    return "\n".join(msgs)
+def _shorten_gu(gu):
+    """구 이름 축약: 서대문구→서대문"""
+    return gu.replace("구", "")
 
 
-def send_telegram(text):
+def _trend_str(trend):
+    if not trend:
+        return ""
+    return f"+{trend:.0f}%" if trend > 0 else f"{trend:.0f}%"
+
+
+def format_gap_message(top, pool_size):
+    """전략1 갭투자 메시지 (HTML)"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    lines = [
+        f"🏠 <b>갭투자 TOP {len(top)}</b>",
+        f"<i>{today} | 필요현금 ≤5.5억 | 비과세 6년</i>",
+        "",
+    ]
+    for i, c in enumerate(top, 1):
+        gu = _shorten_gu(c['구'])
+        t = _trend_str(c['추세'])
+        if i <= 3:
+            # 상위 3개: 상세
+            lines.append(
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_갭']:.1f}\n"
+                f"  매매 {c['매매가']:.1f} | 전세 {c['전세평균']:.1f} | "
+                f"갭 {c['갭']:.1f} | 필요 {c['갭필요현금']:.1f}\n"
+                f"  통근 {c['통근가중']:.0f}분 | 추세 <b>{t}</b>"
+            )
+        else:
+            # 4위~: 한 줄 압축
+            lines.append(
+                f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+                f" | {c['매매가']:.1f} 갭{c['갭']:.1f} 필요{c['갭필요현금']:.1f} {t}"
+            )
+    lines.append("")
+    lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원)</i>")
+    return "\n".join(lines)
+
+
+def format_live_message(top, pool_size):
+    """전략2 실거주 메시지 (HTML)"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    lines = [
+        f"🔑 <b>실거주 TOP {len(top)}</b>",
+        f"<i>{today} | 대출 최대6억 | 비과세 2년</i>",
+        "",
+    ]
+    for i, c in enumerate(top, 1):
+        gu = _shorten_gu(c['구'])
+        t = _trend_str(c['추세'])
+        if i <= 3:
+            lines.append(
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_실거주']:.1f}\n"
+                f"  매매 {c['매매가']:.1f} | 대출 {c['실거주대출']:.1f} | "
+                f"필요 {c['실거주필요현금']:.1f}\n"
+                f"  통근 {c['통근가중']:.0f}분 | 추세 <b>{t}</b>"
+            )
+        else:
+            lines.append(
+                f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+                f" | {c['매매가']:.1f} 필요{c['실거주필요현금']:.1f} {t}"
+            )
+    lines.append("")
+    lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원)</i>")
+    return "\n".join(lines)
+
+
+def format_wait_message(top, pool_size):
+    """전략3 전월세 메시지 (HTML)"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    lines = [
+        f"📋 <b>전월세 거주 TOP {len(top)}</b>",
+        f"<i>{today} | 전세≤5억 | 현금 축적 후 매수</i>",
+        "",
+    ]
+    for i, c in enumerate(top, 1):
+        gu = _shorten_gu(c['구'])
+        if i <= 3:
+            lines.append(
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_전월세']:.1f}\n"
+                f"  전세 {c['전세평균']:.1f} | 통근 {c['통근가중']:.0f}분 | 독립문 {c['독립문']}분"
+            )
+        else:
+            lines.append(
+                f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+                f" | 전세{c['전세평균']:.1f} 통근{c['통근가중']:.0f}분"
+            )
+    lines.append("")
+    lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원)</i>")
+    return "\n".join(lines)
+
+
+def send_telegram(text, parse_mode="HTML"):
+    """텔레그램 발송 (전략별 별도 메시지)"""
     if not BOT_TOKEN or not CHAT_ID:
         print("[SKIP] 텔레그램 미설정")
         return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    chunks, cur = [], ""
-    for line in text.split("\n"):
-        if len(cur) + len(line) + 1 > 4000:
-            chunks.append(cur)
-            cur = line
-        else:
-            cur = cur + "\n" + line if cur else line
-    if cur:
-        chunks.append(cur)
-    for chunk in chunks:
-        try:
+    try:
+        resp = requests.post(url, data={
+            "chat_id": CHAT_ID,
+            "text": text,
+            "parse_mode": parse_mode,
+            "disable_web_page_preview": "true",
+        }, timeout=30)
+        if resp.status_code != 200:
+            # HTML 파싱 실패 시 plain text로 재시도
             requests.post(url, data={
-                "chat_id": CHAT_ID, "text": chunk,
+                "chat_id": CHAT_ID,
+                "text": text,
                 "disable_web_page_preview": "true",
             }, timeout=30)
-        except Exception as e:
-            print(f"[WARN] 텔레그램: {e}")
+    except Exception as e:
+        print(f"[WARN] 텔레그램: {e}")
 
 
 def save_results(data, top1, top2, top3):
@@ -470,17 +519,17 @@ def save_results(data, top1, top2, top3):
             w.writerows(data)
         print(f"전체 저장: {path} ({len(data)}건)")
 
-    # TOP 20 JSON
+    # TOP 10 JSON
     summary = {
         "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "strategy1_gap": top1,
         "strategy2_live": top2,
         "strategy3_wait": top3,
     }
-    path = BASE_DIR / "strategy_top20.json"
+    path = BASE_DIR / "strategy_top10.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
-    print(f"TOP20 저장: {path}")
+    print(f"TOP10 저장: {path}")
 
 
 # ── 메인 ──────────────────────────────────────────────────
@@ -498,16 +547,26 @@ def main():
     data = aggregate_and_score(all_trade, all_rent)
     print(f"집계+스코어: {len(data)}건 (통근 필터 적용)")
 
-    top1 = top20_gap(data)
-    top2 = top20_live(data)
-    top3 = top20_wait(data)
-    print(f"전략1: {len(top1)} / 전략2: {len(top2)} / 전략3: {len(top3)}")
+    # 전략별 풀 크기 (메시지 하단 표시용)
+    gap_pool = [d for d in data if d["갭필요현금"] is not None and 0 < d["갭필요현금"] <= 5.5 and d["매매가"] >= 8 and d["전세건수"] >= 2]
+    live_pool = [d for d in data if d["실거주필요현금"] <= 6.0 and d["매매가"] >= 8 and d["전세건수"] >= 2]
+    wait_pool = [d for d in data if d["전세평균"] is not None and d["전세평균"] <= 5.0 and d["전세건수"] >= 2]
+
+    top1 = top10_gap(data)
+    top2 = top10_live(data)
+    top3 = top10_wait(data)
+    print(f"전략1: {len(top1)}/{len(gap_pool)} / 전략2: {len(top2)}/{len(live_pool)} / 전략3: {len(top3)}/{len(wait_pool)}")
 
     save_results(data, top1, top2, top3)
 
-    msg = format_message(top1, top2, top3)
-    print(f"\n{msg}")
-    send_telegram(msg)
+    # 전략별 별도 메시지 발송
+    msg1 = format_gap_message(top1, len(gap_pool))
+    msg2 = format_live_message(top2, len(live_pool))
+    msg3 = format_wait_message(top3, len(wait_pool))
+
+    for msg in [msg1, msg2, msg3]:
+        print(f"\n{msg}")
+        send_telegram(msg)
 
 
 if __name__ == "__main__":
