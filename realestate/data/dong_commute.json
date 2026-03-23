@@ -1,0 +1,2226 @@
+{
+  "강남구_개포동": {
+    "yeouido": 51,
+    "cheongye": 34,
+    "doklip": 57,
+    "nearest_station": "개포동",
+    "nearest_line": "분당선",
+    "walk_min": 12
+  },
+  "강남구_논현동": {
+    "yeouido": 32,
+    "cheongye": 22,
+    "doklip": 41,
+    "nearest_station": "학동",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  },
+  "강남구_대치동": {
+    "yeouido": 41,
+    "cheongye": 23,
+    "doklip": 46,
+    "nearest_station": "대치",
+    "nearest_line": "3호선",
+    "walk_min": 8
+  },
+  "강남구_도곡동": {
+    "yeouido": 34,
+    "cheongye": 16,
+    "doklip": 39,
+    "nearest_station": "매봉",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "강남구_삼성동": {
+    "yeouido": 35,
+    "cheongye": 28,
+    "doklip": 50,
+    "nearest_station": "봉은사",
+    "nearest_line": "9호선",
+    "walk_min": 7
+  },
+  "강남구_세곡동": {
+    "yeouido": 65,
+    "cheongye": 45,
+    "doklip": 71,
+    "nearest_station": "복정",
+    "nearest_line": "8호선",
+    "walk_min": 15
+  },
+  "강남구_수서동": {
+    "yeouido": 48,
+    "cheongye": 30,
+    "doklip": 53,
+    "nearest_station": "수서",
+    "nearest_line": "3호선",
+    "walk_min": 7
+  },
+  "강남구_신사동": {
+    "yeouido": 33,
+    "cheongye": 25,
+    "doklip": 26,
+    "nearest_station": "압구정",
+    "nearest_line": "3호선",
+    "walk_min": 6
+  },
+  "강남구_압구정동": {
+    "yeouido": 33,
+    "cheongye": 25,
+    "doklip": 26,
+    "nearest_station": "압구정",
+    "nearest_line": "3호선",
+    "walk_min": 6
+  },
+  "강남구_역삼동": {
+    "yeouido": 37,
+    "cheongye": 18,
+    "doklip": 42,
+    "nearest_station": "역삼",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "강남구_일원동": {
+    "yeouido": 43,
+    "cheongye": 25,
+    "doklip": 48,
+    "nearest_station": "대청",
+    "nearest_line": "3호선",
+    "walk_min": 6
+  },
+  "강남구_자곡동": {
+    "yeouido": 56,
+    "cheongye": 38,
+    "doklip": 61,
+    "nearest_station": "수서",
+    "nearest_line": "3호선",
+    "walk_min": 15
+  },
+  "강남구_청담동": {
+    "yeouido": 39,
+    "cheongye": 29,
+    "doklip": 48,
+    "nearest_station": "청담",
+    "nearest_line": "7호선",
+    "walk_min": 8
+  },
+  "강동구_강일동": {
+    "yeouido": 71,
+    "cheongye": 68,
+    "doklip": 66,
+    "nearest_station": "강일",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "강동구_고덕동": {
+    "yeouido": 69,
+    "cheongye": 66,
+    "doklip": 64,
+    "nearest_station": "상일동",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "강동구_길동": {
+    "yeouido": 53,
+    "cheongye": 50,
+    "doklip": 48,
+    "nearest_station": "길동",
+    "nearest_line": "5호선",
+    "walk_min": 7
+  },
+  "강동구_둔촌동": {
+    "yeouido": 59,
+    "cheongye": 56,
+    "doklip": 54,
+    "nearest_station": "길동",
+    "nearest_line": "5호선",
+    "walk_min": 13
+  },
+  "강동구_명일동": {
+    "yeouido": 63,
+    "cheongye": 60,
+    "doklip": 58,
+    "nearest_station": "고덕",
+    "nearest_line": "5호선",
+    "walk_min": 11
+  },
+  "강동구_상일동": {
+    "yeouido": 67,
+    "cheongye": 64,
+    "doklip": 62,
+    "nearest_station": "강일",
+    "nearest_line": "5호선",
+    "walk_min": 11
+  },
+  "강동구_성내동": {
+    "yeouido": 52,
+    "cheongye": 37,
+    "doklip": 49,
+    "nearest_station": "강동구청",
+    "nearest_line": "8호선",
+    "walk_min": 5
+  },
+  "강동구_암사동": {
+    "yeouido": 62,
+    "cheongye": 49,
+    "doklip": 57,
+    "nearest_station": "암사",
+    "nearest_line": "8호선",
+    "walk_min": 13
+  },
+  "강동구_천호동": {
+    "yeouido": 59,
+    "cheongye": 46,
+    "doklip": 54,
+    "nearest_station": "암사",
+    "nearest_line": "8호선",
+    "walk_min": 10
+  },
+  "강북구_미아동": {
+    "yeouido": 48,
+    "cheongye": 59,
+    "doklip": 40,
+    "nearest_station": "미아",
+    "nearest_line": "4호선",
+    "walk_min": 9
+  },
+  "강북구_번동": {
+    "yeouido": 53,
+    "cheongye": 64,
+    "doklip": 45,
+    "nearest_station": "미아",
+    "nearest_line": "4호선",
+    "walk_min": 14
+  },
+  "강북구_수유동": {
+    "yeouido": 61,
+    "cheongye": 70,
+    "doklip": 51,
+    "nearest_station": "가오리",
+    "nearest_line": "우이신설선",
+    "walk_min": 9
+  },
+  "강북구_우이동": {
+    "yeouido": 72,
+    "cheongye": 81,
+    "doklip": 62,
+    "nearest_station": "북한산우이",
+    "nearest_line": "우이신설선",
+    "walk_min": 14
+  },
+  "강서구_가양동": {
+    "yeouido": 24,
+    "cheongye": 57,
+    "doklip": 56,
+    "nearest_station": "양천향교",
+    "nearest_line": "9호선",
+    "walk_min": 6
+  },
+  "강서구_공항동": {
+    "yeouido": 32,
+    "cheongye": 70,
+    "doklip": 59,
+    "nearest_station": "송정",
+    "nearest_line": "5호선",
+    "walk_min": 6
+  },
+  "강서구_내발산동": {
+    "yeouido": 29,
+    "cheongye": 67,
+    "doklip": 56,
+    "nearest_station": "발산",
+    "nearest_line": "5호선",
+    "walk_min": 7
+  },
+  "강서구_등촌동": {
+    "yeouido": 28,
+    "cheongye": 61,
+    "doklip": 60,
+    "nearest_station": "가양",
+    "nearest_line": "9호선",
+    "walk_min": 12
+  },
+  "강서구_마곡동": {
+    "yeouido": 33,
+    "cheongye": 66,
+    "doklip": 65,
+    "nearest_station": "마곡나루",
+    "nearest_line": "9호선",
+    "walk_min": 13
+  },
+  "강서구_방화동": {
+    "yeouido": 37,
+    "cheongye": 73,
+    "doklip": 64,
+    "nearest_station": "방화",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "강서구_염창동": {
+    "yeouido": 22,
+    "cheongye": 55,
+    "doklip": 54,
+    "nearest_station": "등촌",
+    "nearest_line": "9호선",
+    "walk_min": 10
+  },
+  "강서구_화곡동": {
+    "yeouido": 29,
+    "cheongye": 67,
+    "doklip": 56,
+    "nearest_station": "화곡",
+    "nearest_line": "5호선",
+    "walk_min": 11
+  },
+  "관악구_남현동": {
+    "yeouido": 34,
+    "cheongye": 39,
+    "doklip": 50,
+    "nearest_station": "남태령",
+    "nearest_line": "4호선",
+    "walk_min": 13
+  },
+  "관악구_봉천동": {
+    "yeouido": 33,
+    "cheongye": 29,
+    "doklip": 49,
+    "nearest_station": "서울대입구",
+    "nearest_line": "2호선",
+    "walk_min": 6
+  },
+  "관악구_신림동": {
+    "yeouido": 31,
+    "cheongye": 58,
+    "doklip": 52,
+    "nearest_station": "서원",
+    "nearest_line": "신림선",
+    "walk_min": 6
+  },
+  "광진구_광장동": {
+    "yeouido": 45,
+    "cheongye": 43,
+    "doklip": 40,
+    "nearest_station": "광나루",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "광진구_구의동": {
+    "yeouido": 50,
+    "cheongye": 48,
+    "doklip": 45,
+    "nearest_station": "아차산",
+    "nearest_line": "5호선",
+    "walk_min": 12
+  },
+  "광진구_군자동": {
+    "yeouido": 46,
+    "cheongye": 36,
+    "doklip": 47,
+    "nearest_station": "어린이대공원",
+    "nearest_line": "7호선",
+    "walk_min": 9
+  },
+  "광진구_자양동": {
+    "yeouido": 43,
+    "cheongye": 33,
+    "doklip": 48,
+    "nearest_station": "뚝섬유원지",
+    "nearest_line": "7호선",
+    "walk_min": 10
+  },
+  "광진구_중곡동": {
+    "yeouido": 48,
+    "cheongye": 38,
+    "doklip": 45,
+    "nearest_station": "중곡",
+    "nearest_line": "7호선",
+    "walk_min": 7
+  },
+  "광진구_화양동": {
+    "yeouido": 46,
+    "cheongye": 37,
+    "doklip": 38,
+    "nearest_station": "건대입구",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "구로구_가리봉동": {
+    "yeouido": 30,
+    "cheongye": 46,
+    "doklip": 51,
+    "nearest_station": "남구로",
+    "nearest_line": "7호선",
+    "walk_min": 6
+  },
+  "구로구_개봉동": {
+    "yeouido": 20,
+    "cheongye": 49,
+    "doklip": 40,
+    "nearest_station": "구일",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "구로구_고척동": {
+    "yeouido": 30,
+    "cheongye": 59,
+    "doklip": 50,
+    "nearest_station": "구일",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "구로구_구로동": {
+    "yeouido": 38,
+    "cheongye": 54,
+    "doklip": 59,
+    "nearest_station": "남구로",
+    "nearest_line": "7호선",
+    "walk_min": 14
+  },
+  "구로구_궁동": {
+    "yeouido": 36,
+    "cheongye": 65,
+    "doklip": 56,
+    "nearest_station": "온수",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "구로구_신도림동": {
+    "yeouido": 24,
+    "cheongye": 53,
+    "doklip": 44,
+    "nearest_station": "구로",
+    "nearest_line": "1호선",
+    "walk_min": 11
+  },
+  "구로구_오류동": {
+    "yeouido": 24,
+    "cheongye": 53,
+    "doklip": 44,
+    "nearest_station": "오류동",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "구로구_온수동": {
+    "yeouido": 26,
+    "cheongye": 55,
+    "doklip": 46,
+    "nearest_station": "온수",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "구로구_천왕동": {
+    "yeouido": 34,
+    "cheongye": 63,
+    "doklip": 54,
+    "nearest_station": "오류동",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "구로구_항동": {
+    "yeouido": 36,
+    "cheongye": 65,
+    "doklip": 56,
+    "nearest_station": "온수",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "금천구_가산동": {
+    "yeouido": 34,
+    "cheongye": 50,
+    "doklip": 55,
+    "nearest_station": "가산디지털단지",
+    "nearest_line": "7호선",
+    "walk_min": 8
+  },
+  "금천구_독산동": {
+    "yeouido": 34,
+    "cheongye": 46,
+    "doklip": 55,
+    "nearest_station": "구로디지털단지",
+    "nearest_line": "2호선",
+    "walk_min": 15
+  },
+  "금천구_시흥동": {
+    "yeouido": 40,
+    "cheongye": 67,
+    "doklip": 61,
+    "nearest_station": "서원",
+    "nearest_line": "신림선",
+    "walk_min": 15
+  },
+  "노원구_공릉동": {
+    "yeouido": 59,
+    "cheongye": 67,
+    "doklip": 36,
+    "nearest_station": "화랑대",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "노원구_상계동": {
+    "yeouido": 71,
+    "cheongye": 72,
+    "doklip": 55,
+    "nearest_station": "수락산",
+    "nearest_line": "7호선",
+    "walk_min": 15
+  },
+  "노원구_월계동": {
+    "yeouido": 51,
+    "cheongye": 55,
+    "doklip": 40,
+    "nearest_station": "광운대",
+    "nearest_line": "1호선",
+    "walk_min": 8
+  },
+  "노원구_중계동": {
+    "yeouido": 59,
+    "cheongye": 70,
+    "doklip": 51,
+    "nearest_station": "상계",
+    "nearest_line": "4호선",
+    "walk_min": 10
+  },
+  "노원구_하계동": {
+    "yeouido": 58,
+    "cheongye": 57,
+    "doklip": 40,
+    "nearest_station": "하계",
+    "nearest_line": "7호선",
+    "walk_min": 8
+  },
+  "도봉구_도봉동": {
+    "yeouido": 70,
+    "cheongye": 74,
+    "doklip": 59,
+    "nearest_station": "도봉산",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "도봉구_방학동": {
+    "yeouido": 66,
+    "cheongye": 70,
+    "doklip": 55,
+    "nearest_station": "방학",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "도봉구_쌍문동": {
+    "yeouido": 56,
+    "cheongye": 67,
+    "doklip": 48,
+    "nearest_station": "쌍문",
+    "nearest_line": "4호선",
+    "walk_min": 13
+  },
+  "도봉구_창동": {
+    "yeouido": 59,
+    "cheongye": 63,
+    "doklip": 48,
+    "nearest_station": "창동",
+    "nearest_line": "1호선",
+    "walk_min": 10
+  },
+  "동대문구_답십리동": {
+    "yeouido": 40,
+    "cheongye": 46,
+    "doklip": 35,
+    "nearest_station": "답십리",
+    "nearest_line": "5호선",
+    "walk_min": 8
+  },
+  "동대문구_용두동": {
+    "yeouido": 36,
+    "cheongye": 44,
+    "doklip": 26,
+    "nearest_station": "제기동",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "동대문구_이문동": {
+    "yeouido": 48,
+    "cheongye": 52,
+    "doklip": 38,
+    "nearest_station": "신이문",
+    "nearest_line": "1호선",
+    "walk_min": 9
+  },
+  "동대문구_장안동": {
+    "yeouido": 49,
+    "cheongye": 51,
+    "doklip": 44,
+    "nearest_station": "장한평",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "동대문구_전농동": {
+    "yeouido": 44,
+    "cheongye": 48,
+    "doklip": 34,
+    "nearest_station": "청량리",
+    "nearest_line": "1호선",
+    "walk_min": 11
+  },
+  "동대문구_제기동": {
+    "yeouido": 40,
+    "cheongye": 48,
+    "doklip": 30,
+    "nearest_station": "제기동",
+    "nearest_line": "1호선",
+    "walk_min": 9
+  },
+  "동대문구_청량리동": {
+    "yeouido": 51,
+    "cheongye": 56,
+    "doklip": 42,
+    "nearest_station": "고려대",
+    "nearest_line": "6호선",
+    "walk_min": 12
+  },
+  "동대문구_회기동": {
+    "yeouido": 42,
+    "cheongye": 46,
+    "doklip": 32,
+    "nearest_station": "외대앞",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "동대문구_휘경동": {
+    "yeouido": 45,
+    "cheongye": 49,
+    "doklip": 35,
+    "nearest_station": "회기",
+    "nearest_line": "1호선",
+    "walk_min": 10
+  },
+  "동작구_노량진동": {
+    "yeouido": 14,
+    "cheongye": 39,
+    "doklip": 28,
+    "nearest_station": "노량진",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "동작구_대방동": {
+    "yeouido": 21,
+    "cheongye": 50,
+    "doklip": 42,
+    "nearest_station": "서울지방병무청",
+    "nearest_line": "신림선",
+    "walk_min": 10
+  },
+  "동작구_동작동": {
+    "yeouido": 23,
+    "cheongye": 40,
+    "doklip": 47,
+    "nearest_station": "흑석",
+    "nearest_line": "9호선",
+    "walk_min": 15
+  },
+  "동작구_본동": {
+    "yeouido": 22,
+    "cheongye": 35,
+    "doklip": 38,
+    "nearest_station": "동작",
+    "nearest_line": "4호선",
+    "walk_min": 7
+  },
+  "동작구_사당동": {
+    "yeouido": 29,
+    "cheongye": 30,
+    "doklip": 42,
+    "nearest_station": "남성",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  },
+  "동작구_상도1동": {
+    "yeouido": 29,
+    "cheongye": 34,
+    "doklip": 46,
+    "nearest_station": "상도",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  },
+  "동작구_상도동": {
+    "yeouido": 31,
+    "cheongye": 36,
+    "doklip": 48,
+    "nearest_station": "상도",
+    "nearest_line": "7호선",
+    "walk_min": 7
+  },
+  "동작구_신대방동": {
+    "yeouido": 20,
+    "cheongye": 47,
+    "doklip": 41,
+    "nearest_station": "보라매공원",
+    "nearest_line": "신림선",
+    "walk_min": 5
+  },
+  "동작구_흑석동": {
+    "yeouido": 13,
+    "cheongye": 30,
+    "doklip": 37,
+    "nearest_station": "흑석",
+    "nearest_line": "9호선",
+    "walk_min": 5
+  },
+  "마포구_공덕동": {
+    "yeouido": 15,
+    "cheongye": 52,
+    "doklip": 30,
+    "nearest_station": "공덕",
+    "nearest_line": "5호선",
+    "walk_min": 9
+  },
+  "마포구_노고산동": {
+    "yeouido": 20,
+    "cheongye": 52,
+    "doklip": 30,
+    "nearest_station": "신촌",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "마포구_대흥동": {
+    "yeouido": 18,
+    "cheongye": 50,
+    "doklip": 33,
+    "nearest_station": "대흥",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "마포구_도화동": {
+    "yeouido": 9,
+    "cheongye": 47,
+    "doklip": 28,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "마포구_마포동": {
+    "yeouido": 9,
+    "cheongye": 47,
+    "doklip": 28,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "마포구_망원동": {
+    "yeouido": 32,
+    "cheongye": 64,
+    "doklip": 39,
+    "nearest_station": "마포구청",
+    "nearest_line": "6호선",
+    "walk_min": 12
+  },
+  "마포구_상수동": {
+    "yeouido": 22,
+    "cheongye": 54,
+    "doklip": 37,
+    "nearest_station": "상수",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "마포구_상암동": {
+    "yeouido": 37,
+    "cheongye": 68,
+    "doklip": 40,
+    "nearest_station": "월드컵경기장",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "마포구_서교동": {
+    "yeouido": 22,
+    "cheongye": 54,
+    "doklip": 36,
+    "nearest_station": "홍대입구",
+    "nearest_line": "2호선",
+    "walk_min": 9
+  },
+  "마포구_성산동": {
+    "yeouido": 26,
+    "cheongye": 58,
+    "doklip": 33,
+    "nearest_station": "마포구청",
+    "nearest_line": "6호선",
+    "walk_min": 6
+  },
+  "마포구_신공덕동": {
+    "yeouido": 11,
+    "cheongye": 48,
+    "doklip": 26,
+    "nearest_station": "공덕",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "마포구_신수동": {
+    "yeouido": 18,
+    "cheongye": 50,
+    "doklip": 33,
+    "nearest_station": "대흥",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "마포구_신정동": {
+    "yeouido": 23,
+    "cheongye": 55,
+    "doklip": 38,
+    "nearest_station": "광흥창",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "마포구_아현동": {
+    "yeouido": 13,
+    "cheongye": 50,
+    "doklip": 24,
+    "nearest_station": "애오개",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "마포구_연남동": {
+    "yeouido": 23,
+    "cheongye": 55,
+    "doklip": 37,
+    "nearest_station": "홍대입구",
+    "nearest_line": "2호선",
+    "walk_min": 10
+  },
+  "마포구_염리동": {
+    "yeouido": 22,
+    "cheongye": 54,
+    "doklip": 37,
+    "nearest_station": "대흥",
+    "nearest_line": "6호선",
+    "walk_min": 9
+  },
+  "마포구_용강동": {
+    "yeouido": 12,
+    "cheongye": 50,
+    "doklip": 31,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 8
+  },
+  "마포구_중동": {
+    "yeouido": 27,
+    "cheongye": 54,
+    "doklip": 40,
+    "nearest_station": "가좌",
+    "nearest_line": "경의중앙선",
+    "walk_min": 10
+  },
+  "마포구_창전동": {
+    "yeouido": 18,
+    "cheongye": 45,
+    "doklip": 33,
+    "nearest_station": "서강대",
+    "nearest_line": "경의중앙선",
+    "walk_min": 5
+  },
+  "마포구_토정동": {
+    "yeouido": 12,
+    "cheongye": 50,
+    "doklip": 31,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 8
+  },
+  "마포구_하중동": {
+    "yeouido": 24,
+    "cheongye": 56,
+    "doklip": 39,
+    "nearest_station": "광흥창",
+    "nearest_line": "6호선",
+    "walk_min": 9
+  },
+  "마포구_합정동": {
+    "yeouido": 19,
+    "cheongye": 51,
+    "doklip": 37,
+    "nearest_station": "합정",
+    "nearest_line": "2호선",
+    "walk_min": 8
+  },
+  "마포구_현석동": {
+    "yeouido": 25,
+    "cheongye": 57,
+    "doklip": 40,
+    "nearest_station": "광흥창",
+    "nearest_line": "6호선",
+    "walk_min": 10
+  },
+  "서대문구_남가좌동": {
+    "yeouido": 31,
+    "cheongye": 58,
+    "doklip": 44,
+    "nearest_station": "가좌",
+    "nearest_line": "경의중앙선",
+    "walk_min": 14
+  },
+  "서대문구_냉천동": {
+    "yeouido": 18,
+    "cheongye": 48,
+    "doklip": 21,
+    "nearest_station": "서대문",
+    "nearest_line": "5호선",
+    "walk_min": 6
+  },
+  "서대문구_대현동": {
+    "yeouido": 23,
+    "cheongye": 52,
+    "doklip": 29,
+    "nearest_station": "이대",
+    "nearest_line": "2호선",
+    "walk_min": 6
+  },
+  "서대문구_북가좌동": {
+    "yeouido": 39,
+    "cheongye": 66,
+    "doklip": 38,
+    "nearest_station": "디지털미디어시티",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "서대문구_북아현동": {
+    "yeouido": 25,
+    "cheongye": 52,
+    "doklip": 29,
+    "nearest_station": "아현",
+    "nearest_line": "2호선",
+    "walk_min": 8
+  },
+  "서대문구_연희동": {
+    "yeouido": 32,
+    "cheongye": 59,
+    "doklip": 45,
+    "nearest_station": "가좌",
+    "nearest_line": "경의중앙선",
+    "walk_min": 15
+  },
+  "서대문구_영천동": {
+    "yeouido": 32,
+    "cheongye": 44,
+    "doklip": 5,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "서대문구_창천동": {
+    "yeouido": 22,
+    "cheongye": 54,
+    "doklip": 32,
+    "nearest_station": "신촌",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "서대문구_천연동": {
+    "yeouido": 35,
+    "cheongye": 47,
+    "doklip": 8,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 8
+  },
+  "서대문구_충정로3가": {
+    "yeouido": 20,
+    "cheongye": 47,
+    "doklip": 24,
+    "nearest_station": "충정로",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "서대문구_합동": {
+    "yeouido": 20,
+    "cheongye": 47,
+    "doklip": 24,
+    "nearest_station": "충정로",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "서대문구_현저동": {
+    "yeouido": 36,
+    "cheongye": 48,
+    "doklip": 9,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 9
+  },
+  "서대문구_홍은동": {
+    "yeouido": 39,
+    "cheongye": 51,
+    "doklip": 12,
+    "nearest_station": "홍제",
+    "nearest_line": "3호선",
+    "walk_min": 8
+  },
+  "서대문구_홍제동": {
+    "yeouido": 35,
+    "cheongye": 47,
+    "doklip": 8,
+    "nearest_station": "무악재",
+    "nearest_line": "3호선",
+    "walk_min": 6
+  },
+  "서초구_내곡동": {
+    "yeouido": 48,
+    "cheongye": 15,
+    "doklip": 54,
+    "nearest_station": "청계산입구",
+    "nearest_line": "신분당선",
+    "walk_min": 15
+  },
+  "서초구_반포동": {
+    "yeouido": 26,
+    "cheongye": 20,
+    "doklip": 31,
+    "nearest_station": "고속터미널",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "서초구_방배동": {
+    "yeouido": 33,
+    "cheongye": 24,
+    "doklip": 44,
+    "nearest_station": "방배",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "서초구_서초동": {
+    "yeouido": 30,
+    "cheongye": 16,
+    "doklip": 35,
+    "nearest_station": "남부터미널",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "서초구_신원동": {
+    "yeouido": 45,
+    "cheongye": 12,
+    "doklip": 51,
+    "nearest_station": "청계산입구",
+    "nearest_line": "신분당선",
+    "walk_min": 12
+  },
+  "서초구_양재동": {
+    "yeouido": 36,
+    "cheongye": 7,
+    "doklip": 42,
+    "nearest_station": "양재시민의숲",
+    "nearest_line": "신분당선",
+    "walk_min": 5
+  },
+  "서초구_우면동": {
+    "yeouido": 46,
+    "cheongye": 17,
+    "doklip": 52,
+    "nearest_station": "양재시민의숲",
+    "nearest_line": "신분당선",
+    "walk_min": 15
+  },
+  "서초구_잠원동": {
+    "yeouido": 32,
+    "cheongye": 26,
+    "doklip": 33,
+    "nearest_station": "잠원",
+    "nearest_line": "3호선",
+    "walk_min": 9
+  },
+  "성동구_금호동1가": {
+    "yeouido": 32,
+    "cheongye": 35,
+    "doklip": 32,
+    "nearest_station": "응봉",
+    "nearest_line": "경의중앙선",
+    "walk_min": 7
+  },
+  "성동구_금호동2가": {
+    "yeouido": 29,
+    "cheongye": 44,
+    "doklip": 24,
+    "nearest_station": "신금호",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "성동구_금호동3가": {
+    "yeouido": 33,
+    "cheongye": 48,
+    "doklip": 28,
+    "nearest_station": "신금호",
+    "nearest_line": "5호선",
+    "walk_min": 9
+  },
+  "성동구_금호동4가": {
+    "yeouido": 40,
+    "cheongye": 33,
+    "doklip": 30,
+    "nearest_station": "옥수",
+    "nearest_line": "3호선",
+    "walk_min": 12
+  },
+  "성동구_도선동": {
+    "yeouido": 38,
+    "cheongye": 42,
+    "doklip": 30,
+    "nearest_station": "왕십리",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "성동구_마장동": {
+    "yeouido": 37,
+    "cheongye": 44,
+    "doklip": 32,
+    "nearest_station": "마장",
+    "nearest_line": "5호선",
+    "walk_min": 7
+  },
+  "성동구_사근동": {
+    "yeouido": 38,
+    "cheongye": 41,
+    "doklip": 30,
+    "nearest_station": "한양대",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "성동구_상왕십리동": {
+    "yeouido": 36,
+    "cheongye": 44,
+    "doklip": 28,
+    "nearest_station": "상왕십리",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "성동구_성수동1가": {
+    "yeouido": 39,
+    "cheongye": 33,
+    "doklip": 35,
+    "nearest_station": "서울숲",
+    "nearest_line": "분당선",
+    "walk_min": 5
+  },
+  "성동구_성수동2가": {
+    "yeouido": 43,
+    "cheongye": 38,
+    "doklip": 35,
+    "nearest_station": "성수",
+    "nearest_line": "2호선",
+    "walk_min": 6
+  },
+  "성동구_송정동": {
+    "yeouido": 49,
+    "cheongye": 51,
+    "doklip": 44,
+    "nearest_station": "장한평",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "성동구_옥수동": {
+    "yeouido": 33,
+    "cheongye": 26,
+    "doklip": 23,
+    "nearest_station": "옥수",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "성동구_용답동": {
+    "yeouido": 41,
+    "cheongye": 47,
+    "doklip": 36,
+    "nearest_station": "답십리",
+    "nearest_line": "5호선",
+    "walk_min": 9
+  },
+  "성동구_응봉동": {
+    "yeouido": 33,
+    "cheongye": 36,
+    "doklip": 33,
+    "nearest_station": "응봉",
+    "nearest_line": "경의중앙선",
+    "walk_min": 8
+  },
+  "성동구_하왕십리동": {
+    "yeouido": 34,
+    "cheongye": 42,
+    "doklip": 26,
+    "nearest_station": "상왕십리",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "성동구_행당동": {
+    "yeouido": 38,
+    "cheongye": 42,
+    "doklip": 30,
+    "nearest_station": "왕십리",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "성북구_길음동": {
+    "yeouido": 51,
+    "cheongye": 60,
+    "doklip": 41,
+    "nearest_station": "솔샘",
+    "nearest_line": "우이신설선",
+    "walk_min": 7
+  },
+  "성북구_돈암동": {
+    "yeouido": 47,
+    "cheongye": 56,
+    "doklip": 37,
+    "nearest_station": "북한산보국문",
+    "nearest_line": "우이신설선",
+    "walk_min": 5
+  },
+  "성북구_동선동1가": {
+    "yeouido": 38,
+    "cheongye": 49,
+    "doklip": 30,
+    "nearest_station": "성신여대입구",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "성북구_동소문동4가": {
+    "yeouido": 47,
+    "cheongye": 56,
+    "doklip": 37,
+    "nearest_station": "정릉",
+    "nearest_line": "우이신설선",
+    "walk_min": 7
+  },
+  "성북구_동소문동5가": {
+    "yeouido": 38,
+    "cheongye": 49,
+    "doklip": 30,
+    "nearest_station": "성신여대입구",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "성북구_동소문동7가": {
+    "yeouido": 45,
+    "cheongye": 54,
+    "doklip": 35,
+    "nearest_station": "정릉",
+    "nearest_line": "우이신설선",
+    "walk_min": 5
+  },
+  "성북구_보문동1가": {
+    "yeouido": 40,
+    "cheongye": 45,
+    "doklip": 31,
+    "nearest_station": "보문",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "성북구_보문동3가": {
+    "yeouido": 40,
+    "cheongye": 45,
+    "doklip": 31,
+    "nearest_station": "보문",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "성북구_보문동6가": {
+    "yeouido": 43,
+    "cheongye": 48,
+    "doklip": 34,
+    "nearest_station": "보문",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "성북구_삼선동2가": {
+    "yeouido": 41,
+    "cheongye": 46,
+    "doklip": 32,
+    "nearest_station": "창신",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "성북구_삼선동3가": {
+    "yeouido": 44,
+    "cheongye": 49,
+    "doklip": 35,
+    "nearest_station": "보문",
+    "nearest_line": "6호선",
+    "walk_min": 9
+  },
+  "성북구_삼선동4가": {
+    "yeouido": 39,
+    "cheongye": 50,
+    "doklip": 31,
+    "nearest_station": "성신여대입구",
+    "nearest_line": "4호선",
+    "walk_min": 6
+  },
+  "성북구_상월곡동": {
+    "yeouido": 48,
+    "cheongye": 53,
+    "doklip": 34,
+    "nearest_station": "상월곡",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "성북구_석관동": {
+    "yeouido": 53,
+    "cheongye": 58,
+    "doklip": 35,
+    "nearest_station": "돌곶이",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "성북구_안암동1가": {
+    "yeouido": 42,
+    "cheongye": 47,
+    "doklip": 33,
+    "nearest_station": "보문",
+    "nearest_line": "6호선",
+    "walk_min": 7
+  },
+  "성북구_안암동3가": {
+    "yeouido": 41,
+    "cheongye": 46,
+    "doklip": 32,
+    "nearest_station": "보문",
+    "nearest_line": "6호선",
+    "walk_min": 6
+  },
+  "성북구_장위동": {
+    "yeouido": 56,
+    "cheongye": 61,
+    "doklip": 38,
+    "nearest_station": "돌곶이",
+    "nearest_line": "6호선",
+    "walk_min": 11
+  },
+  "성북구_정릉동": {
+    "yeouido": 61,
+    "cheongye": 70,
+    "doklip": 51,
+    "nearest_station": "삼양사거리",
+    "nearest_line": "우이신설선",
+    "walk_min": 15
+  },
+  "성북구_종암동": {
+    "yeouido": 51,
+    "cheongye": 56,
+    "doklip": 42,
+    "nearest_station": "고려대",
+    "nearest_line": "6호선",
+    "walk_min": 12
+  },
+  "성북구_하월곡동": {
+    "yeouido": 53,
+    "cheongye": 58,
+    "doklip": 43,
+    "nearest_station": "월곡",
+    "nearest_line": "6호선",
+    "walk_min": 12
+  },
+  "송파구_가락동": {
+    "yeouido": 48,
+    "cheongye": 30,
+    "doklip": 53,
+    "nearest_station": "가락시장",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "송파구_거여동": {
+    "yeouido": 62,
+    "cheongye": 47,
+    "doklip": 67,
+    "nearest_station": "문정",
+    "nearest_line": "8호선",
+    "walk_min": 15
+  },
+  "송파구_마천동": {
+    "yeouido": 61,
+    "cheongye": 54,
+    "doklip": 76,
+    "nearest_station": "중앙보훈병원",
+    "nearest_line": "9호선",
+    "walk_min": 15
+  },
+  "송파구_문정동": {
+    "yeouido": 52,
+    "cheongye": 37,
+    "doklip": 57,
+    "nearest_station": "문정",
+    "nearest_line": "8호선",
+    "walk_min": 5
+  },
+  "송파구_방이동": {
+    "yeouido": 45,
+    "cheongye": 38,
+    "doklip": 60,
+    "nearest_station": "한성백제",
+    "nearest_line": "9호선",
+    "walk_min": 5
+  },
+  "송파구_삼전동": {
+    "yeouido": 40,
+    "cheongye": 33,
+    "doklip": 55,
+    "nearest_station": "석촌고분",
+    "nearest_line": "9호선",
+    "walk_min": 6
+  },
+  "송파구_석촌동": {
+    "yeouido": 46,
+    "cheongye": 35,
+    "doklip": 51,
+    "nearest_station": "석촌",
+    "nearest_line": "8호선",
+    "walk_min": 5
+  },
+  "송파구_송파동": {
+    "yeouido": 43,
+    "cheongye": 36,
+    "doklip": 58,
+    "nearest_station": "송파나루",
+    "nearest_line": "9호선",
+    "walk_min": 5
+  },
+  "송파구_신천동": {
+    "yeouido": 47,
+    "cheongye": 31,
+    "doklip": 43,
+    "nearest_station": "잠실나루",
+    "nearest_line": "2호선",
+    "walk_min": 6
+  },
+  "송파구_오금동": {
+    "yeouido": 56,
+    "cheongye": 38,
+    "doklip": 61,
+    "nearest_station": "오금",
+    "nearest_line": "3호선",
+    "walk_min": 9
+  },
+  "송파구_잠실동": {
+    "yeouido": 42,
+    "cheongye": 26,
+    "doklip": 46,
+    "nearest_station": "잠실새내",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "송파구_장지동": {
+    "yeouido": 56,
+    "cheongye": 39,
+    "doklip": 61,
+    "nearest_station": "장지",
+    "nearest_line": "8호선",
+    "walk_min": 7
+  },
+  "송파구_풍납동": {
+    "yeouido": 57,
+    "cheongye": 54,
+    "doklip": 52,
+    "nearest_station": "천호",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "양천구_목동": {
+    "yeouido": 23,
+    "cheongye": 56,
+    "doklip": 55,
+    "nearest_station": "신목동",
+    "nearest_line": "9호선",
+    "walk_min": 15
+  },
+  "양천구_신월동": {
+    "yeouido": 31,
+    "cheongye": 69,
+    "doklip": 58,
+    "nearest_station": "까치산",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "양천구_신정동": {
+    "yeouido": 29,
+    "cheongye": 67,
+    "doklip": 56,
+    "nearest_station": "신정",
+    "nearest_line": "5호선",
+    "walk_min": 15
+  },
+  "영등포구_당산동": {
+    "yeouido": 14,
+    "cheongye": 46,
+    "doklip": 36,
+    "nearest_station": "당산",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_당산동1가": {
+    "yeouido": 16,
+    "cheongye": 44,
+    "doklip": 38,
+    "nearest_station": "영등포구청",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_당산동2가": {
+    "yeouido": 16,
+    "cheongye": 44,
+    "doklip": 38,
+    "nearest_station": "영등포구청",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_당산동3가": {
+    "yeouido": 16,
+    "cheongye": 44,
+    "doklip": 38,
+    "nearest_station": "영등포구청",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_당산동4가": {
+    "yeouido": 19,
+    "cheongye": 47,
+    "doklip": 41,
+    "nearest_station": "영등포구청",
+    "nearest_line": "2호선",
+    "walk_min": 8
+  },
+  "영등포구_당산동5가": {
+    "yeouido": 14,
+    "cheongye": 46,
+    "doklip": 36,
+    "nearest_station": "당산",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_당산동6가": {
+    "yeouido": 14,
+    "cheongye": 46,
+    "doklip": 36,
+    "nearest_station": "당산",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_대림동": {
+    "yeouido": 22,
+    "cheongye": 38,
+    "doklip": 43,
+    "nearest_station": "대림",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_도림동": {
+    "yeouido": 23,
+    "cheongye": 52,
+    "doklip": 43,
+    "nearest_station": "신도림",
+    "nearest_line": "1호선",
+    "walk_min": 12
+  },
+  "영등포구_문래동2가": {
+    "yeouido": 18,
+    "cheongye": 47,
+    "doklip": 38,
+    "nearest_station": "신도림",
+    "nearest_line": "1호선",
+    "walk_min": 7
+  },
+  "영등포구_문래동3가": {
+    "yeouido": 18,
+    "cheongye": 42,
+    "doklip": 40,
+    "nearest_station": "문래",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "영등포구_문래동4가": {
+    "yeouido": 21,
+    "cheongye": 50,
+    "doklip": 41,
+    "nearest_station": "신도림",
+    "nearest_line": "1호선",
+    "walk_min": 10
+  },
+  "영등포구_문래동5가": {
+    "yeouido": 26,
+    "cheongye": 55,
+    "doklip": 46,
+    "nearest_station": "신도림",
+    "nearest_line": "1호선",
+    "walk_min": 15
+  },
+  "영등포구_문래동6가": {
+    "yeouido": 19,
+    "cheongye": 57,
+    "doklip": 46,
+    "nearest_station": "양평",
+    "nearest_line": "5호선",
+    "walk_min": 11
+  },
+  "영등포구_신길동": {
+    "yeouido": 25,
+    "cheongye": 42,
+    "doklip": 46,
+    "nearest_station": "신풍",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  },
+  "영등포구_양평동1가": {
+    "yeouido": 15,
+    "cheongye": 53,
+    "doklip": 42,
+    "nearest_station": "양평",
+    "nearest_line": "5호선",
+    "walk_min": 7
+  },
+  "영등포구_양평동2가": {
+    "yeouido": 14,
+    "cheongye": 52,
+    "doklip": 41,
+    "nearest_station": "양평",
+    "nearest_line": "5호선",
+    "walk_min": 6
+  },
+  "영등포구_양평동3가": {
+    "yeouido": 16,
+    "cheongye": 54,
+    "doklip": 43,
+    "nearest_station": "양평",
+    "nearest_line": "5호선",
+    "walk_min": 8
+  },
+  "영등포구_양평동4가": {
+    "yeouido": 12,
+    "cheongye": 45,
+    "doklip": 44,
+    "nearest_station": "선유도",
+    "nearest_line": "9호선",
+    "walk_min": 6
+  },
+  "영등포구_양평동5가": {
+    "yeouido": 11,
+    "cheongye": 44,
+    "doklip": 43,
+    "nearest_station": "선유도",
+    "nearest_line": "9호선",
+    "walk_min": 5
+  },
+  "영등포구_양평동6가": {
+    "yeouido": 14,
+    "cheongye": 47,
+    "doklip": 46,
+    "nearest_station": "선유도",
+    "nearest_line": "9호선",
+    "walk_min": 8
+  },
+  "영등포구_여의도동": {
+    "yeouido": 8,
+    "cheongye": 46,
+    "doklip": 31,
+    "nearest_station": "여의나루",
+    "nearest_line": "5호선",
+    "walk_min": 6
+  },
+  "영등포구_영등포동": {
+    "yeouido": 14,
+    "cheongye": 45,
+    "doklip": 34,
+    "nearest_station": "영등포",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "영등포구_영등포동1가": {
+    "yeouido": 13,
+    "cheongye": 44,
+    "doklip": 33,
+    "nearest_station": "신길",
+    "nearest_line": "1호선",
+    "walk_min": 6
+  },
+  "영등포구_영등포동2가": {
+    "yeouido": 16,
+    "cheongye": 47,
+    "doklip": 36,
+    "nearest_station": "신길",
+    "nearest_line": "1호선",
+    "walk_min": 9
+  },
+  "영등포구_영등포동5가": {
+    "yeouido": 9,
+    "cheongye": 47,
+    "doklip": 36,
+    "nearest_station": "영등포시장",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "영등포구_영등포동7가": {
+    "yeouido": 9,
+    "cheongye": 47,
+    "doklip": 36,
+    "nearest_station": "영등포시장",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "영등포구_영등포동8가": {
+    "yeouido": 14,
+    "cheongye": 52,
+    "doklip": 41,
+    "nearest_station": "영등포시장",
+    "nearest_line": "5호선",
+    "walk_min": 10
+  },
+  "용산구_도원동": {
+    "yeouido": 21,
+    "cheongye": 49,
+    "doklip": 36,
+    "nearest_station": "효창공원앞",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "용산구_동자동": {
+    "yeouido": 20,
+    "cheongye": 45,
+    "doklip": 22,
+    "nearest_station": "서울역",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "용산구_문배동": {
+    "yeouido": 27,
+    "cheongye": 41,
+    "doklip": 32,
+    "nearest_station": "삼각지",
+    "nearest_line": "4호선",
+    "walk_min": 7
+  },
+  "용산구_보광동": {
+    "yeouido": 29,
+    "cheongye": 36,
+    "doklip": 33,
+    "nearest_station": "한남",
+    "nearest_line": "경의중앙선",
+    "walk_min": 8
+  },
+  "용산구_산천동": {
+    "yeouido": 14,
+    "cheongye": 52,
+    "doklip": 33,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 10
+  },
+  "용산구_서빙고동": {
+    "yeouido": 24,
+    "cheongye": 35,
+    "doklip": 32,
+    "nearest_station": "서빙고",
+    "nearest_line": "경의중앙선",
+    "walk_min": 5
+  },
+  "용산구_신계동": {
+    "yeouido": 21,
+    "cheongye": 49,
+    "doklip": 36,
+    "nearest_station": "효창공원앞",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "용산구_용문동": {
+    "yeouido": 18,
+    "cheongye": 46,
+    "doklip": 33,
+    "nearest_station": "효창공원앞",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "용산구_용산동2가": {
+    "yeouido": 32,
+    "cheongye": 53,
+    "doklip": 42,
+    "nearest_station": "녹사평",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "용산구_용산동5가": {
+    "yeouido": 26,
+    "cheongye": 39,
+    "doklip": 34,
+    "nearest_station": "신용산",
+    "nearest_line": "4호선",
+    "walk_min": 7
+  },
+  "용산구_원효로1가": {
+    "yeouido": 19,
+    "cheongye": 44,
+    "doklip": 25,
+    "nearest_station": "남영",
+    "nearest_line": "1호선",
+    "walk_min": 6
+  },
+  "용산구_원효로4가": {
+    "yeouido": 17,
+    "cheongye": 55,
+    "doklip": 36,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 13
+  },
+  "용산구_이촌동": {
+    "yeouido": 25,
+    "cheongye": 38,
+    "doklip": 37,
+    "nearest_station": "이촌",
+    "nearest_line": "4호선",
+    "walk_min": 8
+  },
+  "용산구_이태원동": {
+    "yeouido": 27,
+    "cheongye": 44,
+    "doklip": 33,
+    "nearest_station": "이태원",
+    "nearest_line": "6호선",
+    "walk_min": 8
+  },
+  "용산구_청암동": {
+    "yeouido": 13,
+    "cheongye": 51,
+    "doklip": 32,
+    "nearest_station": "마포",
+    "nearest_line": "5호선",
+    "walk_min": 9
+  },
+  "용산구_한강로1가": {
+    "yeouido": 25,
+    "cheongye": 39,
+    "doklip": 30,
+    "nearest_station": "삼각지",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "용산구_한강로2가": {
+    "yeouido": 24,
+    "cheongye": 37,
+    "doklip": 32,
+    "nearest_station": "신용산",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "용산구_한강로3가": {
+    "yeouido": 16,
+    "cheongye": 41,
+    "doklip": 26,
+    "nearest_station": "용산",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "용산구_한남동": {
+    "yeouido": 28,
+    "cheongye": 41,
+    "doklip": 30,
+    "nearest_station": "한강진",
+    "nearest_line": "6호선",
+    "walk_min": 7
+  },
+  "용산구_효창동": {
+    "yeouido": 20,
+    "cheongye": 48,
+    "doklip": 35,
+    "nearest_station": "효창공원앞",
+    "nearest_line": "6호선",
+    "walk_min": 7
+  },
+  "용산구_후암동": {
+    "yeouido": 36,
+    "cheongye": 52,
+    "doklip": 33,
+    "nearest_station": "회현",
+    "nearest_line": "4호선",
+    "walk_min": 14
+  },
+  "은평구_갈현동": {
+    "yeouido": 48,
+    "cheongye": 60,
+    "doklip": 21,
+    "nearest_station": "연신내",
+    "nearest_line": "3호선",
+    "walk_min": 11
+  },
+  "은평구_구산동": {
+    "yeouido": 33,
+    "cheongye": 60,
+    "doklip": 24,
+    "nearest_station": "새절",
+    "nearest_line": "6호선",
+    "walk_min": 5
+  },
+  "은평구_녹번동": {
+    "yeouido": 41,
+    "cheongye": 53,
+    "doklip": 14,
+    "nearest_station": "녹번",
+    "nearest_line": "3호선",
+    "walk_min": 8
+  },
+  "은평구_대조동": {
+    "yeouido": 45,
+    "cheongye": 57,
+    "doklip": 18,
+    "nearest_station": "불광",
+    "nearest_line": "3호선",
+    "walk_min": 10
+  },
+  "은평구_불광동": {
+    "yeouido": 44,
+    "cheongye": 64,
+    "doklip": 25,
+    "nearest_station": "독바위",
+    "nearest_line": "6호선",
+    "walk_min": 10
+  },
+  "은평구_수색동": {
+    "yeouido": 27,
+    "cheongye": 54,
+    "doklip": 36,
+    "nearest_station": "수색",
+    "nearest_line": "경의중앙선",
+    "walk_min": 6
+  },
+  "은평구_신사동": {
+    "yeouido": 33,
+    "cheongye": 60,
+    "doklip": 28,
+    "nearest_station": "증산",
+    "nearest_line": "6호선",
+    "walk_min": 7
+  },
+  "은평구_역촌동": {
+    "yeouido": 37,
+    "cheongye": 64,
+    "doklip": 28,
+    "nearest_station": "새절",
+    "nearest_line": "6호선",
+    "walk_min": 9
+  },
+  "은평구_응암동": {
+    "yeouido": 55,
+    "cheongye": 71,
+    "doklip": 32,
+    "nearest_station": "응암",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "은평구_증산동": {
+    "yeouido": 34,
+    "cheongye": 61,
+    "doklip": 43,
+    "nearest_station": "수색",
+    "nearest_line": "경의중앙선",
+    "walk_min": 13
+  },
+  "은평구_진관동": {
+    "yeouido": 54,
+    "cheongye": 66,
+    "doklip": 27,
+    "nearest_station": "구파발",
+    "nearest_line": "3호선",
+    "walk_min": 15
+  },
+  "종로구_교북동": {
+    "yeouido": 32,
+    "cheongye": 44,
+    "doklip": 5,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "종로구_구기동": {
+    "yeouido": 49,
+    "cheongye": 69,
+    "doklip": 30,
+    "nearest_station": "독바위",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "종로구_내수동": {
+    "yeouido": 30,
+    "cheongye": 42,
+    "doklip": 7,
+    "nearest_station": "경복궁",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "종로구_명륜1가": {
+    "yeouido": 38,
+    "cheongye": 49,
+    "doklip": 30,
+    "nearest_station": "혜화",
+    "nearest_line": "4호선",
+    "walk_min": 9
+  },
+  "종로구_명륜2가": {
+    "yeouido": 34,
+    "cheongye": 45,
+    "doklip": 26,
+    "nearest_station": "혜화",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "종로구_무악동": {
+    "yeouido": 35,
+    "cheongye": 47,
+    "doklip": 8,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 8
+  },
+  "종로구_사직동": {
+    "yeouido": 36,
+    "cheongye": 48,
+    "doklip": 9,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 9
+  },
+  "종로구_숭인동": {
+    "yeouido": 34,
+    "cheongye": 48,
+    "doklip": 24,
+    "nearest_station": "동묘앞",
+    "nearest_line": "1호선",
+    "walk_min": 7
+  },
+  "종로구_신교동": {
+    "yeouido": 40,
+    "cheongye": 52,
+    "doklip": 17,
+    "nearest_station": "경복궁",
+    "nearest_line": "3호선",
+    "walk_min": 15
+  },
+  "종로구_신문로2가": {
+    "yeouido": 24,
+    "cheongye": 50,
+    "doklip": 23,
+    "nearest_station": "광화문",
+    "nearest_line": "5호선",
+    "walk_min": 10
+  },
+  "종로구_익선동": {
+    "yeouido": 29,
+    "cheongye": 41,
+    "doklip": 10,
+    "nearest_station": "안국",
+    "nearest_line": "3호선",
+    "walk_min": 6
+  },
+  "종로구_창신동": {
+    "yeouido": 39,
+    "cheongye": 44,
+    "doklip": 30,
+    "nearest_station": "창신",
+    "nearest_line": "6호선",
+    "walk_min": 6
+  },
+  "종로구_충신동": {
+    "yeouido": 33,
+    "cheongye": 50,
+    "doklip": 23,
+    "nearest_station": "동대문",
+    "nearest_line": "1호선",
+    "walk_min": 8
+  },
+  "종로구_평동": {
+    "yeouido": 17,
+    "cheongye": 47,
+    "doklip": 20,
+    "nearest_station": "서대문",
+    "nearest_line": "5호선",
+    "walk_min": 5
+  },
+  "종로구_평창동": {
+    "yeouido": 49,
+    "cheongye": 69,
+    "doklip": 30,
+    "nearest_station": "독바위",
+    "nearest_line": "6호선",
+    "walk_min": 15
+  },
+  "종로구_홍파동": {
+    "yeouido": 32,
+    "cheongye": 44,
+    "doklip": 5,
+    "nearest_station": "독립문",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "종로구_효제동": {
+    "yeouido": 28,
+    "cheongye": 45,
+    "doklip": 18,
+    "nearest_station": "종로5가",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "중구_남대문로5가": {
+    "yeouido": 27,
+    "cheongye": 43,
+    "doklip": 24,
+    "nearest_station": "회현",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "중구_만리동1가": {
+    "yeouido": 20,
+    "cheongye": 45,
+    "doklip": 22,
+    "nearest_station": "서울역",
+    "nearest_line": "1호선",
+    "walk_min": 5
+  },
+  "중구_만리동2가": {
+    "yeouido": 24,
+    "cheongye": 49,
+    "doklip": 26,
+    "nearest_station": "서울역",
+    "nearest_line": "1호선",
+    "walk_min": 9
+  },
+  "중구_순화동": {
+    "yeouido": 19,
+    "cheongye": 49,
+    "doklip": 22,
+    "nearest_station": "서대문",
+    "nearest_line": "5호선",
+    "walk_min": 7
+  },
+  "중구_신당동": {
+    "yeouido": 35,
+    "cheongye": 28,
+    "doklip": 21,
+    "nearest_station": "금호",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "중구_인현동2가": {
+    "yeouido": 30,
+    "cheongye": 34,
+    "doklip": 15,
+    "nearest_station": "충무로",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "중구_입정동": {
+    "yeouido": 26,
+    "cheongye": 41,
+    "doklip": 18,
+    "nearest_station": "을지로3가",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "중구_정동": {
+    "yeouido": 23,
+    "cheongye": 48,
+    "doklip": 21,
+    "nearest_station": "시청",
+    "nearest_line": "1호선",
+    "walk_min": 6
+  },
+  "중구_중림동": {
+    "yeouido": 20,
+    "cheongye": 47,
+    "doklip": 24,
+    "nearest_station": "충정로",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "중구_충무로4가": {
+    "yeouido": 30,
+    "cheongye": 34,
+    "doklip": 15,
+    "nearest_station": "충무로",
+    "nearest_line": "3호선",
+    "walk_min": 5
+  },
+  "중구_충무로5가": {
+    "yeouido": 30,
+    "cheongye": 45,
+    "doklip": 22,
+    "nearest_station": "을지로4가",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "중구_필동3가": {
+    "yeouido": 31,
+    "cheongye": 35,
+    "doklip": 16,
+    "nearest_station": "충무로",
+    "nearest_line": "3호선",
+    "walk_min": 6
+  },
+  "중구_황학동": {
+    "yeouido": 34,
+    "cheongye": 46,
+    "doklip": 26,
+    "nearest_station": "신당",
+    "nearest_line": "2호선",
+    "walk_min": 7
+  },
+  "중구_회현동1가": {
+    "yeouido": 27,
+    "cheongye": 43,
+    "doklip": 24,
+    "nearest_station": "회현",
+    "nearest_line": "4호선",
+    "walk_min": 5
+  },
+  "중구_흥인동": {
+    "yeouido": 32,
+    "cheongye": 44,
+    "doklip": 24,
+    "nearest_station": "신당",
+    "nearest_line": "2호선",
+    "walk_min": 5
+  },
+  "중랑구_망우동": {
+    "yeouido": 52,
+    "cheongye": 55,
+    "doklip": 51,
+    "nearest_station": "망우",
+    "nearest_line": "경의중앙선",
+    "walk_min": 15
+  },
+  "중랑구_면목동": {
+    "yeouido": 49,
+    "cheongye": 40,
+    "doklip": 43,
+    "nearest_station": "사가정",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  },
+  "중랑구_묵동": {
+    "yeouido": 50,
+    "cheongye": 49,
+    "doklip": 36,
+    "nearest_station": "먹골",
+    "nearest_line": "7호선",
+    "walk_min": 6
+  },
+  "중랑구_상봉동": {
+    "yeouido": 45,
+    "cheongye": 44,
+    "doklip": 39,
+    "nearest_station": "상봉",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  },
+  "중랑구_신내동": {
+    "yeouido": 47,
+    "cheongye": 50,
+    "doklip": 46,
+    "nearest_station": "양원",
+    "nearest_line": "경의중앙선",
+    "walk_min": 8
+  },
+  "중랑구_중화동": {
+    "yeouido": 47,
+    "cheongye": 46,
+    "doklip": 37,
+    "nearest_station": "중화",
+    "nearest_line": "7호선",
+    "walk_min": 5
+  }
+}

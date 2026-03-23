@@ -242,9 +242,17 @@ def aggregate_and_score(all_trade, all_rent):
     today = datetime.now()
     two_months_ago = today - timedelta(days=60)
 
-    # 단지별 매매/전세 모으기
-    trade_map = defaultdict(list)  # (구, 단지, 면적) → [{date, amount, year}]
-    rent_map = defaultdict(list)   # (구, 단지, 면적) → [deposit]
+    # 법정동 단위 통근시간 로드
+    dong_commute_path = BASE_DIR / "dong_commute.json"
+    dong_commute = {}
+    if dong_commute_path.exists():
+        with open(dong_commute_path, encoding="utf-8") as f:
+            dong_commute = json.load(f)
+        print(f"  dong_commute.json 로드: {len(dong_commute)}개 법정동")
+
+    # 단지별 매매/전세 모으기 (키에 법정동 포함)
+    trade_map = defaultdict(list)  # (구, 법정동, 단지, 면적) → [{date, amount, year}]
+    rent_map = defaultdict(list)   # (구, 법정동, 단지, 면적) → [deposit]
 
     for code, rows in all_trade.items():
         gu = DISTRICTS[code]
@@ -258,7 +266,8 @@ def aggregate_and_score(all_trade, all_rent):
                 by = int(r["건축년도"]) if r.get("건축년도") else None
             except (ValueError, KeyError):
                 continue
-            trade_map[(gu, r["단지명"], at)].append({"date": dt, "amount": amt, "build_year": by})
+            dong = r.get("법정동", "").strip()
+            trade_map[(gu, dong, r["단지명"], at)].append({"date": dt, "amount": amt, "build_year": by})
 
     for code, rows in all_rent.items():
         gu = DISTRICTS[code]
@@ -270,11 +279,12 @@ def aggregate_and_score(all_trade, all_rent):
                 dep = int(r["보증금액"]) / 10000
             except (ValueError, KeyError):
                 continue
-            rent_map[(gu, r["단지명"], at)].append(dep)
+            dong = r.get("법정동", "").strip()
+            rent_map[(gu, dong, r["단지명"], at)].append(dep)
 
     # 구+면적별 평균가격 (할인율 계산용)
     gu_area_prices = defaultdict(list)
-    for (gu, name, at), trades in trade_map.items():
+    for (gu, dong, name, at), trades in trade_map.items():
         if len(trades) >= 2:
             avg = sum(t["amount"] for t in trades) / len(trades)
             gu_area_prices[(gu, at)].append(avg)
@@ -284,12 +294,18 @@ def aggregate_and_score(all_trade, all_rent):
 
     # 단지별 집계 + 스코어
     results = []
-    for (gu, name, area_type), trades in trade_map.items():
+    for (gu, dong, name, area_type), trades in trade_map.items():
         if len(trades) < 2:
             continue
 
-        # 통근 필터
-        yeouido, cheongye, doklip = COMMUTE.get(gu, (99, 99, 99))
+        # 통근시간: 법정동 단위 (dong_commute.json) → fallback: 구 단위 (COMMUTE)
+        dong_key = f"{gu}_{dong}"
+        dc = dong_commute.get(dong_key)
+        if dc:
+            yeouido, cheongye, doklip = dc["yeouido"], dc["cheongye"], dc["doklip"]
+        else:
+            yeouido, cheongye, doklip = COMMUTE.get(gu, (99, 99, 99))
+
         if yeouido > COMMUTE_LIMIT or cheongye > COMMUTE_LIMIT:
             continue
 
@@ -321,7 +337,7 @@ def aggregate_and_score(all_trade, all_rent):
         age = (2026 - build_year) if build_year else None
 
         # 전세
-        rents = rent_map.get((gu, name, area_type), [])
+        rents = rent_map.get((gu, dong, name, area_type), [])
         jeonse_avg = round(sum(rents) / len(rents), 2) if len(rents) >= 2 else None
         jeonse_range = f"{min(rents):.1f}~{max(rents):.1f}" if rents else ""
 
@@ -379,7 +395,7 @@ def aggregate_and_score(all_trade, all_rent):
         need_live = round(price - loan_live + tax, 2)
 
         results.append({
-            "구": gu, "단지명": name, "면적": area_type,
+            "구": gu, "법정동": dong, "단지명": name, "면적": area_type,
             "매매가": price, "2개월전": price_2m_ago, "2개월평균": price_2m_avg,
             "최근거래": price_latest, "최근일자": latest["date"].strftime("%m.%d"),
             "괴리율": gap_pct, "추세": trend,
