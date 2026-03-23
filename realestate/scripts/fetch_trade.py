@@ -374,10 +374,14 @@ def aggregate_and_score(all_trade, all_rent):
 
         scores = {'S1': s1, 'S2': s2, 'S3': s3, 'S4': s4, 'S5': s5, 'S6': s6, 'S7': s7, 'S8': s8}
 
-        # 전략별 총점
-        gap_score = sum(scores[k] * v / 100 for k, v in GAP_WEIGHTS.items())
-        live_score = sum(scores[k] * v / 100 for k, v in LIVE_WEIGHTS.items())
-        wait_score = sum(scores[k] * v / 100 for k, v in WAIT_WEIGHTS.items())
+        # 주상복합 페널티 (-5%)
+        is_jusang = any(kw in name for kw in ("주상복합", "주상", "타워팰리스"))
+        jusang_mult = 0.95 if is_jusang else 1.0
+
+        # 전략별 총점 (10점 만점 → ×10 = 100점 만점)
+        gap_score = sum(scores[k] * v / 100 for k, v in GAP_WEIGHTS.items()) * 10 * jusang_mult
+        live_score = sum(scores[k] * v / 100 for k, v in LIVE_WEIGHTS.items()) * 10 * jusang_mult
+        wait_score = sum(scores[k] * v / 100 for k, v in WAIT_WEIGHTS.items()) * 10 * jusang_mult
 
         # 갭투자 필요현금
         gap_val = round(price - jeonse_avg, 2) if jeonse_avg else None
@@ -408,9 +412,10 @@ def aggregate_and_score(all_trade, all_rent):
             "갭": gap_val, "갭대출": round(loan_gap, 2) if loan_gap else None,
             "갭필요현금": need_gap, "실거주대출": round(loan_live, 2),
             "실거주필요현금": need_live,
-            "총점_갭": round(gap_score, 2),
-            "총점_실거주": round(live_score, 2),
-            "총점_전월세": round(wait_score, 2),
+            "주상복합": is_jusang,
+            "총점_갭": round(gap_score, 1),
+            "총점_실거주": round(live_score, 1),
+            "총점_전월세": round(wait_score, 1),
             **scores,
         })
 
@@ -517,7 +522,7 @@ def format_gap_message(top, pool_size, region_tag=""):
         if i <= 3:
             # 상위 3개: 상세
             lines.append(
-                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_갭']:.1f}\n"
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_갭']:.0f}점\n"
                 f"  매매 {c['매매가']:.1f} | 전세 {c['전세평균']:.1f} | "
                 f"갭 {c['갭']:.1f} | 필요 {c['갭필요현금']:.1f}\n"
                 f"  통근 {c['통근가중']:.0f}분 | 추세 <b>{t}</b>"
@@ -547,7 +552,7 @@ def format_live_message(top, pool_size, region_tag=""):
         t = _trend_str(c['추세'])
         if i <= 3:
             lines.append(
-                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_실거주']:.1f}\n"
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_실거주']:.0f}점\n"
                 f"  매매 {c['매매가']:.1f} | 대출 {c['실거주대출']:.1f} | "
                 f"필요 {c['실거주필요현금']:.1f}\n"
                 f"  통근 {c['통근가중']:.0f}분 | 추세 <b>{t}</b>"
@@ -575,7 +580,7 @@ def format_wait_message(top, pool_size, region_tag=""):
         gu = _shorten_gu(c['구'])
         if i <= 3:
             lines.append(
-                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_전월세']:.1f}\n"
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{c['총점_전월세']:.0f}점\n"
                 f"  전세 {c['전세평균']:.1f} | 통근 {c['통근가중']:.0f}분 | 독립문 {c['독립문']}분"
             )
         else:
