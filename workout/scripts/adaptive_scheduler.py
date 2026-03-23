@@ -479,7 +479,7 @@ def rule_a3_condition_check(target_date_str, health_data, workout_log=None):
     if workout_log:
         entry = workout_log.get(target_date_str, {})
         already_done = entry.get('done', False)
-        today_zone = entry.get('training_zone', 'rest')
+        today_zone = entry.get('training_zone') or 'rest'
 
     # 종합 판정: 단일 지표가 아닌 다수 지표 종합
     # 적색: high 2개 이상, 또는 high 1개 + medium 2개 이상
@@ -1202,7 +1202,7 @@ def _detect_improvement_items(workout_log, schedule_data, health_data):
     # 2. VDOT 3주 정체 → 훈련 자극 변경 필요
     vdot_history = schedule_data.get('vdot_history', [])
     if len(vdot_history) >= 3:
-        recent_3 = [v['vdot'] for v in vdot_history[-3:]]
+        recent_3 = [v['vdot'] if isinstance(v, dict) else v for v in vdot_history[-3:]]
         if max(recent_3) - min(recent_3) <= 1:
             items.append({
                 "type": "plateau",
@@ -1258,13 +1258,20 @@ def _update_improvement_queue(new_items):
     if "resolved" not in queue:
         queue["resolved"] = []
 
-    existing_messages = {item['message'] for item in queue['items']}
+    existing_types = {item['type'] for item in queue['items']}
 
     added = 0
     for item in new_items:
-        if item['message'] not in existing_messages:
+        if item['type'] not in existing_types:
             queue['items'].append(item)
             added += 1
+        else:
+            # 같은 type이면 message만 최신으로 갱신
+            for existing in queue['items']:
+                if existing['type'] == item['type']:
+                    existing['message'] = item['message']
+                    existing['detected_at'] = item['detected_at']
+                    break
 
     # 30일 이전 항목 정리
     cutoff = (NOW - timedelta(days=30)).strftime('%Y-%m-%d')
@@ -1294,10 +1301,14 @@ def adjust_schedule():
     overrides, report = run(workout_log, schedule_data, health_data)
 
     if overrides:
-        schedule_data['overrides'] = overrides
+        # 기존 auto override 중 아직 유효한 것 보존 (전체 교체 방지)
+        existing = schedule_data.get('overrides', {})
+        merged = dict(existing)
+        merged.update(overrides)  # 새 override가 우선
+        schedule_data['overrides'] = merged
         cleanup_overrides(schedule_data)
         save_json(SCHEDULE_FILE, schedule_data)
-        print(f"[adaptive] overrides 업데이트: {len(overrides)}건")
+        print(f"[adaptive] overrides 업데이트: {len(schedule_data['overrides'])}건")
 
     # VDOT 히스토리 축적
     current_vdot = schedule_data.get('current_vdot')
@@ -1348,35 +1359,13 @@ if __name__ == '__main__':
         health_data = load_json(HEALTH_FILE)
         queue = load_json(QUEUE_FILE)
 
-        # 주간 통계
+        # 주간 통계 (get_weekly_stats 재사용)
         week_monday = get_week_monday(NOW)
-        swim_count = run_count = bike_count = 0
-        total_run_km = 0.0
-        total_load = 0
-        for d_offset in range(7):
-            d = (week_monday + timedelta(days=d_offset)).strftime('%Y-%m-%d')
-            entry = workout_log.get(d)
-            if not entry or not entry.get('done'):
-                continue
-            m = entry.get('metrics', {})
-            t = m.get('type', '')
-            if t == 'swim':
-                swim_count += 1
-            elif t == 'run':
-                run_count += 1
-                total_run_km += m.get('distance_km', 0)
-            elif t == 'bike':
-                bike_count += 1
-            # all_metrics도 카운트
-            for am in entry.get('all_metrics', []):
-                at = am.get('type', '')
-                if at == 'swim' and t != 'swim':
-                    swim_count += 1
-                elif at == 'run' and t != 'run':
-                    run_count += 1
-                    total_run_km += am.get('distance_km', 0)
-                elif at == 'bike' and t != 'bike':
-                    bike_count += 1
+        stats = get_weekly_stats(workout_log, week_monday)
+        swim_count = stats['swim']['count']
+        run_count = stats['run']['count']
+        bike_count = stats['bike']['count']
+        total_run_km = stats['run']['total_km']
 
         phase, phase_name = get_phase(NOW)
         targets = PHASE_TARGETS.get(phase, {})

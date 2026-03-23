@@ -1429,8 +1429,6 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
 
     return "\n".join(lines)
 
-    return "\n".join(lines)
-
 
 # ============================================================
 # 브릭 자동 감지
