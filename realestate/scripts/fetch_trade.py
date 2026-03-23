@@ -465,6 +465,30 @@ def top10_wait(data):
     return pool[:10]
 
 
+def top5_tight_gap(data):
+    """갭투자 타이트: 필요현금 5.0~6.0억, 매매 8억+, 점수순"""
+    pool = [d for d in data
+            if d["갭필요현금"] is not None
+            and 5.0 <= d["갭필요현금"] <= 6.0
+            and d["매매가"] >= 8
+            and d["전세건수"] >= 2]
+    pool.sort(key=lambda x: -x["총점_갭"])
+    return pool[:5]
+
+
+def top5_tight_live(data):
+    """실거주 타이트: 필요현금 5.0~6.0억, 매매 8억+, DSR 체크, 점수순"""
+    pool = []
+    for d in data:
+        if not (5.0 <= d["실거주필요현금"] <= 6.0 and d["매매가"] >= 8 and d["전세건수"] >= 2):
+            continue
+        if _monthly_payment(d["실거주대출"]) > 500:
+            continue
+        pool.append(d)
+    pool.sort(key=lambda x: -x["총점_실거주"])
+    return pool[:5]
+
+
 # ── 텔레그램 (양식 C: 하이브리드) ────────────────────────
 
 def _shorten_gu(gu):
@@ -561,6 +585,37 @@ def format_wait_message(top, pool_size, region_tag=""):
             )
     lines.append("")
     lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원)</i>")
+    return "\n".join(lines)
+
+
+def format_tight_message(tight_gap, tight_live, region_tag=""):
+    """타이트 운용 TOP 5 (갭+실거주 합본 메시지)"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    tag = f" ({region_tag})" if region_tag else ""
+    lines = [
+        f"💰 <b>타이트 운용 TOP 5{tag}</b>",
+        f"<i>{today} | 필요현금 5.0~6.0억 | 잔여 0~1억</i>",
+        "",
+        "<b>▸ 갭투자</b>",
+    ]
+    for i, c in enumerate(tight_gap, 1):
+        gu = _shorten_gu(c['구'])
+        t = _trend_str(c['추세'])
+        remain = round(6.0 - c['갭필요현금'], 1)
+        lines.append(
+            f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+            f" | {c['매매가']:.1f} 갭{c['갭']:.1f} 잔여{remain} {t}"
+        )
+    lines.append("")
+    lines.append("<b>▸ 실거주</b>")
+    for i, c in enumerate(tight_live, 1):
+        gu = _shorten_gu(c['구'])
+        t = _trend_str(c['추세'])
+        remain = round(6.0 - c['실거주필요현금'], 1)
+        lines.append(
+            f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+            f" | {c['매매가']:.1f} 잔여{remain} {t}"
+        )
     return "\n".join(lines)
 
 
@@ -674,6 +729,19 @@ def main():
     for msg in [emsg1, emsg2, emsg3]:
         print(f"\n{msg}")
         send_telegram(msg)
+
+    # ── 타이트 운용 TOP 5 (서울 전체 + 동쪽) ──
+    tight_gap = top5_tight_gap(data)
+    tight_live = top5_tight_live(data)
+    tight_msg = format_tight_message(tight_gap, tight_live, "서울 전체")
+    print(f"\n{tight_msg}")
+    send_telegram(tight_msg)
+
+    east_tight_gap = top5_tight_gap(east_data)
+    east_tight_live = top5_tight_live(east_data)
+    east_tight_msg = format_tight_message(east_tight_gap, east_tight_live, "독립문 동쪽")
+    print(f"\n{east_tight_msg}")
+    send_telegram(east_tight_msg)
 
 
 if __name__ == "__main__":
