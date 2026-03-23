@@ -103,6 +103,22 @@ RENT_TAG_MAP = {
 }
 
 
+def _calc_acq_tax(price):
+    """취득세 + 지방교육세 계산 (억원 단위 입출력)
+    - 6억 이하: 1% + 교육세 0.1% = 1.1%
+    - 6억 초과~9억 이하: 누진 사선형 (취득가×2/3 - 3)% + 교육세
+    - 9억 초과: 3% + 교육세 0.3% = 3.3%
+    """
+    if price <= 6:
+        rate = 0.01
+    elif price <= 9:
+        rate = (price * 2 / 3 - 3) / 100
+    else:
+        rate = 0.03
+    edu_tax_rate = rate * 0.1  # 지방교육세 = 취득세의 10%
+    return round(price * (rate + edu_tax_rate), 4)
+
+
 def get_area_type(val):
     try:
         a = float(val)
@@ -321,7 +337,7 @@ def aggregate_and_score(all_trade, all_rent):
         gap_val = round(price - jeonse_avg, 2) if jeonse_avg else None
         if jeonse_avg:
             loan_gap = max(min(price * LTV, LOAN_CAP) - jeonse_avg, 0)
-            tax = price * (0.011 if price <= 6 else (0.022 if price <= 9 else 0.033))
+            tax = _calc_acq_tax(price)
             need_gap = round(gap_val - loan_gap + tax, 2)
         else:
             loan_gap = None
@@ -329,7 +345,7 @@ def aggregate_and_score(all_trade, all_rent):
 
         # 실거주 필요현금
         loan_live = min(price * LTV, LOAN_CAP)
-        tax = price * (0.011 if price <= 6 else (0.022 if price <= 9 else 0.033))
+        tax = _calc_acq_tax(price)
         need_live = round(price - loan_live + tax, 2)
 
         results.append({
