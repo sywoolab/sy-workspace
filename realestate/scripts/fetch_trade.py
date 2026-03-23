@@ -609,7 +609,7 @@ def format_tight_message(tight_gap, tight_live, region_tag=""):
         t = _trend_str(c['추세'])
         remain = round(6.0 - c['갭필요현금'], 1)
         lines.append(
-            f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+            f"{i}. [{gu}] {c['단지명']} {c['면적']} {c['총점_갭']:.0f}점"
             f" | {c['매매가']:.1f} 갭{c['갭']:.1f} 잔여{remain} {t}"
         )
     lines.append("")
@@ -619,7 +619,7 @@ def format_tight_message(tight_gap, tight_live, region_tag=""):
         t = _trend_str(c['추세'])
         remain = round(6.0 - c['실거주필요현금'], 1)
         lines.append(
-            f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+            f"{i}. [{gu}] {c['단지명']} {c['면적']} {c['총점_실거주']:.0f}점"
             f" | {c['매매가']:.1f} 잔여{remain} {t}"
         )
     return "\n".join(lines)
