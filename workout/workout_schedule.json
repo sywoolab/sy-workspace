@@ -25,7 +25,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-03-25",
+    "date": "2026-03-26",
     "estimated_finish": "2:49",
     "status": "green",
     "status_text": "목표 달성 가능",
@@ -56,7 +56,7 @@
       "target": 300
     },
     "adjustments": [
-      "🔴 러닝 0/3회 — 4일 내 3회 추가 필요",
+      "🔴 러닝 0/3회 — 3일 내 3회 추가 필요",
       "🟡 Body Battery 최대 45 — 고강도 운동 자제, Easy 권장",
       "🔴 수면 점수 48 — 수면 부족, 강도 낮추기 권장",
       "🟡 Training Readiness 35 (LOW) — Easy 강도까지만 권장"
