@@ -2,11 +2,9 @@ name: garmin-sync
 
 on:
   schedule:
-    # KST 08:17, 13:17, 19:17, 23:17 (4회/일, 비정각 → 429 방지)
-    - cron: '17 23 * * *'
-    - cron: '17 4 * * *'
-    - cron: '17 10 * * *'
-    - cron: '17 14 * * *'
+    # KST 12:17, 21:17 (2회/일 — 429 방지 위해 최소화)
+    - cron: '17 3 * * *'
+    - cron: '17 12 * * *'
   workflow_dispatch:
     inputs:
       mode:
@@ -40,10 +38,11 @@ jobs:
         run: python workout/scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
 
       - name: Commit changes
+        if: always()
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add workout/workout_log.json workout/data/garmin_health.json
+          git add workout/workout_log.json workout/data/garmin_health.json workout/data/sync_state.json 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "garmin sync: update workout log & health data"
             git push

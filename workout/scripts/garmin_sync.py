@@ -176,46 +176,86 @@ def _update_tokens_secret():
         print(f"[WARN] Secret 자동 갱신 중 오류: {e}")
 
 
-def login_garmin():
-    """가민 커넥트 로그인 (토큰 캐시 활용, GitHub Actions는 Secret에서 복원)
+SYNC_STATE_FILE = os.path.join(BASE_DIR, 'data', 'sync_state.json')
 
-    로그인 실패 시 텔레그램 알림 + exit(1)로 명시적 실패 처리.
-    429 포함 모든 실패를 알린다 — 조용한 실패가 며칠간 감지 안 되는 문제 방지.
+
+def _is_rate_limited(err):
+    """429 계열 에러인지 판별"""
+    s = str(err)
+    return '429' in s or 'Too Many Requests' in s or 'Rate limit' in s
+
+
+def _load_sync_state():
+    """동기화 상태 파일 로드 (마지막 성공일, 연속 실패 횟수)"""
+    try:
+        with open(SYNC_STATE_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def _save_sync_state(state):
+    os.makedirs(os.path.dirname(SYNC_STATE_FILE), exist_ok=True)
+    with open(SYNC_STATE_FILE, 'w', encoding='utf-8') as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+
+
+def login_garmin():
+    """가민 커넥트 로그인 (토큰 캐시 → 비밀번호, 429 시 지수 백오프 재시도)
+
+    재시도 전략: 30초 → 60초 → 120초 (최대 3회)
+    전부 실패 시 연속 실패 카운트 기록. 알림은 sync()에서 판단.
     """
+    import time
+
     if not GARMIN_EMAIL or not GARMIN_PASSWORD:
         print("[ERROR] GARMIN_EMAIL / GARMIN_PASSWORD 환경변수 필요")
         sys.exit(1)
 
-    # GitHub Actions: 환경변수에서 토큰 복원
     _restore_tokens_from_env()
 
     api = Garmin(GARMIN_EMAIL, GARMIN_PASSWORD)
-
-    # 토큰 캐시 시도
     os.makedirs(TOKEN_DIR, exist_ok=True)
-    try:
-        api.login(TOKEN_DIR)
-        print("[OK] 가민 토큰 캐시로 로그인")
-    except Exception as e1:
-        print(f"[INFO] 캐시 로그인 실패: {e1}")
-        try:
-            api.login()
-            api.garth.dump(TOKEN_DIR)
-            _update_tokens_secret()
-            print("[OK] 가민 신규 로그인 + 토큰 갱신")
-        except Exception as e:
-            err_str = str(e)
-            if '429' in err_str or 'Too Many Requests' in err_str or 'Rate limit' in err_str:
-                msg = f"⚠️ 가민 동기화 실패 (429 Rate Limit)\n다음 스케줄에 재시도합니다.\n\n오류: {e}"
-                print(f"[RATE_LIMIT] {e}")
-                send_telegram(msg)
-                sys.exit(1)
-            msg = f"❌ 가민 로그인 실패\n\n오류: {e}"
-            print(f"[ERROR] 가민 로그인 실패: {e}")
-            send_telegram(msg)
-            sys.exit(1)
 
-    return api
+    # 시도 순서: [(방법, 설명), ...]
+    attempts = [
+        ('cache', '토큰 캐시'),
+        ('password', '비밀번호'),
+    ]
+    max_retries = 3
+    base_delay = 30  # 초
+
+    for i, (method, desc) in enumerate(attempts):
+        # cache→password 전환 시 쿨다운 (이전 방식에서 429였으면 잠시 대기)
+        if i > 0:
+            print(f"[INFO] {desc} 전환 전 {base_delay}초 쿨다운")
+            time.sleep(base_delay)
+
+        for retry in range(max_retries):
+            try:
+                if method == 'cache':
+                    api.login(TOKEN_DIR)
+                else:
+                    api.login()
+                    api.garth.dump(TOKEN_DIR)
+                    _update_tokens_secret()
+                print(f"[OK] 가민 {desc} 로그인 성공" + (f" (재시도 {retry}회)" if retry else ""))
+                return api
+            except Exception as e:
+                if _is_rate_limited(e) and retry < max_retries - 1:
+                    delay = base_delay * (2 ** retry)
+                    print(f"[RATE_LIMIT] {desc} 시도 {retry+1}/{max_retries} 실패 — {delay}초 대기")
+                    time.sleep(delay)
+                    continue
+                elif _is_rate_limited(e):
+                    print(f"[RATE_LIMIT] {desc} {max_retries}회 재시도 모두 실패")
+                    break  # 다음 method로
+                else:
+                    print(f"[WARN] {desc} 로그인 실패: {e}")
+                    break  # 다음 method로
+
+    # 모든 시도 실패
+    return None
 
 
 # ============================================================
@@ -1499,8 +1539,34 @@ def _detect_brick(entry, parsed_activities):
 def sync():
     print(f"[{NOW.strftime('%Y-%m-%d %H:%M')}] 가민 동기화 시작")
 
-    # 1. 가민 로그인
+    # 동기화 상태 로드
+    sync_state = _load_sync_state()
+
+    # 1. 가민 로그인 (재시도 포함)
     api = login_garmin()
+
+    if api is None:
+        # 로그인 실패 — 연속 실패 카운트 증가
+        fail_count = sync_state.get('consecutive_failures', 0) + 1
+        sync_state['consecutive_failures'] = fail_count
+        sync_state['last_failure'] = NOW.strftime('%Y-%m-%d %H:%M')
+        _save_sync_state(sync_state)
+
+        # 하루 전체 실패(4회 연속) 시에만 알림 — 불필요한 알림 방지
+        if fail_count >= 4:
+            msg = (f"❌ 가민 동기화 {fail_count}회 연속 실패\n"
+                   f"마지막 성공: {sync_state.get('last_success', '없음')}\n"
+                   f"로컬 수동 sync 필요할 수 있습니다.")
+            send_telegram(msg)
+            # 알림 후 카운터 리셋 (다음 4회 실패 때 다시 알림)
+            sync_state['consecutive_failures'] = 0
+            _save_sync_state(sync_state)
+
+        print(f"  로그인 실패 (연속 {fail_count}회)")
+        return False
+
+    # 로그인 성공 — 실패 카운터 리셋
+    sync_state['consecutive_failures'] = 0
 
     # 2. 기존 데이터 로드
     workout_log = load_json(LOG_FILE)
@@ -1519,8 +1585,15 @@ def sync():
             if amid:
                 existing_ids.add(amid)
 
-    # 3. 최근 2일간 활동 조회
-    activities = fetch_activities(api, YESTERDAY, TODAY)
+    # 3. 조회 범위 결정: 마지막 성공일 ~ 오늘 (놓친 날짜 소급)
+    last_success = sync_state.get('last_success_date')
+    if last_success and last_success < YESTERDAY:
+        start_date = last_success
+        print(f"  소급 동기화: {start_date} ~ {TODAY} (마지막 성공: {last_success})")
+    else:
+        start_date = YESTERDAY
+
+    activities = fetch_activities(api, start_date, TODAY)
 
     # 4. 새 활동 필터링 & 파싱
     new_activities = []
@@ -1643,8 +1716,18 @@ def sync():
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 
+        # 동기화 성공 기록
+        sync_state['last_success'] = NOW.strftime('%Y-%m-%d %H:%M')
+        sync_state['last_success_date'] = TODAY
+        _save_sync_state(sync_state)
+
         return True  # 변경 있음
     else:
+        # 새 활동 없어도 로그인 성공 = sync 정상
+        sync_state['last_success'] = NOW.strftime('%Y-%m-%d %H:%M')
+        sync_state['last_success_date'] = TODAY
+        _save_sync_state(sync_state)
+
         print("  새 활동 없음 — 조용히 종료")
         return False  # 변경 없음
 
@@ -1807,14 +1890,8 @@ if __name__ == '__main__':
         else:
             changed = sync()
         sys.exit(0)
-    except SystemExit as e:
-        # login_garmin()의 sys.exit(0)은 429 graceful exit → 그대로 종료
-        # sys.exit(1)은 진짜 오류 → 텔레그램 알림 후 종료
-        if e.code != 0:
-            error_msg = f"❌ 가민 동기화 실패 (exit {e.code})"
-            print(error_msg)
-            send_telegram(error_msg)
-        sys.exit(e.code)
+    except SystemExit:
+        raise
     except Exception as e:
         error_msg = f"❌ 가민 동기화 오류\n{traceback.format_exc()}"
         print(error_msg)
