@@ -195,15 +195,14 @@ def login_garmin():
     os.makedirs(TOKEN_DIR, exist_ok=True)
     try:
         api.login(TOKEN_DIR)
-        api.garth.dump(TOKEN_DIR)
-        _update_tokens_secret()
-        print("[OK] 가민 토큰 캐시로 로그인 (토큰 갱신됨)")
-    except Exception:
+        print("[OK] 가민 토큰 캐시로 로그인")
+    except Exception as e1:
+        print(f"[INFO] 캐시 로그인 실패: {e1}")
         try:
             api.login()
             api.garth.dump(TOKEN_DIR)
             _update_tokens_secret()
-            print("[OK] 가민 신규 로그인 + 토큰 저장")
+            print("[OK] 가민 신규 로그인 + 토큰 갱신")
         except Exception as e:
             err_str = str(e)
             if '429' in err_str or 'Too Many Requests' in err_str or 'Rate limit' in err_str:

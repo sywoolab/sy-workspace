@@ -296,5 +296,30 @@
     "garmin_ids": [
       22266012629
     ]
+  },
+  "2026-03-25": {
+    "planned": "Easy 또는 완전 휴식",
+    "done": true,
+    "actual": "수영 950m 46분 @1:30/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 950,
+      "duration_min": 46.4,
+      "moving_min": 14.3,
+      "pace_per_100m": "1:30",
+      "avg_hr": 119,
+      "max_hr": 163,
+      "swolf": 30,
+      "strokes": 269,
+      "avg_spm": null,
+      "swim_equipment": "fins"
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.3 / 무산소 1.5 | 부하 64 | 장비 추정",
+    "garmin_id": 22288934001,
+    "start_time": "06:10",
+    "garmin_ids": [
+      22288934001
+    ]
   }
 }
