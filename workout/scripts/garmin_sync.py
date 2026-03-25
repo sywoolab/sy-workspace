@@ -179,8 +179,8 @@ def _update_tokens_secret():
 def login_garmin():
     """가민 커넥트 로그인 (토큰 캐시 활용, GitHub Actions는 Secret에서 복원)
 
-    Rate limit(429) 발생 시 exit(0)으로 조용히 종료하여
-    다음 스케줄까지 대기한다 (exit(1)은 불필요한 알림 유발).
+    로그인 실패 시 텔레그램 알림 + exit(1)로 명시적 실패 처리.
+    429 포함 모든 실패를 알린다 — 조용한 실패가 며칠간 감지 안 되는 문제 방지.
     """
     if not GARMIN_EMAIL or not GARMIN_PASSWORD:
         print("[ERROR] GARMIN_EMAIL / GARMIN_PASSWORD 환경변수 필요")
@@ -207,9 +207,13 @@ def login_garmin():
         except Exception as e:
             err_str = str(e)
             if '429' in err_str or 'Too Many Requests' in err_str or 'Rate limit' in err_str:
-                print(f"[RATE_LIMIT] 가민 429 — 다음 실행까지 대기: {e}")
-                sys.exit(0)  # 조용히 종료 (GitHub Actions failure 방지)
+                msg = f"⚠️ 가민 동기화 실패 (429 Rate Limit)\n다음 스케줄에 재시도합니다.\n\n오류: {e}"
+                print(f"[RATE_LIMIT] {e}")
+                send_telegram(msg)
+                sys.exit(1)
+            msg = f"❌ 가민 로그인 실패\n\n오류: {e}"
             print(f"[ERROR] 가민 로그인 실패: {e}")
+            send_telegram(msg)
             sys.exit(1)
 
     return api
