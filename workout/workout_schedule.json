@@ -25,16 +25,16 @@
     }
   },
   "last_analysis": {
-    "date": "2026-03-23",
-    "estimated_finish": "2:50",
-    "status": "yellow",
-    "status_text": "주의 — 개선 필요",
+    "date": "2026-03-25",
+    "estimated_finish": "2:49",
+    "status": "green",
+    "status_text": "목표 달성 가능",
     "phase": 1,
     "phase_name": "Phase 1: 베이스",
     "vdot": 41,
     "weekly_summary": {
       "swim": {
-        "count": 1,
+        "count": 2,
         "target": 4
       },
       "run": {
@@ -52,11 +52,14 @@
       "hard_pct": 0
     },
     "training_load": {
-      "current": 20,
+      "current": 30,
       "target": 300
     },
     "adjustments": [
-      "🔴 Training Readiness 28 (LOW) — 몸이 준비 안 됨, 휴식 권장"
+      "🔴 러닝 0/3회 — 4일 내 3회 추가 필요",
+      "🟡 Body Battery 최대 45 — 고강도 운동 자제, Easy 권장",
+      "🔴 수면 점수 48 — 수면 부족, 강도 낮추기 권장",
+      "🟡 Training Readiness 35 (LOW) — Easy 강도까지만 권장"
     ]
   }
 }
