@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "type": "recurring_override",
+      "priority": "medium",
+      "message": "규칙 A3-high이 주 3회 트리거 — 근본 원인 검토 필요",
+      "detected_at": "2026-03-26"
+    }
+  ],
+  "resolved": []
+}
