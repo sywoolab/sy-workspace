@@ -42,6 +42,16 @@
       "auto": true,
       "rule": "A3-high",
       "created_at": "2026-03-27T15:55:52.941620+09:00"
+    },
+    "2026-03-28": {
+      "date": "2026-03-28",
+      "workout": "Easy 또는 완전 휴식",
+      "detail": "컨디션 불량 — 고강도 금지",
+      "reason": "컨디션 적색: BB 45, TR 35, 수면 48",
+      "source": "adaptive_A3",
+      "auto": true,
+      "rule": "A3-high",
+      "created_at": "2026-03-28T00:15:41.901944+09:00"
     }
   },
   "last_analysis": {
