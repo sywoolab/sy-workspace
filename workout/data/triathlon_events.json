@@ -86,19 +86,19 @@
   },
   {
     "status": "접수예정",
-    "name": "제55회 전국소년체육대회",
-    "location": "부산 기장군 장안읍 임랑해수욕장",
-    "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.05.23 ~ 24"
-  },
-  {
-    "status": "접수예정",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅱ(5.23 토요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2066&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.23",
     "reg_period": "2026-04-01 14:00 ~ 2026-05-15 18:00"
+  },
+  {
+    "status": "접수예정",
+    "name": "제55회 전국소년체육대회",
+    "location": "부산 기장군 장안읍 임랑해수욕장",
+    "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.23 ~ 24"
   },
   {
     "status": "접수마감",
@@ -136,7 +136,7 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "2026 서울특별시장배 어린이&청소년 트라이애슬론/아쿠아슬론 대회",
     "location": "육군사관학교",
     "course": "고등부: 슈퍼스프린트, 아쿠아슬론 / 중등부: 슈퍼스프린트, 아쿠아슬론 / 초등부: 슈퍼스프린트(4~6학년), 아쿠아슬론(1~6학년) / 유치부: 아쿠아슬론",
@@ -187,15 +187,6 @@
     "reg_period": "2026-03-25  ~ 2026-04-14"
   },
   {
-    "status": "접수중",
-    "name": "2026년 1차 수영 테스트 프로그램",
-    "location": "통영 트라이애슬론 광장",
-    "course": "수영테스트(수영 300m)",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2074&page=2&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.04.25",
-    "reg_period": "2026-03-04 14:00 ~ 2026-03-27 23:59"
-  },
-  {
     "status": "접수예정",
     "name": "2026 전국생활체육대축전",
     "location": "경남 통영시 통영트라이애슬론광장",
@@ -204,12 +195,21 @@
     "date": "2026.04.25 ~ 26"
   },
   {
+    "status": "접수마감",
+    "name": "2026년 1차 수영 테스트 프로그램",
+    "location": "통영 트라이애슬론 광장",
+    "course": "수영테스트(수영 300m)",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2074&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.04.25",
+    "reg_period": "접수마감"
+  },
+  {
     "status": "접수중",
     "name": "2026 인천광역시철인3종협회장배 전국 엘리트·생활체육 아쿠아슬론 대회",
     "location": "인천체육고등학교",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2056&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.18 ~ 19",
-    "reg_period": "2026-02-12 14:00 ~ 2026-03-29 23:59"
+    "reg_period": "2026-02-12 14:00 ~ 2026-04-04 23:59"
   },
   {
     "status": "접수중",
