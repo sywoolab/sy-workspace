@@ -65,13 +65,13 @@
     },
     "2026-03-31": {
       "date": "2026-03-31",
-      "workout": "러닝 Easy (보충)",
-      "detail": "기본 거리 + 2km 추가 @6:00+",
-      "reason": "지난 주 부하 108/300 (36%) — Easy 보충",
-      "source": "adaptive_B3",
+      "workout": "Easy 또는 완전 휴식",
+      "detail": "컨디션 불량 — 고강도 금지",
+      "reason": "컨디션 적색: BB 45, TR 35, 수면 48",
+      "source": "adaptive_A3",
       "auto": true,
-      "rule": "B3",
-      "created_at": "2026-03-29T23:10:23.927003+09:00"
+      "rule": "A3-high",
+      "created_at": "2026-03-31T01:14:50.698591+09:00"
     },
     "2026-03-30": {
       "date": "2026-03-30",
