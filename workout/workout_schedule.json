@@ -118,11 +118,11 @@
       }
     },
     "intensity_split": {
-      "easy_pct": 0,
+      "easy_pct": 100,
       "hard_pct": 0
     },
     "training_load": {
-      "current": 0,
+      "current": 13,
       "target": 300
     },
     "adjustments": [
