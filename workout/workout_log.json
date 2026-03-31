@@ -361,12 +361,24 @@
   "2026-04-01": {
     "planned": "러닝 5~6km Easy",
     "done": true,
-    "actual": "수영 (오리발)",
+    "actual": "수영 1075m 54분 @1:45/100m",
     "metrics": {
       "type": "swim",
+      "distance_m": 1075,
+      "duration_min": 54.4,
+      "moving_min": 18.9,
+      "pace_per_100m": "1:45",
+      "avg_hr": 121,
+      "max_hr": 172,
+      "swolf": 34,
+      "strokes": 336,
+      "avg_spm": 18,
       "swim_equipment": "fins"
     },
     "training_zone": "easy",
-    "note": "목 칼칼 + 약 복용. 러닝 대신 수영으로 대체. 오리발 착용. 가민 데이터 싱크 대기"
+    "note": "유산소 2.7 / 무산소 2.3 | 부하 98 | 목 칼칼 + 약 복용. 러닝 대신 수영(오리발) 대체",
+    "garmin_id": 22365977315,
+    "start_time": "06:09",
+    "garmin_ids": [22365977315]
   }
 }
