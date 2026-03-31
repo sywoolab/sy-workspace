@@ -119,12 +119,12 @@
     "reg_period": "2026-03-11 14:00 ~ 2026-04-02 18:00"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "2026 아이치·나고야 아시안게임 국가대표 선발전(1차)",
     "location": "경상남도 양산시",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2079&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.13 ~ 15",
-    "reg_period": "2026-03-17 14:00 ~ 2026-03-31 23:59"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
@@ -195,7 +195,7 @@
     "date": "2026.04.25 ~ 26"
   },
   {
-    "status": "접수마감",
+    "status": "접수예정",
     "name": "2026년 1차 수영 테스트 프로그램",
     "location": "통영 트라이애슬론 광장",
     "course": "수영테스트(수영 300m)",
