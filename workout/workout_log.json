@@ -339,5 +339,34 @@
     "done": false,
     "actual": "",
     "note": "컨디션 회복 시 가벼운 운동 재개"
+  },
+  "2026-03-29": {
+    "planned": "브릭 → 수영",
+    "done": false,
+    "actual": "",
+    "note": "감기 회복 중 휴식"
+  },
+  "2026-03-30": {
+    "planned": "완전 휴식",
+    "done": false,
+    "actual": "",
+    "note": "일요일 휴식"
+  },
+  "2026-03-31": {
+    "planned": "수영 수업",
+    "done": false,
+    "actual": "",
+    "note": "감기 회복 중 휴식"
+  },
+  "2026-04-01": {
+    "planned": "러닝 5~6km Easy",
+    "done": true,
+    "actual": "수영 (오리발)",
+    "metrics": {
+      "type": "swim",
+      "swim_equipment": "fins"
+    },
+    "training_zone": "easy",
+    "note": "목 칼칼 + 약 복용. 러닝 대신 수영으로 대체. 오리발 착용. 가민 데이터 싱크 대기"
   }
 }
