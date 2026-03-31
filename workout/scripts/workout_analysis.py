@@ -204,23 +204,30 @@ def get_bare_swim_pace(entry):
 
 
 def calc_training_load(entry):
-    """일일 훈련 부하 계산 (수영 장비 보정 포함)"""
+    """일일 훈련 부하 계산
+    - 가민 training_load(EPOC 기반)가 있으면 그대로 사용
+    - 없을 때만 시간×계수 폴백 계산
+    """
     metrics = entry.get('metrics', {})
+
+    # 가민 EPOC 기반 부하가 있으면 우선 사용
+    garmin_load = metrics.get('training_load')
+    if garmin_load:
+        return round(garmin_load)
+
+    # 폴백: 시간 × 강도 × 종목 × 장비 계수
     wtype = metrics.get('type', 'run')
     duration = metrics.get('duration_min', 0)
-    # 수영: moving_min이 있으면 실제 운동 시간 사용 (elapsed time 대기 포함 과대평가 방지)
     if wtype == 'swim':
         duration = metrics.get('moving_min', duration)
     if wtype == 'run':
         pace = pace_to_seconds(metrics.get('pace_per_km'))
-        # 거리 기반으로 시간 추정
         dist = metrics.get('distance_km', 0)
         if pace and dist:
             duration = (pace * dist) / 60
     zone = entry.get('training_zone', 'moderate')
     intensity = INTENSITY_MULTIPLIER.get(zone, 1.2)
     type_mult = TYPE_MULTIPLIER.get(wtype, 1.0)
-    # 수영 장비 보정
     equip_mult = 1.0
     if wtype == 'swim':
         equipment = get_swim_equipment(entry)

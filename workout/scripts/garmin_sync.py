@@ -654,6 +654,10 @@ def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
             'avg_power': parsed.get('avg_power'),
         })
 
+    # 가민 training_load를 metrics에 저장 (workout_analysis에서 직접 사용)
+    if parsed.get('training_load'):
+        metrics['training_load'] = parsed['training_load']
+
     # 훈련 효과 기록
     te_parts = []
     if parsed.get('aerobic_te'):
