@@ -43,7 +43,7 @@
     "reg_period": "2026-01-16 14:00 ~ 2026-06-12 23:59"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "제26회 문화체육관광부장관배 전국 트라이애슬론 선수권 대회",
     "location": "전북 익산시 익산국제철인3종경기장 일원",
     "course": "전문체육(엘리트/U23: 스탠다드), 고등부 (스프린트), 중등부 (슈퍼스프린트), 초등부 (아쿠아슬론, 생활체육(스탠다드)",
@@ -77,19 +77,11 @@
     "reg_period": "2026-03-17  ~ 2026-03-31"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅱ(5.24 일요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2067&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.24",
-    "reg_period": "2026-04-01 14:00 ~ 2026-05-15 18:00"
-  },
-  {
-    "status": "접수예정",
-    "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅱ(5.23 토요일)",
-    "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2066&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.05.23",
     "reg_period": "2026-04-01 14:00 ~ 2026-05-15 18:00"
   },
   {
@@ -99,6 +91,14 @@
     "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.23 ~ 24"
+  },
+  {
+    "status": "접수중",
+    "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅱ(5.23 토요일)",
+    "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2066&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.23",
+    "reg_period": "2026-04-01 14:00 ~ 2026-05-15 18:00"
   },
   {
     "status": "접수마감",
@@ -218,6 +218,14 @@
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2082&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.15",
     "reg_period": "2026-03-25  ~ 2026-04-14"
+  },
+  {
+    "status": "접수예정",
+    "name": "2026 1차 심판 보수교육 강습회",
+    "location": "온라인",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2054&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.04.11",
+    "reg_period": "2026-04-02 10:00 ~ 2026-04-07"
   },
   {
     "status": "접수예정",
