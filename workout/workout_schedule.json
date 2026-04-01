@@ -91,7 +91,17 @@
       "source": "adaptive_B1",
       "auto": true,
       "rule": "B1",
-      "created_at": "2026-04-01T01:18:08.609396+09:00"
+      "created_at": "2026-04-01T17:09:01.243401+09:00"
+    },
+    "2026-04-02": {
+      "date": "2026-04-02",
+      "workout": "러닝 Easy",
+      "detail": "3km @6:00+/km",
+      "reason": "부하 98 후 회복",
+      "source": "adaptive_A1",
+      "auto": true,
+      "rule": "A1",
+      "created_at": "2026-04-01T17:09:01.243333+09:00"
     }
   },
   "last_analysis": {
