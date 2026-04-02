@@ -1,84 +1,4 @@
 {
-  "2026-03-18": {
-    "date": "2026-03-18",
-    "steps": 1814,
-    "stress": {
-      "avg": 13,
-      "max": 79,
-      "rest": 71.19,
-      "low": 2.54,
-      "medium": 1.27,
-      "high": 0.64
-    },
-    "body_battery": {
-      "max": 82,
-      "min": 16,
-      "start": 66
-    },
-    "resting_hr": 45,
-    "sleep": {
-      "duration_min": 428,
-      "score": 77,
-      "deep_min": 62,
-      "light_min": 302,
-      "rem_min": 65,
-      "awake_min": 12
-    },
-    "hrv": {
-      "weekly_avg": 53,
-      "last_night": 64,
-      "status": "BALANCED"
-    },
-    "training_readiness": {
-      "score": 48,
-      "level": "LOW"
-    },
-    "training_status": {
-      "status": null,
-      "load": null,
-      "vo2max_run": null
-    }
-  },
-  "2026-03-19": {
-    "date": "2026-03-19",
-    "steps": 14698,
-    "stress": {
-      "avg": 26,
-      "max": 96,
-      "rest": 47.77,
-      "low": 18.69,
-      "medium": 6.85,
-      "high": 1.35
-    },
-    "body_battery": {
-      "max": 80,
-      "min": 18,
-      "start": 36
-    },
-    "resting_hr": 47,
-    "sleep": {
-      "duration_min": 416,
-      "score": 78,
-      "deep_min": 55,
-      "light_min": 264,
-      "rem_min": 97,
-      "awake_min": 1
-    },
-    "hrv": {
-      "weekly_avg": 54,
-      "last_night": 63,
-      "status": "BALANCED"
-    },
-    "training_readiness": {
-      "score": 62,
-      "level": "MODERATE"
-    },
-    "training_status": {
-      "status": null,
-      "load": null,
-      "vo2max_run": null
-    }
-  },
   "2026-03-20": {
     "date": "2026-03-20",
     "steps": 5310,
@@ -267,6 +187,37 @@
     "training_readiness": {
       "score": 35,
       "level": "LOW"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-04-03": {
+    "date": "2026-04-03",
+    "steps": null,
+    "stress": {
+      "avg": null,
+      "max": null,
+      "rest": null,
+      "low": null,
+      "medium": null,
+      "high": null
+    },
+    "body_battery": {
+      "max": null,
+      "min": null,
+      "start": null
+    },
+    "resting_hr": null,
+    "sleep": {
+      "duration_min": 0,
+      "score": null,
+      "deep_min": 0,
+      "light_min": 0,
+      "rem_min": 0,
+      "awake_min": 0
     },
     "training_status": {
       "status": null,
