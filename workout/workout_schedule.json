@@ -81,7 +81,7 @@
       "source": "adaptive_B1",
       "auto": true,
       "rule": "B1",
-      "created_at": "2026-04-02T01:15:43.120244+09:00"
+      "created_at": "2026-04-02T16:52:10.598333+09:00"
     },
     "2026-04-02": {
       "date": "2026-04-02",
@@ -91,7 +91,7 @@
       "source": "adaptive_A3",
       "auto": true,
       "rule": "A3-high",
-      "created_at": "2026-04-02T01:15:43.120220+09:00"
+      "created_at": "2026-04-02T16:52:10.598307+09:00"
     }
   },
   "last_analysis": {
