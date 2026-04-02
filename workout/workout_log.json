@@ -381,5 +381,35 @@
     "garmin_id": 22365977315,
     "start_time": "06:09",
     "garmin_ids": [22365977315]
+  },
+  "2026-04-02": {
+    "planned": "러닝 6~7km + 코어",
+    "done": false,
+    "actual": "",
+    "note": "감기 컨디션 불량 → 약 먹고 취침. 휴식"
+  },
+  "2026-04-03": {
+    "planned": "수영 수업 + 저녁 러닝",
+    "done": true,
+    "actual": "수영 1675m 59분 @1:33/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1675,
+      "duration_min": 58.7,
+      "moving_min": 25.9,
+      "pace_per_100m": "1:33",
+      "avg_hr": 127,
+      "max_hr": 181,
+      "swolf": 31,
+      "strokes": 499,
+      "avg_spm": 19,
+      "swim_equipment": "fins_paddles",
+      "training_load": 118
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.0 / 무산소 2.5 | 부하 118 | 오리발+패들. 저녁 러닝 5km Easy 예정",
+    "garmin_id": 22387858284,
+    "start_time": "06:13",
+    "garmin_ids": [22387858284]
   }
 }
