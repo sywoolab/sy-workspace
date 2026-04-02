@@ -104,7 +104,7 @@
     "vdot": 41,
     "weekly_summary": {
       "swim": {
-        "count": 2,
+        "count": 1,
         "target": 4
       },
       "run": {
@@ -118,11 +118,11 @@
       }
     },
     "intensity_split": {
-      "easy_pct": 42,
-      "hard_pct": 58
+      "easy_pct": 100,
+      "hard_pct": 0
     },
     "training_load": {
-      "current": 216,
+      "current": 98,
       "target": 300
     },
     "adjustments": [
