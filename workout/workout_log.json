@@ -389,8 +389,8 @@
     "note": "감기 컨디션 불량 → 약 먹고 취침. 휴식"
   },
   "2026-04-03": {
-    "planned": "수영 수업 + 저녁 러닝",
-    "done": true,
+    "planned": "수영 수업 + 저녁 러닝 5km Easy",
+    "done": false,
     "actual": "수영 1675m 59분 @1:33/100m",
     "metrics": {
       "type": "swim",
