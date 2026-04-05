@@ -1,6 +1,6 @@
 {
   "current_vdot": 40,
-  "brick_count": 1,
+  "brick_count": 2,
   "ow_count": 0,
   "overrides": {
     "2026-03-31": {
@@ -66,7 +66,7 @@
   },
   "last_analysis": {
     "date": "2026-04-06",
-    "estimated_finish": "2:52",
+    "estimated_finish": "2:51",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 2,
