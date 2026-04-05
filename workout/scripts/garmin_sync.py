@@ -930,6 +930,7 @@ def generate_workout_feedback(parsed, schedule_data, workout_log=None):
             score += 15
     except Exception:
         planned = ''
+        detail = ''
         phase_num = 1
 
     # ─── 2. 강도 적절성 ───

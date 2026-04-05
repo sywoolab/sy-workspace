@@ -540,5 +540,186 @@
         "start_time": "18:38"
       }
     ]
+  },
+  "2026-04-04": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "수영 1200m 59분 @1:55/100m + 러닝 5.46km @5:39",
+    "metrics": {
+      "type": "run",
+      "distance_km": 5.46,
+      "pace_per_km": "5:39",
+      "avg_hr": 150,
+      "max_hr": 166,
+      "cadence": 175,
+      "training_load": 89,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 369,
+          "avg_hr": 145,
+          "max_hr": 155,
+          "pace_sec": 369,
+          "pace_str": "6:09"
+        },
+        {
+          "distance": 1000,
+          "duration": 349,
+          "avg_hr": 149,
+          "max_hr": 155,
+          "pace_sec": 349,
+          "pace_str": "5:49"
+        },
+        {
+          "distance": 1000,
+          "duration": 355,
+          "avg_hr": 146,
+          "max_hr": 154,
+          "pace_sec": 355,
+          "pace_str": "5:54"
+        },
+        {
+          "distance": 1000,
+          "duration": 325,
+          "avg_hr": 156,
+          "max_hr": 166,
+          "pace_sec": 325,
+          "pace_str": "5:25"
+        },
+        {
+          "distance": 1000,
+          "duration": 314,
+          "avg_hr": 155,
+          "max_hr": 160,
+          "pace_sec": 314,
+          "pace_str": "5:13"
+        },
+        {
+          "distance": 463,
+          "duration": 140,
+          "avg_hr": 156,
+          "max_hr": 158,
+          "pace_sec": 302,
+          "pace_str": "5:01"
+        }
+      ]
+    },
+    "training_zone": "tempo",
+    "note": "유산소 3.0 / 무산소 2.2 | 부하 114 | 유산소 3.1 | 부하 89",
+    "garmin_id": 22400119921,
+    "start_time": "11:59",
+    "garmin_ids": [
+      22400498338,
+      22400119921
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1200,
+        "duration_min": 58.8,
+        "moving_min": 23.1,
+        "pace_per_100m": "1:55",
+        "avg_hr": 128,
+        "max_hr": 177,
+        "swolf": 37,
+        "strokes": 387,
+        "avg_spm": null,
+        "training_load": 114,
+        "garmin_id": 22400498338,
+        "start_time": "13:03"
+      },
+      {
+        "type": "run",
+        "distance_km": 5.46,
+        "pace_per_km": "5:39",
+        "avg_hr": 150,
+        "max_hr": 166,
+        "cadence": 175,
+        "training_load": 89,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 369,
+            "avg_hr": 145,
+            "max_hr": 155,
+            "pace_sec": 369,
+            "pace_str": "6:09"
+          },
+          {
+            "distance": 1000,
+            "duration": 349,
+            "avg_hr": 149,
+            "max_hr": 155,
+            "pace_sec": 349,
+            "pace_str": "5:49"
+          },
+          {
+            "distance": 1000,
+            "duration": 355,
+            "avg_hr": 146,
+            "max_hr": 154,
+            "pace_sec": 355,
+            "pace_str": "5:54"
+          },
+          {
+            "distance": 1000,
+            "duration": 325,
+            "avg_hr": 156,
+            "max_hr": 166,
+            "pace_sec": 325,
+            "pace_str": "5:25"
+          },
+          {
+            "distance": 1000,
+            "duration": 314,
+            "avg_hr": 155,
+            "max_hr": 160,
+            "pace_sec": 314,
+            "pace_str": "5:13"
+          },
+          {
+            "distance": 463,
+            "duration": 140,
+            "avg_hr": 156,
+            "max_hr": 158,
+            "pace_sec": 302,
+            "pace_str": "5:01"
+          }
+        ],
+        "garmin_id": 22400119921,
+        "start_time": "11:59"
+      }
+    ]
+  },
+  "2026-04-05": {
+    "planned": "자전거 → 브릭 러닝 → 수영",
+    "done": false,
+    "actual": "",
+    "note": "휴식"
+  },
+  "2026-04-06": {
+    "planned": "완전 휴식",
+    "done": true,
+    "actual": "수영 975m 64분 @2:09/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 975,
+      "duration_min": 64.2,
+      "moving_min": 21.0,
+      "pace_per_100m": "2:09",
+      "avg_hr": 115,
+      "max_hr": 158,
+      "swolf": 42,
+      "strokes": 376,
+      "avg_spm": null,
+      "training_load": 63
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.3 / 무산소 1.8 | 부하 63",
+    "garmin_id": 22420838221,
+    "start_time": "06:10",
+    "garmin_ids": [
+      22420838221
+    ]
   }
 }
