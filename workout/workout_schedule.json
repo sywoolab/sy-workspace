@@ -75,10 +75,10 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-04",
-    "estimated_finish": "2:49",
-    "status": "green",
-    "status_text": "목표 달성 가능",
+    "date": "2026-04-05",
+    "estimated_finish": "2:52",
+    "status": "yellow",
+    "status_text": "주의 — 개선 필요",
     "phase": 1,
     "phase_name": "Phase 1: 베이스",
     "vdot": 39,
@@ -106,7 +106,6 @@
       "target": 300
     },
     "adjustments": [
-      "🔴 러닝 1/3회 — 1일 내 2회 추가 필요",
       "⚠️ 80/20 위반: Easy 25% / 고강도 75% (목표: 80/20)",
       "🟡 Training Readiness 43 (LOW) — Easy 강도까지만 권장"
     ]
