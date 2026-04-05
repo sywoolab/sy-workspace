@@ -3,16 +3,6 @@
   "brick_count": 1,
   "ow_count": 0,
   "overrides": {
-    "2026-03-28": {
-      "date": "2026-03-28",
-      "workout": "Easy 또는 완전 휴식",
-      "detail": "컨디션 불량 — 고강도 금지",
-      "reason": "컨디션 적색: BB 45, TR 35, 수면 48",
-      "source": "adaptive_A3",
-      "auto": true,
-      "rule": "A3-high",
-      "created_at": "2026-03-28T23:08:53.634293+09:00"
-    },
     "2026-03-29": {
       "date": "2026-03-29",
       "workout": "Easy 또는 완전 휴식",
@@ -125,6 +115,10 @@
     {
       "date": "2026-03-29",
       "vdot": 41
+    },
+    {
+      "date": "2026-04-05",
+      "vdot": 39
     }
   ]
 }
