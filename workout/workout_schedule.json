@@ -1,5 +1,5 @@
 {
-  "current_vdot": 39,
+  "current_vdot": 40,
   "brick_count": 1,
   "ow_count": 0,
   "overrides": {
@@ -65,39 +65,38 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-05",
+    "date": "2026-04-06",
     "estimated_finish": "2:52",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
-    "phase": 1,
-    "phase_name": "Phase 1: 베이스",
-    "vdot": 39,
+    "phase": 2,
+    "phase_name": "Phase 2: 빌드",
+    "vdot": 40,
     "weekly_summary": {
       "swim": {
-        "count": 2,
-        "target": 4
+        "count": 1,
+        "target": 3
       },
       "run": {
-        "count": 1,
+        "count": 0,
         "target": 3,
-        "total_km": 5.4
+        "total_km": 0.0
       },
       "bike": {
         "count": 0,
-        "target": 1
+        "target": 2
       }
     },
     "intensity_split": {
-      "easy_pct": 25,
-      "hard_pct": 75
+      "easy_pct": 100,
+      "hard_pct": 0
     },
     "training_load": {
-      "current": 341,
-      "target": 300
+      "current": 63,
+      "target": 380
     },
     "adjustments": [
-      "⚠️ 80/20 위반: Easy 25% / 고강도 75% (목표: 80/20)",
-      "🟡 Training Readiness 43 (LOW) — Easy 강도까지만 권장"
+      "🟡 Training Readiness 34 (LOW) — Easy 강도까지만 권장"
     ]
   },
   "vdot_history": [
