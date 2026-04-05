@@ -1887,11 +1887,41 @@ def resend_today():
     print(f"  텔레그램 전송: {'성공' if ok else '실패'} ({len(parsed_list)}건)")
 
 
+def fill_planned():
+    """workout_log.json에서 빈 planned 필드를 get_schedule_for_date()로 채움.
+
+    용도: garmin_sync 자동싱크��� 실패했을 때, 또는 수동으로 엔트리를 추가한 후
+    planned를 정확하게 채우기 위한 유틸리티.
+
+    사용: python garmin_sync.py fill-planned
+    """
+    workout_log = load_json(LOG_FILE) or {}
+    schedule_data = load_json(SCHEDULE_FILE) or {}
+    count = 0
+    for date_key in sorted(workout_log.keys()):
+        entry = workout_log[date_key]
+        if not entry.get('planned'):
+            try:
+                planned = get_planned_workout(date_key, schedule_data)
+                entry['planned'] = planned
+                count += 1
+                print(f"  {date_key}: → {planned}")
+            except Exception as e:
+                print(f"  {date_key}: 실패 ({e})")
+    if count:
+        save_json(LOG_FILE, workout_log)
+        print(f"[OK] {count}건 planned 채움")
+    else:
+        print("[OK] 빈 planned 없음")
+
+
 if __name__ == '__main__':
     mode = sys.argv[1] if len(sys.argv) > 1 else 'sync'
     try:
         if mode == 'resend':
             resend_today()
+        elif mode == 'fill-planned':
+            fill_planned()
         else:
             changed = sync()
         sys.exit(0)
