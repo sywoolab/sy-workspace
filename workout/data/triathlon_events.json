@@ -229,12 +229,12 @@
     "date": "2026.04.25 ~ 26"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "2026년 제3차 철인3종 수상인명구조요원 자격 이수 강습회",
     "location": "경남 함안군 가야읍 함안대로 619-4 함안체육회실내수영장",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2083&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.18",
-    "reg_period": "2026-04-03 15:00 ~ 2026-04-10 18:00"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
@@ -247,7 +247,7 @@
   {
     "status": "접수중",
     "name": "2026 철인3종 1차 대회규정 정기 교육",
-    "location": "온라인 ZOOM",
+    "location": "올림픽회관",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2082&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.15",
     "reg_period": "2026-03-25  ~ 2026-04-14"
