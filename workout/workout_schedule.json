@@ -65,7 +65,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-10",
+    "date": "2026-04-11",
     "estimated_finish": "2:51",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
@@ -96,7 +96,7 @@
       "target": 380
     },
     "adjustments": [
-      "🔴 러닝 0/3회 — 2일 내 3회 추가 필요",
+      "🔴 러닝 0/3회 — 1일 내 3회 추가 필요",
       "🟡 Training Readiness 34 (LOW) — Easy 강도까지만 권장"
     ]
   },
