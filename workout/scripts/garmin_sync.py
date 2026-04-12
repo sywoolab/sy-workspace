@@ -592,11 +592,12 @@ def detect_swim_equipment(parsed, workout_log):
     avg_pace = sum(bare_paces) / len(bare_paces)
     avg_swolf = sum(bare_swolfs) / len(bare_swolfs) if bare_swolfs else 99
 
-    # 페이스가 맨몸 평균보다 10초/100m 이상 빠르거나, Swolf가 5 이상 낮으면 장비 추정
+    # 페이스가 맨몸 평균보다 20초/100m 이상 빠르고(AND) Swolf가 7 이상 낮아야 장비 추정
+    # 기존 10초/5 임계값은 실력 향상이나 컨디션 차이로 쉽게 넘어서 오판 빈발
     pace_diff = avg_pace - pace_100m
     swolf_diff = avg_swolf - swolf if swolf else 0
 
-    return pace_diff >= 10 or swolf_diff >= 5
+    return pace_diff >= 20 and swolf_diff >= 7
 
 
 def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):

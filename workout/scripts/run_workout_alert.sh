@@ -15,6 +15,6 @@ LOG_FILE="$LOG_DIR/workout_alert_$(date +%Y%m%d).log"
 MODE="${1:-morning}"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 운동 알림 ($MODE)" >> "$LOG_FILE"
 
-/usr/bin/python3 scripts/workout_alert.py "$MODE" >> "$LOG_FILE" 2>&1
+/usr/bin/python3 workout/scripts/workout_alert.py "$MODE" >> "$LOG_FILE" 2>&1
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 완료" >> "$LOG_FILE"

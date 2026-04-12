@@ -291,6 +291,9 @@ def analyze_week(log, dt=None):
         else:
             metrics_list = [entry.get('metrics', {})]
 
+        # 같은 날짜의 같은 종목 연속 활동은 1세션으로 카운트 (예: 수영 중 시계 끊김)
+        day_types_counted = set()
+
         for m_item in metrics_list:
             # all_metrics 항목으로 임시 entry 구성하여 부하 계산
             tmp_entry = dict(entry)
@@ -319,19 +322,25 @@ def analyze_week(log, dt=None):
                 stats['hard_minutes'] += duration
 
             if wtype == 'swim':
-                stats['swim']['count'] += 1
+                if wtype not in day_types_counted:
+                    stats['swim']['count'] += 1
+                    day_types_counted.add(wtype)
                 pace = m_item.get('pace_per_100m')
                 if pace:
                     stats['swim']['paces'].append(pace_to_seconds(pace))
             elif wtype == 'run':
-                stats['run']['count'] += 1
+                if wtype not in day_types_counted:
+                    stats['run']['count'] += 1
+                    day_types_counted.add(wtype)
                 stats['run']['total_km'] += m_item.get('distance_km', 0)
                 pace = m_item.get('pace_per_km')
                 if pace:
                     stats['run']['paces'].append(pace_to_seconds(pace))
                 stats['run']['zones'].append(zone)
             elif wtype == 'bike':
-                stats['bike']['count'] += 1
+                if wtype not in day_types_counted:
+                    stats['bike']['count'] += 1
+                    day_types_counted.add(wtype)
             elif wtype == 'brick':
                 stats['brick']['count'] += 1
 

@@ -19,13 +19,13 @@ LOG_FILE="$LOG_DIR/garmin_sync_$(date +%Y%m%d).log"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 로컬 가민 동기화 시작" >> "$LOG_FILE"
 
 # 동기화 실행
-/usr/bin/python3 scripts/garmin_sync.py sync >> "$LOG_FILE" 2>&1
+/usr/bin/python3 workout/scripts/garmin_sync.py sync >> "$LOG_FILE" 2>&1
 EXIT_CODE=$?
 
 # 변경사항 있으면 git push (인터넷 되면)
 if [ $EXIT_CODE -eq 0 ]; then
     cd /Users/sywoo/sy-workspace
-    git add workout_log.json data/garmin_health.json 2>/dev/null
+    git add workout/workout_log.json workout/data/garmin_health.json workout/data/sync_state.json 2>/dev/null
     if ! git diff --staged --quiet 2>/dev/null; then
         git commit -m "garmin sync: local auto update" >> "$LOG_FILE" 2>&1
         git push >> "$LOG_FILE" 2>&1 || echo "[WARN] git push 실패 (인터넷 없음?) — 다음 실행 시 재시도" >> "$LOG_FILE"
