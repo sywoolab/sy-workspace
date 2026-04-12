@@ -912,7 +912,7 @@ def format_analysis_message(log):
         status_emoji = "🔴"
         status_text = "경고 — 스케줄 강화 필요"
 
-    lines.append(f"🏁 D-{DAYS_LEFT} | 목표 2:50 | 예상 {minutes_to_hhmm(total)} {status_emoji}")
+    lines.append(f"🏁 D-{DAYS_LEFT} | 예상 완주 {minutes_to_hhmm(total)} {status_emoji}")
     lines.append(f"  ({status_text})")
     lines.append(f"  수영 {estimate['swim']:.0f} + T1 {estimate['t1']:.0f} "
                  f"+ 자전거 {estimate['bike']:.0f} + T2 {estimate['t2']:.0f} "
