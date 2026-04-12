@@ -3,16 +3,6 @@
   "brick_count": 2,
   "ow_count": 0,
   "overrides": {
-    "2026-04-04": {
-      "date": "2026-04-04",
-      "workout": "러닝 Easy",
-      "detail": "3km @6:00+/km",
-      "reason": "어제 interval, 부하 243 후 회복",
-      "source": "adaptive_A1",
-      "auto": true,
-      "rule": "A1",
-      "created_at": "2026-04-03T23:33:42.525147+09:00"
-    },
     "2026-04-07": {
       "date": "2026-04-07",
       "workout": "러닝 Easy",
@@ -62,6 +52,26 @@
       "auto": true,
       "rule": "B1",
       "created_at": "2026-04-09T17:10:53.559723+09:00"
+    },
+    "2026-04-12": {
+      "date": "2026-04-12",
+      "workout": "Easy only",
+      "detail": "템포/인터벌 금지, Easy 강도까지만",
+      "reason": "컨디션 황색: TR 32, 수면 4h22m",
+      "source": "adaptive_A3",
+      "auto": true,
+      "rule": "A3-medium",
+      "created_at": "2026-04-12T14:32:42.883662+09:00"
+    },
+    "2026-04-14": {
+      "date": "2026-04-14",
+      "workout": "러닝 Easy (보충)",
+      "detail": "기본 거리 + 2km 추가 @6:00+",
+      "reason": "지난 주 부하 160/380 (42%) — Easy 보충",
+      "source": "adaptive_B3",
+      "auto": true,
+      "rule": "B3",
+      "created_at": "2026-04-12T14:32:42.883687+09:00"
     }
   },
   "last_analysis": {
@@ -108,6 +118,10 @@
     {
       "date": "2026-04-05",
       "vdot": 39
+    },
+    {
+      "date": "2026-04-12",
+      "vdot": 40
     }
   ]
 }
