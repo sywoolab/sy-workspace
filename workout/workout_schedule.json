@@ -1,6 +1,6 @@
 {
-  "current_vdot": 37,
-  "brick_count": 1,
+  "current_vdot": 35,
+  "brick_count": 2,
   "ow_count": 0,
   "overrides": {
     "2026-04-07": {
@@ -76,12 +76,12 @@
   },
   "last_analysis": {
     "date": "2026-04-13",
-    "estimated_finish": "2:54",
+    "estimated_finish": "2:57",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 2,
     "phase_name": "Phase 2: 빌드",
-    "vdot": 40,
+    "vdot": 35,
     "weekly_summary": {
       "swim": {
         "count": 1,

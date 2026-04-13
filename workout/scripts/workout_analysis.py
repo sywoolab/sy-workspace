@@ -471,7 +471,7 @@ def estimate_finish_time(log):
 
 
 def update_vdot(log):
-    """최근 러닝 데이터로 VDOT 재추정 (빌드업 시 후반 페이스 반영)"""
+    """최근 러닝 데이터로 VDOT 재추정 (훈련 공백 감쇠 + 거리 보정 반영)"""
     run_entries = get_latest_metrics(log, 'run', 5)
     if not run_entries:
         return 35  # 기본값
@@ -484,27 +484,32 @@ def update_vdot(log):
         if not pace or dist < 3:
             continue
 
-        best_pace = pace  # 기본은 평균 페이스
-
-        # 빌드업 판정: 구간 데이터가 있으면 후반 페이스 사용
-        laps = metrics.get('laps', [])
-        if laps and len(laps) >= 3:
-            lap_paces = [l.get('pace_sec', 0) for l in laps if l.get('pace_sec')]
-            if lap_paces:
-                accel = sum(1 for i in range(1, len(lap_paces)) if lap_paces[i] < lap_paces[i-1] - 3)
-                pace_range = max(lap_paces) - min(lap_paces)
-                if accel >= len(lap_paces) * 0.5 and pace_range > 25:
-                    # 빌드업: 후반 50% 평균 (워밍업 제외)
-                    second_half = lap_paces[len(lap_paces)//2:]
-                    best_pace = round(sum(second_half) / len(second_half))
+        # 평균 페이스 기반 VDOT (빌드업 후반 페이스는 과대평가하므로 사용하지 않음)
+        best_pace = pace
 
         v = estimate_vdot(best_pace, dist)
+
+        # 짧은 거리 보정: 5~6km 러닝의 VDOT은 10km 대비 1~2 높게 나옴
+        if dist < 7:
+            v = max(35, v - 1)
+
+        # 훈련 공백 감쇠: 마지막 러닝 이후 7일 이상 지나면 VDOT 하락
+        try:
+            from datetime import datetime as _dt
+            days_ago = (NOW.date() - _dt.strptime(date_key, '%Y-%m-%d').date()).days
+            if days_ago > 14:
+                v = max(35, v - 3)  # 2주 이상 공백: -3
+            elif days_ago > 7:
+                v = max(35, v - 1)  # 1주 이상 공백: -1
+        except Exception:
+            pass
+
         vdots.append(v)
 
     if not vdots:
         return 35
-    # 최고 VDOT 중시 (상위 3개 평균)
-    return max(vdots) if len(vdots) <= 3 else round(sum(sorted(vdots, reverse=True)[:3]) / 3)
+    # 가중평균 (최근 기록 중시가 아닌 보수적 평균)
+    return round(sum(vdots) / len(vdots))
 
 
 def check_adjustments(log, week_stats, phase, vdot):
