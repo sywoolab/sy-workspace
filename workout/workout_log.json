@@ -804,5 +804,92 @@
         "start_time": "06:10"
       }
     ]
+  },
+  "2026-04-14": {
+    "planned": "러닝 Easy (보충)",
+    "done": true,
+    "actual": "러닝 7.36km @5:42",
+    "metrics": {
+      "type": "run",
+      "distance_km": 7.36,
+      "pace_per_km": "5:42",
+      "avg_hr": 133,
+      "max_hr": 154,
+      "cadence": 174,
+      "training_load": 78,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 379,
+          "avg_hr": 122,
+          "max_hr": 142,
+          "pace_sec": 379,
+          "pace_str": "6:19"
+        },
+        {
+          "distance": 1000,
+          "duration": 349,
+          "avg_hr": 128,
+          "max_hr": 136,
+          "pace_sec": 349,
+          "pace_str": "5:48"
+        },
+        {
+          "distance": 1000,
+          "duration": 346,
+          "avg_hr": 131,
+          "max_hr": 142,
+          "pace_sec": 346,
+          "pace_str": "5:45"
+        },
+        {
+          "distance": 1000,
+          "duration": 358,
+          "avg_hr": 128,
+          "max_hr": 138,
+          "pace_sec": 358,
+          "pace_str": "5:58"
+        },
+        {
+          "distance": 1000,
+          "duration": 344,
+          "avg_hr": 129,
+          "max_hr": 140,
+          "pace_sec": 344,
+          "pace_str": "5:43"
+        },
+        {
+          "distance": 1000,
+          "duration": 327,
+          "avg_hr": 146,
+          "max_hr": 149,
+          "pace_sec": 327,
+          "pace_str": "5:27"
+        },
+        {
+          "distance": 1000,
+          "duration": 313,
+          "avg_hr": 146,
+          "max_hr": 153,
+          "pace_sec": 313,
+          "pace_str": "5:13"
+        },
+        {
+          "distance": 357,
+          "duration": 104,
+          "avg_hr": 148,
+          "max_hr": 154,
+          "pace_sec": 292,
+          "pace_str": "4:51"
+        }
+      ]
+    },
+    "training_zone": "tempo",
+    "note": "유산소 3.1 | 부하 78",
+    "garmin_id": 22516118233,
+    "start_time": "06:29",
+    "garmin_ids": [
+      22516118233
+    ]
   }
 }
