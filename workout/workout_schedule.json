@@ -75,7 +75,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-13",
+    "date": "2026-04-14",
     "estimated_finish": "2:57",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
@@ -88,9 +88,9 @@
         "target": 3
       },
       "run": {
-        "count": 0,
+        "count": 1,
         "target": 3,
-        "total_km": 0.0
+        "total_km": 7.4
       },
       "bike": {
         "count": 0,
@@ -98,17 +98,17 @@
       }
     },
     "intensity_split": {
-      "easy_pct": 100,
-      "hard_pct": 0
+      "easy_pct": 37,
+      "hard_pct": 63
     },
     "training_load": {
-      "current": 97,
+      "current": 175,
       "target": 380
     },
     "adjustments": [
-      "🟡 Body Battery 최대 50 — 고강도 운동 자제, Easy 권장",
-      "🔴 수면 점수 45 — 수면 부족, 강도 낮추기 권장",
-      "🔴 Training Readiness 17 (POOR) — 몸이 준비 안 됨, 휴식 권장"
+      "⚠️ 80/20 위반: Easy 37% / 고강도 63% (목표: 80/20)",
+      "🟡 Body Battery 최대 49 — 고강도 운동 자제, Easy 권장",
+      "🟡 Training Readiness 38 (LOW) — Easy 강도까지만 권장"
     ]
   },
   "vdot_history": [
