@@ -76,7 +76,7 @@
   },
   "last_analysis": {
     "date": "2026-04-13",
-    "estimated_finish": "2:50",
+    "estimated_finish": "2:54",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 2,
@@ -84,7 +84,7 @@
     "vdot": 40,
     "weekly_summary": {
       "swim": {
-        "count": 2,
+        "count": 1,
         "target": 3
       },
       "run": {
