@@ -4,8 +4,10 @@
 
 cd /Users/sywoo/sy-workspace
 
-# .env 로드
-export $(grep -v '^#' .env | xargs)
+# .env 로드 (특수문자 안전 처리)
+set -a
+source .env
+set +a
 
 # BOT_TOKEN 매핑 (스크립트에서 BOT_TOKEN으로 읽음)
 export BOT_TOKEN="${TRAINING_BOT_TOKEN}"
@@ -28,7 +30,8 @@ if [ $EXIT_CODE -eq 0 ]; then
     git add workout/workout_log.json workout/data/garmin_health.json workout/data/sync_state.json 2>/dev/null
     if ! git diff --staged --quiet 2>/dev/null; then
         git commit -m "garmin sync: local auto update" >> "$LOG_FILE" 2>&1
-        git push >> "$LOG_FILE" 2>&1 || echo "[WARN] git push 실패 (인터넷 없음?) — 다음 실행 시 재시도" >> "$LOG_FILE"
+        git pull --rebase >> "$LOG_FILE" 2>&1
+        git push >> "$LOG_FILE" 2>&1 || echo "[WARN] git push 실패 — 다음 실행 시 재시도" >> "$LOG_FILE"
     fi
 fi
 

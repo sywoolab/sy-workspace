@@ -4,7 +4,9 @@
 
 cd /Users/sywoo/sy-workspace
 
-export $(grep -v '^#' .env | xargs)
+set -a
+source .env
+set +a
 export BOT_TOKEN="${TRAINING_BOT_TOKEN}"
 export CHAT_ID="${TELEGRAM_CHAT_ID}"
 
