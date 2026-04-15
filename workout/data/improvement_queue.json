@@ -5,6 +5,12 @@
       "priority": "medium",
       "message": "규칙 A3-high이 주 3회 트리거 — 근본 원인 검토 필요",
       "detected_at": "2026-03-26"
+    },
+    {
+      "type": "recovery",
+      "priority": "high",
+      "message": "주간 평균 수면 점수 52점 — 볼륨 감량 검토 필요",
+      "detected_at": "2026-04-15"
     }
   ],
   "resolved": []
