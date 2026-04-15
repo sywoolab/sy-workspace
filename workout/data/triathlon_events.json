@@ -159,7 +159,7 @@
     "course": "고등부: 슈퍼스프린트, 아쿠아슬론 / 중등부: 슈퍼스프린트, 아쿠아슬론 / 초등부: 슈퍼스프린트(4~6학년), 아쿠아슬론(1~6학년) / 유치부: 아쿠아슬론",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2075&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.03",
-    "reg_period": "2026-03-27 10:00 ~ 2026-04-15 23:59"
+    "reg_period": "2026-03-27 10:00 ~ 2026-04-20 23:59"
   },
   {
     "status": "접수마감",
@@ -237,12 +237,12 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수마감",
+    "status": "접수중",
     "name": "2026 인천광역시철인3종협회장배 전국 엘리트·생활체육 아쿠아슬론 대회",
     "location": "인천체육고등학교",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2056&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.18 ~ 19",
-    "reg_period": "접수마감"
+    "reg_period": "2026-02-12 14:00 ~ 2026-04-16 09:00"
   },
   {
     "status": "접수마감",
