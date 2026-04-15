@@ -493,14 +493,14 @@ def update_vdot(log):
         if dist < 7:
             v = max(35, v - 1)
 
-        # 훈련 공백 감쇠: 마지막 러닝 이후 7일 이상 지나면 VDOT 하락
+        # 2주 이상 된 기록은 현재 체력을 반영하지 않으므로 제외
         try:
             from datetime import datetime as _dt
             days_ago = (NOW.date() - _dt.strptime(date_key, '%Y-%m-%d').date()).days
             if days_ago > 14:
-                v = max(35, v - 3)  # 2주 이상 공백: -3
+                continue  # 오래된 기록 제외
             elif days_ago > 7:
-                v = max(35, v - 1)  # 1주 이상 공백: -1
+                v = max(35, v - 1)  # 1~2주 기록: -1
         except Exception:
             pass
 
@@ -508,7 +508,7 @@ def update_vdot(log):
 
     if not vdots:
         return 35
-    # 가중평균 (최근 기록 중시가 아닌 보수적 평균)
+    # 최근 기록 기반 평균
     return round(sum(vdots) / len(vdots))
 
 
