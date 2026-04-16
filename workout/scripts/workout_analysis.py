@@ -423,7 +423,8 @@ def estimate_finish_time(log):
 
     est_swim = ((avg_swim_pace + ow_correction) * 15) / 60
 
-    # 자전거: 코스 영향 보정 — lap 데이터 있으면 평지 구간(상위 50%) 평속 사용
+    # 자전거: 코스 영향 보정 — lap 데이터 있으면 평지 구간(상위 30%) 평속 - 5% 감속
+    # lap에는 신호/턴/경사가 섞여있어 항속이 깎여 보이므로 상위 lap 사용
     bike_entries = get_latest_metrics(log, 'bike', 3)
     if bike_entries:
         speeds = []
@@ -432,11 +433,13 @@ def estimate_finish_time(log):
             laps = m.get('laps', [])
             lap_speeds = [l.get('speed_kmh', 0) for l in laps if l.get('speed_kmh', 0) > 0]
             if lap_speeds and len(lap_speeds) >= 4:
-                # lap 평속 편차가 크면 (max-min > 10km/h) 코스 영향 → 상위 50% 평균
+                # lap 평속 편차가 크면 (max-min > 10km/h) 코스 영향 → 가장 빠른 lap 1~2개를 항속으로 추정
                 if max(lap_speeds) - min(lap_speeds) > 10:
                     sorted_speeds = sorted(lap_speeds, reverse=True)
-                    top_half = sorted_speeds[:len(sorted_speeds)//2]
-                    speeds.append(sum(top_half) / len(top_half))
+                    top_n = min(2, len(sorted_speeds))  # 상위 1~2개
+                    flat_speed = sum(sorted_speeds[:top_n]) / top_n
+                    # 항속 - 후반 피로/턴어라운드 감속 7% → 대회 평균 평속
+                    speeds.append(flat_speed * 0.93)
                 else:
                     # 코스 균일 → 평균 평속 사용
                     speeds.append(m.get('avg_speed_kmh', 32))
