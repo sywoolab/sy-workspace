@@ -116,9 +116,9 @@
   },
   "last_analysis": {
     "date": "2026-04-17",
-    "estimated_finish": "3:34",
-    "status": "red",
-    "status_text": "경고 — 스케줄 강화 필요",
+    "estimated_finish": "2:59",
+    "status": "yellow",
+    "status_text": "주의 — 개선 필요",
     "phase": 2,
     "phase_name": "Phase 2: 빌드",
     "vdot": 36,
