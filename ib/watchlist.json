@@ -9,6 +9,8 @@
     {"name": "소울에너지", "dart_code": "01654640", "stock_code": null, "listed": false},
     {"name": "수양켐텍", "dart_code": "00963684", "stock_code": null, "listed": false},
     {"name": "에치와이", "dart_code": "00158644", "stock_code": null, "listed": false, "alias": ["HY", "한국야쿠르트", "에이치와이"]},
-    {"name": "제노스코", "dart_code": null, "stock_code": null, "listed": false, "note": "미국법인(오스코텍 자회사), DART 없음, 뉴스만 모니터링", "alias": ["Genosco", "제노스코"]}
+    {"name": "제노스코", "dart_code": null, "stock_code": null, "listed": false, "note": "미국법인(오스코텍 자회사), DART 없음, 뉴스만 모니터링", "alias": ["Genosco", "제노스코"]},
+    {"name": "롯데관광개발", "dart_code": "00231372", "stock_code": "032350", "listed": true},
+    {"name": "차바이오텍", "dart_code": "00525679", "stock_code": "085660", "listed": true}
   ]
 }
