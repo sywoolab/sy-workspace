@@ -1020,10 +1020,10 @@
       "strokes": 267,
       "avg_spm": null,
       "training_load": 53,
-      "swim_equipment": "fins"
+      "swim_equipment": "fins_paddles"
     },
     "training_zone": "easy",
-    "note": "유산소 2.1 / 무산소 1.9 | 부하 53 | 장비 추정",
+    "note": "유산소 2.1 / 무산소 1.9 | 부하 53 | 오리발+패들",
     "garmin_id": 22552647893,
     "start_time": "06:14",
     "garmin_ids": [
