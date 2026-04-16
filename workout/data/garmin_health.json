@@ -281,28 +281,37 @@
   },
   "2026-04-16": {
     "date": "2026-04-16",
-    "steps": null,
+    "steps": 9190,
     "stress": {
-      "avg": null,
-      "max": null,
-      "rest": null,
-      "low": null,
-      "medium": null,
-      "high": null
+      "avg": 30,
+      "max": 90,
+      "rest": 29.12,
+      "low": 33.0,
+      "medium": 4.38,
+      "high": 0.42
     },
     "body_battery": {
-      "max": null,
-      "min": null,
-      "start": null
+      "max": 34,
+      "min": 5,
+      "start": 6
     },
-    "resting_hr": null,
+    "resting_hr": 55,
     "sleep": {
-      "duration_min": 0,
-      "score": null,
-      "deep_min": 0,
-      "light_min": 0,
-      "rem_min": 0,
-      "awake_min": 0
+      "duration_min": 397,
+      "score": 65,
+      "deep_min": 96,
+      "light_min": 249,
+      "rem_min": 52,
+      "awake_min": 18
+    },
+    "hrv": {
+      "weekly_avg": 40,
+      "last_night": 36,
+      "status": "UNBALANCED"
+    },
+    "training_readiness": {
+      "score": 16,
+      "level": "POOR"
     },
     "training_status": {
       "status": null,

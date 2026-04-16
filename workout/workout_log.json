@@ -916,5 +916,92 @@
     "garmin_ids": [
       22528574592
     ]
+  },
+  "2026-04-16": {
+    "planned": "러닝 Easy (감량)",
+    "done": true,
+    "actual": "자전거 41.62km 117분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 41.62,
+      "duration_min": 116.7,
+      "avg_speed_kmh": 21.4,
+      "avg_hr": 135,
+      "max_hr": 170,
+      "avg_power": null,
+      "training_load": 169,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 631,
+          "avg_hr": 124,
+          "max_hr": 149,
+          "speed_kmh": 28.5
+        },
+        {
+          "distance": 5000,
+          "duration": 534,
+          "avg_hr": 147,
+          "max_hr": 164,
+          "speed_kmh": 33.7
+        },
+        {
+          "distance": 5000,
+          "duration": 527,
+          "avg_hr": 148,
+          "max_hr": 156,
+          "speed_kmh": 34.1
+        },
+        {
+          "distance": 5000,
+          "duration": 1019,
+          "avg_hr": 144,
+          "max_hr": 168,
+          "speed_kmh": 17.7
+        },
+        {
+          "distance": 5000,
+          "duration": 1044,
+          "avg_hr": 131,
+          "max_hr": 166,
+          "speed_kmh": 17.2
+        },
+        {
+          "distance": 5000,
+          "duration": 1355,
+          "avg_hr": 141,
+          "max_hr": 170,
+          "speed_kmh": 13.3
+        },
+        {
+          "distance": 5000,
+          "duration": 934,
+          "avg_hr": 123,
+          "max_hr": 158,
+          "speed_kmh": 19.3
+        },
+        {
+          "distance": 5000,
+          "duration": 692,
+          "avg_hr": 127,
+          "max_hr": 152,
+          "speed_kmh": 26.0
+        },
+        {
+          "distance": 1621,
+          "duration": 265,
+          "avg_hr": 130,
+          "max_hr": 140,
+          "speed_kmh": 22.0
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.7 / 무산소 2.2 | 부하 169",
+    "garmin_id": 22545321435,
+    "start_time": "17:31",
+    "garmin_ids": [
+      22545321435
+    ]
   }
 }
