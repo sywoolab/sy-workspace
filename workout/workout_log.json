@@ -1003,5 +1003,31 @@
     "garmin_ids": [
       22545321435
     ]
+  },
+  "2026-04-17": {
+    "planned": "Easy 또는 완전 휴식",
+    "done": true,
+    "actual": "수영 1000m 46분 @1:27/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1000,
+      "duration_min": 46.1,
+      "moving_min": 14.6,
+      "pace_per_100m": "1:27",
+      "avg_hr": 111,
+      "max_hr": 165,
+      "swolf": 29,
+      "strokes": 267,
+      "avg_spm": null,
+      "training_load": 53,
+      "swim_equipment": "fins"
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.1 / 무산소 1.9 | 부하 53 | 장비 추정",
+    "garmin_id": 22552647893,
+    "start_time": "06:14",
+    "garmin_ids": [
+      22552647893
+    ]
   }
 }
