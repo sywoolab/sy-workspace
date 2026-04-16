@@ -1,5 +1,5 @@
 {
-  "current_vdot": 35,
+  "current_vdot": 36,
   "brick_count": 2,
   "ow_count": 0,
   "overrides": {
@@ -115,16 +115,16 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-15",
-    "estimated_finish": "2:58",
-    "status": "yellow",
-    "status_text": "주의 — 개선 필요",
+    "date": "2026-04-17",
+    "estimated_finish": "3:34",
+    "status": "red",
+    "status_text": "경고 — 스케줄 강화 필요",
     "phase": 2,
     "phase_name": "Phase 2: 빌드",
-    "vdot": 35,
+    "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 2,
+        "count": 3,
         "target": 3
       },
       "run": {
@@ -133,26 +133,25 @@
         "total_km": 7.4
       },
       "bike": {
-        "count": 0,
+        "count": 1,
         "target": 2
       }
     },
     "intensity_split": {
-      "easy_pct": 30,
-      "hard_pct": 70
+      "easy_pct": 18,
+      "hard_pct": 82
     },
     "training_load": {
-      "current": 253,
+      "current": 475,
       "target": 380
     },
     "adjustments": [
-      "🔴 러닝 1/3회 — 4일 내 2회 추가 필요",
-      "⚠️ 80/20 위반: Easy 30% / 고강도 70% (목표: 80/20)",
-      "🔴 Body Battery 최대 14 — 회복 부족, 오늘 Easy 또는 휴식 권장",
-      "🔴 수면 점수 32 — 수면 부족, 강도 낮추기 권장",
-      "🟡 HRV 급감 19ms (주간평균 40ms) — 피로 누적 주의",
-      "🔴 Training Readiness 1 (POOR) — 몸이 준비 안 됨, 휴식 권장",
-      "🟡 스트레스 평균 67 — 정신적 피로 주의, 운동으로 해소 or 휴식"
+      "🔴 러닝 1/3회 — 2일 내 2회 추가 필요",
+      "⚠️ 80/20 위반: Easy 18% / 고강도 82% (목표: 80/20)",
+      "🔴 주간 부하 475 > 목표 380의 120% — 다음 일 Easy 권장",
+      "🟡 Body Battery 최대 54 — 고강도 운동 자제, Easy 권장",
+      "🔴 수면 점수 25 — 수면 부족, 강도 낮추기 권장",
+      "🔴 Training Readiness 1 (POOR) — 몸이 준비 안 됨, 휴식 권장"
     ]
   },
   "vdot_history": [
