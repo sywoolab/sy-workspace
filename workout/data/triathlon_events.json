@@ -128,6 +128,14 @@
     "reg_period": "접수마감"
   },
   {
+    "status": "접수중",
+    "name": "2026 철인3종 3차 대회 규정 정기 교육",
+    "location": "온라인 ZOOM",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2091&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.13",
+    "reg_period": "2026-04-17  ~ 2026-05-11"
+  },
+  {
     "status": "접수마감",
     "name": "2026 아이치·나고야 아시안게임 국가대표 선발전(1차)",
     "location": "경상남도 양산시",
@@ -162,15 +170,6 @@
     "reg_period": "2026-03-27 10:00 ~ 2026-04-20 23:59"
   },
   {
-    "status": "접수마감",
-    "name": "제6회 창원특례시 마산만 전국 트라이애슬론 대회",
-    "location": "경남 창원시 3.15해양누리공원 일원",
-    "course": "스탠다드",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2057&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.05.02 ~ 03",
-    "reg_period": "접수마감"
-  },
-  {
     "status": "접수중",
     "name": "2026 제2회 부산 낙동강 슬로우철인3종 페스타",
     "location": "부산 북구 화명생태공원 일원",
@@ -188,6 +187,15 @@
     "reg_period": "2026-04-06 18:00 ~ 2026-04-28 23:59"
   },
   {
+    "status": "접수마감",
+    "name": "제6회 창원특례시 마산만 전국 트라이애슬론 대회",
+    "location": "경남 창원시 3.15해양누리공원 일원",
+    "course": "스탠다드",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2057&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.02 ~ 03",
+    "reg_period": "접수마감"
+  },
+  {
     "status": "접수중",
     "name": "2026 철인3종 2차 대회규정 정기 교육",
     "location": "온라인 ZOOM",
@@ -196,20 +204,20 @@
     "reg_period": "2026-04-06 18:00 ~ 2026-04-28 23:59"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅰ(4.26 일요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2068&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.26",
-    "reg_period": "2026-03-16 14:00 ~ 2026-04-17 18:00"
+    "reg_period": "접수마감"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅰ(4.25 토요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2069&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.25",
-    "reg_period": "2026-03-16 14:00 ~ 2026-04-17 18:00"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
@@ -230,14 +238,6 @@
   },
   {
     "status": "접수마감",
-    "name": "2026년 제3차 철인3종 수상인명구조요원 자격 이수 강습회",
-    "location": "경남 함안군 가야읍 함안대로 619-4 함안체육회실내수영장",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2083&page=2&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.04.18",
-    "reg_period": "접수마감"
-  },
-  {
-    "status": "접수마감",
     "name": "2026 인천광역시철인3종협회장배 전국 엘리트·생활체육 아쿠아슬론 대회",
     "location": "인천체육고등학교",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2056&page=2&sYear=2026&vType=list&field=&keyword=",
@@ -246,11 +246,11 @@
   },
   {
     "status": "접수마감",
-    "name": "2026 철인3종 1차 대회규정 정기 교육",
-    "location": "온라인 ZOOM",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2082&page=2&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.04.15",
-    "reg_period": "2026-03-25  ~ 2026-04-14"
+    "name": "2026년 제3차 철인3종 수상인명구조요원 자격 이수 강습회",
+    "location": "경남 함안군 가야읍 함안대로 619-4 함안체육회실내수영장",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2083&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.04.18",
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
