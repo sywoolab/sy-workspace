@@ -235,6 +235,8 @@ def login_garmin():
             try:
                 if method == 'cache':
                     api.login(TOKEN_DIR)
+                    api.garth.dump(TOKEN_DIR)
+                    _update_tokens_secret()
                 else:
                     api.login()
                     api.garth.dump(TOKEN_DIR)
@@ -1573,6 +1575,7 @@ def sync():
 
     # 로그인 성공 — 실패 카운터 리셋
     sync_state['consecutive_failures'] = 0
+    _save_sync_state(sync_state)
 
     # 2. 기존 데이터 로드
     workout_log = load_json(LOG_FILE)
