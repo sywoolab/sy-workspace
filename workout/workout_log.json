@@ -1029,5 +1029,30 @@
     "garmin_ids": [
       22552647893
     ]
+  },
+  "2026-04-18": {
+    "planned": "러닝 Easy (감량)",
+    "done": true,
+    "actual": "수영 1350m 52분 @1:46/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1350,
+      "duration_min": 52.0,
+      "moving_min": 24.0,
+      "pace_per_100m": "1:46",
+      "avg_hr": 130,
+      "max_hr": 161,
+      "swolf": 36,
+      "strokes": 498,
+      "avg_spm": null,
+      "training_load": 101
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.8 / 무산소 2.2 | 부하 101",
+    "garmin_id": 22564644270,
+    "start_time": "08:05",
+    "garmin_ids": [
+      22564644270
+    ]
   }
 }
