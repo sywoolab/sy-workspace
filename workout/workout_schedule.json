@@ -3,16 +3,6 @@
   "brick_count": 2,
   "ow_count": 0,
   "overrides": {
-    "2026-04-11": {
-      "date": "2026-04-11",
-      "workout": "브릭 → 수영",
-      "detail": "자전거 45분 → 러닝 4km Easy → 수영 개인교습",
-      "reason": "Phase 2 적응 주: 자전거 21일 공백 → 45분으로 축소 + 수영 개인교습",
-      "source": "manual",
-      "auto": false,
-      "rule": "SS4-부상방지우선",
-      "created_at": "2026-04-06T08:59:42.751782+09:00"
-    },
     "2026-04-20": {
       "date": "2026-04-20",
       "workout": "완전 휴식 or 수영 가볍게",
@@ -102,6 +92,16 @@
       "auto": true,
       "rule": "C3",
       "created_at": "2026-04-18T22:36:29.038665+09:00"
+    },
+    "2026-04-19": {
+      "date": "2026-04-19",
+      "workout": "Easy 또는 완전 휴식",
+      "detail": "컨디션 불량 — 고강도 금지",
+      "reason": "컨디션 적색: BB 46, TR 18, RHR 56",
+      "source": "adaptive_A3",
+      "auto": true,
+      "rule": "A3-high",
+      "created_at": "2026-04-19T14:38:09.562983+09:00"
     }
   },
   "last_analysis": {
@@ -156,6 +156,10 @@
     {
       "date": "2026-04-12",
       "vdot": 40
+    },
+    {
+      "date": "2026-04-19",
+      "vdot": 36
     }
   ]
 }
