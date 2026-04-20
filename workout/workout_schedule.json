@@ -1,6 +1,6 @@
 {
   "current_vdot": 36,
-  "brick_count": 2,
+  "brick_count": 3,
   "ow_count": 0,
   "overrides": {
     "2026-04-20": {
@@ -95,8 +95,8 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-20",
-    "estimated_finish": "2:55",
+    "date": "2026-04-21",
+    "estimated_finish": "2:54",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 2,
@@ -108,9 +108,9 @@
         "target": 3
       },
       "run": {
-        "count": 0,
+        "count": 1,
         "target": 3,
-        "total_km": 0.0
+        "total_km": 6.4
       },
       "bike": {
         "count": 0,
@@ -119,16 +119,16 @@
     },
     "intensity_split": {
       "easy_pct": 0,
-      "hard_pct": 0
+      "hard_pct": 100
     },
     "training_load": {
-      "current": 0,
+      "current": 117,
       "target": 380
     },
     "adjustments": [
-      "🟡 Body Battery 최대 46 — 고강도 운동 자제, Easy 권장",
-      "🔴 Training Readiness 18 (POOR) — 몸이 준비 안 됨, 휴식 권장",
-      "🟡 안정시 심박 56bpm (평소 ~45) — 피로/스트레스 주의"
+      "🟡 Body Battery 최대 45 — 고강도 운동 자제, Easy 권장",
+      "🟡 수면 5h 30m — 6시간 미만, 컨디션 주의",
+      "🔴 Training Readiness 13 (POOR) — 몸이 준비 안 됨, 휴식 권장"
     ]
   },
   "vdot_history": [
