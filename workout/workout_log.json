@@ -1054,5 +1054,100 @@
     "garmin_ids": [
       22564644270
     ]
+  },
+  "2026-04-21": {
+    "planned": "러닝 Easy (감량)",
+    "done": true,
+    "actual": "러닝 6.41km @5:45",
+    "metrics": {
+      "type": "run",
+      "distance_km": 6.41,
+      "pace_per_km": "5:45",
+      "avg_hr": 158,
+      "max_hr": 174,
+      "cadence": 174,
+      "training_load": 117,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 372,
+          "avg_hr": 149,
+          "max_hr": 161,
+          "pace_sec": 372,
+          "pace_str": "6:12"
+        },
+        {
+          "distance": 1000,
+          "duration": 347,
+          "avg_hr": 157,
+          "max_hr": 162,
+          "pace_sec": 347,
+          "pace_str": "5:46"
+        },
+        {
+          "distance": 1000,
+          "duration": 350,
+          "avg_hr": 154,
+          "max_hr": 160,
+          "pace_sec": 350,
+          "pace_str": "5:49"
+        },
+        {
+          "distance": 1000,
+          "duration": 341,
+          "avg_hr": 159,
+          "max_hr": 163,
+          "pace_sec": 341,
+          "pace_str": "5:41"
+        },
+        {
+          "distance": 1000,
+          "duration": 339,
+          "avg_hr": 159,
+          "max_hr": 172,
+          "pace_sec": 339,
+          "pace_str": "5:39"
+        },
+        {
+          "distance": 1000,
+          "duration": 338,
+          "avg_hr": 169,
+          "max_hr": 174,
+          "pace_sec": 338,
+          "pace_str": "5:37"
+        },
+        {
+          "distance": 411,
+          "duration": 129,
+          "avg_hr": 163,
+          "max_hr": 173,
+          "pace_sec": 315,
+          "pace_str": "5:14"
+        }
+      ]
+    },
+    "training_zone": "tempo",
+    "note": "유산소 3.5 | 부하 117",
+    "garmin_id": 22599063228,
+    "start_time": "06:31",
+    "garmin_ids": [
+      22599063228
+    ]
+  },
+  "2026-04-19": {
+    "planned": "Easy 또는 완전 휴식",
+    "done": true,
+    "actual": "멀티스포츠 45분",
+    "metrics": {
+      "type": "brick",
+      "training_load": 152
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.8 / 무산소 0.7 | 부하 152",
+    "garmin_id": 22577771619,
+    "start_time": "14:02",
+    "garmin_ids": [
+      22577771619
+    ]
   }
 }
