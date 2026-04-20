@@ -1135,19 +1135,50 @@
     ]
   },
   "2026-04-19": {
-    "planned": "Easy 또는 완전 휴식",
+    "planned": "아쿠아슬론 대회",
     "done": true,
-    "actual": "멀티스포츠 45분",
+    "actual": "수영 800m 16분 @1:54/100m + T1 3:18 + 러닝 4.98km @5:07",
     "metrics": {
-      "type": "brick",
+      "type": "run",
+      "distance_km": 4.98,
+      "pace_per_km": "5:07",
+      "avg_hr": 169,
+      "max_hr": 182,
       "training_load": 152
     },
-    "training_zone": "moderate",
-    "note": "유산소 3.8 / 무산소 0.7 | 부하 152",
+    "training_zone": "tempo",
+    "note": "아쿠아슬론 대회 | 수영 800m(50m풀, 350+400끊어서) @1:54 HR133/148 | T1 3:18 | 러닝 5km @5:07 HR169/182 | 유산소 3.8",
     "garmin_id": 22577771619,
     "start_time": "14:02",
     "garmin_ids": [
       22577771619
-    ]
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 800,
+        "duration_min": 16.5,
+        "moving_min": 15.3,
+        "pace_per_100m": "1:54",
+        "avg_hr": 133,
+        "max_hr": 148,
+        "swolf": 81,
+        "strokes": 372,
+        "garmin_id": 22577771619,
+        "start_time": "14:02",
+        "note": "50m풀 16lengths, 350m+400m 끊어서"
+      },
+      {
+        "type": "run",
+        "distance_km": 4.98,
+        "pace_per_km": "5:07",
+        "avg_hr": 169,
+        "max_hr": 182,
+        "training_load": 152,
+        "garmin_id": 22577771619,
+        "start_time": "14:21"
+      }
+    ],
+    "is_brick": true
   }
 }

@@ -391,7 +391,7 @@ def count_ow(log):
         if not entry.get('done'):
             continue
         note = (entry.get('note', '') + entry.get('actual', '')).lower()
-        if '오픈워터' in note or 'ow' in note or '아쿠아슬론' in note:
+        if '오픈워터' in note or 'open water' in note or 'ow수영' in note:
             count += 1
     return count
 
