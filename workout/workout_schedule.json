@@ -95,8 +95,8 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-17",
-    "estimated_finish": "2:59",
+    "date": "2026-04-20",
+    "estimated_finish": "2:55",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 2,
@@ -104,34 +104,31 @@
     "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 3,
+        "count": 0,
         "target": 3
       },
       "run": {
-        "count": 1,
+        "count": 0,
         "target": 3,
-        "total_km": 7.4
+        "total_km": 0.0
       },
       "bike": {
-        "count": 1,
+        "count": 0,
         "target": 2
       }
     },
     "intensity_split": {
-      "easy_pct": 18,
-      "hard_pct": 82
+      "easy_pct": 0,
+      "hard_pct": 0
     },
     "training_load": {
-      "current": 475,
+      "current": 0,
       "target": 380
     },
     "adjustments": [
-      "🔴 러닝 1/3회 — 2일 내 2회 추가 필요",
-      "⚠️ 80/20 위반: Easy 18% / 고강도 82% (목표: 80/20)",
-      "🔴 주간 부하 475 > 목표 380의 120% — 다음 일 Easy 권장",
-      "🟡 Body Battery 최대 54 — 고강도 운동 자제, Easy 권장",
-      "🔴 수면 점수 25 — 수면 부족, 강도 낮추기 권장",
-      "🔴 Training Readiness 1 (POOR) — 몸이 준비 안 됨, 휴식 권장"
+      "🟡 Body Battery 최대 46 — 고강도 운동 자제, Easy 권장",
+      "🔴 Training Readiness 18 (POOR) — 몸이 준비 안 됨, 휴식 권장",
+      "🟡 안정시 심박 56bpm (평소 ~45) — 피로/스트레스 주의"
     ]
   },
   "vdot_history": [
