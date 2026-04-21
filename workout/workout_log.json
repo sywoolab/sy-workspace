@@ -1180,5 +1180,30 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-04-22": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "수영 825m 38분 @1:58/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 825,
+      "duration_min": 37.8,
+      "moving_min": 16.3,
+      "pace_per_100m": "1:58",
+      "avg_hr": 115,
+      "max_hr": 161,
+      "swolf": 39,
+      "strokes": 301,
+      "avg_spm": null,
+      "training_load": 45
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.0 / 무산소 1.7 | 부하 45",
+    "garmin_id": 22611743245,
+    "start_time": "06:33",
+    "garmin_ids": [
+      22611743245
+    ]
   }
 }
