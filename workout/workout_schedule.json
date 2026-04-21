@@ -67,21 +67,21 @@
       "date": "2026-04-23",
       "workout": "러닝 Easy (감량)",
       "detail": "4km — 부상 방지",
-      "reason": "부상 징후 감지: RHR 56",
+      "reason": "부상 징후 감지: RHR 54",
       "source": "adaptive_C3",
       "auto": true,
       "rule": "C3",
-      "created_at": "2026-04-18T22:36:29.038665+09:00"
+      "created_at": "2026-04-21T14:37:18.096211+09:00"
     },
     "2026-04-25": {
       "date": "2026-04-25",
       "workout": "러닝 Easy (감량)",
       "detail": "3km — 부상 방지",
-      "reason": "부상 징후 감지: RHR 56",
+      "reason": "부상 징후 감지: RHR 54",
       "source": "adaptive_C3",
       "auto": true,
       "rule": "C3",
-      "created_at": "2026-04-18T22:36:29.038665+09:00"
+      "created_at": "2026-04-21T14:37:18.096211+09:00"
     },
     "2026-04-19": {
       "date": "2026-04-19",
@@ -92,6 +92,26 @@
       "auto": true,
       "rule": "A3-high",
       "created_at": "2026-04-19T22:35:17.189434+09:00"
+    },
+    "2026-04-22": {
+      "date": "2026-04-22",
+      "workout": "Easy 또는 완전 휴식",
+      "detail": "오늘(2026-04-21) 컨디션 불량에서 고강도 운동 → 회복 필요",
+      "reason": "컨디션 적색 사후 회복: BB 45, TR 13, 수면 5h30m",
+      "source": "adaptive_A3",
+      "auto": true,
+      "rule": "A3-high",
+      "created_at": "2026-04-21T14:37:18.088274+09:00"
+    },
+    "2026-04-28": {
+      "date": "2026-04-28",
+      "workout": "러닝 Easy (감량)",
+      "detail": "3km — 부상 방지",
+      "reason": "부상 징후 감지: RHR 54",
+      "source": "adaptive_C3",
+      "auto": true,
+      "rule": "C3",
+      "created_at": "2026-04-21T14:37:18.096211+09:00"
     }
   },
   "last_analysis": {
