@@ -123,7 +123,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-22",
+    "date": "2026-04-23",
     "estimated_finish": "2:56",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
@@ -136,9 +136,9 @@
         "target": 3
       },
       "run": {
-        "count": 1,
+        "count": 2,
         "target": 3,
-        "total_km": 6.4
+        "total_km": 12.6
       },
       "bike": {
         "count": 0,
@@ -146,15 +146,16 @@
       }
     },
     "intensity_split": {
-      "easy_pct": 31,
-      "hard_pct": 69
+      "easy_pct": 18,
+      "hard_pct": 82
     },
     "training_load": {
-      "current": 162,
+      "current": 238,
       "target": 380
     },
     "adjustments": [
-      "🔴 러닝 1/3회 — 4일 내 2회 추가 필요"
+      "🔴 러닝 2/3회 — 3일 내 1회 추가 필요",
+      "⚠️ 80/20 위반: Easy 18% / 고강도 82% (목표: 80/20)"
     ]
   },
   "vdot_history": [
