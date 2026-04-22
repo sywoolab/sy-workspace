@@ -1205,5 +1205,84 @@
     "garmin_ids": [
       22611743245
     ]
+  },
+  "2026-04-23": {
+    "planned": "러닝 6~7km 빌드업",
+    "done": true,
+    "actual": "러닝 6.14km @6:19",
+    "metrics": {
+      "type": "run",
+      "distance_km": 6.14,
+      "pace_per_km": "6:19",
+      "avg_hr": 146,
+      "max_hr": 160,
+      "cadence": 170,
+      "training_load": 76,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 378,
+          "avg_hr": 143,
+          "max_hr": 149,
+          "pace_sec": 378,
+          "pace_str": "6:17"
+        },
+        {
+          "distance": 1000,
+          "duration": 383,
+          "avg_hr": 143,
+          "max_hr": 151,
+          "pace_sec": 383,
+          "pace_str": "6:23"
+        },
+        {
+          "distance": 1000,
+          "duration": 386,
+          "avg_hr": 147,
+          "max_hr": 153,
+          "pace_sec": 386,
+          "pace_str": "6:26"
+        },
+        {
+          "distance": 1000,
+          "duration": 380,
+          "avg_hr": 147,
+          "max_hr": 160,
+          "pace_sec": 380,
+          "pace_str": "6:19"
+        },
+        {
+          "distance": 1000,
+          "duration": 375,
+          "avg_hr": 146,
+          "max_hr": 153,
+          "pace_sec": 375,
+          "pace_str": "6:15"
+        },
+        {
+          "distance": 1000,
+          "duration": 380,
+          "avg_hr": 149,
+          "max_hr": 160,
+          "pace_sec": 380,
+          "pace_str": "6:20"
+        },
+        {
+          "distance": 141,
+          "duration": 47,
+          "avg_hr": 157,
+          "max_hr": 160,
+          "pace_sec": 333,
+          "pace_str": "5:32"
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.0 / 무산소 0.1 | 부하 76",
+    "garmin_id": 22624082572,
+    "start_time": "06:35",
+    "garmin_ids": [
+      22624082572
+    ]
   }
 }
