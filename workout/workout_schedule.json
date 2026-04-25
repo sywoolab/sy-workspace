@@ -1,6 +1,6 @@
 {
   "current_vdot": 36,
-  "brick_count": 2,
+  "brick_count": 3,
   "ow_count": 0,
   "overrides": {
     "2026-04-20": {
@@ -103,8 +103,8 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-24",
-    "estimated_finish": "2:56",
+    "date": "2026-04-25",
+    "estimated_finish": "2:55",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 2,
@@ -116,26 +116,29 @@
         "target": 3
       },
       "run": {
-        "count": 2,
+        "count": 3,
         "target": 3,
-        "total_km": 12.6
+        "total_km": 22.6
       },
       "bike": {
-        "count": 0,
+        "count": 1,
         "target": 2
       }
     },
     "intensity_split": {
-      "easy_pct": 18,
-      "hard_pct": 82
+      "easy_pct": 7,
+      "hard_pct": 93
     },
     "training_load": {
-      "current": 238,
+      "current": 583,
       "target": 380
     },
     "adjustments": [
-      "🔴 러닝 2/3회 — 2일 내 1회 추가 필요",
-      "⚠️ 80/20 위반: Easy 18% / 고강도 82% (목표: 80/20)"
+      "⚠️ 80/20 위반: Easy 7% / 고강도 93% (목표: 80/20)",
+      "🔴 주간 부하 583 > 목표 380의 120% — 다음 일 Easy 권장",
+      "🔴 Body Battery 최대 36 — 회복 부족, 오늘 Easy 또는 휴식 권장",
+      "🟡 HRV 급감 33ms (주간평균 46ms) — 피로 누적 주의",
+      "🔴 Training Readiness 1 (POOR) — 몸이 준비 안 됨, 휴식 권장"
     ]
   },
   "vdot_history": [
