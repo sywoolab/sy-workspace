@@ -1577,5 +1577,30 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-04-26": {
+    "planned": "자유수영 1.5km",
+    "done": true,
+    "actual": "수영 1500m 32분 @2:07/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1500,
+      "duration_min": 32.0,
+      "moving_min": 31.9,
+      "pace_per_100m": "2:07",
+      "avg_hr": 120,
+      "max_hr": 150,
+      "swolf": 43,
+      "strokes": 686,
+      "avg_spm": null,
+      "training_load": 42
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.1 / 무산소 0.6 | 부하 42",
+    "garmin_id": 22660678804,
+    "start_time": "13:05",
+    "garmin_ids": [
+      22660678804
+    ]
   }
 }
