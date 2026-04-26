@@ -1,6 +1,6 @@
 {
-  "consecutive_failures": 1,
-  "last_failure": "2026-04-25 22:38",
+  "consecutive_failures": 2,
+  "last_failure": "2026-04-26 14:47",
   "last_success": "2026-04-25 19:52",
   "last_success_date": "2026-04-25"
 }
