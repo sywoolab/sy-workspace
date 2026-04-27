@@ -140,7 +140,7 @@
     "2026-05-05": {
       "date": "2026-05-05",
       "workout": "휴일 (어린이날)",
-      "detail": "완전 휴식 or 가벼운 활동",
+      "detail": "완전 휴식",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -180,7 +180,7 @@
     "2026-05-10": {
       "date": "2026-05-10",
       "workout": "대구 이동 + 검수 + 수성못 OW 500~750m",
-      "detail": "웻슈트 입고 OW 연습",
+      "detail": "웻슈트 입고 OW 연습. 토요일 이동",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -188,7 +188,7 @@
     "2026-05-11": {
       "date": "2026-05-11",
       "workout": "🏁 대회",
-      "detail": "대구 시장배 스탠다드",
+      "detail": "대구 시장배 스탠다드. 일요일 대회",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
