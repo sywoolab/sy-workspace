@@ -59,8 +59,8 @@
     },
     "2026-04-28": {
       "date": "2026-04-28",
-      "workout": "수영 수업",
-      "detail": "월요일 Easy",
+      "workout": "러닝 6km Easy",
+      "detail": "화요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -83,64 +83,64 @@
     },
     "2026-04-27": {
       "date": "2026-04-27",
-      "workout": "완전 휴식",
-      "detail": "",
+      "workout": "휴식",
+      "detail": "월요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-04-29": {
       "date": "2026-04-29",
-      "workout": "러닝 6km Easy",
-      "detail": "화요일",
+      "workout": "수영 수업",
+      "detail": "수요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-04-30": {
       "date": "2026-04-30",
-      "workout": "수영 수업",
-      "detail": "수요일 Easy",
+      "workout": "러닝 5km 빌드업",
+      "detail": "목요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-01": {
       "date": "2026-05-01",
-      "workout": "러닝 5km",
-      "detail": "목요일 빌드업 OK",
+      "workout": "수영 수업",
+      "detail": "금요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-02": {
       "date": "2026-05-02",
-      "workout": "수영 수업",
-      "detail": "금요일 Easy",
+      "workout": "자전거 30~40분 + 러닝 3km + 수영 강습",
+      "detail": "토요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-03": {
       "date": "2026-05-03",
-      "workout": "자전거 30~40분 + 러닝 3km + 수영 강습",
-      "detail": "토요일 가벼운 브릭 + 강습",
+      "workout": "완전 휴식",
+      "detail": "일요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-04": {
       "date": "2026-05-04",
-      "workout": "휴식",
-      "detail": "월요일. 브릭 다음날",
+      "workout": "수영 수업",
+      "detail": "월요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-05": {
       "date": "2026-05-05",
-      "workout": "러닝 4km Easy",
-      "detail": "화요일 어린이날",
+      "workout": "러닝 4km Easy (어린이날)",
+      "detail": "화요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -148,7 +148,7 @@
     "2026-05-06": {
       "date": "2026-05-06",
       "workout": "수영 수업",
-      "detail": "수요일 D-4",
+      "detail": "수요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -156,7 +156,7 @@
     "2026-05-07": {
       "date": "2026-05-07",
       "workout": "러닝 3km Easy",
-      "detail": "목요일 D-3",
+      "detail": "목요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -164,7 +164,7 @@
     "2026-05-08": {
       "date": "2026-05-08",
       "workout": "수영 수업 가볍게",
-      "detail": "금요일 D-2",
+      "detail": "금요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -172,15 +172,15 @@
     "2026-05-09": {
       "date": "2026-05-09",
       "workout": "대구 이동 + 검수 + 수성못 OW 500~750m",
-      "detail": "토요일 D-1",
+      "detail": "토요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-10": {
       "date": "2026-05-10",
-      "workout": "🏁 대회",
-      "detail": "일요일 D-0 대구 시장배",
+      "workout": "🏁 대회 대구 시장배",
+      "detail": "일요일",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
