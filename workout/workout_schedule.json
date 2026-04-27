@@ -59,8 +59,8 @@
     },
     "2026-04-28": {
       "date": "2026-04-28",
-      "workout": "수영 수업",
-      "detail": "Easy",
+      "workout": "완전 휴식",
+      "detail": "브릭 후 회복",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
