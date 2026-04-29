@@ -3,16 +3,6 @@
   "brick_count": 3,
   "ow_count": 0,
   "overrides": {
-    "2026-04-21": {
-      "date": "2026-04-21",
-      "workout": "러닝 Easy (감량)",
-      "detail": "3km — 부상 방지",
-      "reason": "부상 징후 감지: RHR 56",
-      "source": "adaptive_C3",
-      "auto": true,
-      "rule": "C3",
-      "created_at": "2026-04-18T22:36:29.038665+09:00"
-    },
     "2026-04-23": {
       "date": "2026-04-23",
       "workout": "러닝 6~7km 빌드업",
