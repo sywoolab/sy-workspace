@@ -1,84 +1,4 @@
 {
-  "2026-04-13": {
-    "date": "2026-04-13",
-    "steps": 1785,
-    "stress": {
-      "avg": 29,
-      "max": 78,
-      "rest": 29.54,
-      "low": 34.33,
-      "medium": 6.79,
-      "high": 0.4
-    },
-    "body_battery": {
-      "max": 50,
-      "min": 23,
-      "start": 33
-    },
-    "resting_hr": 46,
-    "sleep": {
-      "duration_min": 203,
-      "score": 45,
-      "deep_min": 47,
-      "light_min": 132,
-      "rem_min": 24,
-      "awake_min": 4
-    },
-    "hrv": {
-      "weekly_avg": 40,
-      "last_night": 52,
-      "status": "UNBALANCED"
-    },
-    "training_readiness": {
-      "score": 17,
-      "level": "POOR"
-    },
-    "training_status": {
-      "status": null,
-      "load": null,
-      "vo2max_run": null
-    }
-  },
-  "2026-04-14": {
-    "date": "2026-04-14",
-    "steps": 8902,
-    "stress": {
-      "avg": 20,
-      "max": 61,
-      "rest": 60.87,
-      "low": 24.03,
-      "medium": 0.69,
-      "high": 0.0
-    },
-    "body_battery": {
-      "max": 49,
-      "min": 5,
-      "start": 40
-    },
-    "resting_hr": 46,
-    "sleep": {
-      "duration_min": 391,
-      "score": 70,
-      "deep_min": 94,
-      "light_min": 231,
-      "rem_min": 66,
-      "awake_min": 22
-    },
-    "hrv": {
-      "weekly_avg": 46,
-      "last_night": 57,
-      "status": "BALANCED"
-    },
-    "training_readiness": {
-      "score": 38,
-      "level": "LOW"
-    },
-    "training_status": {
-      "status": null,
-      "load": null,
-      "vo2max_run": null
-    }
-  },
   "2026-04-15": {
     "date": "2026-04-15",
     "steps": 7739,
@@ -432,6 +352,46 @@
     "training_readiness": {
       "score": 41,
       "level": "LOW"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-04-29": {
+    "date": "2026-04-29",
+    "steps": 4755,
+    "stress": {
+      "avg": 20,
+      "max": 95,
+      "rest": 52.38,
+      "low": 14.54,
+      "medium": 4.89,
+      "high": 1.03
+    },
+    "body_battery": {
+      "max": 97,
+      "min": 42,
+      "start": 56
+    },
+    "resting_hr": 44,
+    "sleep": {
+      "duration_min": 482,
+      "score": 83,
+      "deep_min": 69,
+      "light_min": 322,
+      "rem_min": 91,
+      "awake_min": 22
+    },
+    "hrv": {
+      "weekly_avg": 51,
+      "last_night": 64,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 69,
+      "level": "MODERATE"
     },
     "training_status": {
       "status": null,
