@@ -79,7 +79,7 @@
     },
     "2026-04-30": {
       "date": "2026-04-30",
-      "workout": "러닝 5km 빌드업",
+      "workout": "러닝 5km Easy",
       "detail": "목요일",
       "source": "manual",
       "auto": false,
@@ -87,15 +87,15 @@
     },
     "2026-05-01": {
       "date": "2026-05-01",
-      "workout": "수영 수업",
-      "detail": "금요일",
+      "workout": "자전거 40분 + 러닝 3km",
+      "detail": "금요일 연휴. 가벼운 브릭",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-02": {
       "date": "2026-05-02",
-      "workout": "자전거 30~40분 + 러닝 3km + 수영 강습",
+      "workout": "수영 강습만",
       "detail": "토요일",
       "source": "manual",
       "auto": false,
@@ -103,8 +103,8 @@
     },
     "2026-05-03": {
       "date": "2026-05-03",
-      "workout": "완전 휴식",
-      "detail": "일요일",
+      "workout": "한강 OW 클래스",
+      "detail": "일요일. 첫 OW 경험",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
