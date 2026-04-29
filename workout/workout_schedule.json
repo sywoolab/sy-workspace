@@ -175,8 +175,8 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-28",
-    "estimated_finish": "2:56",
+    "date": "2026-04-29",
+    "estimated_finish": "2:57",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 3,
@@ -184,7 +184,7 @@
     "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 0,
+        "count": 1,
         "target": 2
       },
       "run": {
@@ -199,14 +199,14 @@
     },
     "intensity_split": {
       "easy_pct": 0,
-      "hard_pct": 0
+      "hard_pct": 100
     },
     "training_load": {
-      "current": 0,
+      "current": 93,
       "target": 200
     },
     "adjustments": [
-      "🟡 Training Readiness 41 (LOW) — Easy 강도까지만 권장"
+      "🔴 러닝 0/2회 — 4일 내 2회 추가 필요"
     ]
   },
   "vdot_history": [
