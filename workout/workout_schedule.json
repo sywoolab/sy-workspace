@@ -111,7 +111,7 @@
     },
     "2026-05-04": {
       "date": "2026-05-04",
-      "workout": "수영 수업",
+      "workout": "휴식",
       "detail": "월요일",
       "source": "manual",
       "auto": false,
@@ -119,16 +119,16 @@
     },
     "2026-05-05": {
       "date": "2026-05-05",
-      "workout": "러닝 4km Easy (어린이날)",
-      "detail": "화요일",
+      "workout": "자유수영",
+      "detail": "화요일 어린이날 D-5",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-06": {
       "date": "2026-05-06",
-      "workout": "수영 수업",
-      "detail": "수요일",
+      "workout": "러닝 4km Easy",
+      "detail": "수요일 D-4",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -136,15 +136,15 @@
     "2026-05-07": {
       "date": "2026-05-07",
       "workout": "러닝 3km Easy",
-      "detail": "목요일",
+      "detail": "목요일 D-3",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-08": {
       "date": "2026-05-08",
-      "workout": "수영 수업 가볍게",
-      "detail": "금요일",
+      "workout": "휴식",
+      "detail": "금요일 D-2",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -152,15 +152,15 @@
     "2026-05-09": {
       "date": "2026-05-09",
       "workout": "대구 이동 + 검수 + 수성못 OW 500~750m",
-      "detail": "토요일",
+      "detail": "토요일 D-1",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-10": {
       "date": "2026-05-10",
-      "workout": "🏁 대회 대구 시장배",
-      "detail": "일요일",
+      "workout": "🏁 대회",
+      "detail": "일요일 D-0 대구 시장배",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
