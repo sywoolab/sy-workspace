@@ -109,8 +109,8 @@
     },
     "2026-05-05": {
       "date": "2026-05-05",
-      "workout": "자유수영",
-      "detail": "화요일 어린이날 D-5",
+      "workout": "OW 훈련",
+      "detail": "화요일 어린이날 D-5. OW 2회차",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
