@@ -1627,5 +1627,76 @@
     "garmin_ids": [
       22697052331
     ]
+  },
+  "2026-04-30": {
+    "planned": "러닝 5km Easy",
+    "done": true,
+    "actual": "러닝 5.4km @5:14",
+    "metrics": {
+      "type": "run",
+      "distance_km": 5.4,
+      "pace_per_km": "5:14",
+      "avg_hr": 151,
+      "max_hr": 168,
+      "cadence": 176,
+      "training_load": 103,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 344,
+          "avg_hr": 144,
+          "max_hr": 149,
+          "pace_sec": 344,
+          "pace_str": "5:43"
+        },
+        {
+          "distance": 1000,
+          "duration": 311,
+          "avg_hr": 149,
+          "max_hr": 151,
+          "pace_sec": 311,
+          "pace_str": "5:11"
+        },
+        {
+          "distance": 1000,
+          "duration": 316,
+          "avg_hr": 152,
+          "max_hr": 161,
+          "pace_sec": 316,
+          "pace_str": "5:16"
+        },
+        {
+          "distance": 1000,
+          "duration": 308,
+          "avg_hr": 153,
+          "max_hr": 157,
+          "pace_sec": 308,
+          "pace_str": "5:07"
+        },
+        {
+          "distance": 1000,
+          "duration": 305,
+          "avg_hr": 155,
+          "max_hr": 161,
+          "pace_sec": 305,
+          "pace_str": "5:05"
+        },
+        {
+          "distance": 404,
+          "duration": 114,
+          "avg_hr": 163,
+          "max_hr": 168,
+          "pace_sec": 282,
+          "pace_str": "4:42"
+        }
+      ]
+    },
+    "training_zone": "interval",
+    "note": "유산소 3.3 | 부하 103",
+    "garmin_id": 22707547233,
+    "start_time": "06:37",
+    "garmin_ids": [
+      22707547233
+    ]
   }
 }
