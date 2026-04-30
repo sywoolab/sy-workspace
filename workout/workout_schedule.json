@@ -19,14 +19,6 @@
       "auto": false,
       "rule": "user-confirmed"
     },
-    "2026-04-22": {
-      "date": "2026-04-22",
-      "workout": "수영 수업",
-      "detail": "Easy",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-04-28": {
       "date": "2026-04-28",
       "workout": "러닝 6km Easy",
