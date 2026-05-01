@@ -3,14 +3,6 @@
   "brick_count": 3,
   "ow_count": 0,
   "overrides": {
-    "2026-04-23": {
-      "date": "2026-04-23",
-      "workout": "러닝 6~7km 빌드업",
-      "detail": "컨디션 보고 조절, HR 체크",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-04-25": {
       "date": "2026-04-25",
       "workout": "브릭 (자전거 40km + 러닝 10km)",
