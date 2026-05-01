@@ -149,7 +149,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-04-30",
+    "date": "2026-05-01",
     "estimated_finish": "2:56",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
@@ -180,7 +180,7 @@
       "target": 200
     },
     "adjustments": [
-      "🔴 러닝 1/2회 — 3일 내 1회 추가 필요"
+      "🔴 러닝 1/2회 — 2일 내 1회 추가 필요"
     ]
   },
   "vdot_history": [
