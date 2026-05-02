@@ -19,14 +19,6 @@
       "auto": false,
       "rule": "user-confirmed"
     },
-    "2026-04-24": {
-      "date": "2026-04-24",
-      "workout": "수영 수업",
-      "detail": "Easy, 토요일 위해 가볍게",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-04-26": {
       "date": "2026-04-26",
       "workout": "자유수영 1.5km",
