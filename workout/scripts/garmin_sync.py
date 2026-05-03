@@ -13,13 +13,19 @@ import sys
 import json
 import base64
 import traceback
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from garminconnect import Garmin
 
 # dotenv는 로컬 실행용 (GitHub Actions에서는 환경변수 직접 주입)
+# L0 §"환경변수 부트스트랩": 부모 경로 거슬러 올라가며 .env 탐색
 try:
     from dotenv import load_dotenv
-    load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env'))
+    _here = Path(__file__).resolve().parent
+    for _p in [_here, *_here.parents]:
+        if (_p / '.env').exists():
+            load_dotenv(_p / '.env')
+            break
 except ImportError:
     pass
 
@@ -38,8 +44,10 @@ TOKEN_DIR = os.path.join(BASE_DIR, 'data', 'garmin_tokens')
 
 GARMIN_EMAIL = os.environ.get('GARMIN_EMAIL', '')
 GARMIN_PASSWORD = os.environ.get('GARMIN_PASSWORD', '')
-BOT_TOKEN = os.environ.get('BOT_TOKEN', os.environ.get('TELEGRAM_BOT_TOKEN', ''))
-CHAT_ID = os.environ.get('CHAT_ID', os.environ.get('TELEGRAM_CHAT_ID', ''))
+BOT_TOKEN = (os.environ.get('BOT_TOKEN')
+             or os.environ.get('TRAINING_BOT_TOKEN')
+             or os.environ.get('TELEGRAM_BOT_TOKEN', ''))
+CHAT_ID = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
 
 RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
@@ -1375,7 +1383,13 @@ def format_on_track(workout_log, schedule_data, plan_adjustments):
 def format_workout_message(parsed_activities, health, plan_adjustments, schedule_data, workout_log):
     """새 운동 감지 시 텔레그램 메시지"""
     lines = []
-    lines.append("🏋️ 가민 운동 자동 감지")
+    # 헤더에 sync 시각 명시 — 며칠치 활동을 한 알림에 묶어 보낼 때 사용자 혼동 방지
+    sync_label = f"{NOW.month}/{NOW.day} {NOW.strftime('%H:%M')}"
+    lines.append(f"🏋️ 가민 운동 자동 감지 ({sync_label} sync)")
+    # 신규 활동이 여러 날에 걸치면 날짜 범위 요약
+    activity_dates = sorted({p.get('date') for p in parsed_activities if p.get('date')})
+    if len(activity_dates) >= 2:
+        lines.append(f"  ⚠️ {len(parsed_activities)}건 / {activity_dates[0]} ~ {activity_dates[-1]} (소급 동기화)")
     lines.append("")
 
     type_emoji = {'run': '🏃', 'swim': '🏊', 'bike': '🚴', 'brick': '🔥', 'strength': '💪'}
@@ -1386,7 +1400,19 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
         emoji = type_emoji.get(wtype, '🏋️')
         name = type_name.get(wtype, p.get('activity_name', '운동'))
 
-        lines.append(f"{emoji} {name}")
+        # 활동 날짜·시각 라벨 — "오늘 07:46" / "어제 11:57" / "5/1 12:47"
+        d = p.get('date', '')
+        t = p.get('start_time', '') or ''
+        if d == TODAY:
+            when = f"오늘 {t}".strip()
+        elif d == YESTERDAY:
+            when = f"어제 {t}".strip()
+        elif d:
+            when = f"{d[5:7].lstrip('0')}/{d[8:10].lstrip('0')} {t}".strip()
+        else:
+            when = ''
+        suffix = f" ({when})" if when else ''
+        lines.append(f"{emoji} {name}{suffix}")
 
         if wtype == 'run':
             lines.append(f"  {p['distance_km']}km | {p['pace_per_km']}/km | {seconds_to_hhmm(p['duration_sec'])}")
@@ -1560,13 +1586,13 @@ def sync():
         sync_state['last_failure'] = NOW.strftime('%Y-%m-%d %H:%M')
         _save_sync_state(sync_state)
 
-        # 하루 전체 실패(4회 연속) 시에만 알림 — 불필요한 알림 방지
-        if fail_count >= 4:
+        # 2회 연속 실패 시 알림 — 데이터 누락 조기 감지
+        if fail_count >= 2:
             msg = (f"❌ 가민 동기화 {fail_count}회 연속 실패\n"
                    f"마지막 성공: {sync_state.get('last_success', '없음')}\n"
                    f"로컬 수동 sync 필요할 수 있습니다.")
             send_telegram(msg)
-            # 알림 후 카운터 리셋 (다음 4회 실패 때 다시 알림)
+            # 알림 후 카운터 리셋 (다음 2회 실패 때 다시 알림)
             sync_state['consecutive_failures'] = 0
             _save_sync_state(sync_state)
 
@@ -1596,9 +1622,11 @@ def sync():
 
     # 3. 조회 범위 결정: 마지막 성공일 ~ 오늘 (놓친 날짜 소급)
     last_success = sync_state.get('last_success_date')
+    recovered_gap_days = 0
     if last_success and last_success < YESTERDAY:
         start_date = last_success
-        print(f"  소급 동기화: {start_date} ~ {TODAY} (마지막 성공: {last_success})")
+        recovered_gap_days = (NOW.date() - datetime.strptime(last_success, '%Y-%m-%d').date()).days
+        print(f"  소급 동기화: {start_date} ~ {TODAY} (마지막 성공: {last_success}, gap {recovered_gap_days}일)")
     else:
         start_date = YESTERDAY
 
@@ -1722,6 +1750,8 @@ def sync():
 
         # 8. 텔레그램 알림
         msg = format_workout_message(new_activities, health, plan_adjustments, schedule_data, workout_log)
+        if recovered_gap_days >= 2:
+            msg = f"⚠️ 동기화 {recovered_gap_days}일만에 복구 (gap: {last_success} → {TODAY})\n\n" + msg
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 
@@ -1733,6 +1763,8 @@ def sync():
         return True  # 변경 있음
     else:
         # 새 활동 없어도 로그인 성공 = sync 정상
+        if recovered_gap_days >= 2:
+            send_telegram(f"⚠️ 가민 동기화 {recovered_gap_days}일만에 복구 (gap: {last_success} → {TODAY}). 새 활동 없음.")
         sync_state['last_success'] = NOW.strftime('%Y-%m-%d %H:%M')
         sync_state['last_success_date'] = TODAY
         _save_sync_state(sync_state)

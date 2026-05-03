@@ -9,15 +9,30 @@ import os
 import json
 import re
 import requests
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from html.parser import HTMLParser
+
+# L0 §"환경변수 부트스트랩": 부모 경로 거슬러 올라가며 .env 탐색
+try:
+    from dotenv import load_dotenv
+    _here = Path(__file__).resolve().parent
+    for _p in [_here, *_here.parents]:
+        if (_p / '.env').exists():
+            load_dotenv(_p / '.env')
+            break
+except ImportError:
+    pass
 
 KST = timezone(timedelta(hours=9))
 NOW = datetime.now(KST)
 TODAY = NOW.strftime('%Y-%m-%d')
 
-BOT_TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ['CHAT_ID']
+# L0 §"봇 토큰 fallback 체인" (운동 봇)
+BOT_TOKEN = (os.environ.get('BOT_TOKEN')
+             or os.environ.get('TRAINING_BOT_TOKEN')
+             or os.environ.get('TELEGRAM_BOT_TOKEN', ''))
+CHAT_ID = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
 
 BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 EVENTS_FILE = os.path.join(BASE_DIR, 'data', 'triathlon_events.json')

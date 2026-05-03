@@ -1,6 +1,18 @@
 """프리시던트 DB 설정 — 카테고리 정의, API 매핑"""
 
 import os
+from pathlib import Path
+
+# L0 §"환경변수 부트스트랩": 부모 경로 거슬러 올라가며 .env 탐색
+try:
+    from dotenv import load_dotenv
+    _here = Path(__file__).resolve().parent
+    for _p in [_here, *_here.parents]:
+        if (_p / '.env').exists():
+            load_dotenv(_p / '.env')
+            break
+except ImportError:
+    pass
 
 DART_API_KEY = os.environ.get('DART_API_KEY', '')
 BASE_URL = 'https://opendart.fss.or.kr/api'
