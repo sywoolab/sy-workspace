@@ -1,7 +1,7 @@
 {
-  "current_vdot": 37,
+  "current_vdot": 36,
   "brick_count": 3,
-  "ow_count": 1,
+  "ow_count": 0,
   "overrides": {
     "2026-04-25": {
       "date": "2026-04-25",
@@ -141,38 +141,41 @@
     }
   },
   "last_analysis": {
-    "date": "2026-05-02",
-    "estimated_finish": "2:56",
+    "date": "2026-05-03",
+    "estimated_finish": "2:57",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 3,
     "phase_name": "Phase 3: 테이퍼",
-    "vdot": 37,
+    "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 1,
+        "count": 3,
         "target": 2
       },
       "run": {
-        "count": 1,
+        "count": 2,
         "target": 2,
-        "total_km": 5.4
+        "total_km": 8.6
       },
       "bike": {
-        "count": 0,
+        "count": 1,
         "target": 1
       }
     },
     "intensity_split": {
-      "easy_pct": 0,
-      "hard_pct": 100
+      "easy_pct": 21,
+      "hard_pct": 79
     },
     "training_load": {
-      "current": 196,
+      "current": 603,
       "target": 200
     },
     "adjustments": [
-      "🔴 러닝 1/2회 — 1일 내 1회 추가 필요"
+      "⚠️ 80/20 위반: Easy 21% / 고강도 79% (목표: 80/20)",
+      "🔴 주간 부하 603 > 목표 200의 120% — 다음 일 Easy 권장",
+      "🟡 수면 4h 46m — 6시간 미만, 컨디션 주의",
+      "🔴 Training Readiness 26 (LOW) — 몸이 준비 안 됨, 휴식 권장"
     ]
   },
   "vdot_history": [
