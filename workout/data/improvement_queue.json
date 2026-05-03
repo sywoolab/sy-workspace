@@ -1,16 +1,22 @@
 {
   "items": [
     {
-      "type": "recurring_override",
-      "priority": "medium",
-      "message": "규칙 A3-high이 주 3회 트리거 — 근본 원인 검토 필요",
-      "detected_at": "2026-03-26"
-    },
-    {
       "type": "recovery",
       "priority": "high",
       "message": "주간 평균 수면 점수 52점 — 볼륨 감량 검토 필요",
       "detected_at": "2026-04-15"
+    },
+    {
+      "type": "structure",
+      "priority": "high",
+      "message": "80/20 강도 배분 3주 연속 위반 — 스케줄 구조 재검토 필요",
+      "detected_at": "2026-05-03"
+    },
+    {
+      "type": "plateau",
+      "priority": "medium",
+      "message": "VDOT 36 — 3주간 정체. 인터벌/템포 비율 조정 검토",
+      "detected_at": "2026-05-03"
     }
   ],
   "resolved": []
