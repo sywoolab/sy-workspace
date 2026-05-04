@@ -1,8 +1,16 @@
 {
-  "current_vdot": 36,
-  "brick_count": 3,
-  "ow_count": 0,
+  "current_vdot": 37,
+  "brick_count": 4,
+  "ow_count": 1,
   "overrides": {
+    "2026-04-25": {
+      "date": "2026-04-25",
+      "workout": "브릭 (자전거 40km + 러닝 10km)",
+      "detail": "대회 시뮬. 자전거 평지, 러닝 빌드업",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
     "2026-04-28": {
       "date": "2026-04-28",
       "workout": "러닝 6km Easy",
@@ -69,11 +77,12 @@
     },
     "2026-05-04": {
       "date": "2026-05-04",
-      "workout": "휴식",
-      "detail": "월요일",
+      "workout": "휴식 (컨디션 양호 시 러닝 가볍게 추가)",
+      "detail": "월요일 D-6. 기본 휴식. 아침 컨디션(수면 6시간+, HRV BALANCED, 다리/심박 정상) 양호 시 러닝 3~4km Easy(6:00+/km, HR 145 이하) 옵션. 사용자가 당일 결정.",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed"
+      "rule": "user-confirmed",
+      "decision_pending": "morning-condition-check"
     },
     "2026-05-05": {
       "date": "2026-05-05",
@@ -133,41 +142,38 @@
     }
   },
   "last_analysis": {
-    "date": "2026-05-03",
-    "estimated_finish": "2:59",
+    "date": "2026-05-02",
+    "estimated_finish": "2:56",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 3,
     "phase_name": "Phase 3: 테이퍼",
-    "vdot": 36,
+    "vdot": 37,
     "weekly_summary": {
       "swim": {
-        "count": 3,
+        "count": 1,
         "target": 2
       },
       "run": {
-        "count": 2,
+        "count": 1,
         "target": 2,
-        "total_km": 8.6
+        "total_km": 5.4
       },
       "bike": {
-        "count": 1,
+        "count": 0,
         "target": 1
       }
     },
     "intensity_split": {
-      "easy_pct": 21,
-      "hard_pct": 79
+      "easy_pct": 0,
+      "hard_pct": 100
     },
     "training_load": {
-      "current": 603,
+      "current": 196,
       "target": 200
     },
     "adjustments": [
-      "⚠️ 80/20 위반: Easy 21% / 고강도 79% (목표: 80/20)",
-      "🔴 주간 부하 603 > 목표 200의 120% — 다음 일 Easy 권장",
-      "🟡 수면 4h 46m — 6시간 미만, 컨디션 주의",
-      "🔴 Training Readiness 26 (LOW) — 몸이 준비 안 됨, 휴식 권장"
+      "🔴 러닝 1/2회 — 1일 내 1회 추가 필요"
     ]
   },
   "vdot_history": [
@@ -189,10 +195,6 @@
     },
     {
       "date": "2026-04-26",
-      "vdot": 36
-    },
-    {
-      "date": "2026-05-03",
       "vdot": 36
     }
   ]

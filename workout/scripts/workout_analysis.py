@@ -7,6 +7,7 @@
 """
 
 import os
+import re
 import json
 import math
 import requests
@@ -382,17 +383,25 @@ def get_latest_metrics(log, workout_type, n=3):
 
 
 def count_bricks(log):
-    """누적 브릭 훈련 횟수 (이중 카운트 방지)"""
+    """누적 브릭(근전환) 훈련 횟수 (이중 카운트 방지)
+
+    체크 우선순위 (L0 §"수집은 전수, 필터는 표시 단계에서"):
+    1) entry.is_brick — garmin_sync._detect_brick이 자동 마킹
+    2) metrics.type == 'brick' — 멀티스포츠 단일 활동
+    3) note/planned 텍스트 fallback — 수동 입력 케이스
+    """
     count = 0
     for entry in log.values():
         if not entry.get('done'):
             continue
+        if entry.get('is_brick'):
+            count += 1
+            continue
         metrics = entry.get('metrics', {})
         if metrics.get('type') == 'brick':
             count += 1
-            continue  # type이 brick이면 note/planned 중복 검사 skip
-        # 미니브릭 (러닝 후 자전거 또는 그 반대)도 카운트
-        note = entry.get('note', '').lower()
+            continue
+        note = (entry.get('note', '') or '').lower()
         planned = entry.get('planned', '').lower() if isinstance(entry.get('planned'), str) else ''
         if '브릭' in note or 'brick' in note or '브릭' in planned or 'brick' in planned:
             count += 1
@@ -400,13 +409,34 @@ def count_bricks(log):
 
 
 def count_ow(log):
-    """오픈워터 경험 횟수"""
+    """오픈워터 수영 경험 횟수
+
+    체크 우선순위 (L0 §"수집은 전수, 필터는 표시 단계에서"):
+    1) metrics.is_open_water — garmin_sync.parse_activity 자동 마킹
+    2) all_metrics 내 is_open_water — 멀티스포츠 케이스
+    3) note/actual/planned/activity_name 키워드 매칭 — 수동 입력
+    4) word boundary "ow" — "OW 첫 경험", "OW 1107m" 등 약어 매칭
+    """
     count = 0
     for entry in log.values():
         if not entry.get('done'):
             continue
-        note = (entry.get('note', '') + entry.get('actual', '')).lower()
-        if '오픈워터' in note or 'open water' in note or 'ow수영' in note:
+        if entry.get('metrics', {}).get('is_open_water'):
+            count += 1
+            continue
+        if any(am.get('is_open_water') for am in entry.get('all_metrics', [])):
+            count += 1
+            continue
+        text = ' '.join([
+            entry.get('note', '') or '',
+            entry.get('actual', '') or '',
+            entry.get('planned', '') or '',
+            entry.get('activity_name', '') or '',
+        ]).lower()
+        if '오픈워터' in text or 'open water' in text or 'ow수영' in text:
+            count += 1
+            continue
+        if re.search(r'(?<![a-z])ow(?![a-z])', text, re.IGNORECASE):
             count += 1
     return count
 

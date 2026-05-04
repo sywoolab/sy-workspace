@@ -380,6 +380,10 @@ def parse_activity(activity):
             'avg_stroke_rate': round(avg_stroke_rate) if avg_stroke_rate else None,
             'pool_length': pool_length,
         })
+        # L0 §"수집은 전수, 필터는 표시 단계에서": OW 정보 보존
+        # ACTIVITY_TYPE_MAP이 swim으로 평탄화한 후에도 원본 종목을 마킹하여 count_ow가 식별 가능
+        if activity_type_key == 'open_water_swimming':
+            result['is_open_water'] = True
 
     elif wtype == 'bike':
         distance_km = round(distance_m / 1000, 2)
@@ -655,6 +659,8 @@ def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
             'strokes': parsed.get('total_strokes'),
             'avg_spm': parsed.get('avg_stroke_rate'),
         })
+        if parsed.get('is_open_water'):
+            metrics['is_open_water'] = True
     elif wtype == 'bike':
         metrics.update({
             'distance_km': parsed.get('distance_km'),
