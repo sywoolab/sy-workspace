@@ -3,26 +3,10 @@
   "brick_count": 4,
   "ow_count": 1,
   "overrides": {
-    "2026-04-25": {
-      "date": "2026-04-25",
-      "workout": "브릭 (자전거 40km + 러닝 10km)",
-      "detail": "대회 시뮬. 자전거 평지, 러닝 빌드업",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-04-28": {
       "date": "2026-04-28",
       "workout": "러닝 6km Easy",
       "detail": "화요일",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
-    "2026-04-26": {
-      "date": "2026-04-26",
-      "workout": "자유수영 1.5km",
-      "detail": "맨몸, 연속, 이븐 페이스 @1:50~2:00",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
