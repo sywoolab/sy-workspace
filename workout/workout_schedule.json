@@ -1,5 +1,5 @@
 {
-  "current_vdot": 37,
+  "current_vdot": 36,
   "brick_count": 4,
   "ow_count": 1,
   "overrides": {
@@ -126,22 +126,22 @@
     }
   },
   "last_analysis": {
-    "date": "2026-05-02",
+    "date": "2026-05-04",
     "estimated_finish": "2:56",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 3,
     "phase_name": "Phase 3: 테이퍼",
-    "vdot": 37,
+    "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 1,
+        "count": 0,
         "target": 2
       },
       "run": {
-        "count": 1,
+        "count": 0,
         "target": 2,
-        "total_km": 5.4
+        "total_km": 0.0
       },
       "bike": {
         "count": 0,
@@ -150,14 +150,15 @@
     },
     "intensity_split": {
       "easy_pct": 0,
-      "hard_pct": 100
+      "hard_pct": 0
     },
     "training_load": {
-      "current": 196,
+      "current": 0,
       "target": 200
     },
     "adjustments": [
-      "🔴 러닝 1/2회 — 1일 내 1회 추가 필요"
+      "🟡 수면 4h 46m — 6시간 미만, 컨디션 주의",
+      "🔴 Training Readiness 26 (LOW) — 몸이 준비 안 됨, 휴식 권장"
     ]
   },
   "vdot_history": [
