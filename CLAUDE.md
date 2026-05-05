@@ -127,3 +127,14 @@
 - `workout_schedule.json`의 overrides에 `source: "manual"`, `auto: false` 필수
 - adaptive_scheduler가 manual override를 덮어쓸 수 있음 → `auto: false`로 보호
 - 텔레그램 알림 반영 시 직접 메시지 전송
+
+### 스케줄/일정 답변 시 SSOT 직접 read 의무 (필수)
+
+운동 일정·스케줄·"내일/모레/D-N에 뭐 해야 함" 류 질문 답변 시:
+
+1. **답변 작성 전 반드시 `workout_schedule.json`의 `overrides` 섹션을 Read 도구로 직접 확인**한다.
+2. 답변 본문에 출처 라벨 인용: `schedule_overrides 5/6: 러닝 4km Easy [user-confirmed]`
+3. **금지**: `workout_alert.py`의 `WEEK*_SCHEDULE` / `DEFAULT_SCHEDULE` 상수만으로 답변하는 것. 이 상수는 default fallback이며, 실제 일정은 `overrides`가 우선한다.
+4. UserPromptSubmit hook이 `workout_schedule.json` 자동 첨부하므로 컨텍스트에 있는 그것을 1차로 사용한다. 단, 컨텍스트 첨부분이 잘렸거나 의심되면 Read로 재확인.
+
+**근거**: 코드의 default 상수와 사용자가 manual override한 실제 일정이 다를 수 있다. 2026-05-05 사례에서 default가 "수=자전거 30분"이었지만 실제 override는 "5/6 러닝 4km Easy"였고, 코드 상수만 보고 답변해 사용자 지적을 받았다 (L0 §"전수 확인 원칙" 위반).
