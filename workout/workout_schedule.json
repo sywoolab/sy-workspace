@@ -118,7 +118,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-05-05",
+    "date": "2026-05-06",
     "estimated_finish": "2:56",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
@@ -131,9 +131,9 @@
         "target": 2
       },
       "run": {
-        "count": 1,
+        "count": 2,
         "target": 2,
-        "total_km": 5.4
+        "total_km": 10.3
       },
       "bike": {
         "count": 0,
@@ -145,11 +145,12 @@
       "hard_pct": 0
     },
     "training_load": {
-      "current": 55,
+      "current": 109,
       "target": 200
     },
     "adjustments": [
-      "💡 Easy 런 5:27/km → 더 느리게 (6:16~6:57)"
+      "💡 Easy 런 5:27/km → 더 느리게 (6:16~6:57)",
+      "🟡 수면 5h 43m — 6시간 미만, 컨디션 주의"
     ]
   },
   "vdot_history": [
