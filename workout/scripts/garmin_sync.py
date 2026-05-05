@@ -534,10 +534,15 @@ def analyze_splits(laps, wtype, vdot=37):
 
 
 def classify_zone(parsed, vdot=37):
-    """훈련 존 판정 (러닝만, 나머지는 HR 기반)"""
+    """훈련 존 판정 (러닝은 pace+HR 결합, 나머지는 HR 기반)
+
+    러닝 보정 원칙: 사용자 빌드업 스타일에서는 평균 페이스가 부하를 과대평가할 수 있다.
+    실제 부하의 1차 지표는 HR. max HR 184 기준 70% 미만이면 페이스 무관 Easy.
+    """
     wtype = parsed['type']
     if wtype == 'run':
         pace = parsed.get('pace_sec', 0)
+        hr = parsed.get('avg_hr', 0)
         if not pace:
             return 'moderate'
         # VDOT 기반 존 경계 (간이 lookup)
@@ -546,16 +551,30 @@ def classify_zone(parsed, vdot=37):
             36: {'easy': 385, 'tempo': 339},
             37: {'easy': 376, 'tempo': 331},
             38: {'easy': 367, 'tempo': 323},
+            39: {'easy': 359, 'tempo': 316},
         }
         z = zones.get(vdot, zones[37])
         if pace >= z['easy']:
-            return 'easy'
+            pace_zone = 'easy'
         elif pace >= z['tempo'] + 10:
-            return 'moderate'
+            pace_zone = 'moderate'
         elif pace >= z['tempo'] - 5:
-            return 'tempo'
+            pace_zone = 'tempo'
         else:
-            return 'interval'
+            pace_zone = 'interval'
+
+        # HR 보정 (max HR 184 가정)
+        # < 129 (70%): 페이스 무관 Easy
+        # 129~146 (70~80%): pace_zone에서 한 단계 격하
+        # 그 외: 페이스 분류 유지
+        if not hr:
+            return pace_zone
+        if hr < 129:
+            return 'easy'
+        if hr < 147:
+            order = ['easy', 'moderate', 'tempo', 'interval']
+            return order[max(0, order.index(pace_zone) - 1)]
+        return pace_zone
     else:
         # HR 기반 간이 판정 (최대심박 184 기준)
         hr = parsed.get('avg_hr', 0)
@@ -627,7 +646,8 @@ def to_workout_log_entry(parsed, schedule_file_data, workout_log_data=None):
         actual = f"러닝 {parsed['distance_km']}km @{parsed['pace_per_km']}"
     elif wtype == 'swim':
         dur_min = round(parsed['duration_sec'] / 60)
-        actual = f"수영 {parsed['distance_m']}m {dur_min}분 @{parsed['pace_per_100m']}/100m"
+        swim_label = "OW" if parsed.get('is_open_water') else "수영"
+        actual = f"{swim_label} {parsed['distance_m']}m {dur_min}분 @{parsed['pace_per_100m']}/100m"
     elif wtype == 'bike':
         dur_min = round(parsed['duration_sec'] / 60)
         if parsed.get('distance_km'):

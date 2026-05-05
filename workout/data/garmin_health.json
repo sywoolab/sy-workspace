@@ -304,6 +304,15 @@
       "rem_min": 95,
       "awake_min": 3
     },
+    "nap": {
+      "start": "14:30",
+      "end": "16:00",
+      "duration_min": 90,
+      "quality": "deep",
+      "watch_worn": false,
+      "source": "manual"
+    },
+    "total_sleep_min_incl_nap": 376,
     "hrv": {
       "weekly_avg": 68,
       "last_night": 67,
@@ -312,6 +321,52 @@
     "training_readiness": {
       "score": 26,
       "level": "LOW"
+    },
+    "user_assessment": {
+      "effective_readiness_level": "MODERATE",
+      "reason": "가민 미착용 14:30-16:00 낮잠 90분 푹잠 + HRV BALANCED 67/68 + 자가 평가 '몸 상태 좋음'. 가민 LOW 산정은 밤 수면 286분(4:46) 짧은 것이 주원인 — 낮잠 합산 시 376분(6:16)",
+      "source": "manual",
+      "recorded_at": "2026-05-03"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-05-05": {
+    "date": "2026-05-05",
+    "steps": 7917,
+    "stress": {
+      "avg": 9,
+      "max": 87,
+      "rest": 66.6,
+      "low": 3.69,
+      "medium": 1.02,
+      "high": 0.2
+    },
+    "body_battery": {
+      "max": 95,
+      "min": 44,
+      "start": 74
+    },
+    "resting_hr": 40,
+    "sleep": {
+      "duration_min": 394,
+      "score": 84,
+      "deep_min": 81,
+      "light_min": 221,
+      "rem_min": 92,
+      "awake_min": 1
+    },
+    "hrv": {
+      "weekly_avg": 68,
+      "last_night": 74,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 70,
+      "level": "MODERATE"
     },
     "training_status": {
       "status": null,

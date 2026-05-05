@@ -808,7 +808,10 @@ def format_single_activity(metrics):
 
     start = metrics.get('start_time', '')
     prefix = f"  [{start}]" if start else " "
-    header = f"{prefix} {type_emoji.get(wtype, '🏋️')} {type_name.get(wtype, wtype)}"
+    label = type_name.get(wtype, wtype)
+    if wtype == 'swim' and metrics.get('is_open_water'):
+        label = "OW (오픈워터)"
+    header = f"{prefix} {type_emoji.get(wtype, '🏋️')} {label}"
     lines = [header]
 
     if wtype == 'swim':
@@ -970,12 +973,12 @@ def format_analysis_message(log):
         lines.append("🔄 변경 없음 — 계획대로 진행")
         lines.append("")
 
-    # 예상 완주시간
+    # 예상 완주시간 (첫 대구 대회 목표 2:55 기준)
     total = estimate['total']
-    if total <= 170:
+    if total <= 175:
         status_emoji = "🟢"
         status_text = "목표 달성 가능"
-    elif total <= 180:
+    elif total <= 185:
         status_emoji = "🟡"
         status_text = "주의 — 개선 필요"
     else:
@@ -989,7 +992,7 @@ def format_analysis_message(log):
                  f"+ 러닝 {estimate['run_brick']:.0f}분")
 
     # schedule 업데이트
-    total_status = "green" if total <= 170 else ("yellow" if total <= 180 else "red")
+    total_status = "green" if total <= 175 else ("yellow" if total <= 185 else "red")
     schedule['last_analysis'] = {
         "date": TODAY,
         "estimated_finish": minutes_to_hhmm(total),
