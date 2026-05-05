@@ -11,14 +11,6 @@
       "auto": false,
       "rule": "user-confirmed"
     },
-    "2026-04-27": {
-      "date": "2026-04-27",
-      "workout": "휴식",
-      "detail": "월요일",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-04-29": {
       "date": "2026-04-29",
       "workout": "수영 수업",
