@@ -3,14 +3,6 @@
   "brick_count": 4,
   "ow_count": 2,
   "overrides": {
-    "2026-04-28": {
-      "date": "2026-04-28",
-      "workout": "러닝 6km Easy",
-      "detail": "화요일",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-04-29": {
       "date": "2026-04-29",
       "workout": "수영 수업",
