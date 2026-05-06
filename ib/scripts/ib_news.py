@@ -41,10 +41,22 @@ MAX_ARTICLES = 20
 # RSS 소스 정의
 # ============================================================
 FEEDS = {
-    # 국내
+    # 국내 IB 전문 매체 (사용자 1순위 — 2026-05-06 더벨 강조)
+    '더벨': 'https://news.google.com/rss/search?q=site:thebell.co.kr&hl=ko&gl=KR&ceid=KR:ko',
+    '인베스트조선': 'https://news.google.com/rss/search?q=site:investchosun.com&hl=ko&gl=KR&ceid=KR:ko',
+    '딜사이트': 'https://news.google.com/rss/search?q=site:dealsite.co.kr&hl=ko&gl=KR&ceid=KR:ko',
+    # 국내 경제지 (RSS 직접)
     '한경': 'https://www.hankyung.com/feed/finance',
     '매경': 'https://www.mk.co.kr/rss/50200011/',
-    '더벨': 'https://news.google.com/rss/search?q=site:thebell.co.kr&hl=ko&gl=KR&ceid=KR:ko',
+    '조선비즈': 'https://news.google.com/rss/search?q=site:biz.chosun.com&hl=ko&gl=KR&ceid=KR:ko',
+    '서울경제': 'https://news.google.com/rss/search?q=site:sedaily.com&hl=ko&gl=KR&ceid=KR:ko',
+    '머니투데이': 'https://news.google.com/rss/search?q=site:mt.co.kr&hl=ko&gl=KR&ceid=KR:ko',
+    '이데일리': 'https://news.google.com/rss/search?q=site:edaily.co.kr&hl=ko&gl=KR&ceid=KR:ko',
+    # 국내 종합지 (가중치 낮음, IB 디테일 부족하지만 큰 딜은 보도)
+    '조선일보': 'https://news.google.com/rss/search?q=site:chosun.com+(IPO+OR+M%26A+OR+인수+OR+상장)&hl=ko&gl=KR&ceid=KR:ko',
+    '중앙일보': 'https://news.google.com/rss/search?q=site:joongang.co.kr+(IPO+OR+M%26A+OR+인수+OR+상장)&hl=ko&gl=KR&ceid=KR:ko',
+    '동아일보': 'https://news.google.com/rss/search?q=site:donga.com+(IPO+OR+M%26A+OR+인수+OR+상장)&hl=ko&gl=KR&ceid=KR:ko',
+    # 키워드 광역 검색
     '국내IB': 'https://news.google.com/rss/search?q=IPO+OR+유상증자+OR+M%26A+OR+인수합병+OR+지배구조+OR+경영권+OR+상속+OR+증여+OR+사모펀드+OR+블록딜+OR+CB+OR+EB&hl=ko&gl=KR&ceid=KR:ko',
     # 해외
     'FT_Companies': 'https://www.ft.com/rss/companies',
@@ -242,8 +254,17 @@ def main():
     all_kr = []
     all_en = []
 
-    # 국내 소스
-    kr_sources = ['한경', '매경', '더벨', '국내IB']
+    # 국내 소스 (2026-05-06 확장 — 사용자 IB 매체 리스트 반영)
+    kr_sources = [
+        # IB 전문 (1순위)
+        '더벨', '인베스트조선', '딜사이트',
+        # 경제지
+        '한경', '매경', '조선비즈', '서울경제', '머니투데이', '이데일리',
+        # 종합지 (IB 키워드 필터)
+        '조선일보', '중앙일보', '동아일보',
+        # 키워드 광역
+        '국내IB',
+    ]
     for name in kr_sources:
         articles = fetch_rss(FEEDS[name], name)
         print(f"  [{name}] {len(articles)}건 수집")
