@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "purpose": "IB 팀 전용 텔레그램 채널 워치리스트",
+    "created": "2026-05-06",
+    "policy": {
+      "disclosures": "DART 전수 발송 (15분 폴링), 중요 공시 🔴 + sound on, 일반 📋 + silent push",
+      "news": "일 2회 (07:30 / 15:00 KST), 기업당 최대 5건, 매체·키워드 가중치 상위만"
+    }
+  },
+  "companies": [
+    {"name": "셀트리온", "dart_code": "00413046", "stock_code": "068270", "listed": true, "market": "KOSPI", "alias": ["Celltrion"]},
+    {"name": "솔루엠", "dart_code": "01159233", "stock_code": "248070", "listed": true, "market": "KOSPI"},
+    {"name": "서진시스템", "dart_code": "00838005", "stock_code": "178320", "listed": true, "market": "KOSPI", "alias": ["Seojin System"]},
+    {"name": "제이에스코퍼레이션", "dart_code": "00332927", "stock_code": "194370", "listed": true, "market": "KOSDAQ"},
+    {"name": "성호전자", "dart_code": "00317210", "stock_code": "043260", "listed": true, "market": "KOSDAQ"},
+    {"name": "오스코텍", "dart_code": "00263654", "stock_code": "039200", "listed": true, "market": "KOSDAQ"},
+    {"name": "아이큐어", "dart_code": "00554352", "stock_code": "175250", "listed": true, "market": "KOSDAQ"},
+    {"name": "다날", "dart_code": "00389970", "stock_code": "064260", "listed": true, "market": "KOSDAQ", "alias": ["Danal"]},
+    {"name": "교보생명", "dart_code": "00112882", "stock_code": null, "listed": false, "alias": ["Kyobo Life", "교보생명보험"], "note": "빅3 생보사 중 유일 비상장. 4번째 IPO 도전 중 (2026 연말 목표)"},
+    {"name": "리벨리온", "dart_code": "01609598", "stock_code": null, "listed": false, "alias": ["Rebellions"], "note": "AI/NPU. 2024.12 사피온코리아와 합병 (사피온 존속법인). 2026 상반기 IPO 추진. ⚠️ 구 corp_code 01735486 사용 금지"},
+    {"name": "딥엑스", "dart_code": "01604584", "stock_code": null, "listed": false, "alias": ["DeepX", "DEEPX", "디퍼엑스"], "note": "AI/NPU. 시리즈D 진행 중 (2026.05)"},
+    {"name": "뮤직카우", "dart_code": "01560095", "stock_code": null, "listed": false, "alias": ["Musicow"], "note": "음악 저작권 STO. 스틱·프랙시스 투자유치"},
+    {"name": "에치와이", "dart_code": "00158644", "stock_code": null, "listed": false, "alias": ["HY", "한국야쿠르트", "에이치와이"]},
+    {"name": "부릉", "dart_code": "01246885", "stock_code": null, "listed": false},
+    {"name": "소울에너지", "dart_code": "01654640", "stock_code": null, "listed": false},
+    {"name": "수양켐텍", "dart_code": "00963684", "stock_code": null, "listed": false},
+    {"name": "비트코퍼레이션", "dart_code": "01834811", "stock_code": null, "listed": false, "alias": ["b;eat", "BEAT"], "note": "다날 그룹 푸드테크 자회사. AI 스마트 리테일 전환"},
+    {"name": "지디케이화장품", "dart_code": "01079733", "stock_code": null, "listed": false, "alias": ["GDK", "GDK화장품"], "note": "솔루엠헬스케어(솔루엠 자회사) 54.6% 보유 (2025.06 인수)"},
+    {"name": "제노스코", "dart_code": null, "stock_code": null, "listed": false, "note": "美 법인(오스코텍 자회사). DART 없음, 뉴스만 모니터링", "alias": ["Genosco"]}
+  ],
+  "group_mapping": [
+    {"parent": "솔루엠", "child": "지디케이화장품", "relation": "솔루엠헬스케어(자회사)가 54.6% 보유"},
+    {"parent": "오스코텍", "child": "제노스코", "relation": "美 자회사"},
+    {"parent": "다날", "child": "비트코퍼레이션", "relation": "다날 그룹 푸드테크 자회사"}
+  ]
+}

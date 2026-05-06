@@ -1,0 +1,40 @@
+name: ib-team-news
+
+on:
+  schedule:
+    - cron: '30 22 * * *'  # 07:30 KST (전날 22:30 UTC)
+    - cron: '0 6 * * *'    # 15:00 KST (당일 06:00 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: 워치리스트 뉴스 발송
+        env:
+          IB_TEAM_BOT_TOKEN: ${{ secrets.IB_TEAM_BOT_TOKEN }}
+          IB_TEAM_CHAT_ID: ${{ secrets.IB_TEAM_CHAT_ID }}
+        run: python ib/scripts/ib_team_news.py
+
+      - name: Commit sent record
+        if: always()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add ib/data/team_news_sent.json 2>/dev/null || true
+          if ! git diff --staged --quiet; then
+            git commit -m "ib-team news: sent record update"
+            git pull --rebase
+            git push
+          fi

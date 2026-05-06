@@ -1,0 +1,40 @@
+name: ib-team-disclosures
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # 24시간 15분 폴링
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: DART 공시 폴링
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          IB_TEAM_BOT_TOKEN: ${{ secrets.IB_TEAM_BOT_TOKEN }}
+          IB_TEAM_CHAT_ID: ${{ secrets.IB_TEAM_CHAT_ID }}
+        run: python ib/scripts/ib_team_disclosures.py
+
+      - name: Commit sent record
+        if: always()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add ib/data/team_disclosures_sent.json 2>/dev/null || true
+          if ! git diff --staged --quiet; then
+            git commit -m "ib-team disclosures: sent record update"
+            git pull --rebase
+            git push
+          fi
