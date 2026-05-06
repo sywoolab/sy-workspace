@@ -410,11 +410,17 @@ def build_message(registry: dict, today: datetime) -> list:
     parts.append("\n━━━━━━━━━━━━━━━━")
     parts.append("🎲 <b>줍줍 (잔여세대/임의공급) — 사용자 핵심 타깃</b>")
     parts.append("━━━━━━━━━━━━━━━━")
+    parts.append(
+        "<i>※ 줍줍 자격은 단지별로 다릅니다. ✅ 줄에서 정확 자격 확인:\n"
+        "   · 임의공급(잔여세대) = 19세 이상 누구나 (보통 1주택자 OK)\n"
+        "   · 취소후재공급(불법행위) = 본 청약 자격 동일 (세대주 등 엄격)\n"
+        "   · 무순위 = 정부 정책 따라 변동</i>"
+    )
     if all_jjup:
         for b, li in all_jjup:
             parts.append("\n" + render_listing(li, today, b))
     else:
-        parts.append("(현재 등록된 줍줍 단지 없음 — 신규 발견 시 별도 🎲 알림)")
+        parts.append("\n(현재 등록된 줍줍 단지 없음 — 신규 발견 시 별도 🎲 알림)")
 
     # ── 2. 일반 적격 단지 — 시간 분류 ──
     has_any_normal = any(eligible_normal_buckets.values())
