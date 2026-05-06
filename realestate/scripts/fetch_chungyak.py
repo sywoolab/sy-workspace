@@ -264,7 +264,7 @@ def render_listing(listing: dict, today: datetime, bucket: str) -> str:
             s_parts.append(html_escape(price))
         lines.append("💰 " + " · ".join(s_parts))
 
-    # 6. 자격 조건
+    # 6. 자격 조건 (표준화 — 줍줍/일반 모두 핵심 키 표시)
     q = listing.get("qualifications", {})
     if q:
         if q.get("note"):
@@ -273,16 +273,54 @@ def render_listing(listing: dict, today: datetime, bucket: str) -> str:
             household = q.get("household")
             if household:
                 lines.append(f"✅ {html_escape(household)}")
+
+            # 표준 자격 키 — 명확히 표시 (줍줍에서 사용자가 가장 헷갈리는 부분)
+            qual_lines = []
+            hhh = q.get("household_head_required")
+            if hhh is True:
+                qual_lines.append("· 세대주: <b>필수</b> ❗")
+            elif hhh is False:
+                qual_lines.append("· 세대주: 무관")
+            elif hhh is None and "household_head_required" in q:
+                qual_lines.append("· 세대주: 모집공고 PDF 확인 필요")
+
+            pb = q.get("passbook_required")
+            if pb is True:
+                qual_lines.append("· 청약통장: 필수")
+            elif pb is False:
+                qual_lines.append("· 청약통장: 불요")
+
+            res = q.get("residency")
+            if res:
+                qual_lines.append(f"· 거주지: {html_escape(res)}")
+
+            own = q.get("ownership")
+            if own:
+                qual_lines.append(f"· 주택소유: {html_escape(own)}")
+
+            crit = q.get("criterion_date")
+            if crit:
+                qual_lines.append(f"· 기준일: {html_escape(crit)}")
+
+            for kw in qual_lines:
+                lines.append(f"   {kw}")
+
             inc60u = q.get("income_pct_60_under")
             inc60o = q.get("income_pct_60_over")
             if inc60u or inc60o:
                 if inc60u:
-                    lines.append(f"   소득 60㎡↓: 외벌이 {inc60u.get('single')}%/맞벌이 {inc60u.get('dual')}%")
+                    lines.append(f"   · 소득 60㎡↓: 외벌이 {inc60u.get('single')}%/맞벌이 {inc60u.get('dual')}%")
                 if inc60o:
-                    lines.append(f"   소득 60㎡↑: 외벌이 {inc60o.get('single')}%/맞벌이 {inc60o.get('dual')}%")
+                    lines.append(f"   · 소득 60㎡↑: 외벌이 {inc60o.get('single')}%/맞벌이 {inc60o.get('dual')}%")
             asset = q.get("asset_total_won")
             if asset:
-                lines.append(f"   총자산 한도: {asset/1e8:.2f}억")
+                lines.append(f"   · 총자산 한도: {asset/1e8:.2f}억")
+
+            # 기타 (배열)
+            other = q.get("other", [])
+            if other:
+                for item in other:
+                    lines.append(f"   · {html_escape(str(item))}")
 
     # 7. 사용자 적격성 (H1 패치: 비표준 키도 모두 표시)
     ua = listing.get("user_assessment", {})

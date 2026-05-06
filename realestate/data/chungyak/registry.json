@@ -182,9 +182,18 @@
       "supply_count": 2,
       "price_summary": "55㎡ 8.83억 (1세대), 74C㎡ 9.58억 (1세대 — 노부모부양 특공)",
       "qualifications": {
-        "household": "서울 거주 무주택세대주 (모집공고일 2026-05-04 기준)",
+        "household_head_required": true,
         "passbook_required": false,
+        "residency": "서울",
+        "ownership": "무주택세대 전원 (세대원 누구라도 주택 보유 시 부적격)",
+        "age_min": 19,
         "method": "추첨 100%",
+        "criterion_date": "모집공고일 2026-05-04 기준 (사후 변경 소급 적용 X)",
+        "other": [
+          "취소후재공급(불법행위 재공급) = 본 청약 자격 동일 — 가장 엄격",
+          "삼성물산 분양문의 02-407-3069"
+        ],
+        "household": "서울 거주 무주택세대주 (모집공고일 2026-05-04 기준)",
         "_critical": "잔여세대 재공급 = '무주택세대주'만 가능. 세대원 신청 불가. 사후 변경 소급 적용 X"
       },
       "user_assessment": {
@@ -248,7 +257,17 @@
       "supply_count": 9,
       "price_summary": "60㎡ 14.88억 / 78㎡ 19.56억 / 84㎡ 21.28억 (3.3㎡당 평균 5,896만원). 입주 2027.04. 전매제한 3년",
       "qualifications": {
+        "household_head_required": false,
         "passbook_required": false,
+        "residency": "무관 (전국)",
+        "ownership": "1주택자 가능 (주택 처분 조건 없음)",
+        "age_min": 19,
+        "method": "추첨 100%",
+        "other": [
+          "임의공급(잔여세대 자체 공급) — 가장 완화된 자격",
+          "전매제한 3년 (투기과열지구)",
+          "당해(분당) 우선 조건 없음"
+        ],
         "household": "임의공급 — 청약통장 불요. 19세 이상 누구나 신청 가능 (1주택자 포함)"
       },
       "user_assessment": {
