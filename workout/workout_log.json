@@ -2136,5 +2136,68 @@
     "garmin_ids": [
       22778636157
     ]
+  },
+  "2026-05-07": {
+    "planned": "러닝 3km Easy",
+    "done": true,
+    "actual": "러닝 4.63km @6:33",
+    "metrics": {
+      "type": "run",
+      "distance_km": 4.63,
+      "pace_per_km": "6:33",
+      "avg_hr": 131,
+      "max_hr": 147,
+      "cadence": 176,
+      "training_load": 44,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 417,
+          "avg_hr": 127,
+          "max_hr": 138,
+          "pace_sec": 417,
+          "pace_str": "6:56"
+        },
+        {
+          "distance": 1000,
+          "duration": 384,
+          "avg_hr": 126,
+          "max_hr": 132,
+          "pace_sec": 384,
+          "pace_str": "6:23"
+        },
+        {
+          "distance": 1000,
+          "duration": 382,
+          "avg_hr": 133,
+          "max_hr": 147,
+          "pace_sec": 382,
+          "pace_str": "6:21"
+        },
+        {
+          "distance": 1000,
+          "duration": 387,
+          "avg_hr": 136,
+          "max_hr": 145,
+          "pace_sec": 387,
+          "pace_str": "6:27"
+        },
+        {
+          "distance": 628,
+          "duration": 251,
+          "avg_hr": 133,
+          "max_hr": 140,
+          "pace_sec": 399,
+          "pace_str": "6:39"
+        }
+      ]
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.4 | 부하 44",
+    "garmin_id": 22790504203,
+    "start_time": "06:28",
+    "garmin_ids": [
+      22790504203
+    ]
   }
 }
