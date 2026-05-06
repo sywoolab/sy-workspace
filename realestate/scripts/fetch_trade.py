@@ -513,44 +513,73 @@ def top5_tight_live(data):
 
 def top5_ext(data):
     """매수상한 +1억(12.6억) 시나리오 TOP 5.
-    매매 11.6 < ~ ≤ 12.6 구간 + 자금 ≤ 7억 필요 단지 중 갭/실거주 적격 전략 자동 판단.
+    매매 11.6 < ~ ≤ 12.6 구간 + 자금 ≤ 7억 필요 단지.
+    레드팀 패치 (2026-05-06):
+    - C2: 갭투자 5/9 이후 대출 불가 — 보완조치 종료일 D 이후엔 갭 전략 시 현금 100% 가정
+    - H2: 정렬 키를 _ext_strategy에 맞춘 점수로 변경
     """
+    # 보완조치 종료일 (real-estate L1 §정책 SSOT)
+    GAP_LOAN_END = datetime(2026, 5, 9).date()
+    today = datetime.now().date()
+
     pool = []
     for d in data:
         # 매매 구간 필터: 기존 상한 초과 ~ 신규 상한 이하
         if not (MAX_PRICE < d["매매가"] <= MAX_PRICE_EXT and d["전세건수"] >= 2):
             continue
-        # 갭/실거주 중 자금 7억 內 적격 전략
-        gap_ok = (d["갭필요현금"] is not None
-                  and 0 < d["갭필요현금"] <= CASH_EXT)
+
+        # 갭 필요현금 — 5/9 이후엔 대출 0으로 재계산
+        if today < GAP_LOAN_END:
+            gap_need = d.get("갭필요현금")  # 기존(대출 가능 가정)
+        else:
+            # 보완조치 종료 후 = 현금 100% 갭 = 매매가 - 전세평균 + 취득세
+            jeonse = d.get("전세평균")
+            if jeonse is None:
+                gap_need = None
+            else:
+                from_acq = d.get("취득세_갭", 0)
+                gap_need = (d["매매가"] - jeonse) + from_acq
+
+        # 갭/실거주 적격 판정
+        gap_ok = gap_need is not None and 0 < gap_need <= CASH_EXT
         live_ok = (d["실거주필요현금"] <= CASH_EXT
                    and _monthly_payment(d["실거주대출"]) <= 500)
         if not (gap_ok or live_ok):
             continue
-        # 적격한 전략 中 자금 적게 드는 쪽 선택
+
+        # 적격 전략 中 자금 적게 드는 쪽 선택
         if gap_ok and live_ok:
-            if d["갭필요현금"] <= d["실거주필요현금"]:
-                strat, req = "갭", d["갭필요현금"]
+            if gap_need <= d["실거주필요현금"]:
+                strat, req, score = "갭", gap_need, d["총점_갭"]
             else:
-                strat, req = "실거주", d["실거주필요현금"]
+                strat, req, score = "실거주", d["실거주필요현금"], d["총점_실거주"]
         elif gap_ok:
-            strat, req = "갭", d["갭필요현금"]
+            strat, req, score = "갭", gap_need, d["총점_갭"]
         else:
-            strat, req = "실거주", d["실거주필요현금"]
+            strat, req, score = "실거주", d["실거주필요현금"], d["총점_실거주"]
+
         d["_ext_strategy"] = strat
         d["_ext_required"] = req
+        d["_ext_score"] = score  # H2 패치: 적격 전략에 맞춘 점수
         pool.append(d)
-    pool.sort(key=lambda x: -max(x["총점_갭"], x["총점_실거주"]))
+
+    pool.sort(key=lambda x: -x["_ext_score"])  # H2 패치
     return pool[:5]
 
 
 def format_ext_message(top, pool_size, region_tag=""):
-    """매수상한 +1억 시나리오 메시지"""
-    today = datetime.now().strftime("%Y-%m-%d")
+    """매수상한 +1억 시나리오 메시지 (레드팀 패치 — 한계 명시)"""
+    today_dt = datetime.now()
+    today = today_dt.strftime("%Y-%m-%d")
     tag = f" ({region_tag})" if region_tag else ""
+    GAP_LOAN_END = datetime(2026, 5, 9).date()
+    gap_loan_note = "5/9 이후 갭 = 현금 100%" if today_dt.date() >= GAP_LOAN_END else "5/9까지 갭 = 대출 가능"
+
     lines = [
         f"🚀 <b>매수상한 +1억 시 추천 TOP {len(top)}{tag}</b>",
-        f"<i>{today} | 매매 11.6~12.6억 | 자금 ≤7억 (+1억 마련 가정)</i>",
+        f"<i>{today} | 매매 11.6~12.6억 | 자금 ≤7억 가정</i>",
+        f"<i>⚠️ [변경 제안] SSOT(11.6억) 미결정 상태에서 보조 시나리오. CASH_EXT 7억은 메인 추정 — 사용자 확정 필요</i>",
+        f"<i>⚠️ {gap_loan_note} | 중개수수료·법무비 별도</i>",
         "",
     ]
     if not top:
@@ -562,7 +591,7 @@ def format_ext_message(top, pool_size, region_tag=""):
         strat = c['_ext_strategy']
         req = c['_ext_required']
         extra = req - CASH  # 기본 6억 대비 추가 자금
-        score = max(c['총점_갭'], c['총점_실거주'])
+        score = c.get('_ext_score', max(c['총점_갭'], c['총점_실거주']))
         if i <= 3:
             lines.append(
                 f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{score:.0f}점\n"
@@ -575,7 +604,7 @@ def format_ext_message(top, pool_size, region_tag=""):
                 f" | {c['매매가']:.1f} {strat}{req:.1f}(+{extra:.1f}) {t}"
             )
     lines.append("")
-    lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원). 11.6억 內 단지는 위 갭/실거주/AI TOP에서 별도 확인.</i>")
+    lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원). 11.6억 內 단지는 갭/실거주/AI TOP 별도 참조.</i>")
     return "\n".join(lines)
 
 
@@ -847,13 +876,15 @@ def send_telegram(text, parse_mode="HTML"):
         print(f"[WARN] 텔레그램: {e}")
 
 
-def save_results(data, top1, top2, top3):
+def save_results(data, top1, top2, top3, ext_top=None):
     # 전체 데이터 CSV
     if data:
-        keys = data[0].keys()
+        keys = list(data[0].keys())
+        # _ext_* 임시 필드는 CSV에서 제외 (data 정합성)
+        keys = [k for k in keys if not k.startswith("_ext_")]
         path = BASE_DIR / "scored_all.csv"
         with open(path, "w", newline="", encoding="utf-8-sig") as f:
-            w = csv.DictWriter(f, fieldnames=keys)
+            w = csv.DictWriter(f, fieldnames=keys, extrasaction="ignore")
             w.writeheader()
             w.writerows(data)
         print(f"전체 저장: {path} ({len(data)}건)")
@@ -865,6 +896,8 @@ def save_results(data, top1, top2, top3):
         "strategy2_live": top2,
         "strategy3_wait": top3,
     }
+    if ext_top is not None:
+        summary["strategy_ext_plus1"] = ext_top  # M3 패치: ext 영속화
     path = BASE_DIR / "strategy_top10.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
@@ -902,38 +935,44 @@ def main():
     top3 = top10_wait(data)
     print(f"전략1: {len(top1)}/{len(gap_pool)} / 전략2: {len(top2)}/{len(live_pool)} / 전략3: {len(top3)}/{len(wait_pool)}")
 
-    save_results(data, top1, top2, top3)
+    # ── 매수상한 +1억 시나리오 TOP 5 (12.6억 한도) — save 전에 계산 ──
+    ext_pool = [d for d in data if MAX_PRICE < d["매매가"] <= MAX_PRICE_EXT and d["전세건수"] >= 2]
+    ext_top = top5_ext(data)
+    print(f"+1억 시나리오: {len(ext_top)}/{len(ext_pool)}")
+
+    # save_results — ext_top까지 영속화 (M3 패치)
+    save_results(data, top1, top2, top3, ext_top=ext_top)
 
     # ── 서울 TOP 10 (3개 메시지) ──
     msg1 = format_gap_message(top1, len(gap_pool))
     msg2 = format_live_message(top2, len(live_pool))
     msg3 = format_wait_message(top3, len(wait_pool))
 
-    for msg in [msg1, msg2, msg3]:
-        print(f"\n{msg}")
-        send_telegram(msg)
+    import time as _t
+    all_msgs = [msg1, msg2, msg3]
 
     # ── 타이트 운용 TOP 5 ──
     tight_gap = top5_tight_gap(data)
     tight_live = top5_tight_live(data)
-    tight_msg = format_tight_message(tight_gap, tight_live)
-    print(f"\n{tight_msg}")
-    send_telegram(tight_msg)
+    all_msgs.append(format_tight_message(tight_gap, tight_live))
 
     # ── AI 추천 매물 TOP 5 ──
     picks = ai_pick(data)
     print(f"AI 추천: {len(picks)}건")
-    ai_msg = format_ai_pick_message(picks)
-    print(f"\n{ai_msg}")
-    send_telegram(ai_msg)
+    all_msgs.append(format_ai_pick_message(picks))
 
-    # ── 매수상한 +1억 시나리오 TOP 5 (12.6억 한도) ──
-    ext_pool = [d for d in data if MAX_PRICE < d["매매가"] <= MAX_PRICE_EXT and d["전세건수"] >= 2]
-    ext_top = top5_ext(data)
-    print(f"+1억 시나리오: {len(ext_top)}/{len(ext_pool)}")
-    ext_msg = format_ext_message(ext_top, len(ext_pool))
-    print(f"\n{ext_msg}")
-    send_telegram(ext_msg)
+    # ── +1억 시나리오 메시지 (적격 단지 있을 때만 — M4 패치) ──
+    if ext_top:
+        all_msgs.append(format_ext_message(ext_top, len(ext_pool)))
+    else:
+        print("+1억 시나리오 적격 단지 없음 → 메시지 스킵")
+
+    # 일괄 발송 (M2 패치: chunk 간 sleep 1초 — rate limit 회피)
+    for i, msg in enumerate(all_msgs):
+        if i > 0:
+            _t.sleep(1.0)
+        print(f"\n{msg}")
+        send_telegram(msg)
 
 
 if __name__ == "__main__":
