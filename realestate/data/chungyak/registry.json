@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "description": "청약/장기임대 매뉴얼 등록 단지. 메인이 직접 검증한 단지만 등록. 자동 스크래퍼가 발견한 신규 단지는 별도 새 단지 알림으로 처리.",
+    "schema_version": 1,
+    "last_curated": "2026-05-06",
+    "user_profile": {
+      "household": "부부 무주택 (출산 예정)",
+      "lifecycle": "예비신혼/신혼 (혼인 7년 이내)",
+      "cash_won": 600000000,
+      "salary_after_tax_won": 10000000,
+      "salary_pretax_estimate_won": 12000000,
+      "max_purchase_price_won": 1160000000,
+      "preferred_areas": ["서울", "경기도 성남시 분당구"],
+      "secondary_areas": ["과천", "고양", "광명"],
+      "ignored_areas_unless_extraordinary": ["안양", "인천", "남양주", "양주", "김포", "파주", "오산", "화성", "양평"]
+    },
+    "income_table_2025": {
+      "_unit": "원/월(세전)",
+      "_source": "도시근로자 가구당 월평균소득 (SH 미리내집 표 기준)",
+      "person_2": 5477003,
+      "person_3": 7626973,
+      "person_4": 8578088,
+      "person_5": 9031048
+    },
+    "income_table_2025_jangjeonse": {
+      "_note": "장기전세 50차 기준 — SH 미리내집 표와 미세 차이",
+      "person_3_pct100": 7626973,
+      "person_3_pct105": 8008322,
+      "person_3_pct150": 11440460
+    },
+    "asset_limit_2025": {
+      "_unit": "원",
+      "_source": "SH 미리내집/장기전세 청약자격 페이지 (2025)",
+      "total_asset_no_child": 640000000,
+      "total_asset_child_1": 704000000,
+      "total_asset_child_2plus": 768000000,
+      "real_estate_max_jangjeonse": 215500000,
+      "car_no_child": 45630000,
+      "car_child_1": 50200000,
+      "car_child_2plus": 54760000
+    },
+    "user_eligibility_summary": {
+      "asset_under_640m": "OK (한도 임박)",
+      "income_pct_2person_pretax_1200": 219,
+      "income_pct_3person_pretax_1200": 157,
+      "comment": "2인 가구 기준 219% > 200% 한도 초과 가능. 출산 후 3인 기준 157% < 200% OK. 건강보험 월보수 정확 산정 필수."
+    }
+  },
+  "listings": [
+    {
+      "id": "sh_minae_7",
+      "name": "SH 제7차 미리내집 (장기전세2)",
+      "type": "장기전세 (분양전환 가능, 신혼특화)",
+      "category": "rental",
+      "supplier": "SH",
+      "location_summary": "서울 동작 상도/신대방, 강북 미아 (신규 124호) + 재공급 317호",
+      "districts": ["동작구", "강북구"],
+      "address_detail": "PDF 확인 필요",
+      "apply_url": "https://www.i-sh.co.kr/app/lay2/program/S48T6792C6814/m_14/appNoti/appUser_list.do?splyTy=03",
+      "info_url": "https://www.i-sh.co.kr/main/lay2/program/S1T294C295/www/brd/m_241/view.do?seq=303480",
+      "qual_url": "https://www.i-sh.co.kr/app/lay2/S48T6792C6812/contents.do",
+      "schedule": [
+        {"phase": "인터넷 청약", "start": "2026-05-06T10:00", "end": "2026-05-08T17:00"},
+        {"phase": "방문 청약", "start": "2026-05-08T10:00", "end": "2026-05-08T17:00"}
+      ],
+      "supply_count": 441,
+      "price_summary": "단지·평형별 상이 (PDF 확인). 분할납부제 70% 입주 + 30% 유예",
+      "tenure_years": 20,
+      "sale_convertible": true,
+      "qualifications": {
+        "household": "서울 거주 무주택세대구성원, 신혼부부(혼인 7년 이내) 또는 예비신혼",
+        "income_pct_60_under": {"single": 120, "dual": 180},
+        "income_pct_60_over": {"single": 150, "dual": 200},
+        "asset_total_won": 640000000,
+        "asset_car_won": 45630000
+      },
+      "user_assessment": {
+        "verdict": "boundary",
+        "asset": "OK (한도 6.4억 vs 사용자 6억, 임박)",
+        "income": "2인 가구 기준 219% > 60㎡초과 맞벌이 200% 초과 가능. 출산 후 3인은 157% OK",
+        "action": "건강보험 월보수 확인 + PDF 자격표 정독 후 결정. 분양 청약과 자격 충돌 없음(무주택 유지)"
+      },
+      "priority_score": 80,
+      "first_seen": "2026-05-06"
+    },
+    {
+      "id": "sh_jangjeonse_50",
+      "name": "SH 제50차 장기전세주택",
+      "type": "장기전세 (분양전환 X, 임대 20년)",
+      "category": "rental",
+      "supplier": "SH",
+      "location_summary": "서울 전역 (신규: 강북 미아, 동작 상도, 동작 신대방 등) + 재공급 71개 단지",
+      "districts": ["동작구", "강북구", "마곡", "내곡", "기타 서울"],
+      "apply_url": "https://www.i-sh.co.kr/app/lay2/program/S48T1587C612/m_14/appNoti/appUser_list.do?splyTy=03",
+      "info_url": "https://www.i-sh.co.kr/main/lay2/program/S1T294C295/www/brd/m_241/view.do?seq=303557",
+      "qual_url": "https://www.i-sh.co.kr/app/lay2/S48T1587C589/contents.do",
+      "schedule": [
+        {"phase": "1순위", "start": "2026-05-13T10:00", "end": "2026-05-14T17:00"},
+        {"phase": "2순위", "start": "2026-05-15T10:00", "end": "2026-05-15T17:00"},
+        {"phase": "3·4순위", "start": "2026-05-18T10:00", "end": "2026-05-18T17:00"}
+      ],
+      "supply_count": 1154,
+      "price_summary": "단지·평형별 상이 (PDF 확인). 시세 80% 이하 전세보증금",
+      "tenure_years": 20,
+      "sale_convertible": false,
+      "qualifications": {
+        "household": "서울 거주 무주택세대구성원, 청약저축 1년+ (1순위 24회+)",
+        "income_pct_60_under": {"single": 105, "dual": 140},
+        "income_pct_60_over": {"single": 150, "dual": 200},
+        "asset_total_won": 640000000,
+        "asset_real_estate_won": 215500000,
+        "asset_car_won": 45630000
+      },
+      "user_assessment": {
+        "verdict": "boundary",
+        "asset": "OK (한도 6.4억, 사용자 6억)",
+        "income": "60㎡ 초과 + 맞벌이 200% 적용 시 사용자 219% 경계 초과 가능",
+        "action": "60㎡ 초과 단지 + 맞벌이 200% 한도로 신청. 신규 단지 중 힐스테이트 동작 시그니처(상도) 통근 양호"
+      },
+      "priority_score": 75,
+      "first_seen": "2026-05-06"
+    },
+    {
+      "id": "sh_dundun_2026",
+      "name": "SH 2026년 전세임대형 든든주택",
+      "type": "전세임대 (다가구·다세대)",
+      "category": "rental",
+      "supplier": "SH",
+      "location_summary": "서울 전역 (입주자가 매물 직접 선정)",
+      "districts": ["서울 25개구 전역"],
+      "apply_url": "https://www.i-sh.co.kr/app/index.do",
+      "info_url": "https://www.i-sh.co.kr/main/lay2/program/S1T294C295/www/brd/m_241/view.do?seq=303584",
+      "qual_url": "",
+      "schedule": [
+        {"phase": "1순위 (신생아·다자녀)", "start": "2026-05-18T10:00", "end": "2026-05-22T17:00"},
+        {"phase": "2순위 (신혼·예비신혼)", "start": "2026-05-18T10:00", "end": "2026-05-22T17:00"}
+      ],
+      "supply_count": 500,
+      "price_summary": "지원기준 호당 2억(80%=1.6억) / 보증금 한도 3억 / 본인부담: 보증금 3억 시 1.4억(=3억-1.6억). 단, 지원기준 2억 이내면 본인 20%(=4,000만)",
+      "tenure_years": 20,
+      "sale_convertible": false,
+      "qualifications": {
+        "household": "신혼·예비신혼·신생아·다자녀",
+        "income_pct_60_under": null,
+        "income_pct_60_over": null,
+        "asset_total_won": null,
+        "note": "소득·자산 기준 없음"
+      },
+      "user_assessment": {
+        "verdict": "eligible",
+        "asset": "기준 없음",
+        "income": "기준 없음",
+        "action": "분양 청약 결과와 별개 안전망. 신청 권고 (2순위 신혼·예비신혼)",
+        "본인부담": "보증금 2억 매물 시 본인 4,000만 / 보증금 3억 매물 시 본인 1.4억 (PDF 정확 산식 확인 필수)"
+      },
+      "priority_score": 70,
+      "first_seen": "2026-05-06"
+    },
+    {
+      "id": "applyhome_lagrande_2026",
+      "name": "래미안 라그란데 잔여세대 일반공급",
+      "type": "잔여세대 일반공급 (취소후재공급, 추첨)",
+      "category": "sale",
+      "supplier": "이문1재정비촉진구역주택재개발정비사업조합",
+      "location_summary": "서울 동대문구 이문로35길 12 (이문동)",
+      "districts": ["동대문구"],
+      "apply_url": "https://www.applyhome.co.kr/co/coa/selectMainView.do",
+      "info_url": "https://www.applyhome.co.kr/ai/aia/selectAPTRemndrLttotPblancListView.do",
+      "schedule": [
+        {"phase": "특별공급(노부모부양)", "start": "2026-05-12T09:00", "end": "2026-05-12T17:30"},
+        {"phase": "일반공급", "start": "2026-05-13T09:00", "end": "2026-05-13T17:30"}
+      ],
+      "supply_count": 2,
+      "price_summary": "55㎡ 8.83억 (1세대), 74C㎡ 9.58억 (1세대 — 노부모부양 특공)",
+      "qualifications": {
+        "household": "서울 거주 무주택세대주",
+        "passbook_required": false,
+        "method": "추첨 100%"
+      },
+      "user_assessment": {
+        "verdict": "eligible",
+        "general_supply_55sqm": "적격, 손실 0 시도 권고 (1세대뿐 경쟁 극심)",
+        "special_supply_74sqm": "노부모부양 자격 미해당, 부적격"
+      },
+      "priority_score": 60,
+      "first_seen": "2026-05-06"
+    },
+    {
+      "id": "applyhome_anyang_everfore_a2",
+      "name": "안양 에버포레 자연앤 e편한세상 A2BL",
+      "type": "민영 분양가상한제",
+      "category": "sale",
+      "supplier": "경기주택도시공사",
+      "location_summary": "경기 안양시 동안구 관양동 521 일원",
+      "districts": ["안양시 동안구"],
+      "apply_url": "https://www.applyhome.co.kr/co/coa/selectMainView.do",
+      "info_url": "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancListView.do",
+      "price_source": "보도자료/블로그 (모집공고 PDF 직접 인용 권고)",
+      "schedule": [
+        {"phase": "특별공급", "start": "2026-05-11T09:00", "end": "2026-05-11T17:30"},
+        {"phase": "1순위(해당지역)", "start": "2026-05-12T09:00", "end": "2026-05-12T17:30"},
+        {"phase": "1순위(기타지역)", "start": "2026-05-13T09:00", "end": "2026-05-13T17:30"},
+        {"phase": "2순위", "start": "2026-05-14T09:00", "end": "2026-05-14T17:30"}
+      ],
+      "supply_count": 344,
+      "price_summary": "84A 7.616억~8.017억 / 84B 7.524억~7.920억 / 84C 7.485억~7.879억 / 84D 7.608억~8.008억",
+      "qualifications": {
+        "passbook_required": true,
+        "household": "무주택세대구성원 + 청약통장 1년+ + 안양시 거주 2년 우선"
+      },
+      "user_assessment": {
+        "verdict": "out_of_preference",
+        "asset": "11.6억 매수상한 內 OK",
+        "income": "민영 (소득 무관)",
+        "residency": "안양시 2년 거주 우선 미충족 → 5/13 기타지역 1순위만 가능 (당첨확률 낮음)",
+        "note": "분양가상한제 안전마진 큰 단지이나 사용자 선호 외(안양). 참고용 유지."
+      },
+      "priority_score": 30,
+      "first_seen": "2026-05-06"
+    },
+    {
+      "id": "applyhome_dusop_bundang_centro",
+      "name": "더샵 분당센트로 (무지개마을4단지 리모델링)",
+      "type": "임의공급 (잔여세대 줍줍)",
+      "category": "sale",
+      "supplier": "무지개마을4단지리모델링주택조합 (포스코이앤씨)",
+      "location_summary": "경기 성남시 분당구 미금로 66 (분당구)",
+      "districts": ["성남시 분당구"],
+      "apply_url": "https://www.applyhome.co.kr/co/coa/selectMainView.do",
+      "info_url": "https://www.applyhome.co.kr/ai/aia/selectAPTRemndrLttotPblancListView.do",
+      "price_source": "한국경제/스트레이트뉴스 보도",
+      "schedule": [
+        {"phase": "임의공급(접수)", "start": "2026-05-07T09:00", "end": "2026-05-11T17:30"},
+        {"phase": "당첨자 발표", "start": "2026-05-14T09:00", "end": "2026-05-14T18:00"},
+        {"phase": "계약", "start": "2026-05-16T09:00", "end": "2026-05-16T17:00"}
+      ],
+      "supply_count": 9,
+      "price_summary": "60㎡ 14.88억 / 78㎡ 19.56억 / 84㎡ 21.28억 (3.3㎡당 평균 5,896만원). 입주 2027.04. 전매제한 3년",
+      "qualifications": {
+        "passbook_required": false,
+        "household": "임의공급 — 청약통장 불요. 19세 이상 누구나 신청 가능 (1주택자 포함)"
+      },
+      "user_assessment": {
+        "verdict": "out_of_preference",
+        "reason": "사용자 1순위 선호지 분당 진행 중이나 모든 평형이 매수상한(11.6억) 초과 — 60㎡ 14.88억 > 11.6억",
+        "asset": "현금 6억 + 대출 6억 = 12억 한도 < 최저 14.88억 → 자금 부족",
+        "income": "임의공급(소득 무관)",
+        "note": "분당 신축 정보 차원에서 등록. 자금 마련 시 재검토 가능"
+      },
+      "priority_score": 25,
+      "first_seen": "2026-05-06"
+    },
+    {
+      "id": "lh_incheon_gyeyang_a9",
+      "name": "인천계양 A9 신혼희망타운",
+      "type": "공공분양 (신혼희망타운, 분양가상한제)",
+      "category": "sale",
+      "supplier": "LH",
+      "location_summary": "인천 계양구 동양동 (인천계양 3기 신도시)",
+      "districts": ["인천 계양구"],
+      "apply_url": "https://apply.lh.or.kr/lhapply/main/main.do",
+      "info_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=0000061083",
+      "price_source": "한국경제/중부일보 보도",
+      "schedule": [
+        {"phase": "사전청약 당첨자 본청약", "start": "2026-05-18T10:00", "end": "2026-05-19T17:00"},
+        {"phase": "본청약 (특공+일반)", "start": "2026-05-27T10:00", "end": "2026-05-28T17:00"}
+      ],
+      "supply_count": null,
+      "price_summary": "55㎡ 평균 약 4.9억 (보도). PDF 확인 필요",
+      "qualifications": {
+        "passbook_required": true,
+        "household": "혼인 7년 이내 또는 만 6세 이하 자녀 + 무주택",
+        "asset_total_won": 362000000,
+        "income_pct_dual": 200,
+        "note": "신혼희망타운 자산 한도 3.62억. 수익공유형 모기지 의무"
+      },
+      "user_assessment": {
+        "verdict": "ineligible",
+        "asset": "❌ 자산 한도 3.62억 vs 사용자 6억 → 부적격 확정",
+        "income": "맞벌이 200% 한도 — 사용자 219% 경계",
+        "location": "인천 (사용자 ignored_areas)",
+        "note": "분양가는 매수상한 內이나 자산 기준 절대 한도로 부적격. 등록은 사용자 결정 기회 보장 목적"
+      },
+      "priority_score": 10,
+      "first_seen": "2026-05-06"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+name: realestate-chungyak-daily
+
+on:
+  schedule:
+    # 매일 UTC 23:00 = KST 08:00 (사용자 아침 알림)
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode (send / detect / dry-run / all)'
+        default: 'all'
+        required: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # detect 모드에서 snapshot.json commit/push 위해 토큰 필요
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests python-dotenv
+
+      - name: Sync (pull --rebase before run)
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git fetch origin
+          git pull --rebase origin main || true
+
+      - name: Run chungyak alert (cron = all, manual = input.mode)
+        env:
+          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          if [ -z "$MODE" ]; then MODE="all"; fi
+          echo "Running mode: $MODE"
+          python realestate/scripts/fetch_chungyak.py --mode "$MODE"
+
+      - name: Save snapshot (신규 감지 상태 보존)
+        if: success()
+        run: |
+          git add realestate/data/chungyak/snapshot.json || true
+          git diff --staged --quiet || (git commit -m "chungyak: daily snapshot update" && git push) || true
