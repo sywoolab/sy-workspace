@@ -180,6 +180,12 @@ def location_priority(listing: dict) -> str:
     return "outside"
 
 
+def is_jjupjjup(listing: dict) -> bool:
+    """잔여세대/임의공급/취소후재공급 = 줍줍 단지 (사용자 핵심 관심)"""
+    typ = listing.get("type", "")
+    return any(kw in typ for kw in ["임의공급", "잔여세대", "취소후재공급", "줍줍"])
+
+
 # ── HTML 포매팅 ──
 
 def html_escape(s):
@@ -189,7 +195,7 @@ def html_escape(s):
 
 
 def render_listing(listing: dict, today: datetime, bucket: str) -> str:
-    """단일 단지 메시지 블록 (9개 필수 항목 모두 포함)"""
+    """단일 단지 메시지 블록 (9개 필수 항목 모두 포함). 적격 단지용 풀 렌더링."""
     lines = []
     name = html_escape(listing["name"])
     typ = html_escape(listing.get("type", ""))
@@ -201,6 +207,8 @@ def render_listing(listing: dict, today: datetime, bucket: str) -> str:
         "month_imminent": "🔵",
         "future": "⚪",
     }.get(bucket, "⚫")
+    if is_jjupjjup(listing):
+        icon = "🎲"  # 줍줍 단지 강조
 
     lines.append(f"{icon} <b>{name}</b>")
     if typ:
@@ -313,94 +321,174 @@ def render_listing(listing: dict, today: datetime, bucket: str) -> str:
 
 # ── 메시지 작성 ──
 
+def render_compact(listing: dict, today: datetime, reason: str = "") -> str:
+    """부적격/선호 외 단지용 1~2줄 압축 렌더링 — 사용자 시간 절약"""
+    name = html_escape(listing["name"])
+    loc = html_escape(listing.get("location_summary", "")[:40])
+    schedule = listing.get("schedule", [])
+    if schedule:
+        try:
+            s = parse_dt(schedule[0]["start"])
+            e = parse_dt(schedule[-1]["end"])
+            date_str = f"{fmt_date(s)}~{fmt_date(e)}"
+        except Exception:
+            date_str = "?"
+    else:
+        date_str = "?"
+
+    jjup_mark = "🎲 " if is_jjupjjup(listing) else ""
+    line = f"• {jjup_mark}<b>{name}</b> · {loc} · {date_str}"
+    if reason:
+        line += f" · <i>{html_escape(reason)}</i>"
+    return line
+
+
 def build_message(registry: dict, today: datetime) -> list:
-    """4단계 시간축으로 분류 + 메시지 리스트 반환 (분할 가능)"""
+    """
+    적격성 + 줍줍 우선 구조:
+    1. 🎯 적격 단지 (시간 분류)
+       - 줍줍은 ⭐별도 섹션
+    2. ⚪ 사용자 선호 외 (1줄 압축)
+    3. 🚫 부적격 (1줄 압축, 사유 명시)
+    4. 즉시 액션
+    """
     listings = registry.get("listings", [])
 
-    buckets = {"today_open": [], "week_imminent": [], "month_imminent": [], "future": []}
+    # 1차 분류: verdict
+    eligible = []
+    out_of_pref = []
+    ineligible = []
     for li in listings:
-        b = classify_time_bucket(li, today)
-        if b in buckets:
-            buckets[b].append((location_priority(li), li))
+        verdict = li.get("user_assessment", {}).get("verdict", "")
+        if verdict in ("eligible", "boundary"):
+            eligible.append(li)
+        elif verdict == "out_of_preference":
+            out_of_pref.append(li)
+        elif verdict == "ineligible":
+            ineligible.append(li)
+        else:
+            eligible.append(li)  # 명시 없으면 적격으로
 
-    # primary 우선 + priority_score 내림차순 정렬
-    def sort_key(t):
-        prio_rank = {"primary": 0, "secondary": 1, "outside": 2}[t[0]]
-        return (prio_rank, -t[1].get("priority_score", 0))
+    # 2차 분류: 적격 단지를 줍줍 vs 일반 + 시간 분류
+    def time_bucket_for(li):
+        return classify_time_bucket(li, today)
 
-    for k in buckets:
-        buckets[k].sort(key=sort_key)
+    eligible_jjup = []
+    eligible_normal_buckets = {"today_open": [], "week_imminent": [], "month_imminent": [], "future": []}
+    for li in eligible:
+        b = time_bucket_for(li)
+        if b == "ended":
+            continue  # 종료 단지 제외
+        if is_jjupjjup(li):
+            eligible_jjup.append((b, li))
+        elif b in eligible_normal_buckets:
+            eligible_normal_buckets[b].append(li)
+
+    # 줍줍은 시간 버킷별로 정렬
+    eligible_jjup.sort(key=lambda t: ["today_open", "week_imminent", "month_imminent", "future"].index(t[0]))
+
+    # 일반 적격 — 위치 + 점수
+    def sort_key(li):
+        loc_rank = {"primary": 0, "secondary": 1, "outside": 2}[location_priority(li)]
+        return (loc_rank, -li.get("priority_score", 0))
+    for k in eligible_normal_buckets:
+        eligible_normal_buckets[k].sort(key=sort_key)
 
     parts = []
-
-    # 헤더
     today_str = fmt_date(today)
-    header = (
+    parts.append(
         f"🏠 <b>부동산 청약/장기임대 일일 알림</b>\n"
-        f"{today.strftime('%Y-%m-%d')} {today_str} · 서울/분당 우선\n"
+        f"{today.strftime('%Y-%m-%d')} {today_str} · 서울/분당 우선"
     )
-    parts.append(header)
 
-    # 오늘 신청 가능
+    # ── 1. 줍줍 (사용자 핵심 관심 — 가장 위) ──
     parts.append("\n━━━━━━━━━━━━━━━━")
-    parts.append("🔴 <b>오늘 신청 가능</b>")
+    parts.append("🎲 <b>줍줍 (잔여세대/임의공급) — 사용자 핵심 타깃</b>")
     parts.append("━━━━━━━━━━━━━━━━")
-    if buckets["today_open"]:
-        for _, li in buckets["today_open"]:
-            parts.append("\n" + render_listing(li, today, "today_open"))
+    if eligible_jjup:
+        for b, li in eligible_jjup:
+            parts.append("\n" + render_listing(li, today, b))
     else:
-        parts.append("✅ 오늘 신청 가능한 단지 없음")
+        parts.append("(현재 등록된 줍줍 단지 없음 — 신규 발견 시 별도 🎲 알림)")
 
-    # 한주 안
-    parts.append("\n━━━━━━━━━━━━━━━━")
-    parts.append("🟡 <b>한주 안 (~D+7)</b>")
-    parts.append("━━━━━━━━━━━━━━━━")
-    if buckets["week_imminent"]:
-        for _, li in buckets["week_imminent"]:
-            parts.append("\n" + render_listing(li, today, "week_imminent"))
-    else:
-        parts.append("(없음)")
+    # ── 2. 일반 적격 단지 — 시간 분류 ──
+    has_any_normal = any(eligible_normal_buckets.values())
+    if has_any_normal:
+        # 오늘
+        if eligible_normal_buckets["today_open"]:
+            parts.append("\n━━━━━━━━━━━━━━━━")
+            parts.append("🔴 <b>오늘 신청 가능</b>")
+            parts.append("━━━━━━━━━━━━━━━━")
+            for li in eligible_normal_buckets["today_open"]:
+                parts.append("\n" + render_listing(li, today, "today_open"))
+        # 한주 안
+        if eligible_normal_buckets["week_imminent"]:
+            parts.append("\n━━━━━━━━━━━━━━━━")
+            parts.append("🟡 <b>한주 안 (~D+7)</b>")
+            parts.append("━━━━━━━━━━━━━━━━")
+            for li in eligible_normal_buckets["week_imminent"]:
+                parts.append("\n" + render_listing(li, today, "week_imminent"))
+        # 한달 안
+        if eligible_normal_buckets["month_imminent"]:
+            parts.append("\n━━━━━━━━━━━━━━━━")
+            parts.append("🔵 <b>한달 안 (~D+30)</b>")
+            parts.append("━━━━━━━━━━━━━━━━")
+            for li in eligible_normal_buckets["month_imminent"]:
+                parts.append("\n" + render_listing(li, today, "month_imminent"))
+        # 향후
+        if eligible_normal_buckets["future"]:
+            parts.append("\n━━━━━━━━━━━━━━━━")
+            parts.append("⚪ <b>향후 주요 일정</b>")
+            parts.append("━━━━━━━━━━━━━━━━")
+            for li in eligible_normal_buckets["future"]:
+                parts.append("\n" + render_listing(li, today, "future"))
 
-    # 한달 안
-    parts.append("\n━━━━━━━━━━━━━━━━")
-    parts.append("🔵 <b>한달 안 (~D+30)</b>")
-    parts.append("━━━━━━━━━━━━━━━━")
-    if buckets["month_imminent"]:
-        for _, li in buckets["month_imminent"]:
-            parts.append("\n" + render_listing(li, today, "month_imminent"))
-    else:
-        parts.append("(없음)")
-
-    # 향후
-    if buckets["future"]:
+    # ── 3. 사용자 선호 외 (1줄 압축) ──
+    out_active = [li for li in out_of_pref if classify_time_bucket(li, today) != "ended"]
+    if out_active:
         parts.append("\n━━━━━━━━━━━━━━━━")
-        parts.append("⚪ <b>향후 주요 일정</b>")
+        parts.append("⚪ <b>참고 — 사용자 선호 외 (자격 OK, 위치/예산 미충족)</b>")
         parts.append("━━━━━━━━━━━━━━━━")
-        for _, li in buckets["future"]:
-            parts.append("\n" + render_listing(li, today, "future"))
+        for li in out_active:
+            ua = li.get("user_assessment", {})
+            reason = ua.get("reason") or ua.get("note") or ua.get("residency") or ""
+            parts.append(render_compact(li, today, reason[:60]))
 
-    # 즉시 액션 (사용자 프로필 기준 — 메인이 매일 갱신)
+    # ── 4. 부적격 (1줄 압축) ──
+    inel_active = [li for li in ineligible if classify_time_bucket(li, today) != "ended"]
+    if inel_active:
+        parts.append("\n━━━━━━━━━━━━━━━━")
+        parts.append("🚫 <b>참고 — 사용자 부적격 (소득·자산 한도)</b>")
+        parts.append("━━━━━━━━━━━━━━━━")
+        for li in inel_active:
+            ua = li.get("user_assessment", {})
+            reason = (ua.get("income") or ua.get("asset") or "")
+            # "❌" 같은 prefix 제거
+            reason = reason.replace("❌ ", "").split(".")[0][:60]
+            parts.append(render_compact(li, today, reason))
+
+    # ── 5. 즉시 액션 ──
     parts.append("\n━━━━━━━━━━━━━━━━")
     parts.append("📌 <b>즉시 액션</b>")
     parts.append("━━━━━━━━━━━━━━━━")
     actions = []
-    for _, li in buckets["today_open"]:
+    # 오늘 적격 단지의 액션
+    for li in eligible_normal_buckets["today_open"] + [li for b, li in eligible_jjup if b == "today_open"]:
         ua = li.get("user_assessment", {})
-        if ua.get("verdict") in ("eligible", "boundary"):
-            action = ua.get("action", "")
-            if action:
-                actions.append(f"• {html_escape(li['name'])}: {html_escape(action)}")
+        action = ua.get("action") or ua.get("note") or ""
+        if action:
+            actions.append(f"• <b>{html_escape(li['name'])}</b>: {html_escape(action)}")
     if actions:
         parts.extend(actions)
     else:
-        parts.append("• 오늘은 즉시 액션 없음")
+        parts.append("• 오늘 즉시 액션 없음 (신규 줍줍 발견 시 자동 알림)")
 
-    parts.append("\n<i>※ 이 알림은 매일 KST 08시 자동 발송. registry.json 단지만 검증 완료. 신규 공고는 별도 [신규] 알림.</i>")
+    parts.append(
+        "\n<i>※ 매일 KST 08시 자동 발송. registry 검증 단지만 표시. "
+        "신규 줍줍/공고 감지 시 별도 🎲 알림 발송.</i>"
+    )
 
-    full = "\n".join(parts)
-
-    # 4096자 제한 — 분할
-    return split_message(full, limit=4000)
+    return split_message("\n".join(parts), limit=4000)
 
 
 def split_message(text: str, limit: int = 4000) -> list:
@@ -502,24 +590,31 @@ def fetch_html(url, timeout=20):
 
 
 def detect_new_chungyak():
-    """청약홈 분양/잔여세대 페이지에서 단지명 추출. None 반환 시 스냅샷 갱신 스킵."""
-    discovered = set()
-    any_success = False
-    for url in [CHUNGYAK_LIST_URL, CHUNGYAK_REMNDR_URL]:
-        html = fetch_html(url)
-        if html is None:
-            continue
-        any_success = True
-        for m in re.finditer(r'data-honm="([^"]+)"', html):
-            discovered.add(m.group(1).strip())
-    if not any_success:
-        print("[WARN] chungyak: 모든 fetch 실패 → 스냅샷 갱신 스킵")
-        return None
-    if not discovered:
-        # 페이지는 정상 200이지만 매칭 0건 — 동적 렌더링/구조 변경 의심
-        print("[WARN] chungyak: 200 응답 but 단지명 0건 — 구조 변경 가능성. 스냅샷 갱신 스킵")
-        return None
-    return discovered
+    """
+    청약홈 두 페이지를 분리 추출. 반환:
+      {
+        "remndr": set(잔여세대 단지명) or None  # 줍줍 우선도 高
+        "normal": set(일반 분양 단지명) or None
+      }
+    None은 fetch/파싱 실패 → 스냅샷 갱신 스킵.
+    """
+    result = {"remndr": None, "normal": None}
+
+    html_r = fetch_html(CHUNGYAK_REMNDR_URL)
+    if html_r is not None:
+        titles = set(m.group(1).strip() for m in re.finditer(r'data-honm="([^"]+)"', html_r))
+        result["remndr"] = titles if titles else None
+        if not titles:
+            print("[WARN] chungyak remndr: 200 응답 but 0건. 스냅샷 갱신 스킵")
+
+    html_n = fetch_html(CHUNGYAK_LIST_URL)
+    if html_n is not None:
+        titles = set(m.group(1).strip() for m in re.finditer(r'data-honm="([^"]+)"', html_n))
+        result["normal"] = titles if titles else None
+        if not titles:
+            print("[WARN] chungyak normal: 200 응답 but 0건. 스냅샷 갱신 스킵")
+
+    return result
 
 
 def detect_new_sh():
@@ -540,14 +635,28 @@ def detect_new_sh():
     return titles
 
 
-def report_new(new_items, source):
+def report_new(new_items, source, is_jjup=False):
+    """신규 단지 알림. is_jjup=True면 줍줍 강조 (사용자 핵심 타깃)."""
     if not new_items:
         return
-    msg_lines = [f"🆕 <b>[{source}] 신규 공고 감지</b>", ""]
+    if is_jjup:
+        header = f"🎲 <b>[줍줍 신규] {source}에 잔여세대 단지 등록됨</b>"
+        footer = (
+            "<i>※ 임의공급/잔여세대 = 청약통장·소득·자산 무관. "
+            "사용자 매수상한 11.6억 內인지 모집공고 확인 후 신청. "
+            "메인이 registry에 추가하면 다음 알림부터 상세 표시.</i>"
+        )
+    else:
+        header = f"🆕 <b>[{source}] 신규 분양 공고</b>"
+        footer = (
+            "<i>※ 일반 분양 신규 등록. 자격(소득·자산·청약통장)·일정 PDF 확인 필요. "
+            "사용자 적격 여부는 메인 검증 후 다음 알림 반영.</i>"
+        )
+    msg_lines = [header, ""]
     for n in sorted(new_items)[:20]:
         msg_lines.append(f"• {html_escape(n)}")
     msg_lines.append("")
-    msg_lines.append("<i>※ 위 공고들은 registry.json에 미등록. 메인이 검증 후 추가 필요.</i>")
+    msg_lines.append(footer)
     send_telegram("\n".join(msg_lines))
 
 
@@ -580,28 +689,52 @@ def main():
 
     if args.mode in ("detect", "all") and not args.no_detect:
         snapshot = load_snapshot()
-        old_chungyak = set(snapshot.get("chungyak_titles", []))
+        old_jjup = set(snapshot.get("chungyak_remndr_titles", []))
+        old_normal = set(snapshot.get("chungyak_normal_titles", []))
         old_sh = set(snapshot.get("sh_titles", []))
 
-        new_chungyak = detect_new_chungyak()
+        chungyak_result = detect_new_chungyak()
+        new_jjup = chungyak_result["remndr"]
+        new_normal = chungyak_result["normal"]
         new_sh = detect_new_sh()
 
-        added_chungyak = new_chungyak - old_chungyak
-        added_sh = new_sh - old_sh
+        # 줍줍 (잔여세대) — 사용자 핵심 타깃
+        if new_jjup is not None:
+            added_jjup = new_jjup - old_jjup
+            print(f"  jjup(줍줍): total={len(new_jjup)} new={len(added_jjup)}")
+            if added_jjup:
+                report_new(added_jjup, "청약홈 잔여세대", is_jjup=True)
+        else:
+            print("  jjup: skip (fetch/parse fail)")
 
-        print(f"  chungyak: total={len(new_chungyak)} new={len(added_chungyak)}")
-        print(f"  SH: total={len(new_sh)} new={len(added_sh)}")
+        # 일반 분양 — 참고용 (낮은 우선도)
+        if new_normal is not None:
+            added_normal = new_normal - old_normal
+            print(f"  normal(분양): total={len(new_normal)} new={len(added_normal)}")
+            if added_normal:
+                report_new(added_normal, "청약홈 분양정보", is_jjup=False)
+        else:
+            print("  normal: skip (fetch/parse fail)")
 
-        if added_chungyak:
-            report_new(added_chungyak, "청약홈")
-        if added_sh:
-            report_new(added_sh, "SH")
+        # SH 게시판
+        if new_sh is not None:
+            added_sh = new_sh - old_sh
+            print(f"  SH: total={len(new_sh)} new={len(added_sh)}")
+            if added_sh:
+                report_new(added_sh, "SH 임대공고", is_jjup=False)
+        else:
+            print("  SH: skip (fetch/parse fail)")
 
-        save_snapshot({
-            "chungyak_titles": sorted(new_chungyak),
-            "sh_titles": sorted(new_sh),
-            "updated": today.isoformat(),
-        })
+        # 스냅샷 갱신 — 성공한 소스만 갱신, 실패한 소스는 이전 스냅샷 보존
+        new_snapshot = dict(snapshot)
+        if new_jjup is not None:
+            new_snapshot["chungyak_remndr_titles"] = sorted(new_jjup)
+        if new_normal is not None:
+            new_snapshot["chungyak_normal_titles"] = sorted(new_normal)
+        if new_sh is not None:
+            new_snapshot["sh_titles"] = sorted(new_sh)
+        new_snapshot["updated"] = today.isoformat()
+        save_snapshot(new_snapshot)
 
 
 if __name__ == "__main__":
