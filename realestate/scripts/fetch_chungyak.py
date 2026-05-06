@@ -354,38 +354,43 @@ def build_message(registry: dict, today: datetime) -> list:
     """
     listings = registry.get("listings", [])
 
-    # 1차 분류: verdict
-    eligible = []
-    out_of_pref = []
-    ineligible = []
-    for li in listings:
-        verdict = li.get("user_assessment", {}).get("verdict", "")
-        if verdict in ("eligible", "boundary"):
-            eligible.append(li)
-        elif verdict == "out_of_preference":
-            out_of_pref.append(li)
-        elif verdict == "ineligible":
-            ineligible.append(li)
-        else:
-            eligible.append(li)  # 명시 없으면 적격으로
-
-    # 2차 분류: 적격 단지를 줍줍 vs 일반 + 시간 분류
+    # 분류 새 규칙 (사용자 피드백 2026-05-06 반영):
+    # - 줍줍(잔여세대/임의공급)은 verdict/매수상한 무관 모두 노출 (사용자: "가격 비싸도 줍줍은 알려줘")
+    # - 일반 단지만 verdict 기준으로 분리
     def time_bucket_for(li):
         return classify_time_bucket(li, today)
 
-    eligible_jjup = []
+    all_jjup = []  # 줍줍 단지 — verdict 무관 (ineligible은 보통 소득 부적격이라 줍줍은 거의 해당 X)
     eligible_normal_buckets = {"today_open": [], "week_imminent": [], "month_imminent": [], "future": []}
-    for li in eligible:
+    out_of_pref = []  # 일반 단지 中 사용자 선호 외
+    ineligible = []  # 일반 단지 中 부적격
+
+    for li in listings:
         b = time_bucket_for(li)
         if b == "ended":
-            continue  # 종료 단지 제외
+            continue
+        verdict = li.get("user_assessment", {}).get("verdict", "")
+
         if is_jjupjjup(li):
-            eligible_jjup.append((b, li))
+            # 줍줍은 verdict 무관 모두 노출 (단 ineligible 줍줍은 부적격 섹션으로 — 의미 없음)
+            if verdict == "ineligible":
+                ineligible.append(li)
+            else:
+                all_jjup.append((b, li))
+            continue
+
+        # 일반 단지
+        if verdict == "out_of_preference":
+            out_of_pref.append(li)
+        elif verdict == "ineligible":
+            ineligible.append(li)
         elif b in eligible_normal_buckets:
+            eligible_normal_buckets[b].append(li)
+        else:
             eligible_normal_buckets[b].append(li)
 
     # 줍줍은 시간 버킷별로 정렬
-    eligible_jjup.sort(key=lambda t: ["today_open", "week_imminent", "month_imminent", "future"].index(t[0]))
+    all_jjup.sort(key=lambda t: ["today_open", "week_imminent", "month_imminent", "future"].index(t[0]))
 
     # 일반 적격 — 위치 + 점수
     def sort_key(li):
@@ -405,8 +410,8 @@ def build_message(registry: dict, today: datetime) -> list:
     parts.append("\n━━━━━━━━━━━━━━━━")
     parts.append("🎲 <b>줍줍 (잔여세대/임의공급) — 사용자 핵심 타깃</b>")
     parts.append("━━━━━━━━━━━━━━━━")
-    if eligible_jjup:
-        for b, li in eligible_jjup:
+    if all_jjup:
+        for b, li in all_jjup:
             parts.append("\n" + render_listing(li, today, b))
     else:
         parts.append("(현재 등록된 줍줍 단지 없음 — 신규 발견 시 별도 🎲 알림)")
@@ -468,25 +473,104 @@ def build_message(registry: dict, today: datetime) -> list:
             parts.append(render_compact(li, today, reason))
 
     # ── 5. 즉시 액션 ──
+    # 줍줍 단지 + 오늘 적격 단지의 action 키 모두 노출 (boundary/eligible)
     parts.append("\n━━━━━━━━━━━━━━━━")
-    parts.append("📌 <b>즉시 액션</b>")
+    parts.append("📌 <b>즉시 액션 (사전 준비)</b>")
     parts.append("━━━━━━━━━━━━━━━━")
     actions = []
-    # 오늘 적격 단지의 액션
-    for li in eligible_normal_buckets["today_open"] + [li for b, li in eligible_jjup if b == "today_open"]:
+    candidates = eligible_normal_buckets["today_open"] + [li for _, li in all_jjup]
+    for li in candidates:
         ua = li.get("user_assessment", {})
-        action = ua.get("action") or ua.get("note") or ""
-        if action:
-            actions.append(f"• <b>{html_escape(li['name'])}</b>: {html_escape(action)}")
+        verdict = ua.get("verdict", "")
+        if verdict in ("eligible", "boundary"):
+            action = ua.get("action") or ua.get("note") or ""
+            if action:
+                actions.append(f"• <b>{html_escape(li['name'])}</b>: {html_escape(action)}")
     if actions:
         parts.extend(actions)
     else:
-        parts.append("• 오늘 즉시 액션 없음 (신규 줍줍 발견 시 자동 알림)")
+        parts.append("• 즉시 액션 없음 (신규 줍줍 발견 시 자동 알림)")
 
     parts.append(
         "\n<i>※ 매일 KST 08시 자동 발송. registry 검증 단지만 표시. "
         "신규 줍줍/공고 감지 시 별도 🎲 알림 발송.</i>"
     )
+
+    return split_message("\n".join(parts), limit=4000)
+
+
+def build_evening_message(registry: dict, today: datetime):
+    """
+    저녁 19시 리마인더: 오늘 마감 + 내일 시작 단지만 요약.
+    임박 단지 없으면 None 반환 (발송 스킵).
+    """
+    listings = registry.get("listings", [])
+    today_date = today.date()
+    tomorrow_date = today_date + timedelta(days=1)
+
+    today_ending = []  # 오늘 자정 전 마감
+    tomorrow_starting = []  # 내일 시작
+
+    for li in listings:
+        verdict = li.get("user_assessment", {}).get("verdict", "")
+        # 부적격 일반 단지는 제외 (줍줍은 verdict 무관 포함)
+        if verdict == "ineligible" and not is_jjupjjup(li):
+            continue
+        for phase in li.get("schedule", []):
+            try:
+                s = parse_dt(phase["start"])
+                e = parse_dt(phase["end"])
+            except Exception:
+                continue
+            if e.date() == today_date and today < e:
+                today_ending.append((li, phase, e))
+            if s.date() == tomorrow_date:
+                tomorrow_starting.append((li, phase, s))
+
+    if not today_ending and not tomorrow_starting:
+        return None  # 발송 스킵
+
+    parts = [f"🌆 <b>부동산 청약 저녁 리마인더</b>\n{today.strftime('%Y-%m-%d')} {fmt_date(today)} 19:00"]
+
+    if today_ending:
+        parts.append("\n━━━━━━━━━━━━━━━━")
+        parts.append("⏰ <b>오늘 마감 — 자정 전 신청 필수</b>")
+        parts.append("━━━━━━━━━━━━━━━━")
+        for li, phase, e in today_ending:
+            jjup = "🎲 " if is_jjupjjup(li) else ""
+            parts.append(f"\n🔴 {jjup}<b>{html_escape(li['name'])}</b>")
+            parts.append(f"   {html_escape(phase['phase'])} 마감: {fmt_datetime(e)}")
+            url = li.get("apply_url", "")
+            if url:
+                parts.append(f'   🌐 <a href="{html_escape(url)}">신청 사이트</a>')
+            ua = li.get("user_assessment", {})
+            verdict = ua.get("verdict", "")
+            if verdict == "eligible":
+                parts.append("   ✅ 사용자 적격")
+            elif verdict == "boundary":
+                parts.append("   🟡 자격 검증 필요")
+
+    if tomorrow_starting:
+        parts.append("\n━━━━━━━━━━━━━━━━")
+        parts.append("🔔 <b>내일 시작 — 시작 시각 정각 준비</b>")
+        parts.append("━━━━━━━━━━━━━━━━")
+        for li, phase, s in tomorrow_starting:
+            jjup = "🎲 " if is_jjupjjup(li) else ""
+            parts.append(f"\n{jjup}<b>{html_escape(li['name'])}</b>")
+            parts.append(f"   {html_escape(phase['phase'])} 시작: {fmt_datetime(s)}")
+            url = li.get("apply_url", "")
+            if url:
+                parts.append(f'   🌐 <a href="{html_escape(url)}">신청 사이트</a>')
+            ua = li.get("user_assessment", {})
+            verdict = ua.get("verdict", "")
+            if verdict == "eligible":
+                parts.append("   ✅ 사용자 적격")
+            elif verdict == "boundary":
+                parts.append("   🟡 자격 검증 필요")
+            elif verdict == "out_of_preference":
+                parts.append("   ⚪ 사용자 선호 외 (참고)")
+
+    parts.append("\n<i>※ 저녁 19시 리마인더. 오늘 마감/내일 시작 임박 단지만 표시.</i>")
 
     return split_message("\n".join(parts), limit=4000)
 
@@ -664,7 +748,7 @@ def report_new(new_items, source, is_jjup=False):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", default="send", choices=["send", "detect", "dry-run", "all"])
+    parser.add_argument("--mode", default="send", choices=["send", "detect", "dry-run", "all", "evening", "evening-dry"])
     parser.add_argument("--no-detect", action="store_true", help="신규 감지 스킵")
     args = parser.parse_args()
 
@@ -673,6 +757,23 @@ def main():
 
     print(f"[fetch_chungyak] {today.isoformat()} mode={args.mode}")
     print(f"  registry: {len(registry.get('listings', []))} listings")
+
+    if args.mode in ("evening", "evening-dry"):
+        chunks = build_evening_message(registry, today)
+        if chunks is None:
+            print("  evening: 임박 단지 없음 → 발송 스킵")
+        else:
+            print(f"  evening message: {len(chunks)} chunks, total {sum(len(c) for c in chunks)} chars")
+            if args.mode == "evening-dry":
+                for i, c in enumerate(chunks):
+                    print(f"\n--- chunk {i+1}/{len(chunks)} ({len(c)} chars) ---")
+                    print(c)
+            else:
+                for i, c in enumerate(chunks):
+                    if i > 0:
+                        time.sleep(1.0)
+                    send_telegram(c)
+        return  # evening 모드는 detect 스킵
 
     if args.mode in ("send", "all", "dry-run"):
         chunks = build_message(registry, today)

@@ -2,12 +2,14 @@ name: realestate-chungyak-daily
 
 on:
   schedule:
-    # 매일 UTC 23:00 = KST 08:00 (사용자 아침 알림)
+    # 매일 UTC 23:00 = KST 08:00 (아침 정기 알림)
     - cron: '0 23 * * *'
+    # 매일 UTC 10:00 = KST 19:00 (저녁 마감 임박 리마인더)
+    - cron: '0 10 * * *'
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Run mode (send / detect / dry-run / all)'
+        description: 'Run mode (send / detect / all / evening)'
         default: 'all'
         required: false
 
@@ -17,7 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # detect 모드에서 snapshot.json commit/push 위해 토큰 필요
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v5
@@ -33,19 +34,34 @@ jobs:
           git fetch origin
           git pull --rebase origin main || true
 
-      - name: Run chungyak alert (cron = all, manual = input.mode)
+      - name: Determine mode (cron schedule branching)
+        id: mode
+        env:
+          SCHED: ${{ github.event.schedule }}
+          MANUAL_MODE: ${{ github.event.inputs.mode }}
+        run: |
+          if [ -n "$MANUAL_MODE" ]; then
+            MODE="$MANUAL_MODE"
+            echo "Manual trigger: $MODE"
+          elif [ "$SCHED" = "0 10 * * *" ]; then
+            MODE="evening"
+            echo "Cron 19시 KST → evening 모드"
+          else
+            MODE="all"
+            echo "Cron 08시 KST → all 모드"
+          fi
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+
+      - name: Run chungyak alert
         env:
           REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          MODE="${{ github.event.inputs.mode }}"
-          if [ -z "$MODE" ]; then MODE="all"; fi
-          echo "Running mode: $MODE"
-          python realestate/scripts/fetch_chungyak.py --mode "$MODE"
+          python realestate/scripts/fetch_chungyak.py --mode "${{ steps.mode.outputs.mode }}"
 
       - name: Save snapshot (신규 감지 상태 보존)
         if: success()
         run: |
           git add realestate/data/chungyak/snapshot.json || true
-          git diff --staged --quiet || (git commit -m "chungyak: daily snapshot update" && git push) || true
+          git diff --staged --quiet || (git commit -m "chungyak: snapshot update (${{ steps.mode.outputs.mode }})" && git push) || true

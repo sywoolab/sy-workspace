@@ -6,12 +6,15 @@
     "user_profile": {
       "household": "부부 무주택 (출산 예정)",
       "lifecycle": "예비신혼/신혼 (혼인 7년 이내)",
+      "is_household_head": false,
+      "_household_note": "2026-05-06 사용자 명시: 세대주 아님. 라그란데 등 '무주택세대주' 요건 단지는 부적격 가능성. 세대주 변경 시 신청 가능 (모집공고일 기준 자격 판단 시 소급 적용 안 됨 주의)",
       "cash_won": 600000000,
       "salary_self_pretax_annual_won": 200000000,
       "salary_spouse_pretax_annual_won": 110000000,
       "salary_combined_pretax_monthly_won": 25000000,
       "_income_source": "2026-05-06 사용자 명시 (본인 세전 2억, 예비배우자 세전 1억+)",
       "max_purchase_price_won": 1160000000,
+      "_funding_flexibility": "사용자 명시 2026-05-06: 줍줍은 가격 매수상한 초과해도 자금 마련 가능 → 모든 줍줍 단지 알림 받기",
       "preferred_areas": ["서울", "경기도 성남시 분당구"],
       "secondary_areas": ["과천", "고양", "광명"],
       "ignored_areas_unless_extraordinary": ["안양", "인천", "남양주", "양주", "김포", "파주", "오산", "화성", "양평"]
@@ -179,14 +182,16 @@
       "supply_count": 2,
       "price_summary": "55㎡ 8.83억 (1세대), 74C㎡ 9.58억 (1세대 — 노부모부양 특공)",
       "qualifications": {
-        "household": "서울 거주 무주택세대주",
+        "household": "서울 거주 무주택세대주 (모집공고일 2026-05-04 기준)",
         "passbook_required": false,
-        "method": "추첨 100%"
+        "method": "추첨 100%",
+        "_critical": "잔여세대 재공급 = '무주택세대주'만 가능. 세대원 신청 불가. 사후 변경 소급 적용 X"
       },
       "user_assessment": {
-        "verdict": "eligible",
-        "general_supply_55sqm": "적격, 손실 0 시도 권고 (1세대뿐 경쟁 극심)",
-        "special_supply_74sqm": "노부모부양 자격 미해당, 부적격"
+        "verdict": "boundary",
+        "general_supply_55sqm_status": "❓ 사용자 세대주 아님 → 모집공고일(5/4) 기준이면 부적격 확정. 청약일 기준이면 5/12까지 변경 후 가능. PDF 확인 + 삼성물산 02-407-3069 직접 문의 필수",
+        "special_supply_74sqm": "노부모부양 자격 미해당, 부적격",
+        "action": "5/8까지 (1) 모집공고 PDF 자격 기준일 확인 (2) 삼성물산 분양문의 전화 (3) 시나리오에 따라 세대주 변경 진행"
       },
       "priority_score": 60,
       "first_seen": "2026-05-06"
