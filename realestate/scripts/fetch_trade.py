@@ -78,6 +78,8 @@ LTV = 0.70
 LOAN_CAP = 6.0
 COMMUTE_LIMIT = 60  # 각 직장 60분 이내
 MAX_PRICE = 11.6    # 매수 가능 상한 (현금 6억 올인 시, 취득세 포함)
+MAX_PRICE_EXT = 12.6  # 매수상한 +1억 시나리오 (자금 ~7억 마련 가정. 부모 증여/추가 대출 등)
+CASH_EXT = 7.0      # +1억 시나리오 가용현금 한도
 
 # 독립문 동쪽 구 (노도강 제외) — 양육 지원 접근성 우선 탐색 영역
 EAST_GU = {'종로구', '중구', '성동구', '동대문구', '성북구', '광진구'}
@@ -509,6 +511,74 @@ def top5_tight_live(data):
     return pool[:5]
 
 
+def top5_ext(data):
+    """매수상한 +1억(12.6억) 시나리오 TOP 5.
+    매매 11.6 < ~ ≤ 12.6 구간 + 자금 ≤ 7억 필요 단지 중 갭/실거주 적격 전략 자동 판단.
+    """
+    pool = []
+    for d in data:
+        # 매매 구간 필터: 기존 상한 초과 ~ 신규 상한 이하
+        if not (MAX_PRICE < d["매매가"] <= MAX_PRICE_EXT and d["전세건수"] >= 2):
+            continue
+        # 갭/실거주 중 자금 7억 內 적격 전략
+        gap_ok = (d["갭필요현금"] is not None
+                  and 0 < d["갭필요현금"] <= CASH_EXT)
+        live_ok = (d["실거주필요현금"] <= CASH_EXT
+                   and _monthly_payment(d["실거주대출"]) <= 500)
+        if not (gap_ok or live_ok):
+            continue
+        # 적격한 전략 中 자금 적게 드는 쪽 선택
+        if gap_ok and live_ok:
+            if d["갭필요현금"] <= d["실거주필요현금"]:
+                strat, req = "갭", d["갭필요현금"]
+            else:
+                strat, req = "실거주", d["실거주필요현금"]
+        elif gap_ok:
+            strat, req = "갭", d["갭필요현금"]
+        else:
+            strat, req = "실거주", d["실거주필요현금"]
+        d["_ext_strategy"] = strat
+        d["_ext_required"] = req
+        pool.append(d)
+    pool.sort(key=lambda x: -max(x["총점_갭"], x["총점_실거주"]))
+    return pool[:5]
+
+
+def format_ext_message(top, pool_size, region_tag=""):
+    """매수상한 +1억 시나리오 메시지"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    tag = f" ({region_tag})" if region_tag else ""
+    lines = [
+        f"🚀 <b>매수상한 +1억 시 추천 TOP {len(top)}{tag}</b>",
+        f"<i>{today} | 매매 11.6~12.6억 | 자금 ≤7억 (+1억 마련 가정)</i>",
+        "",
+    ]
+    if not top:
+        lines.append("(이번 주 11.6~12.6억 구간 적격 단지 없음)")
+        return "\n".join(lines)
+    for i, c in enumerate(top, 1):
+        gu = _shorten_gu(c['구'])
+        t = _trend_str(c['추세'])
+        strat = c['_ext_strategy']
+        req = c['_ext_required']
+        extra = req - CASH  # 기본 6억 대비 추가 자금
+        score = max(c['총점_갭'], c['총점_실거주'])
+        if i <= 3:
+            lines.append(
+                f"<b>{i}. [{gu}] {c['단지명']}</b> {c['면적']} ⭐{score:.0f}점\n"
+                f"  매매 {c['매매가']:.1f} | 전략 <b>{strat}</b> | 필요 {req:.1f}억 (+{extra:.1f}억)\n"
+                f"  통근 {c['통근가중']:.0f}분 | 추세 <b>{t}</b>"
+            )
+        else:
+            lines.append(
+                f"{i}. [{gu}] {c['단지명']} {c['면적']}"
+                f" | {c['매매가']:.1f} {strat}{req:.1f}(+{extra:.1f}) {t}"
+            )
+    lines.append("")
+    lines.append(f"<i>후보 {pool_size}개 중 TOP {len(top)} (단위: 억원). 11.6억 內 단지는 위 갭/실거주/AI TOP에서 별도 확인.</i>")
+    return "\n".join(lines)
+
+
 def ai_pick(data):
     """AI 추천: 내가 진짜 이 집을 산다면.
     기존 스코어(100점) + 실질 의사결정 보정(±점) → 최종 점수
@@ -856,6 +926,14 @@ def main():
     ai_msg = format_ai_pick_message(picks)
     print(f"\n{ai_msg}")
     send_telegram(ai_msg)
+
+    # ── 매수상한 +1억 시나리오 TOP 5 (12.6억 한도) ──
+    ext_pool = [d for d in data if MAX_PRICE < d["매매가"] <= MAX_PRICE_EXT and d["전세건수"] >= 2]
+    ext_top = top5_ext(data)
+    print(f"+1억 시나리오: {len(ext_top)}/{len(ext_pool)}")
+    ext_msg = format_ext_message(ext_top, len(ext_pool))
+    print(f"\n{ext_msg}")
+    send_telegram(ext_msg)
 
 
 if __name__ == "__main__":
