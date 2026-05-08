@@ -2,8 +2,8 @@ name: garmin-sync
 
 on:
   schedule:
-    # KST 12:17, 21:17 (2회/일 — 429 방지 위해 최소화)
-    - cron: '17 3 * * *'
+    # KST 13:17, 21:17 (2회/일 — 429 방지 위해 최소화)
+    - cron: '17 4 * * *'
     - cron: '17 12 * * *'
   workflow_dispatch:
     inputs:
