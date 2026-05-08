@@ -3,14 +3,6 @@
   "brick_count": 4,
   "ow_count": 2,
   "overrides": {
-    "2026-05-01": {
-      "date": "2026-05-01",
-      "workout": "자전거 40분 + 러닝 3km",
-      "detail": "금요일 연휴. 가벼운 브릭",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-05-02": {
       "date": "2026-05-02",
       "workout": "수영 강습만",
