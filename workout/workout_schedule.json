@@ -95,7 +95,7 @@
   },
   "last_analysis": {
     "date": "2026-05-08",
-    "estimated_finish": "2:57",
+    "estimated_finish": "2:58",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 3,
@@ -103,7 +103,7 @@
     "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 1,
+        "count": 2,
         "target": 2
       },
       "run": {
@@ -121,7 +121,7 @@
       "hard_pct": 0
     },
     "training_load": {
-      "current": 153,
+      "current": 178,
       "target": 200
     },
     "adjustments": [
