@@ -94,7 +94,7 @@
     }
   },
   "last_analysis": {
-    "date": "2026-05-07",
+    "date": "2026-05-08",
     "estimated_finish": "2:57",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
@@ -125,8 +125,7 @@
       "target": 200
     },
     "adjustments": [
-      "💡 Easy 런 5:27/km → 더 느리게 (6:25~7:07)",
-      "🔴 연속 3일 러닝 — 내일은 반드시 수영/자전거/휴식으로 대체"
+      "💡 Easy 런 5:27/km → 더 느리게 (6:25~7:07)"
     ]
   },
   "vdot_history": [
