@@ -1,7 +1,7 @@
 {
   "current_vdot": 36,
   "brick_count": 4,
-  "ow_count": 2,
+  "ow_count": 3,
   "overrides": {
     "2026-05-02": {
       "date": "2026-05-02",
@@ -87,7 +87,7 @@
   },
   "last_analysis": {
     "date": "2026-05-09",
-    "estimated_finish": "2:58",
+    "estimated_finish": "2:57",
     "status": "yellow",
     "status_text": "주의 — 개선 필요",
     "phase": 3,
@@ -95,7 +95,7 @@
     "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 2,
+        "count": 3,
         "target": 2
       },
       "run": {
@@ -109,11 +109,11 @@
       }
     },
     "intensity_split": {
-      "easy_pct": 100,
-      "hard_pct": 0
+      "easy_pct": 96,
+      "hard_pct": 4
     },
     "training_load": {
-      "current": 178,
+      "current": 202,
       "target": 200
     },
     "adjustments": [

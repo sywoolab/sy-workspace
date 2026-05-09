@@ -2224,5 +2224,31 @@
     "garmin_ids": [
       22806762030
     ]
+  },
+  "2026-05-09": {
+    "planned": "대구 이동 + 검수 + 수성못 OW 500~750m",
+    "done": true,
+    "actual": "OW 295m 6분 @2:08/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 295,
+      "duration_min": 6.5,
+      "moving_min": 6.3,
+      "pace_per_100m": "2:08",
+      "avg_hr": 139,
+      "max_hr": 154,
+      "swolf": 46,
+      "strokes": 159,
+      "avg_spm": null,
+      "is_open_water": true,
+      "training_load": 24
+    },
+    "training_zone": "moderate",
+    "note": "유산소 1.8 / 무산소 0.1 | 부하 24",
+    "garmin_id": 22815490756,
+    "start_time": "14:39",
+    "garmin_ids": [
+      22815490756
+    ]
   }
 }
