@@ -3,14 +3,6 @@
   "brick_count": 4,
   "ow_count": 3,
   "overrides": {
-    "2026-05-02": {
-      "date": "2026-05-02",
-      "workout": "수영 강습만",
-      "detail": "토요일",
-      "source": "manual",
-      "auto": false,
-      "rule": "user-confirmed"
-    },
     "2026-05-03": {
       "date": "2026-05-03",
       "workout": "한강 OW 클래스",
@@ -139,6 +131,10 @@
     },
     {
       "date": "2026-04-26",
+      "vdot": 36
+    },
+    {
+      "date": "2026-05-10",
       "vdot": 36
     }
   ]
