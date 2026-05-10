@@ -157,14 +157,20 @@ def _restore_tokens_from_env():
 
 
 def _update_tokens_secret():
-    """갱신된 토큰을 GitHub Secret에 자동 업데이트 (GitHub Actions 환경에서만)"""
+    """갱신된 토큰을 GitHub Secret에 자동 업데이트 (GitHub Actions 환경에서만).
+
+    실패 시 텔레그램 알림 발송 — silent fail 차단 (2026-05-08 sync 사고 재발 방지, P1 패치).
+    회전 실패가 누적되면 다음 run에서 cache+password 둘 다 실패 → silent sync miss.
+    """
     import subprocess
     if not os.environ.get('GITHUB_ACTIONS'):
         return  # 로컬 실행 시 skip
     try:
         gh_token = os.environ.get('GH_TOKEN', '')
         if not gh_token:
-            print("[SKIP] GH_TOKEN 없음 — Secret 자동 업데이트 불가")
+            msg = "⚠️ GARMIN_TOKENS Secret 갱신 불가 — GH_PAT 누락. 다음 sync에서 stale 토큰 위험"
+            print(f"[SKIP] {msg}")
+            send_telegram(msg)
             return
         import tempfile
         with tempfile.NamedTemporaryFile(suffix='.tar.gz', delete=False) as tmp:
@@ -186,9 +192,14 @@ def _update_tokens_secret():
         if result.returncode == 0:
             print("[OK] GARMIN_TOKENS Secret 자동 갱신 완료")
         else:
-            print(f"[WARN] Secret 갱신 실패: {result.stderr[:200]}")
+            err = (result.stderr or '')[:200]
+            msg = f"⚠️ GARMIN_TOKENS Secret 갱신 실패 (returncode={result.returncode}) — {err}"
+            print(f"[WARN] {msg}")
+            send_telegram(msg)
     except Exception as e:
-        print(f"[WARN] Secret 자동 갱신 중 오류: {e}")
+        msg = f"⚠️ GARMIN_TOKENS Secret 갱신 중 오류: {type(e).__name__}: {e}"
+        print(f"[WARN] {msg}")
+        send_telegram(msg)
 
 
 SYNC_STATE_FILE = os.path.join(BASE_DIR, 'data', 'sync_state.json')
@@ -1676,21 +1687,37 @@ def sync():
         start_date = YESTERDAY
 
     activities = fetch_activities(api, start_date, TODAY)
+    fetched_count = len(activities)
+
+    # === L1 §"자동화 산출물 검증": SKIP 사유별 카운터 ===
+    # 필터로 누락되는 활동의 사유를 누적해, 산출물(new_activities) 0건일 때
+    # 의심 알림 발송 + 정상 sync 메시지에 SKIP 누적 노출.
+    skip_reasons = {
+        'duplicate_id': 0,        # 이미 workout_log에 있음
+        'multi_sport_parent': 0,  # 멀티스포츠 부모 (children으로 분리 수집)
+        'transition': 0,          # T1/T2 트랜지션
+        'sub_60s': 0,             # 60초 미만 잡음
+        'sub_300s': 0,            # 5분 미만 단독 활동 (멀티스포츠 면제)
+        'unsupported_type': 0,    # run/swim/bike/brick/strength 외
+    }
 
     # 4. 새 활동 필터링 & 파싱
     new_activities = []
     for act in activities:
         act_id = act.get('activityId')
         if act_id in existing_ids:
+            skip_reasons['duplicate_id'] += 1
             continue
 
         # 멀티스포츠 부모는 children이 별도 등록되므로 skip (이중 집계 방지)
         if act.get('parent') is True:
+            skip_reasons['multi_sport_parent'] += 1
             print(f"  [SKIP] {act_id} multi_sport 부모 — children으로 분리 처리")
             continue
         # 트랜지션은 운동 분석 대상 아님 (T1/T2 시간은 부모 metric으로 충분)
         type_key = (act.get('activityType') or {}).get('typeKey', '').lower()
         if type_key in ('transition', 'transition_v2'):
+            skip_reasons['transition'] += 1
             print(f"  [SKIP] {act_id} {type_key} — 트랜지션 제외")
             continue
 
@@ -1699,6 +1726,7 @@ def sync():
             duration = parsed.get('duration_sec', 0) or 0
             # 60초 미만 = 명확한 잡음 (가민 자동 시작/실수)
             if duration < 60:
+                skip_reasons['sub_60s'] += 1
                 print(f"  [SKIP] {parsed['type']} {duration}초 — 1분 미만 잡음")
                 continue
             # 같은 날 활동 2개 이상 = 트라이애슬론/멀티스포츠 → cutoff 면제 (분할 segment 보호)
@@ -1709,6 +1737,7 @@ def sync():
             is_multi_sport_day = len(same_day_acts) >= 2
             # 단독 활동: 5분(300초) cutoff (기존 10분에서 완화 — 짧은 OW/회복 활동 누락 방지)
             if duration < 300 and parsed['type'] != 'brick' and not is_multi_sport_day:
+                skip_reasons['sub_300s'] += 1
                 print(f"  [SKIP] {parsed['type']} {duration}초 — 5분 미만 단일 활동")
                 continue
             # 랩/스플릿 데이터 추가
@@ -1716,8 +1745,34 @@ def sync():
                 laps = fetch_laps(api, act_id)
                 parsed['laps'] = parse_laps(laps, parsed['type'])
             new_activities.append(parsed)
+        else:
+            skip_reasons['unsupported_type'] += 1
 
-    print(f"  새 활동: {len(new_activities)}건")
+    new_count = len(new_activities)
+    total_skipped = sum(skip_reasons.values())
+    # 신규 fetched 중 필터로 SKIP된 건수 (duplicate_id 제외 = 진짜 누락 가능 케이스)
+    non_dup_skip = total_skipped - skip_reasons['duplicate_id']
+    skip_summary_parts = [f"{k}={v}" for k, v in skip_reasons.items() if v > 0]
+    skip_summary = ', '.join(skip_summary_parts) if skip_summary_parts else '없음'
+    print(f"  새 활동: {new_count}건 (조회 {fetched_count}건, SKIP {total_skipped}건 [{skip_summary}])")
+
+    # === L1 §"자동화 산출물 검증": 진짜 의심 SKIP만 알림 (false positive 방지) ===
+    # duplicate_id, multi_sport_parent, transition은 "구조적 정상 SKIP":
+    #   - duplicate_id: 이미 처리된 활동 재조회
+    #   - multi_sport_parent: 트라이애슬론 부모 (children이 별도 등록)
+    #   - transition: T1/T2 (부모 metric으로 충분)
+    # cutoff 필터(sub_60s, sub_300s) + unsupported_type만 진짜 누락 가능 케이스 → 알림 트리거.
+    suspicious_skip = (
+        skip_reasons['sub_60s']
+        + skip_reasons['sub_300s']
+        + skip_reasons['unsupported_type']
+    )
+    if fetched_count > 0 and new_count == 0 and suspicious_skip > 0:
+        send_telegram(
+            f"⚠️ 가민 sync 의심: {fetched_count}건 fetch / 0건 추가 / 의심 SKIP {suspicious_skip}건\n"
+            f"SKIP 사유: {skip_summary}\n"
+            f"필터 누락 가능성 — 가민 앱과 workout_log.json 비교 필요"
+        )
 
     # 5. 건강 데이터 수집 (항상)
     health = fetch_health_data(api, TODAY)
@@ -1817,6 +1872,10 @@ def sync():
         msg = format_workout_message(new_activities, health, plan_adjustments, schedule_data, workout_log)
         if recovered_gap_days >= 2:
             msg = f"⚠️ 동기화 {recovered_gap_days}일만에 복구 (gap: {last_success} → {TODAY})\n\n" + msg
+        # L1 §"자동화 산출물 검증": 신규 SKIP 사유 누적 노출 (duplicate_id 제외)
+        if non_dup_skip > 0:
+            non_dup_parts = [f"{k}={v}" for k, v in skip_reasons.items() if v > 0 and k != 'duplicate_id']
+            msg += f"\n\n[필터 SKIP {non_dup_skip}건: {', '.join(non_dup_parts)}]"
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 
