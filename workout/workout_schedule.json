@@ -1,7 +1,7 @@
 {
   "current_vdot": 36,
-  "brick_count": 4,
-  "ow_count": 3,
+  "brick_count": 5,
+  "ow_count": 4,
   "overrides": {
     "2026-05-03": {
       "date": "2026-05-03",
@@ -87,29 +87,32 @@
     "vdot": 36,
     "weekly_summary": {
       "swim": {
-        "count": 3,
+        "count": 4,
         "target": 2
       },
       "run": {
-        "count": 3,
+        "count": 4,
         "target": 2,
-        "total_km": 14.9
+        "total_km": 24.4
       },
       "bike": {
-        "count": 0,
+        "count": 1,
         "target": 1
       }
     },
     "intensity_split": {
-      "easy_pct": 96,
-      "hard_pct": 4
+      "easy_pct": 45,
+      "hard_pct": 55
     },
     "training_load": {
-      "current": 202,
+      "current": 1126,
       "target": 200
     },
     "adjustments": [
-      "💡 Easy 런 5:27/km → 더 느리게 (6:25~7:07)"
+      "⚠️ 80/20 위반: Easy 45% / 고강도 55% (목표: 80/20)",
+      "💡 Easy 런 5:27/km → 더 느리게 (6:25~7:07)",
+      "🔴 주간 부하 1126 > 목표 200의 120% — 다음 일 Easy 권장",
+      "🔴 Training Readiness 14 (POOR) — 몸이 준비 안 됨, 휴식 권장"
     ]
   },
   "vdot_history": [
