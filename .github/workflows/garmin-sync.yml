@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install garminconnect requests
+      - run: pip install -r requirements.txt
 
       - name: Sync Garmin data
         env:

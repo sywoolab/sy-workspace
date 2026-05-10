@@ -1653,7 +1653,9 @@ def sync():
             _save_sync_state(sync_state)
 
         print(f"  로그인 실패 (연속 {fail_count}회)")
-        return False
+        # 별건 패치 (2026-05-11): 로그인 실패는 None 반환으로 명시 → main에서 sys.exit(1) 트리거
+        # 기존 False 반환은 "변경 없음"과 구별 안 되어 workflow가 silent success로 끝남
+        return None
 
     # 로그인 성공 — 실패 카운터 리셋
     sync_state['consecutive_failures'] = 0
@@ -2078,12 +2080,16 @@ def fill_planned():
 if __name__ == '__main__':
     mode = sys.argv[1] if len(sys.argv) > 1 else 'sync'
     try:
+        result = None
         if mode == 'resend':
             resend_today()
         elif mode == 'fill-planned':
             fill_planned()
         else:
-            changed = sync()
+            result = sync()  # None=로그인 실패, True=변경 있음, False=변경 없음
+        # 별건 패치 (2026-05-11): sync 로그인 실패 시 workflow도 fail로 표시 (silent success 차단)
+        if mode == 'sync' and result is None:
+            sys.exit(1)
         sys.exit(0)
     except SystemExit:
         raise
