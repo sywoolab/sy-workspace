@@ -17,6 +17,13 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from garminconnect import Garmin
 
+# Windows cp949 환경에서도 한글/em-dash 출력 안전 (크로스플랫폼)
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except (AttributeError, ValueError):
+    pass
+
 # dotenv는 로컬 실행용 (GitHub Actions에서는 환경변수 직접 주입)
 # L0 §"환경변수 부트스트랩": 부모 경로 거슬러 올라가며 .env 탐색
 try:
@@ -272,9 +279,21 @@ def login_garmin():
 # 활동 데이터 수집
 # ============================================================
 def fetch_activities(api, start_date, end_date):
-    """가민에서 활동 목록 가져오기"""
+    """가민에서 활동 목록 가져오기 (멀티스포츠 children 포함)
+
+    excludeChildren=false: 트라이애슬론 등 멀티스포츠의 child activity
+    (swim/bike/run/transition_v2)를 부모와 함께 노출. 기본 get_activities_by_date는
+    parent만 반환하여 트라이애슬론 종목별 metric을 잃음.
+    """
     try:
-        activities = api.get_activities_by_date(start_date, end_date)
+        path = (
+            f'/activitylist-service/activities/search/activities'
+            f'?start=0&limit=100&excludeChildren=false'
+            f'&startDate={start_date}&endDate={end_date}'
+        )
+        activities = api.connectapi(path)
+        if not isinstance(activities, list):
+            activities = []
         print(f"[OK] 활동 {len(activities)}건 조회 ({start_date} ~ {end_date})")
         return activities
     except Exception as e:
@@ -1665,12 +1684,32 @@ def sync():
         if act_id in existing_ids:
             continue
 
+        # 멀티스포츠 부모는 children이 별도 등록되므로 skip (이중 집계 방지)
+        if act.get('parent') is True:
+            print(f"  [SKIP] {act_id} multi_sport 부모 — children으로 분리 처리")
+            continue
+        # 트랜지션은 운동 분석 대상 아님 (T1/T2 시간은 부모 metric으로 충분)
+        type_key = (act.get('activityType') or {}).get('typeKey', '').lower()
+        if type_key in ('transition', 'transition_v2'):
+            print(f"  [SKIP] {act_id} {type_key} — 트랜지션 제외")
+            continue
+
         parsed = parse_activity(act)
         if parsed['type'] in ('run', 'swim', 'bike', 'brick', 'strength'):
-            # 10분 미만 활동 필터 (가민 자동 감지 잡음 제거)
             duration = parsed.get('duration_sec', 0) or 0
-            if duration < 600 and parsed['type'] != 'brick':
-                print(f"  [SKIP] {parsed['type']} {duration}초 — 10분 미만 무시")
+            # 60초 미만 = 명확한 잡음 (가민 자동 시작/실수)
+            if duration < 60:
+                print(f"  [SKIP] {parsed['type']} {duration}초 — 1분 미만 잡음")
+                continue
+            # 같은 날 활동 2개 이상 = 트라이애슬론/멀티스포츠 → cutoff 면제 (분할 segment 보호)
+            same_day_acts = [
+                a for a in activities
+                if (a.get('startTimeLocal') or '')[:10] == (act.get('startTimeLocal') or '')[:10]
+            ]
+            is_multi_sport_day = len(same_day_acts) >= 2
+            # 단독 활동: 5분(300초) cutoff (기존 10분에서 완화 — 짧은 OW/회복 활동 누락 방지)
+            if duration < 300 and parsed['type'] != 'brick' and not is_multi_sport_day:
+                print(f"  [SKIP] {parsed['type']} {duration}초 — 5분 미만 단일 활동")
                 continue
             # 랩/스플릿 데이터 추가
             if parsed['type'] in ('run', 'bike'):
