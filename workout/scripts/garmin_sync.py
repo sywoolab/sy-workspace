@@ -248,8 +248,10 @@ def login_garmin():
         ('cache', '토큰 캐시'),
         ('password', '비밀번호'),
     ]
-    max_retries = 3
-    base_delay = 30  # 초
+    # 2026-05-11 가민 429 rate limit 사고 후 백오프 강화 (30→90s, 3→2회)
+    # 가민 server-side rate window는 분 단위 — 90s/180s 백오프로 더 안정
+    max_retries = 2
+    base_delay = 90  # 초
 
     for i, (method, desc) in enumerate(attempts):
         # cache→password 전환 시 쿨다운 (이전 방식에서 429였으면 잠시 대기)
