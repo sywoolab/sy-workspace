@@ -60,6 +60,43 @@
 - 스크립트 수정 시 로컬 실행으로 사전 검증 (환경변수 세팅 필요)
 - `workout/workout_log.json`, `workout/workout_schedule.json`은 다른 에이전트가 동시 수정할 수 있음 → git pull 후 작업
 
+## 자동화 산출물 검증 (필수 — 2026-05-10 도입)
+
+> 가민 sync 6회 실패 사례에서 도출. 자동화 스크립트가 "성공" 메시지를 출력하면서도 실제 산출물에는 누락이 있는 silent fail 패턴을 차단한다.
+
+### 원칙
+
+자동화 스크립트는 외부 API 응답 수신만으로 "성공"을 보고하지 않는다. **자기 산출물(workout_log entry, 알림 발송 결과 등)의 변화량까지 검증**한 후에만 success 종료한다.
+
+### 강제 규칙
+
+1. **산출물 변화량 비교 의무**: API에서 N건 fetch했는데 산출물에 0건 추가되면 의심 알림 발송 (SKIP 사유 포함)
+2. **SKIP 사유 텔레그램 노출**: 필터(cutoff, dedupe, type 미지원 등)로 SKIP 발생 시 텔레그램 메시지에 누적 SKIP 건수+사유 표시. 매 sync마다 사용자가 인지 가능
+3. **땜질 금지**: 특정 회차만 수동 보정(예: garmin_id 강제 추가 commit)하지 않는다. 동일 사고가 다음 회차에 또 발생함. **반드시 root cause 코드 수정으로 재발 차단**
+4. **알려진 이슈 SLA**: feedback memory 또는 INBOX에 등록된 자동화 미해결 이슈는 **2주 이내 코드 수정 또는 INBOX 승격**. 만료 시 자동화 신뢰도가 무너진다
+
+### 적용 대상
+
+`workout/scripts/garmin_sync.py`, `workout/scripts/workout_alert.py`, `ib/scripts/*`, `realestate/scripts/*` 등 모든 cron-driven 자동화 스크립트.
+
+### 검증 패턴 (참조 구현)
+
+```python
+# sync 시작 전후 산출물 차이 측정
+before_count = len(workout_log)
+new_activities = process()
+after_count = len(workout_log)
+delta = after_count - before_count
+fetched = len(activities)
+skipped = fetched - delta
+
+if fetched > 0 and delta == 0:
+    send_telegram(f"⚠️ {fetched}건 fetch했으나 모두 SKIP — 사유 확인 필요")
+elif skipped > 0:
+    # 정상 SKIP도 노출 (cutoff/dedupe 등)
+    msg += f"\n[SKIP {skipped}건: {skip_reasons_summary}]"
+```
+
 ## 운동 데이터
 
 - 마스터 규칙: `workout/_masters/WORKOUT_MASTER.md`
