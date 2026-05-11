@@ -78,8 +78,8 @@
     },
     "2026-05-12": {
       "date": "2026-05-12",
-      "workout": "🏊 자유수영 1.5km @2:00/100m (옵션, 회복 swim)",
-      "detail": "",
+      "workout": "휴식 (컨디션 불량 — 사용자 결정)",
+      "detail": "5/10 대회 + 5/11 휴식 후 5/12 화 컨디션 미회복. 자유수영 1.5km 옵션 스킵. 본인 결정 14:55 KST.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
