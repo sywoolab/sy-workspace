@@ -376,28 +376,37 @@
   },
   "2026-05-12": {
     "date": "2026-05-12",
-    "steps": null,
+    "steps": 6802,
     "stress": {
-      "avg": null,
-      "max": null,
-      "rest": null,
-      "low": null,
-      "medium": null,
-      "high": null
+      "avg": 28,
+      "max": 95,
+      "rest": 51.53,
+      "low": 21.04,
+      "medium": 10.69,
+      "high": 2.22
     },
     "body_battery": {
-      "max": null,
-      "min": null,
-      "start": null
+      "max": 87,
+      "min": 16,
+      "start": 21
     },
-    "resting_hr": null,
+    "resting_hr": 45,
     "sleep": {
-      "duration_min": 0,
-      "score": null,
-      "deep_min": 0,
-      "light_min": 0,
-      "rem_min": 0,
+      "duration_min": 386,
+      "score": 80,
+      "deep_min": 57,
+      "light_min": 242,
+      "rem_min": 87,
       "awake_min": 0
+    },
+    "hrv": {
+      "weekly_avg": 60,
+      "last_night": 62,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 4,
+      "level": "POOR"
     },
     "training_status": {
       "status": null,
@@ -438,6 +447,46 @@
     "training_readiness": {
       "score": 26,
       "level": "LOW"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-05-13": {
+    "date": "2026-05-13",
+    "steps": 7577,
+    "stress": {
+      "avg": 42,
+      "max": 91,
+      "rest": 11.18,
+      "low": 51.81,
+      "medium": 18.61,
+      "high": 3.33
+    },
+    "body_battery": {
+      "max": 42,
+      "min": 6,
+      "start": 17
+    },
+    "resting_hr": 48,
+    "sleep": {
+      "duration_min": 364,
+      "score": 48,
+      "deep_min": 33,
+      "light_min": 323,
+      "rem_min": 8,
+      "awake_min": 40
+    },
+    "hrv": {
+      "weekly_avg": 55,
+      "last_night": 33,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 13,
+      "level": "POOR"
     },
     "training_status": {
       "status": null,
