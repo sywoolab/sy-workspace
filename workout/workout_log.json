@@ -2570,5 +2570,30 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-05-14": {
+    "planned": "🏃 러닝 4km Easy (HR 145↓, 다리 풀기)",
+    "done": true,
+    "actual": "수영 1525m 36분 @2:11/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1525,
+      "duration_min": 35.6,
+      "moving_min": 33.3,
+      "pace_per_100m": "2:11",
+      "avg_hr": 146,
+      "max_hr": 179,
+      "swolf": 44,
+      "strokes": 689,
+      "avg_spm": null,
+      "training_load": 123
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.2 / 무산소 1.6 | 부하 123",
+    "garmin_id": 22873558899,
+    "start_time": "11:15",
+    "garmin_ids": [
+      22873558899
+    ]
   }
 }
