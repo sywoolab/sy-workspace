@@ -2,12 +2,11 @@ name: garmin-sync
 
 on:
   schedule:
-    # KST 2회/일 (13:17, 21:17) — 2026-05-11 가민 429 rate limit 사고 후 축소
-    # 이전 7회/일은 GH Actions IP 풀에서 가민 API rate limit hit 빈발 → 5/8~5/11 silent sync miss
-    # 안정성 우선: cron 빈도 < 가민 server 측 IP rate limit window
-    # 즉시 sync 필요 시 workflow_dispatch 수동 trigger
-    - cron: '17 4 * * *'   # KST 13:17 — 점심 (오전 운동 흡수)
-    - cron: '17 12 * * *'  # KST 21:17 — 저녁 마무리 (저녁 운동 흡수)
+    # KST 1회/일 (21:17) — 2026-05-14 사고 후 추가 축소
+    # 2회/일 (5/11 도입)에도 가민 429 IP 차단 유지됨 (5/12~5/14 4회 연속 failure)
+    # → 1회로 더 축소해 가민 측 차단 자연 해소 유도
+    # 즉시 sync 필요 시 workflow_dispatch 수동 trigger (cron보다 짧은 간격 가능)
+    - cron: '17 12 * * *'  # KST 21:17 — 저녁 마무리 (하루 운동 통합 흡수)
   workflow_dispatch:
     inputs:
       mode:
