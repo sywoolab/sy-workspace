@@ -416,19 +416,19 @@
   },
   "2026-05-14": {
     "date": "2026-05-14",
-    "steps": 4357,
+    "steps": 8342,
     "stress": {
-      "avg": 39,
+      "avg": 37,
       "max": 99,
-      "rest": 20.89,
-      "low": 38.4,
-      "medium": 15.51,
-      "high": 2.53
+      "rest": 23.51,
+      "low": 36.61,
+      "medium": 13.84,
+      "high": 2.05
     },
     "body_battery": {
       "max": 38,
       "min": 17,
-      "start": 24
+      "start": 18
     },
     "resting_hr": 49,
     "sleep": {
