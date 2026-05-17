@@ -1,12 +1,12 @@
 name: garmin-sync
 
 on:
-  schedule:
-    # KST 1회/일 (21:17) — 2026-05-14 사고 후 추가 축소
-    # 2회/일 (5/11 도입)에도 가민 429 IP 차단 유지됨 (5/12~5/14 4회 연속 failure)
-    # → 1회로 더 축소해 가민 측 차단 자연 해소 유도
-    # 즉시 sync 필요 시 workflow_dispatch 수동 trigger (cron보다 짧은 간격 가능)
-    - cron: '17 12 * * *'  # KST 21:17 — 저녁 마무리 (하루 운동 통합 흡수)
+  schedule: []
+  # ⚠️ cron 비활성화 (2026-05-18) — GH Actions IP 풀이 가민 측에 영구 차단 상태
+  # 5/14 fix 후 1회 success → 5/15~5/17 cron 매번 429 + 수동 trigger도 429
+  # 차단 자연 해소 위해 cron 제거. 매 cron 429 시도가 가민 측 차단 강화 신호 되는 것 차단
+  # 수동 sync는 Mac/Win 로컬에서 `gsync` alias 사용 (개인 IP는 차단 안 됨)
+  # 미래 가민 차단 풀리면 workflow_dispatch로 검증 후 cron 부활 가능
   workflow_dispatch:
     inputs:
       mode:
