@@ -8,6 +8,9 @@
     }
   },
   "companies": [
+    {"name": "에이팩트", "dart_code": "00445054", "stock_code": "200470", "listed": true, "market": "KOSDAQ", "alias": ["APACT"], "note": "오로라 3호 펀드 인수딜 대상 (2026.06.10 거래종결)"},
+    {"name": "유니드", "dart_code": null, "stock_code": "014830", "listed": true, "market": "KOSPI", "alias": ["UNID"], "note": "에이팩트 우선매수제안권 행사자"},
+    {"name": "효성화학", "dart_code": null, "stock_code": "298000", "listed": true, "market": "KOSPI", "alias": ["Hyosung Chemical"], "note": "오로라 3호 펀드 LP (500억)"},
     {"name": "셀트리온", "dart_code": "00413046", "stock_code": "068270", "listed": true, "market": "KOSPI", "alias": ["Celltrion"]},
     {"name": "솔루엠", "dart_code": "01159233", "stock_code": "248070", "listed": true, "market": "KOSPI"},
     {"name": "서진시스템", "dart_code": "00838005", "stock_code": "178320", "listed": true, "market": "KOSPI", "alias": ["Seojin System"]},

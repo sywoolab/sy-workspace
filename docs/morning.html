@@ -66,12 +66,26 @@
   .dn { color: #dc2626; }
   .nt { color: #9ca3af; }
 
+  /* 금리 매트릭스 */
+  .rate-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rate-group-title { font-size: 11px; font-weight: 700; color: #6b7280;
+                      text-transform: uppercase; letter-spacing: 0.6px;
+                      margin-bottom: 8px; padding-bottom: 5px;
+                      border-bottom: 1px solid #e5e7eb; }
+  .rate-row { display: flex; justify-content: space-between; align-items: center;
+              padding: 5px 0; border-bottom: 1px solid #f9fafb; font-size: 13px; }
+  .rate-row:last-child { border-bottom: none; }
+  .rate-label { color: #374151; }
+  .rate-val { font-weight: 700; color: #111827; }
+  .rate-source { font-size: 10px; color: #9ca3af; margin-top: 8px; }
+
   /* 푸터 */
   .footer { text-align: center; font-size: 12px; color: #9ca3af;
             padding: 16px 0 8px; }
   @media (max-width: 480px) {
     .market-grid { grid-template-columns: 1fr 1fr; }
     .market-item .price { font-size: 16px; }
+    .rate-matrix { grid-template-columns: 1fr; }
   }
 </style>
 
@@ -80,7 +94,7 @@
 <div class="container">
   <div class="header">
     <h1>📋 IB 뉴스브리프 <span class="session-badge">오전</span></h1>
-    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 08:27 KST &nbsp;·&nbsp; 전일 종가 기준</div>
+    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 08:39 KST &nbsp;·&nbsp; 전일 종가 기준</div>
   </div>
 
   <div class="card">
@@ -111,11 +125,6 @@
           <div class="price">1,488.3</div>
           <div class="chg"><span class="up">▲</span> 8.8 &nbsp; <span class="up">+0.59%</span></div>
         </div>
-        <div class="market-item">
-          <div class="label">미국 10Y</div>
-          <div class="price">4.623%</div>
-          <div class="chg"><span class="up">▲</span> 0.028pp &nbsp; <span class="up">+0.61%</span></div>
-        </div>
     </div>
   </div>
 
@@ -125,6 +134,21 @@
           <table class="stock-table">
             <thead><tr><th>종목</th><th>현재가</th><th style="text-align:right">등락</th></tr></thead>
             <tbody>
+        <tr>
+          <td><span class="stock-name">에이팩트</span><span class="stock-code">200470</span></td>
+          <td class="stock-price">7,730</td>
+          <td><span class="nt">─</span> <span class="nt">0.00%</span></td>
+        </tr>
+        <tr>
+          <td><span class="stock-name">유니드</span><span class="stock-code">014830</span></td>
+          <td class="stock-price">75,800</td>
+          <td><span class="nt">─</span> <span class="nt">0.00%</span></td>
+        </tr>
+        <tr>
+          <td><span class="stock-name">효성화학</span><span class="stock-code">298000</span></td>
+          <td class="stock-price">38,900</td>
+          <td><span class="nt">─</span> <span class="nt">0.00%</span></td>
+        </tr>
         <tr>
           <td><span class="stock-name">셀트리온</span><span class="stock-code">068270</span></td>
           <td class="stock-price">183,200</td>
@@ -170,11 +194,28 @@
 
   
     <div class="card">
+      <div class="card-title">📉 금리 매트릭스</div>
+      <div class="rate-matrix">
+        <div>
+          <div class="rate-group-title">🇰🇷 한국</div>
+          <div class="rate-row"><span class="rate-label">기준금리</span><span class="rate-val">2.75%</span></div><div class="rate-row"><span class="rate-label">CD 3M</span><span class="rate-val">3.47%</span></div><div class="rate-row"><span class="rate-label">국고채 1Y</span><span class="rate-val">2.83%</span></div><div class="rate-row"><span class="rate-label">국고채 3Y</span><span class="rate-val">2.82%</span></div><div class="rate-row"><span class="rate-label">국고채 5Y</span><span class="rate-val">2.93%</span></div>
+          <div class="rate-source">기준: 2026-05-19 (수동 업데이트)</div>
+        </div>
+        <div>
+          <div class="rate-group-title">🇺🇸 미국</div>
+          <div class="rate-row"><span class="rate-label">Fed Rate</span><span class="rate-val">4.50%</span></div><div class="rate-row"><span class="rate-label">SOFR 3M</span><span class="rate-val">4.32%</span></div><div class="rate-row"><span class="rate-label">T-Note 1Y</span><span class="rate-val">3.81%</span></div><div class="rate-row"><span class="rate-label">T-Note 3Y</span><span class="rate-val">4.14%</span></div><div class="rate-row"><span class="rate-label">T-Note 5Y</span><span class="rate-val">4.27%</span></div>
+          <div class="rate-source">T-Note: Treasury.gov 자동 / Fed·SOFR 수동</div>
+        </div>
+      </div>
+    </div>
+
+  
+    <div class="card">
       <div class="card-title">📰 뉴스 — 0건 · 0개사</div>
       <p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>
     </div>
 
-  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 자동생성 2026-05-19 08:27 KST</div>
+  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 자동생성 2026-05-19 08:39 KST</div>
 </div>
 </body>
 </html>

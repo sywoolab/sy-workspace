@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "note": "한국 금리 수동 관리 파일. ECOS API 미사용 시 이 파일의 값을 사용.",
+    "updated": "2026-05-19",
+    "update_hint": "한국은행 통안증권 공시 또는 금투협 채권정보 참조"
+  },
+  "kr": {
+    "base_rate":   { "value": 2.75, "label": "기준금리",   "note": "2025.02 인하" },
+    "cd_3m":       { "value": 3.47, "label": "CD 91일",    "note": "금투협 기준" },
+    "ktb_1y":      { "value": 2.83, "label": "국고채 1Y"  },
+    "ktb_3y":      { "value": 2.82, "label": "국고채 3Y"  },
+    "ktb_5y":      { "value": 2.93, "label": "국고채 5Y"  }
+  },
+  "us": {
+    "fed_rate":    { "value": 4.50, "label": "Fed Rate",    "note": "Upper bound. 2024.12 이후 동결" },
+    "sofr_3m":     { "value": 4.32, "label": "SOFR 3M",    "note": "2025년 평균 추정" }
+  }
+}

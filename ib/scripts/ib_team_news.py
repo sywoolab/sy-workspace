@@ -145,7 +145,7 @@ def fetch_stock_price(code):
 
 
 def collect_market_data():
-    """(label, price, change, rate, fmt) 튜플 리스트"""
+    """지수·환율 데이터 리스트"""
     items = []
     for code, label in [('KOSPI', 'KOSPI'), ('KOSDAQ', 'KOSDAQ')]:
         d = fetch_naver_index(code)
@@ -161,11 +161,61 @@ def collect_market_data():
     if fx:
         items.append({'label': 'USD/KRW', 'price_str': f'{fx["price"]:,.1f}',
                       'change': -fx['change'], 'rate': -fx['rate']})
-    tnx = fetch_yahoo('%5ETNX')
-    if tnx:
-        items.append({'label': '미국 10Y', 'price_str': f'{tnx["price"]:.3f}%',
-                      'change': tnx['change'], 'rate': tnx['rate']})
     return items
+
+
+# ─────────────────────────────────────────
+# 금리 데이터
+# ─────────────────────────────────────────
+
+def fetch_us_rates():
+    """Treasury.gov XML — 미국 국채 수익률 (자동, 최근 2개월 fallback)"""
+    from datetime import datetime as _dt
+    ns_d = 'http://schemas.microsoft.com/ado/2007/08/dataservices'
+    ns_m = 'http://schemas.microsoft.com/ado/2007/08/dataservices/metadata'
+    now  = _dt.now()
+    # 이번 달 → 이전 달 순서로 시도 (영업일 기준 당일 미게재 시 fallback)
+    for delta in [0, -1]:
+        import calendar
+        if delta == 0:
+            ym = now.strftime('%Y%m')
+        else:
+            m = now.month - 1 or 12
+            y = now.year if now.month > 1 else now.year - 1
+            ym = f'{y}{m:02d}'
+        url = (f'https://home.treasury.gov/resource-center/data-chart-center/'
+               f'interest-rates/pages/xml?data=daily_treasury_yield_curve'
+               f'&field_tdr_date_value_month={ym}')
+        try:
+            r    = requests.get(url, headers=HEADERS, timeout=15)
+            root = ET.fromstring(r.content)
+            entries = root.findall('.//{http://www.w3.org/2005/Atom}entry')
+            if not entries:
+                continue
+            props = entries[-1].find(f'.//{{{ns_m}}}properties')
+            result = {}
+            for key, tag in [('1y','BC_1YEAR'), ('3y','BC_3YEAR'),
+                              ('5y','BC_5YEAR'), ('10y','BC_10YEAR')]:
+                el = props.find(f'{{{ns_d}}}{tag}') if props is not None else None
+                if el is not None and el.text:
+                    result[key] = float(el.text)
+            if result:
+                print(f'  US Rates ({ym}): {result}')
+                return result
+        except Exception as e:
+            print(f'  [treasury {ym}] err: {e}')
+    return {}
+
+
+def load_rates_config():
+    """rates_config.json — 한국 금리 + SOFR/Fed 정적 관리"""
+    config_path = os.path.join(BASE_DIR, 'data', 'rates_config.json')
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f'  [rates_config] err: {e}')
+        return {}
 
 
 def collect_stock_data(companies):
@@ -307,18 +357,82 @@ HTML_STYLE = """
   .dn { color: #dc2626; }
   .nt { color: #9ca3af; }
 
+  /* 금리 매트릭스 */
+  .rate-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rate-group-title { font-size: 11px; font-weight: 700; color: #6b7280;
+                      text-transform: uppercase; letter-spacing: 0.6px;
+                      margin-bottom: 8px; padding-bottom: 5px;
+                      border-bottom: 1px solid #e5e7eb; }
+  .rate-row { display: flex; justify-content: space-between; align-items: center;
+              padding: 5px 0; border-bottom: 1px solid #f9fafb; font-size: 13px; }
+  .rate-row:last-child { border-bottom: none; }
+  .rate-label { color: #374151; }
+  .rate-val { font-weight: 700; color: #111827; }
+  .rate-source { font-size: 10px; color: #9ca3af; margin-top: 8px; }
+
   /* 푸터 */
   .footer { text-align: center; font-size: 12px; color: #9ca3af;
             padding: 16px 0 8px; }
   @media (max-width: 480px) {
     .market-grid { grid-template-columns: 1fr 1fr; }
     .market-item .price { font-size: 16px; }
+    .rate-matrix { grid-template-columns: 1fr; }
   }
 </style>
 """
 
 
-def build_html_report(market_data, stock_data, sections, now, session):
+def build_rates_section(us_rates, rates_cfg):
+    """금리 매트릭스 HTML — 한국(수동) + 미국(자동)"""
+    kr = rates_cfg.get('kr', {})
+    us_cfg = rates_cfg.get('us', {})
+    cfg_updated = rates_cfg.get('_meta', {}).get('updated', '미확인')
+
+    # 한국 금리 행
+    kr_rows = ''
+    for key, label in [('base_rate','기준금리'), ('cd_3m','CD 3M'),
+                        ('ktb_1y','국고채 1Y'), ('ktb_3y','국고채 3Y'), ('ktb_5y','국고채 5Y')]:
+        val = kr.get(key, {}).get('value')
+        val_str = f'{val:.2f}%' if val is not None else '─'
+        kr_rows += f'<div class="rate-row"><span class="rate-label">{label}</span><span class="rate-val">{val_str}</span></div>'
+
+    # 미국 금리 행 — Treasury 자동 + Fed/SOFR 정적
+    def _us_val(key, us_rates_dict, fallback_cfg):
+        v = us_rates_dict.get(key)
+        if v is not None:
+            return f'{v:.2f}%'
+        v2 = fallback_cfg.get(key, {}).get('value') if isinstance(fallback_cfg.get(key), dict) else None
+        return f'{v2:.2f}%' if v2 else '─'
+
+    fed_val = f'{us_cfg.get("fed_rate", {}).get("value", "N/A"):.2f}%' if isinstance(us_cfg.get("fed_rate"), dict) else '─'
+    sofr_val = f'{us_cfg.get("sofr_3m", {}).get("value", "N/A"):.2f}%' if isinstance(us_cfg.get("sofr_3m"), dict) else '─'
+    us_rows = (
+        f'<div class="rate-row"><span class="rate-label">Fed Rate</span><span class="rate-val">{fed_val}</span></div>'
+        f'<div class="rate-row"><span class="rate-label">SOFR 3M</span><span class="rate-val">{sofr_val}</span></div>'
+        f'<div class="rate-row"><span class="rate-label">T-Note 1Y</span><span class="rate-val">{_us_val("1y", us_rates, {})}</span></div>'
+        f'<div class="rate-row"><span class="rate-label">T-Note 3Y</span><span class="rate-val">{_us_val("3y", us_rates, {})}</span></div>'
+        f'<div class="rate-row"><span class="rate-label">T-Note 5Y</span><span class="rate-val">{_us_val("5y", us_rates, {})}</span></div>'
+    )
+
+    return f"""
+    <div class="card">
+      <div class="card-title">📉 금리 매트릭스</div>
+      <div class="rate-matrix">
+        <div>
+          <div class="rate-group-title">🇰🇷 한국</div>
+          {kr_rows}
+          <div class="rate-source">기준: {cfg_updated} (수동 업데이트)</div>
+        </div>
+        <div>
+          <div class="rate-group-title">🇺🇸 미국</div>
+          {us_rows}
+          <div class="rate-source">T-Note: Treasury.gov 자동 / Fed·SOFR 수동</div>
+        </div>
+      </div>
+    </div>"""
+
+
+def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None):
     _days_ko = ['월', '화', '수', '목', '금', '토', '일']
     date_str = f'{now.strftime("%Y년 %m월 %d일")} ({_days_ko[now.weekday()]})'
     time_str = now.strftime('%H:%M') + ' KST'
@@ -395,6 +509,9 @@ def build_html_report(market_data, stock_data, sections, now, session):
     if not news_html:
         news_html = '<p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>'
 
+    # ── 금리 매트릭스 ────────────────────────────────
+    rates_section = build_rates_section(us_rates or {}, rates_cfg or {})
+
     news_section = f"""
     <div class="card">
       <div class="card-title">📰 뉴스 — {total}건 · {len(sections)}개사</div>
@@ -423,6 +540,8 @@ def build_html_report(market_data, stock_data, sections, now, session):
   </div>
 
   {stock_section}
+
+  {rates_section}
 
   {news_section}
 
@@ -476,10 +595,13 @@ def main():
     companies = load_watchlist()
     sent      = load_sent()
 
-    # ── 1. 시장 데이터 & 주가 ────────────────────
+    # ── 1. 시장 데이터 & 주가 & 금리 ────────────────
     print('  마켓 데이터 수집...')
     market_data = collect_market_data()
     stock_data  = collect_stock_data(companies)
+    print('  금리 데이터 수집...')
+    us_rates    = fetch_us_rates()
+    rates_cfg   = load_rates_config()
 
     # ── 2. 뉴스 수집 ─────────────────────────────
     sections       = []
@@ -511,7 +633,8 @@ def main():
     total_news = sum(len(p) for _, p in sections)
 
     # ── 3. HTML 생성 & 저장 ───────────────────────
-    html     = build_html_report(market_data, stock_data, sections, now, session)
+    html     = build_html_report(market_data, stock_data, sections, now, session,
+                                  us_rates=us_rates, rates_cfg=rates_cfg)
     page_url = save_html_report(html, session)
 
     # ── 4. 텔레그램: 링크 + 요약만 ───────────────
