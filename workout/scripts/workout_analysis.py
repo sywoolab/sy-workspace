@@ -1037,6 +1037,10 @@ def main():
 
     print(f"\n--- 메시지 미리보기 ---\n{msg}\n")
 
+    # 대시보드 링크 추가 (2026-05-19)
+    dashboard_url = "https://sywoolab.github.io/training-dashboard/"
+    msg += f"\n\n📊 [전체 훈련 대시보드]({dashboard_url})"
+
     ok = send_telegram(msg)
     print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 

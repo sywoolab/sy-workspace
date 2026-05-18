@@ -1,0 +1,40 @@
+name: dashboard-update
+
+on:
+  push:
+    paths:
+      - 'workout/workout_log.json'
+      - 'workout/data/garmin_health.json'
+      - 'workout/workout_schedule.json'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: Generate dashboard HTML
+        run: python workout/scripts/generate_dashboard.py
+
+      - name: Deploy to training-dashboard repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          cd /tmp
+          git clone https://x-access-token:${GH_TOKEN}@github.com/sywoolab/training-dashboard.git
+          cp $GITHUB_WORKSPACE/workout/data/training_report.html training-dashboard/index.html
+          cd training-dashboard
+          git add index.html
+          if ! git diff --staged --quiet; then
+            git commit -m "auto: 훈련 대시보드 업데이트 $(date '+%Y-%m-%d %H:%M')"
+            git push
+          fi

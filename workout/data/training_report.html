@@ -1,122 +1,95 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>철인3종 훈련 기록 2026</title>
+<title>철인3종 훈련 대시보드</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Apple SD Gothic Neo',sans-serif;background:#0f0f13;color:#e0e0e0;padding:16px}
-h1{color:#fff;font-size:20px;margin-bottom:16px}
-.races{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.race-card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:12px;padding:14px 18px;flex:1;min-width:180px}
-.race-card .days{font-size:28px;font-weight:700;color:#7c6fff}
-.race-card .label{font-size:13px;color:#aaa;margin-top:2px}
-.race-card .goal{font-size:12px;color:#6cffb1;margin-top:4px}
-.section-title{font-size:15px;font-weight:600;color:#fff;margin:20px 0 10px;border-left:3px solid #7c6fff;padding-left:10px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#1a1a2e;color:#aaa;padding:8px 10px;text-align:left;font-weight:500}
-td{padding:7px 10px;border-bottom:1px solid #222;vertical-align:top}
-tr:hover{background:#1a1a28}
-.tl-bar{height:6px;background:#333;border-radius:3px;margin-top:3px}
-.tl-fill{height:100%;background:linear-gradient(90deg,#7c6fff,#ff6c6c);border-radius:3px}
-.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;background:#2a2a4a;color:#aaa}
-.badge.swim{background:#1a3a5a;color:#6ab4ff}
-.badge.bike{background:#3a2a1a;color:#ffa06a}
-.badge.run{background:#1a3a2a;color:#6affa0}
-.badge.brick{background:#3a1a3a;color:#ff6aff}
-.red{color:#ff6c6c}.green{color:#6affa0}.yellow{color:#ffd56c}.gray{color:#666}
-.hrv-ok{color:#6affa0}.hrv-mid{color:#ffd56c}.hrv-bad{color:#ff6c6c}
-.race-row{background:#1a1a2e!important;color:#fff;font-weight:600}
+body{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;background:#0f0f13;color:#e0e0e0;padding:16px;max-width:900px;margin:0 auto}
+h1{color:#fff;font-size:18px;margin-bottom:4px}
+.sub{color:#666;font-size:12px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:18px}
+.card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:10px;padding:12px 14px}
+.card .val{font-size:26px;font-weight:700;color:#7c6fff}
+.card .label{font-size:12px;color:#888;margin-top:2px}
+.card .sub-val{font-size:12px;color:#aaa;margin-top:4px}
+.section{font-size:14px;font-weight:600;color:#fff;margin:16px 0 8px;border-left:3px solid #7c6fff;padding-left:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#1a1a2e;color:#888;padding:7px 8px;text-align:left;position:sticky;top:0}
+td{padding:6px 8px;border-bottom:1px solid #1e1e2e;vertical-align:middle}
+tr:hover{background:#15152a}
+.badge{display:inline-block;font-size:11px;padding:2px 6px;border-radius:8px;margin:1px;white-space:nowrap}
+.swim{background:#0d2a45;color:#6ab4ff}.bike{background:#2d1e0d;color:#ffa06a}
+.run{background:#0d2a1e;color:#6affa0}.brick{background:#2d0d2d;color:#ff6aff}
+.rest{color:#444}
+.g{color:#6affa0}.y{color:#ffd56c}.r{color:#ff6c6c}.dim{color:#555}
+.race-row td{background:#1a1a2e!important;color:#ffd56c;font-weight:600}
+.today-row td{background:#1a2a1a!important}
+.tl-cell{white-space:nowrap}
+.tl{display:inline-block;height:5px;border-radius:2px;margin-left:4px;vertical-align:middle}
 </style></head><body>
-<h1>🏊‍♂️ 철인3종 훈련 기록 2026</h1>
+<h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
+<div class="sub">마지막 업데이트: 2026-05-19 08:27 KST</div>
 
-<div class="races">
-<div class="race-card">
-  <div class="days" style="color:#ffd56c">D-19</div>
-  <div class="label">한강 쉬엄쉬엄 (수영1+자전거20+러닝10)</div>
-  <div class="goal">축제형</div>
-</div><div class="race-card">
-  <div class="days" style="color:#7c6fff">D-33</div>
-  <div class="label">한강리버크로스스위밍 2km</div>
-  <div class="goal">OW</div>
-</div><div class="race-card">
-  <div class="days" style="color:#7c6fff">D-40</div>
-  <div class="label">고령 대가야 스탠다드</div>
-  <div class="goal">sub-2:42 목표</div>
-</div></div>
-<div class="section-title">운동 기록 및 컨디션 (3월 16일~)</div>
-<table>
-<thead><tr>
-<th>날짜</th><th>운동</th><th>부하</th><th>수면</th><th>RHR</th><th>HRV last/weekly</th>
-</tr></thead><tbody>
-<tr><td>05-19 (화)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="yellow">6h41m</span></td><td><span class="yellow">47</span></td><td><span class="hrv-ok">67</span> / <span class="hrv-mid">49</span></td></tr>
-<tr><td>05-17 (일)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="green">7h57m</span></td><td><span class="yellow">46</span></td><td><span class="hrv-ok">62</span> / <span class="hrv-mid">49</span></td></tr>
-<tr><td>05-16 (토)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="yellow">6h29m</span></td><td><span class="red">51</span></td><td><span class="hrv-bad">39</span> / <span class="hrv-mid">49</span></td></tr>
-<tr><td>05-14 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="green">7h40m</span></td><td><span class="yellow">49</span></td><td><span class="hrv-bad">37</span> / <span class="hrv-mid">50</span></td></tr>
-<tr class="race-row"><td>05-10 (일)</td><td><span class="badge run">🏃 0.0km</span> <span class="badge bike">🚴 0.0km </span> <span class="badge swim">🏊 1398m</span> <span class="badge swim">🏊 230m</span> </td><td><span style="color:#ff6c6c">924</span><div class="tl-bar"><div class="tl-fill" style="width:100%;background:#ff6c6c"></div></div></td><td><span class="green">7h04m</span></td><td><span class="green">42</span></td><td><span class="hrv-ok">64</span> / <span class="hrv-ok">64</span></td></tr>
-<tr><td>05-09 (토)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="yellow">6h53m</span></td><td><span class="green">43</span></td><td><span class="hrv-ok">62</span> / <span class="hrv-ok">64</span></td></tr>
-<tr><td>05-08 (금)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="green">8h33m</span></td><td><span class="yellow">46</span></td><td><span class="hrv-mid">52</span> / <span class="hrv-ok">65</span></td></tr>
-<tr><td>05-07 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="green">7h45m</span></td><td><span class="green">43</span></td><td><span class="hrv-ok">71</span> / <span class="hrv-ok">68</span></td></tr>
-<tr><td>05-06 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td><span class="red">5h43m</span></td><td><span class="green">44</span></td><td><span class="hrv-ok">62</span> / <span class="hrv-ok">68</span></td></tr>
-<tr><td>05-05 (화)</td><td><span class="badge run">🏃 0.0km</span> <span class="badge swim">🏊 1059m</span> </td><td><span style="color:#7c6fff">55</span><div class="tl-bar"><div class="tl-fill" style="width:9.166666666666666%;background:#7c6fff"></div></div></td><td><span class="yellow">6h34m</span></td><td><span class="green">40</span></td><td><span class="hrv-ok">74</span> / <span class="hrv-ok">68</span></td></tr>
-<tr><td>05-03 (일)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>05-02 (토)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>05-01 (금)</td><td><span class="badge run">🏃 0.0km</span> <span class="badge bike">🚴 0.0km </span> </td><td><span style="color:#ffd56c">297</span><div class="tl-bar"><div class="tl-fill" style="width:49.5%;background:#ffd56c"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-30 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-29 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-26 (일)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-25 (토)</td><td><span class="badge run">🏃 0.0km</span> <span class="badge bike">🚴 0.0km </span> </td><td><span style="color:#ffd56c">345</span><div class="tl-bar"><div class="tl-fill" style="width:57.49999999999999%;background:#ffd56c"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-23 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-22 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-21 (화)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-19 (일)</td><td><span class="badge swim">🏊 800m</span> <span class="badge run">🏃 0.0km</span> </td><td><span style="color:#7c6fff">152</span><div class="tl-bar"><div class="tl-fill" style="width:25.333333333333336%;background:#7c6fff"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-18 (토)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-17 (금)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-16 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-15 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-14 (화)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-13 (월)</td><td><span class="badge swim">🏊 475m</span> <span class="badge swim">🏊 1075m</span> </td><td><span style="color:#7c6fff">97</span><div class="tl-bar"><div class="tl-fill" style="width:16.166666666666664%;background:#7c6fff"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-09 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-06 (월)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-05 (일)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-04 (토)</td><td><span class="badge swim">🏊 1200m</span> <span class="badge run">🏃 0.0km</span> </td><td><span style="color:#ffd56c">203</span><div class="tl-bar"><div class="tl-fill" style="width:33.83333333333333%;background:#ffd56c"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-03 (금)</td><td><span class="badge swim">🏊 1675m</span> <span class="badge run">🏃 0.0km</span> </td><td><span style="color:#ffd56c">243</span><div class="tl-bar"><div class="tl-fill" style="width:40.5%;background:#ffd56c"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-02 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-01 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-31 (화)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-30 (월)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-29 (일)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-28 (토)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-27 (금)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-26 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-25 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-23 (월)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-21 (토)</td><td><span class="badge swim">🏊 2275m</span> <span class="badge bike">🚴 0.0km </span> <span class="badge run">🏃 0.0km</span> </td><td><span style="color:#ff6c6c">469</span><div class="tl-bar"><div class="tl-fill" style="width:78.16666666666666%;background:#ff6c6c"></div></div></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-19 (목)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-18 (수)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-17 (화)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-16 (월)</td><td><span class="gray">휴식</span></td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+<div class="grid">
+<div class="card"><div class="val" style="color:#ffd56c">D-19</div><div class="label">한강 쉬엄쉬엄 (1+20+10)</div><div class="sub-val">T1 연습</div></div>
+<div class="card"><div class="val" style="color:#7c6fff">D-33</div><div class="label">한강리버크로스 2km OW</div><div class="sub-val">OW 적응</div></div>
+<div class="card"><div class="val" style="color:#7c6fff">D-40</div><div class="label">대가야 스탠다드</div><div class="sub-val">🎯 sub-2:42</div></div>
+<div class="card"><div class="val" style="color:#7c6fff">D-100</div><div class="label">거제 스탠다드</div><div class="sub-val">🎯 sub-2:35</div></div>
+<div class="card"><div class="val" style="color:#6affa0">0.0km</div><div class="label">이번주 수영</div></div>
+<div class="card"><div class="val" style="color:#ffa06a">0km</div><div class="label">이번주 자전거</div></div>
+<div class="card"><div class="val" style="color:#6ab4ff">0km</div><div class="label">이번주 러닝</div></div>
+<div class="card"><div class="val" style="color:#ff6aff">0</div><div class="label">이번주 누적부하</div></div>
+</div>
+<div class="section">훈련 기록 (최근 60일)</div>
+<table><thead><tr><th>날짜</th><th>운동</th><th>부하</th><th>수면</th><th>RHR</th><th>HRV</th></tr></thead><tbody>
+<tr class="today-row"><td>05-19 (화)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="y">6h41m</span></td><td><span class="y">47</span></td><td><span class="g">67</span>/<span class="y">49</span></td></tr>
+<tr><td>05-17 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="g">7h57m</span></td><td><span class="y">46</span></td><td><span class="g">62</span>/<span class="y">49</span></td></tr>
+<tr><td>05-16 (토)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="y">6h29m</span></td><td><span class="r">51</span></td><td><span class="r">39</span>/<span class="y">49</span></td></tr>
+<tr><td>05-14 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="g">7h40m</span></td><td><span class="y">49</span></td><td><span class="r">37</span>/<span class="y">50</span></td></tr>
+<tr><td>05-10 (일)</td><td><span class="badge run">🏃 0.0km</span><span class="badge bike">🚴 0km</span><span class="badge swim">🏊 1398m</span><span class="badge swim">🏊 230m</span></td><td class="tl-cell"><span style="color:#ff6c6c">924</span><span class="tl" style="width:50px;background:#ff6c6c"></span></td><td><span class="g">7h04m</span></td><td><span class="g">42</span></td><td><span class="g">64</span>/<span class="g">64</span></td></tr>
+<tr><td>05-09 (토)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="y">6h53m</span></td><td><span class="g">43</span></td><td><span class="g">62</span>/<span class="g">64</span></td></tr>
+<tr><td>05-08 (금)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="g">8h33m</span></td><td><span class="y">46</span></td><td><span class="y">52</span>/<span class="g">65</span></td></tr>
+<tr><td>05-07 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="g">7h45m</span></td><td><span class="g">43</span></td><td><span class="g">71</span>/<span class="g">68</span></td></tr>
+<tr><td>05-06 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td><span class="r">5h43m</span></td><td><span class="g">44</span></td><td><span class="g">62</span>/<span class="g">68</span></td></tr>
+<tr><td>05-05 (화)</td><td><span class="badge run">🏃 0.0km</span><span class="badge swim">🏊 1059m</span></td><td class="tl-cell"><span style="color:#7c6fff">55</span><span class="tl" style="width:5px;background:#7c6fff"></span></td><td><span class="y">6h34m</span></td><td><span class="g">40</span></td><td><span class="g">74</span>/<span class="g">68</span></td></tr>
+<tr><td>05-03 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>05-02 (토)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>05-01 (금)</td><td><span class="badge run">🏃 0.0km</span><span class="badge bike">🚴 0km</span></td><td class="tl-cell"><span style="color:#ffd56c">297</span><span class="tl" style="width:25px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-30 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-29 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-26 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-25 (토)</td><td><span class="badge run">🏃 0.0km</span><span class="badge bike">🚴 0km</span></td><td class="tl-cell"><span style="color:#ffd56c">345</span><span class="tl" style="width:29px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-23 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-22 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-21 (화)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-19 (일)</td><td><span class="badge swim">🏊 800m</span><span class="badge run">🏃 0.0km</span></td><td class="tl-cell"><span style="color:#7c6fff">152</span><span class="tl" style="width:13px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-18 (토)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-17 (금)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-16 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-15 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-14 (화)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-13 (월)</td><td><span class="badge swim">🏊 475m</span><span class="badge swim">🏊 1075m</span></td><td class="tl-cell"><span style="color:#7c6fff">97</span><span class="tl" style="width:8px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-09 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-06 (월)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-05 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-04 (토)</td><td><span class="badge swim">🏊 1200m</span><span class="badge run">🏃 0.0km</span></td><td class="tl-cell"><span style="color:#ffd56c">203</span><span class="tl" style="width:17px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-03 (금)</td><td><span class="badge swim">🏊 1675m</span><span class="badge run">🏃 0.0km</span></td><td class="tl-cell"><span style="color:#ffd56c">243</span><span class="tl" style="width:20px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-02 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-01 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-31 (화)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-30 (월)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-29 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-28 (토)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-27 (금)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-26 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-25 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-23 (월)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-21 (토)</td><td><span class="badge swim">🏊 2275m</span><span class="badge bike">🚴 0km</span><span class="badge run">🏃 0.0km</span></td><td class="tl-cell"><span style="color:#ff6c6c">469</span><span class="tl" style="width:39px;background:#ff6c6c"></span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-19 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-18 (수)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-17 (화)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-16 (월)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
 </tbody></table>
-
-<div class="section-title">5/10 대구 시장배 결과 (첫 대회)</div>
-<table><thead><tr><th>종목</th><th>거리</th><th>시간</th><th>페이스/평속</th><th>HR</th></tr></thead>
-<tbody>
-<tr><td>수영 (OW)</td><td>1,398m</td><td>32:10</td><td>2:14/100m (이동 2:14)</td><td>139/154</td></tr>
-<tr><td>T1</td><td>—</td><td>5:39</td><td>—</td><td>—</td></tr>
-<tr><td>자전거</td><td>39.31km</td><td>1:10:16</td><td>33.6 km/h</td><td>162/197</td></tr>
-<tr><td>T2</td><td>—</td><td>2:32</td><td>—</td><td>—</td></tr>
-<tr><td>러닝</td><td>9.46km</td><td>53:44</td><td>5:41/km</td><td>146/160</td></tr>
-<tr class="race-row"><td><strong>합계</strong></td><td><strong>50.68km</strong></td><td><strong>2:44:21</strong></td><td>마스터 목표 -8:39</td><td>—</td></tr>
-</tbody></table>
-
-<div class="section-title">시즌 목표</div>
-<table><thead><tr><th>대회</th><th>날짜</th><th>목표</th><th>핵심 단축 영역</th></tr></thead>
-<tbody>
-<tr><td>🏁 한강 쉬엄쉬엄</td><td>6/7</td><td>T1 단축 연습</td><td>수트 탈의</td></tr>
-<tr><td>🏊 한강리버크로스</td><td>6/21</td><td>OW 2km 완주</td><td>패닉 대응 실전</td></tr>
-<tr><td>🏁 대가야 스탠다드</td><td>6/28</td><td><strong>sub-2:42</strong></td><td>수영 -3:01, T1 -2:09, 자전거 -6:33, 러닝 -3:48</td></tr>
-<tr><td>🏁 가을 (거제/통영)</td><td>8~10월</td><td><strong>sub-2:35</strong></td><td>수영 OW 누적 노출 + 자전거 80km 능력 유지</td></tr>
-</tbody></table>
-
-<div style="color:#555;font-size:11px;margin-top:20px;text-align:center">
-Generated: 2026-05-19 08:09 KST | sy-workspace workout_log.json</div>
+<div style="color:#333;font-size:11px;margin-top:14px;text-align:center">
+sy-workspace / workout_log.json · 2026-05-19 08:27 KST</div>
 </body></html>
