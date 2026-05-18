@@ -21,17 +21,18 @@ jobs:
 
       - run: pip install requests
 
-      - name: 워치리스트 뉴스 발송
+      - name: 뉴스브리프 HTML 생성 + 텔레그램 발송
         env:
           IB_TEAM_BOT_TOKEN: ${{ secrets.IB_TEAM_BOT_TOKEN }}
           IB_TEAM_CHAT_ID: ${{ secrets.IB_TEAM_CHAT_ID }}
         run: python ib/scripts/ib_team_news.py
 
-      - name: Commit sent record
+      - name: Commit HTML & sent record
         if: always()
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+          git add docs/morning.html docs/afternoon.html 2>/dev/null || true
           git add ib/data/team_news_sent.json 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "ib-team news: sent record update"

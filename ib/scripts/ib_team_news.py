@@ -1,10 +1,15 @@
 """
-IB 팀 채널 — 프로페셔널 뉴스브리프 (HTML 포맷)
-───────────────────────────────────────────
-상단: 마켓 스냅샷 (KOSPI·KOSDAQ·S&P500·환율·금리)
-중단: 워치리스트 주가 (상장사 한정)
-하단: 뉴스 (기업별, 점수 필터)
-───────────────────────────────────────────
+IB 팀 채널 — 뉴스브리프
+────────────────────────────────────────────
+구조:
+  1. 마켓 데이터 + 주가 + 뉴스 수집
+  2. HTML 리포트 생성 → docs/ 저장 (GitHub Pages)
+  3. 텔레그램: 링크 + 간단 요약만 발송
+
+GitHub Pages URL:
+  오전: https://sywoolab.github.io/sy-workspace/morning.html
+  오후: https://sywoolab.github.io/sy-workspace/afternoon.html
+
 스케줄: 07:30 KST / 15:00 KST
 """
 
@@ -32,12 +37,17 @@ KST = timezone(timedelta(hours=9))
 BOT_TOKEN = os.environ.get('IB_TEAM_BOT_TOKEN', '')
 CHAT_ID   = os.environ.get('IB_TEAM_CHAT_ID', '')
 
-BASE_DIR       = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+BASE_DIR       = str(Path(__file__).resolve().parent.parent)   # ib/
+REPO_ROOT      = str(Path(__file__).resolve().parent.parent.parent)  # repo root
 WATCHLIST_FILE = os.path.join(BASE_DIR, 'watchlist_team.json')
 SENT_FILE      = os.path.join(BASE_DIR, 'data', 'team_news_sent.json')
+DOCS_DIR       = os.path.join(REPO_ROOT, 'docs')
+
+PAGES_BASE     = 'https://sywoolab.github.io/sy-workspace'
+HEADERS        = {'User-Agent': 'Mozilla/5.0'}
 
 # ─────────────────────────────────────────
-# 매체 가중치
+# 가중치 설정
 # ─────────────────────────────────────────
 SOURCE_WEIGHT = {
     '더벨': 3, '인베스트조선': 3, '딜사이트': 3, '연합인포맥스': 3,
@@ -62,18 +72,12 @@ KEYWORD_BOOST = {
     '광고': -2, '협찬': -2, '이벤트': -2, '경품': -2,
 }
 
-HEADERS = {'User-Agent': 'Mozilla/5.0'}
-
 
 # ─────────────────────────────────────────
-# 시장 데이터
+# 유틸
 # ─────────────────────────────────────────
 
-def _arrow(chg: float) -> str:
-    return '▲' if chg > 0 else ('▼' if chg < 0 else '─')
-
-
-def _n(val, default=0) -> float:
+def _n(val, default=0):
     """쉼표 포함 숫자 문자열 안전 변환"""
     try:
         return float(str(val or default).replace(',', ''))
@@ -81,139 +85,113 @@ def _n(val, default=0) -> float:
         return float(default)
 
 
-def fetch_naver_index(code: str):
-    """KOSPI·KOSDAQ — 네이버 금융 실시간 API"""
+def _arrow_html(chg):
+    """HTML용 상승/하락 색상 span"""
+    if chg > 0:
+        return f'<span class="up">▲</span>'
+    elif chg < 0:
+        return f'<span class="dn">▼</span>'
+    return '<span class="nt">─</span>'
+
+
+def _rate_html(rate):
+    cls = 'up' if rate > 0 else ('dn' if rate < 0 else 'nt')
+    sign = '+' if rate > 0 else ''
+    return f'<span class="{cls}">{sign}{rate:.2f}%</span>'
+
+
+# ─────────────────────────────────────────
+# 시장 데이터 수집
+# ─────────────────────────────────────────
+
+def fetch_naver_index(code):
     url = f'https://polling.finance.naver.com/api/realtime/domestic/index/{code}'
     try:
         r = requests.get(url, headers=HEADERS, timeout=10)
         d = r.json().get('datas', [{}])[0]
-        close = _n(d.get('closePrice') or d.get('price'))
-        chg   = _n(d.get('compareToPreviousClosePrice'))
-        rate  = _n(d.get('fluctuationsRatio'))
-        return {'price': close, 'change': chg, 'rate': rate}
+        return {'price': _n(d.get('closePrice') or d.get('price')),
+                'change': _n(d.get('compareToPreviousClosePrice')),
+                'rate':   _n(d.get('fluctuationsRatio'))}
     except Exception as e:
         print(f'  [index {code}] err: {e}')
         return None
 
 
-def fetch_yahoo(symbol: str):
-    """S&P500·미국 금리(^TNX)·환율(KRW=X) — Yahoo Finance v8 JSON"""
+def fetch_yahoo(symbol):
     url = f'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=2d'
     try:
-        r = requests.get(url, headers=HEADERS, timeout=10)
-        result = r.json()['chart']['result'][0]
-        meta = result['meta']
-        price  = meta.get('regularMarketPrice', 0)
-        prev   = meta.get('chartPreviousClose', price)
-        chg    = price - prev
-        rate   = chg / prev * 100 if prev else 0
-        return {'price': price, 'change': chg, 'rate': rate}
+        r    = requests.get(url, headers=HEADERS, timeout=10)
+        meta = r.json()['chart']['result'][0]['meta']
+        price = meta.get('regularMarketPrice', 0)
+        prev  = meta.get('chartPreviousClose', price)
+        chg   = price - prev
+        return {'price': price, 'change': chg, 'rate': chg / prev * 100 if prev else 0}
     except Exception as e:
         print(f'  [yahoo {symbol}] err: {e}')
         return None
 
 
-def fetch_stock_price(code: str):
-    """개별 종목 주가 — 네이버 금융 실시간 API"""
+def fetch_stock_price(code):
     url = f'https://polling.finance.naver.com/api/realtime/domestic/stock/{code}'
     try:
         r = requests.get(url, headers=HEADERS, timeout=10)
         d = r.json().get('datas', [{}])[0]
-        close = _n(d.get('closePrice') or d.get('price'))
-        chg   = _n(d.get('compareToPreviousClosePrice'))
-        rate  = _n(d.get('fluctuationsRatio'))
-        return {'price': close, 'change': chg, 'rate': rate}
+        return {'price': _n(d.get('closePrice') or d.get('price')),
+                'change': _n(d.get('compareToPreviousClosePrice')),
+                'rate':   _n(d.get('fluctuationsRatio'))}
     except Exception as e:
         print(f'  [stock {code}] err: {e}')
         return None
 
 
-def build_market_section(session: str, now: datetime) -> str:
-    """마켓 스냅샷 블록 — 오전엔 전일 종가 기준"""
-    is_morning = now.hour < 12
-    prefix = '전일 종가' if is_morning else '현재가'
-
-    lines = [f'<b>📊 마켓 스냅샷</b>  <i>({prefix})</i>']
-
-    # 국내 지수
+def collect_market_data():
+    """(label, price, change, rate, fmt) 튜플 리스트"""
+    items = []
     for code, label in [('KOSPI', 'KOSPI'), ('KOSDAQ', 'KOSDAQ')]:
         d = fetch_naver_index(code)
         if d:
-            ar = _arrow(d['change'])
-            sign = '+' if d['change'] > 0 else ''
-            lines.append(
-                f'  {label:<8} <b>{d["price"]:,.2f}</b>  '
-                f'{ar} {abs(d["change"]):,.2f}  ({sign}{d["rate"]:.2f}%)'
-            )
-
-    # 미국 S&P500 (전일 종가 상시)
-    sp = fetch_yahoo('%5EGSPC')
-    if sp:
-        ar = _arrow(sp['change'])
-        sign = '+' if sp['change'] > 0 else ''
-        lines.append(
-            f'  {"S&P 500":<8} <b>{sp["price"]:,.2f}</b>  '
-            f'{ar} {abs(sp["change"]):,.2f}  ({sign}{sp["rate"]:.2f}%)'
-        )
-
-    lines.append('')  # 빈 줄
-
-    # 환율
+            items.append({'label': label, 'price_str': f'{d["price"]:,.2f}',
+                          'change': d['change'], 'rate': d['rate']})
+    for sym, label in [('%5EGSPC', 'S&P 500'), ('%5EDJI', 'DOW')]:
+        d = fetch_yahoo(sym)
+        if d:
+            items.append({'label': label, 'price_str': f'{d["price"]:,.2f}',
+                          'change': d['change'], 'rate': d['rate']})
     fx = fetch_yahoo('KRW=X')
     if fx:
-        ar = _arrow(-fx['change'])  # KRW=X는 달러당 원 → 원화강세 = 수치하락
-        sign = '+' if fx['change'] > 0 else ''
-        lines.append(
-            f'  USD/KRW  <b>{fx["price"]:,.1f}</b>  {ar} {abs(fx["change"]):.1f}'
-        )
-
-    # 미국 10Y 금리 (%TNX = 10-Year Treasury)
+        items.append({'label': 'USD/KRW', 'price_str': f'{fx["price"]:,.1f}',
+                      'change': -fx['change'], 'rate': -fx['rate']})
     tnx = fetch_yahoo('%5ETNX')
     if tnx:
-        ar = _arrow(tnx['change'])
-        sign = '+' if tnx['change'] > 0 else ''
-        lines.append(
-            f'  미국 10Y  <b>{tnx["price"]:.3f}%</b>  {ar} {abs(tnx["change"]):.3f}pp'
-        )
-
-    return '\n'.join(lines)
+        items.append({'label': '미국 10Y', 'price_str': f'{tnx["price"]:.3f}%',
+                      'change': tnx['change'], 'rate': tnx['rate']})
+    return items
 
 
-def build_stock_section(companies: list) -> str:
-    """워치리스트 주가 블록 (상장사만)"""
-    listed = [c for c in companies if c.get('listed') and c.get('stock_code')]
-    if not listed:
-        return ''
-
-    lines = ['<b>📈 워치리스트 주가</b>']
-    for comp in listed:
-        d = fetch_stock_price(comp['stock_code'])
-        if not d:
+def collect_stock_data(companies):
+    rows = []
+    for comp in companies:
+        if not comp.get('listed') or not comp.get('stock_code'):
             continue
-        name  = comp['name']
-        code  = comp['stock_code']
-        ar    = _arrow(d['change'])
-        sign  = '+' if d['change'] > 0 else ''
-        rate_str = f'{sign}{d["rate"]:.2f}%'
-        # 색상: 볼드(상승) or 이탤릭(하락) — 텔레그램 HTML 활용
-        price_int = int(d['price'])
-        price_fmt = f'<b>{price_int:,}</b>' if d['change'] >= 0 else f'{price_int:,}'
-        lines.append(
-            f'  {name:<10} <code>{code}</code>  {price_fmt}  {ar} {rate_str}'
-        )
-    return '\n'.join(lines)
+        d = fetch_stock_price(comp['stock_code'])
+        if d:
+            rows.append({'name': comp['name'], 'code': comp['stock_code'],
+                         'market': comp.get('market', ''),
+                         'price': int(d['price']), 'change': d['change'],
+                         'rate': d['rate']})
+    return rows
 
 
 # ─────────────────────────────────────────
-# 뉴스 fetch + 점수
+# 뉴스 수집
 # ─────────────────────────────────────────
 
-def load_watchlist() -> list:
+def load_watchlist():
     with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
         return json.load(f)['companies']
 
 
-def load_sent() -> set:
+def load_sent():
     try:
         with open(SENT_FILE, 'r') as f:
             return set(json.load(f))
@@ -221,26 +199,24 @@ def load_sent() -> set:
         return set()
 
 
-def save_sent(sent_set: set):
+def save_sent(sent_set):
     os.makedirs(os.path.dirname(SENT_FILE), exist_ok=True)
-    recent = sorted(sent_set)[-2000:]
     with open(SENT_FILE, 'w') as f:
-        json.dump(recent, f)
+        json.dump(sorted(sent_set)[-2000:], f)
 
 
-def article_hash(title: str, link: str) -> str:
+def article_hash(title, link):
     return hashlib.md5(f'{title[:80]}{link[:80]}'.encode()).hexdigest()[:12]
 
 
-def fetch_news(company_name: str, aliases=None):
+def fetch_news(company_name, aliases=None):
     terms = [company_name] + (aliases or [])
     query = '+OR+'.join([f'%22{t}%22' for t in terms])
-    url = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
-    out = []
+    url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
+    out   = []
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
-        root = ET.fromstring(resp.content)
-        for item in root.findall('.//item'):
+        for item in ET.fromstring(resp.content).findall('.//item'):
             title  = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
             link   = item.findtext('link', '').strip()
             source = item.findtext('source', '').strip()
@@ -251,65 +227,246 @@ def fetch_news(company_name: str, aliases=None):
     return out
 
 
-def score_article(article: dict, company: dict) -> int:
-    title  = article['title']
-    source = article['source']
-    score  = 0
-    for src_kw, w in SOURCE_WEIGHT.items():
-        if src_kw in source:
-            score += w
-            break
-    for kw, w in KEYWORD_BOOST.items():
-        if kw in title:
+def score_article(article, company):
+    title, source, score = article['title'], article['source'], 0
+    for k, w in SOURCE_WEIGHT.items():
+        if k in source:
+            score += w; break
+    for k, w in KEYWORD_BOOST.items():
+        if k in title:
             score += w
     for term in [company['name']] + company.get('alias', []):
         if term in title:
-            score += 1
-            break
+            score += 1; break
     return score
 
 
 # ─────────────────────────────────────────
-# 텔레그램 전송
+# HTML 리포트 생성
 # ─────────────────────────────────────────
 
-def send_telegram(text: str, silent: bool = False):
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
-    # 4000자 청크 분할
-    chunks, cur = [], ''
-    for line in text.split('\n'):
-        if len(cur) + len(line) + 1 > 3900:
-            chunks.append(cur)
-            cur = line
-        else:
-            cur += ('\n' + line) if cur else line
-    if cur:
-        chunks.append(cur)
+HTML_STYLE = """
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+         background: #f4f6f9; color: #1a202c; font-size: 15px; line-height: 1.5; }
+  .container { max-width: 680px; margin: 0 auto; padding: 16px; }
 
-    for c in chunks:
-        resp = requests.post(url, data={
-            'chat_id': CHAT_ID,
-            'text': c,
-            'parse_mode': 'HTML',
-            'disable_web_page_preview': 'true',
-            'disable_notification': 'true' if silent else 'false',
-        }, timeout=30)
-        if not resp.json().get('ok'):
-            print(f'  전송 실패: {resp.text[:300]}')
+  /* 헤더 */
+  .header { background: linear-gradient(135deg, #0f2044 0%, #1a3a6b 100%);
+            color: #fff; border-radius: 12px; padding: 20px 24px; margin-bottom: 14px; }
+  .header h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .meta { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+  .session-badge { display: inline-block; background: rgba(255,255,255,0.18);
+                   border-radius: 6px; padding: 2px 10px; font-size: 12px;
+                   font-weight: 600; margin-left: 8px; letter-spacing: 0.3px; }
+
+  /* 카드 */
+  .card { background: #fff; border-radius: 10px; padding: 16px 18px;
+          margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: 0.8px; color: #6b7280; margin-bottom: 12px; }
+
+  /* 마켓 그리드 */
+  .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .market-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px; }
+  .market-item .label { font-size: 11px; color: #9ca3af; font-weight: 600;
+                        text-transform: uppercase; letter-spacing: 0.5px; }
+  .market-item .price { font-size: 18px; font-weight: 700; margin: 2px 0; color: #111827; }
+  .market-item .chg { font-size: 12px; }
+
+  /* 주가 테이블 */
+  .stock-table { width: 100%; border-collapse: collapse; }
+  .stock-table th { font-size: 11px; color: #9ca3af; font-weight: 600;
+                    text-align: left; padding: 4px 0 8px; border-bottom: 1px solid #f3f4f6; }
+  .stock-table th:last-child, .stock-table td:last-child { text-align: right; }
+  .stock-table td { padding: 8px 0; font-size: 14px; border-bottom: 1px solid #f9fafb; }
+  .stock-table tr:last-child td { border-bottom: none; }
+  .stock-name { font-weight: 600; }
+  .stock-code { font-size: 11px; color: #9ca3af; margin-left: 4px; }
+  .stock-price { font-weight: 700; font-size: 15px; }
+
+  /* 뉴스 */
+  .company-header { display: flex; align-items: center; gap: 8px;
+                    padding: 10px 0 6px; border-bottom: 1px solid #f3f4f6;
+                    margin-bottom: 8px; }
+  .company-header:not(:first-child) { margin-top: 18px; }
+  .company-name { font-weight: 700; font-size: 15px; color: #1a202c; }
+  .company-code { font-size: 11px; color: #9ca3af; background: #f3f4f6;
+                  border-radius: 4px; padding: 1px 6px; }
+  .news-item { padding: 7px 0; border-bottom: 1px solid #f9fafb; }
+  .news-item:last-child { border-bottom: none; }
+  .news-title { font-size: 14px; color: #1a56db; text-decoration: none;
+                font-weight: 500; display: block; line-height: 1.45; }
+  .news-title:hover { text-decoration: underline; }
+  .news-title.high { font-weight: 700; color: #1e40af; }
+  .news-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+  /* 색상 */
+  .up { color: #16a34a; }
+  .dn { color: #dc2626; }
+  .nt { color: #9ca3af; }
+
+  /* 푸터 */
+  .footer { text-align: center; font-size: 12px; color: #9ca3af;
+            padding: 16px 0 8px; }
+  @media (max-width: 480px) {
+    .market-grid { grid-template-columns: 1fr 1fr; }
+    .market-item .price { font-size: 16px; }
+  }
+</style>
+"""
+
+
+def build_html_report(market_data, stock_data, sections, now, session):
+    _days_ko = ['월', '화', '수', '목', '금', '토', '일']
+    date_str = f'{now.strftime("%Y년 %m월 %d일")} ({_days_ko[now.weekday()]})'
+    time_str = now.strftime('%H:%M') + ' KST'
+    price_label = '전일 종가' if now.hour < 12 else '현재가'
+
+    # ── 마켓 카드 ──────────────────────────────────
+    market_html = ''
+    for m in market_data:
+        ar  = _arrow_html(m['change'])
+        rt  = _rate_html(m['rate'])
+        sign = '+' if m['change'] > 0 else ''
+        chg_abs = abs(m['change'])
+        # 환율/금리는 소수점 표기 유지
+        if m['label'] in ('USD/KRW',):
+            chg_str = f'{chg_abs:.1f}'
+        elif m['label'] in ('미국 10Y',):
+            chg_str = f'{chg_abs:.3f}pp'
+        else:
+            chg_str = f'{chg_abs:,.2f}'
+        market_html += f"""
+        <div class="market-item">
+          <div class="label">{m['label']}</div>
+          <div class="price">{m['price_str']}</div>
+          <div class="chg">{ar} {chg_str} &nbsp; {rt}</div>
+        </div>"""
+
+    # ── 주가 테이블 ────────────────────────────────
+    stock_rows = ''
+    for s in stock_data:
+        ar   = _arrow_html(s['change'])
+        rt   = _rate_html(s['rate'])
+        code = f'<span class="stock-code">{s["code"]}</span>'
+        stock_rows += f"""
+        <tr>
+          <td><span class="stock-name">{s['name']}</span>{code}</td>
+          <td class="stock-price">{s['price']:,}</td>
+          <td>{ar} {rt}</td>
+        </tr>"""
+
+    stock_section = ''
+    if stock_rows:
+        stock_section = f"""
+        <div class="card">
+          <div class="card-title">📈 워치리스트 주가</div>
+          <table class="stock-table">
+            <thead><tr><th>종목</th><th>현재가</th><th style="text-align:right">등락</th></tr></thead>
+            <tbody>{stock_rows}</tbody>
+          </table>
+        </div>"""
+
+    # ── 뉴스 섹션 ──────────────────────────────────
+    news_html = ''
+    total = 0
+    for comp, picks in sections:
+        code_badge = ''
+        if comp.get('listed') and comp.get('stock_code'):
+            code_badge = f'<span class="company-code">{comp["stock_code"]}</span>'
+        market_badge = f'<span class="company-code">{comp["market"]}</span>' if comp.get('market') else ''
+        news_html += f"""
+        <div class="company-header">
+          <span class="company-name">{comp['name']}</span>{code_badge}{market_badge}
+        </div>"""
+        for a in picks:
+            t      = a['title']
+            cls    = 'news-title high' if a['score'] >= 5 else 'news-title'
+            src    = a.get('source') or ''
+            news_html += f"""
+        <div class="news-item">
+          <a class="{cls}" href="{a['link']}" target="_blank" rel="noopener">{t}</a>
+          <div class="news-meta">{src}</div>
+        </div>"""
+            total += 1
+
+    if not news_html:
+        news_html = '<p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>'
+
+    news_section = f"""
+    <div class="card">
+      <div class="card-title">📰 뉴스 — {total}건 · {len(sections)}개사</div>
+      {news_html}
+    </div>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB 뉴스브리프 {date_str} {session}</title>
+  {HTML_STYLE}
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📋 IB 뉴스브리프 <span class="session-badge">{session}</span></h1>
+    <div class="meta">{date_str} &nbsp;·&nbsp; {time_str} &nbsp;·&nbsp; {price_label} 기준</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 마켓 스냅샷</div>
+    <div class="market-grid">{market_html}
+    </div>
+  </div>
+
+  {stock_section}
+
+  {news_section}
+
+  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 자동생성 {now.strftime("%Y-%m-%d %H:%M")} KST</div>
+</div>
+</body>
+</html>"""
+
+
+def save_html_report(html, session):
+    os.makedirs(DOCS_DIR, exist_ok=True)
+    filename = 'morning.html' if session == '오전' else 'afternoon.html'
+    path = os.path.join(DOCS_DIR, filename)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(html)
+    print(f'  HTML 저장: {path}')
+    return f'{PAGES_BASE}/{filename}'
+
+
+# ─────────────────────────────────────────
+# 텔레그램
+# ─────────────────────────────────────────
+
+def send_telegram(text, silent=False):
+    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
+    resp = requests.post(url, data={
+        'chat_id': CHAT_ID, 'text': text,
+        'parse_mode': 'HTML',
+        'disable_web_page_preview': 'false',
+        'disable_notification': 'true' if silent else 'false',
+    }, timeout=30)
+    if not resp.json().get('ok'):
+        print(f'  전송 실패: {resp.text[:300]}')
 
 
 # ─────────────────────────────────────────
 # 메인
 # ─────────────────────────────────────────
 
-DIVIDER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-
 def main():
     now     = datetime.now(KST)
     session = '오전' if now.hour < 12 else '오후'
     _days_ko = ['월', '화', '수', '목', '금', '토', '일']
     date_str = f'{now.strftime("%Y-%m-%d")} ({_days_ko[now.weekday()]})'
-    time_str = now.strftime('%H:%M')
     print(f'[{now}] IB 뉴스브리프 ({session})')
 
     if not BOT_TOKEN or not CHAT_ID:
@@ -319,98 +476,75 @@ def main():
     companies = load_watchlist()
     sent      = load_sent()
 
-    # ── 1. 헤더 ──────────────────────────────────
-    header_line = (
-        f'<b>📋 IB 뉴스브리프</b>  |  {date_str}  <b>{session}</b>  {time_str} KST'
-    )
+    # ── 1. 시장 데이터 & 주가 ────────────────────
+    print('  마켓 데이터 수집...')
+    market_data = collect_market_data()
+    stock_data  = collect_stock_data(companies)
 
-    # ── 2. 마켓 스냅샷 ───────────────────────────
-    market_block = build_market_section(session, now)
+    # ── 2. 뉴스 수집 ─────────────────────────────
+    sections       = []
+    total_fetched  = 0
+    total_skip_dup = 0
+    total_skip_sc  = 0
 
-    # ── 3. 워치리스트 주가 ───────────────────────
-    stock_block = build_stock_section(companies)
-
-    # ── 4. 뉴스 수집 ─────────────────────────────
-    sections = []
-    total_fetched = 0
-    total_skip_dedup = 0
-    total_skip_score = 0
     for comp in companies:
         articles = fetch_news(comp['name'], comp.get('alias'))
         total_fetched += len(articles)
-        seen, unique = set(), []
-        dedup_skip = 0
+        seen, unique, dup_n = set(), [], 0
         for a in articles:
             h  = article_hash(a['title'], a['link'])
             tk = re.sub(r'\s+', '', a['title'].lower())[:50]
             if h in sent or tk in seen:
-                dedup_skip += 1
-                continue
-            seen.add(tk)
-            a['hash'] = h
-            unique.append(a)
-        total_skip_dedup += dedup_skip
-
+                dup_n += 1; continue
+            seen.add(tk); a['hash'] = h; unique.append(a)
+        total_skip_dup += dup_n
         for a in unique:
             a['score'] = score_article(a, comp)
-
-        score_skip = sum(1 for a in unique if a['score'] <= 0)
-        total_skip_score += score_skip
-        filtered = sorted(
-            [a for a in unique if a['score'] > 0],
-            key=lambda x: x['score'], reverse=True
-        )[:5]
-
+        sc_skip = sum(1 for a in unique if a['score'] <= 0)
+        total_skip_sc += sc_skip
+        filtered = sorted([a for a in unique if a['score'] > 0],
+                          key=lambda x: x['score'], reverse=True)[:5]
         if filtered:
             sections.append((comp, filtered))
-        print(f'  [{comp["name"]}] fetch={len(articles)} dedup_skip={dedup_skip} score_skip={score_skip} → {len(filtered)}건')
+        print(f'  [{comp["name"]}] {len(articles)}건 → {len(filtered)}건 채택')
 
-    # ── 5. 뉴스 블록 ─────────────────────────────
-    news_lines = [f'<b>📰 뉴스</b>']
-    total = 0
-    for comp, picks in sections:
-        code_str = ''
-        if comp.get('listed') and comp.get('stock_code'):
-            code_str = f'  <code>{comp["stock_code"]}</code>'
-        market_str = f' ({comp["market"]})' if comp.get('market') else ''
-        news_lines.append(f'\n🏢 <b>{comp["name"]}</b>{code_str}{market_str}')
-        for i, a in enumerate(picks, 1):
-            t    = a['title'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-            link = a['link'].replace('&', '&amp;')  # href 속성 내 & 이스케이프
-            src  = (a['source'] or '─').replace('&', '&amp;')
-            # 높은 점수 기사 볼드 (score >= 5)
-            title_tag = f'<b>{t}</b>' if a['score'] >= 5 else t
-            news_lines.append(f'  {i}. <a href="{link}">{title_tag}</a>  <i>[{src}]</i>')
-            total += 1
+    total_news = sum(len(p) for _, p in sections)
 
-    if not sections:
-        news_lines.append('\n  신규 IB 관련 뉴스 없음')
+    # ── 3. HTML 생성 & 저장 ───────────────────────
+    html     = build_html_report(market_data, stock_data, sections, now, session)
+    page_url = save_html_report(html, session)
 
-    # L1 §자동화 산출물 검증: SKIP 건수 노출 (전량 SKIP 시 ⚠️ 경고)
-    skip_info = f'중복 {total_skip_dedup}건 · 필터 {total_skip_score}건 SKIP'
-    if total_fetched > 0 and total == 0:
-        skip_suffix = f'\n⚠️ <b>전체 SKIP</b> — fetch {total_fetched}건 / {skip_info}'
-    else:
-        skip_suffix = f'\n<i>({skip_info})</i>' if (total_skip_dedup + total_skip_score) > 0 else ''
+    # ── 4. 텔레그램: 링크 + 요약만 ───────────────
+    # 마켓 스냅샷 1줄 요약
+    mkt_summary = ''
+    for m in market_data[:3]:  # KOSPI, KOSDAQ, S&P500
+        ar   = '▲' if m['change'] > 0 else ('▼' if m['change'] < 0 else '─')
+        sign = '+' if m['rate'] > 0 else ''
+        mkt_summary += f'{m["label"]} <b>{m["price_str"]}</b> {ar}{sign}{m["rate"]:.1f}%   '
 
-    footer = f'\n{DIVIDER}\n총 <b>{total}건</b>  ·  <b>{len(sections)}개사</b>{skip_suffix}'
+    # SKIP 안내
+    skip_info = ''
+    if total_skip_dup + total_skip_sc > 0:
+        skip_info = f'\n<i>(중복 {total_skip_dup} · 필터 {total_skip_sc} SKIP)</i>'
+    if total_fetched > 0 and total_news == 0:
+        skip_info = f'\n⚠️ 전체 SKIP — fetch {total_fetched}건'
 
-    # ── 6. 최종 조립 ─────────────────────────────
-    parts = [
-        header_line,
-        DIVIDER,
-        market_block,
-        DIVIDER,
-    ]
-    if stock_block:
-        parts += [stock_block, DIVIDER]
-    parts += ['\n'.join(news_lines), footer]
+    tg_msg = (
+        f'<b>📋 IB 뉴스브리프</b>  {date_str}  [{session}]\n'
+        f'\n'
+        f'<b>🔗 리포트 보기</b>\n'
+        f'<a href="{page_url}">{page_url}</a>\n'
+        f'\n'
+        f'{mkt_summary.strip()}\n'
+        f'\n'
+        f'📰 뉴스 <b>{total_news}건</b>  ·  <b>{len(sections)}개사</b>'
+        f'{skip_info}'
+    )
 
-    full_msg = '\n'.join(parts)
+    send_telegram(tg_msg)
+    print(f'  텔레그램 전송 완료 — {page_url}')
 
-    send_telegram(full_msg, silent=False)
-    print(f'  전송 완료 — 뉴스 {total}건 / {len(sections)}개사')
-
+    # ── 5. sent 업데이트 ──────────────────────────
     for _, picks in sections:
         for a in picks:
             sent.add(a['hash'])
