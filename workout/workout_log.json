@@ -2839,5 +2839,30 @@
     "garmin_ids": [
       22895719936
     ]
+  },
+  "2026-05-19": {
+    "planned": "🏃 러닝 8km Easy",
+    "done": true,
+    "actual": "수영 1475m 37분 @2:07/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1475,
+      "duration_min": 37.2,
+      "moving_min": 31.3,
+      "pace_per_100m": "2:07",
+      "avg_hr": 134,
+      "max_hr": 173,
+      "swolf": 43,
+      "strokes": 669,
+      "avg_spm": null,
+      "training_load": 75
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.8 / 무산소 0.7 | 부하 75",
+    "garmin_id": 22929086155,
+    "start_time": "06:26",
+    "garmin_ids": [
+      22929086155
+    ]
   }
 }

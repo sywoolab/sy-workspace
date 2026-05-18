@@ -134,8 +134,8 @@
     },
     "2026-05-19": {
       "date": "2026-05-19",
-      "workout": "🏃 러닝 8km Easy",
-      "detail": "",
+      "workout": "🏊 자유수영 1475m @2:07/100m",
+      "detail": "W2. 자전거 85km+46km 누적 피로. 능동 회복 swim. 어제 권고대로 변경.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -230,8 +230,8 @@
     },
     "2026-05-31": {
       "date": "2026-05-31",
-      "workout": "🚴 자전거 80km — 첫 도전 (80km 단일 능력 기준 달성)",
-      "detail": "",
+      "workout": "🚴 자전거 80km — 단일 능력 유지 라이드 (5/16 85km 달성 후 두 번째)",
+      "detail": "80km 단일 능력 기준 이미 달성(5/16 85km). 이번은 능력 유지 + 페이스 연습 (33~35km/h 목표).",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
