@@ -603,13 +603,13 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IB 뉴스브리프 {date_str} {session}</title>
+  <title>신한 IB종합금융부 Daily Brief — {date_str}</title>
   {HTML_STYLE}
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>📋 IB 뉴스브리프 <span class="session-badge">{session}</span></h1>
+    <h1>신한 IB종합금융부 Daily Brief <span class="session-badge">{session}</span></h1>
     <div class="meta">{date_str} &nbsp;·&nbsp; {time_str} &nbsp;·&nbsp; {price_label} 기준</div>
   </div>
 
@@ -627,7 +627,7 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 
   {news_section}
 
-  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 뉴스 생성: {now.strftime("%Y-%m-%d %H:%M")} KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
+  <div class="footer">신한투자증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: {now.strftime("%Y-%m-%d %H:%M")} KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
 
 <script>
