@@ -145,22 +145,31 @@ def fetch_stock_price(code):
 
 
 def collect_market_data():
-    """지수·환율 데이터 리스트"""
+    """지수·환율 데이터 리스트 (html_id, yahoo_sym 포함 — JS 실시간 업데이트용)"""
     items = []
-    for code, label in [('KOSPI', 'KOSPI'), ('KOSDAQ', 'KOSDAQ')]:
+    for code, label, html_id, ysym in [
+        ('KOSPI',  'KOSPI',   'mkt-kospi',  '^KS11'),
+        ('KOSDAQ', 'KOSDAQ',  'mkt-kosdaq', '^KQ11'),
+    ]:
         d = fetch_naver_index(code)
         if d:
             items.append({'label': label, 'price_str': f'{d["price"]:,.2f}',
-                          'change': d['change'], 'rate': d['rate']})
-    for sym, label in [('%5EGSPC', 'S&P 500'), ('%5EDJI', 'DOW')]:
+                          'change': d['change'], 'rate': d['rate'],
+                          'html_id': html_id, 'yahoo_sym': ysym, 'invert': False})
+    for sym, label, html_id, ysym in [
+        ('%5EGSPC', 'S&P 500', 'mkt-sp500', '^GSPC'),
+        ('%5EDJI',  'DOW',     'mkt-dow',   '^DJI'),
+    ]:
         d = fetch_yahoo(sym)
         if d:
             items.append({'label': label, 'price_str': f'{d["price"]:,.2f}',
-                          'change': d['change'], 'rate': d['rate']})
+                          'change': d['change'], 'rate': d['rate'],
+                          'html_id': html_id, 'yahoo_sym': ysym, 'invert': False})
     fx = fetch_yahoo('KRW=X')
     if fx:
         items.append({'label': 'USD/KRW', 'price_str': f'{fx["price"]:,.1f}',
-                      'change': -fx['change'], 'rate': -fx['rate']})
+                      'change': -fx['change'], 'rate': -fx['rate'],
+                      'html_id': 'mkt-usdkrw', 'yahoo_sym': 'KRW=X', 'invert': True})
     return items
 
 
@@ -225,10 +234,13 @@ def collect_stock_data(companies):
             continue
         d = fetch_stock_price(comp['stock_code'])
         if d:
+            mkt = comp.get('market', '')
+            suffix = '.KQ' if mkt == 'KOSDAQ' else '.KS'
             rows.append({'name': comp['name'], 'code': comp['stock_code'],
-                         'market': comp.get('market', ''),
+                         'market': mkt,
                          'price': int(d['price']), 'change': d['change'],
-                         'rate': d['rate']})
+                         'rate': d['rate'],
+                         'yahoo_sym': f"{comp['stock_code']}{suffix}"})
     return rows
 
 
@@ -438,39 +450,51 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     time_str = now.strftime('%H:%M') + ' KST'
     price_label = '전일 종가' if now.hour < 12 else '현재가'
 
-    # ── 마켓 카드 ──────────────────────────────────
+    # ── 마켓 카드 (JS 실시간 업데이트용 id 부여) ──────
     market_html = ''
+    js_market_symbols = {}  # {html_id: {sym, invert, fmt}}
     for m in market_data:
         ar  = _arrow_html(m['change'])
         rt  = _rate_html(m['rate'])
-        sign = '+' if m['change'] > 0 else ''
         chg_abs = abs(m['change'])
-        # 환율/금리는 소수점 표기 유지
         if m['label'] in ('USD/KRW',):
             chg_str = f'{chg_abs:.1f}'
         elif m['label'] in ('미국 10Y',):
             chg_str = f'{chg_abs:.3f}pp'
         else:
             chg_str = f'{chg_abs:,.2f}'
+        hid = m.get('html_id', '')
+        ysym = m.get('yahoo_sym', '')
+        if hid and ysym:
+            js_market_symbols[hid] = {'sym': ysym, 'invert': m.get('invert', False),
+                                       'fmt': ',.1f' if 'KRW' in m['label'] else ',.2f'}
         market_html += f"""
-        <div class="market-item">
+        <div class="market-item" id="{hid}">
           <div class="label">{m['label']}</div>
-          <div class="price">{m['price_str']}</div>
-          <div class="chg">{ar} {chg_str} &nbsp; {rt}</div>
+          <div class="price" id="{hid}-p">{m['price_str']}</div>
+          <div class="chg" id="{hid}-c">{ar} {chg_str} &nbsp; {rt}</div>
         </div>"""
 
-    # ── 주가 테이블 ────────────────────────────────
+    # ── 주가 테이블 (JS 실시간 업데이트용 id 부여) ────
     stock_rows = ''
+    js_stock_symbols = {}  # {code: yahoo_sym}
     for s in stock_data:
         ar   = _arrow_html(s['change'])
         rt   = _rate_html(s['rate'])
-        code = f'<span class="stock-code">{s["code"]}</span>'
+        code = s['code']
+        ysym = s.get('yahoo_sym', '')
+        if ysym:
+            js_stock_symbols[code] = ysym
         stock_rows += f"""
-        <tr>
-          <td><span class="stock-name">{s['name']}</span>{code}</td>
-          <td class="stock-price">{s['price']:,}</td>
-          <td>{ar} {rt}</td>
+        <tr id="s-{code}">
+          <td><span class="stock-name">{s['name']}</span><span class="stock-code">{code}</span></td>
+          <td class="stock-price" id="s-{code}-p">{s['price']:,}</td>
+          <td id="s-{code}-c">{ar} {rt}</td>
         </tr>"""
+
+    # 생성 시각 표시 (JS가 실시간으로 교체)
+    created_at = now.strftime('%m/%d %H:%M')
+    stock_ts = f'<div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: {created_at} KST</div>'
 
     stock_section = ''
     if stock_rows:
@@ -481,7 +505,12 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
             <thead><tr><th>종목</th><th>현재가</th><th style="text-align:right">등락</th></tr></thead>
             <tbody>{stock_rows}</tbody>
           </table>
+          {stock_ts}
         </div>"""
+
+    # ── JS 심볼 테이블 (Python → JS로 전달) ────────
+    import json as _json
+    js_data = _json.dumps({'market': js_market_symbols, 'stock': js_stock_symbols})
 
     # ── 뉴스 섹션 ──────────────────────────────────
     news_html = ''
@@ -545,8 +574,84 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 
   {news_section}
 
-  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 자동생성 {now.strftime("%Y-%m-%d %H:%M")} KST</div>
+  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 뉴스 생성: {now.strftime("%Y-%m-%d %H:%M")} KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
+
+<script>
+/* 실시간 주가·지수 업데이트 — Yahoo Finance API (CORS 허용) */
+const _DATA = {js_data};
+
+function _fmtNum(v, fmt) {{
+  if (fmt === ',.1f') return v.toLocaleString('ko-KR', {{minimumFractionDigits:1, maximumFractionDigits:1}});
+  return v.toLocaleString('ko-KR', {{minimumFractionDigits:2, maximumFractionDigits:2}});
+}}
+function _arrow(chg) {{
+  return chg > 0 ? '<span class="up">▲</span>' : chg < 0 ? '<span class="dn">▼</span>' : '<span class="nt">─</span>';
+}}
+function _rateSpan(rate) {{
+  const cls = rate > 0 ? 'up' : rate < 0 ? 'dn' : 'nt';
+  const sign = rate > 0 ? '+' : '';
+  return `<span class="${{cls}}">${{sign}}${{rate.toFixed(2)}}%</span>`;
+}}
+
+async function _fetch(sym) {{
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${{encodeURIComponent(sym)}}?interval=1d&range=1d`;
+  const r = await fetch(url);
+  const d = await r.json();
+  const m = d?.chart?.result?.[0]?.meta;
+  if (!m) return null;
+  const price = m.regularMarketPrice;
+  const prev  = m.chartPreviousClose || price;
+  return {{price, prev, chg: price - prev}};
+}}
+
+async function updateAll() {{
+  const tasks = [];
+
+  /* 지수·환율 */
+  for (const [id, cfg] of Object.entries(_DATA.market)) {{
+    tasks.push((async () => {{
+      const d = await _fetch(cfg.sym).catch(() => null);
+      if (!d) return;
+      let chg = cfg.invert ? -d.chg : d.chg;
+      const rate = d.prev ? chg / d.prev * 100 : 0;
+      const pEl = document.getElementById(id + '-p');
+      const cEl = document.getElementById(id + '-c');
+      if (!pEl) return;
+      pEl.textContent = _fmtNum(d.price, cfg.fmt);
+      cEl.innerHTML = _arrow(chg) + ' ' + _fmtNum(Math.abs(chg), cfg.fmt) + ' &nbsp; ' + _rateSpan(rate);
+    }})());
+  }}
+
+  /* 개별 주가 */
+  for (const [code, sym] of Object.entries(_DATA.stock)) {{
+    tasks.push((async () => {{
+      const d = await _fetch(sym).catch(() => null);
+      if (!d) return;
+      const rate = d.prev ? d.chg / d.prev * 100 : 0;
+      const pEl = document.getElementById('s-' + code + '-p');
+      const cEl = document.getElementById('s-' + code + '-c');
+      if (!pEl) return;
+      pEl.textContent = Math.round(d.price).toLocaleString('ko-KR');
+      pEl.style.color  = d.chg > 0 ? '#16a34a' : d.chg < 0 ? '#dc2626' : '';
+      cEl.innerHTML = _arrow(d.chg) + ' ' + _rateSpan(rate);
+    }})());
+  }}
+
+  await Promise.allSettled(tasks);
+
+  /* 기준 시각 업데이트 */
+  const ts = document.getElementById('stock-timestamp');
+  if (ts) {{
+    const t = new Date();
+    const hhmm = t.toLocaleTimeString('ko-KR', {{hour:'2-digit', minute:'2-digit'}});
+    ts.innerHTML = '🔄 실시간&nbsp;&nbsp;' + hhmm + ' KST';
+    ts.style.color = '#16a34a';
+  }}
+}}
+
+document.addEventListener('DOMContentLoaded', updateAll);
+</script>
 </body>
 </html>"""
 

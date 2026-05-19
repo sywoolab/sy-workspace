@@ -94,36 +94,36 @@
 <div class="container">
   <div class="header">
     <h1>📋 IB 뉴스브리프 <span class="session-badge">오전</span></h1>
-    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 09:42 KST &nbsp;·&nbsp; 전일 종가 기준</div>
+    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 09:50 KST &nbsp;·&nbsp; 전일 종가 기준</div>
   </div>
 
   <div class="card">
     <div class="card-title">📊 마켓 스냅샷</div>
     <div class="market-grid">
-        <div class="market-item">
+        <div class="market-item" id="mkt-kospi">
           <div class="label">KOSPI</div>
-          <div class="price">7,378.30</div>
-          <div class="chg"><span class="dn">▼</span> 137.74 &nbsp; <span class="dn">-1.83%</span></div>
+          <div class="price" id="mkt-kospi-p">7,363.43</div>
+          <div class="chg" id="mkt-kospi-c"><span class="dn">▼</span> 152.61 &nbsp; <span class="dn">-2.03%</span></div>
         </div>
-        <div class="market-item">
+        <div class="market-item" id="mkt-kosdaq">
           <div class="label">KOSDAQ</div>
-          <div class="price">1,105.18</div>
-          <div class="chg"><span class="dn">▼</span> 5.91 &nbsp; <span class="dn">-0.53%</span></div>
+          <div class="price" id="mkt-kosdaq-p">1,099.00</div>
+          <div class="chg" id="mkt-kosdaq-c"><span class="dn">▼</span> 12.09 &nbsp; <span class="dn">-1.09%</span></div>
         </div>
-        <div class="market-item">
+        <div class="market-item" id="mkt-sp500">
           <div class="label">S&P 500</div>
-          <div class="price">7,403.05</div>
-          <div class="chg"><span class="dn">▼</span> 98.19 &nbsp; <span class="dn">-1.31%</span></div>
+          <div class="price" id="mkt-sp500-p">7,403.05</div>
+          <div class="chg" id="mkt-sp500-c"><span class="dn">▼</span> 98.19 &nbsp; <span class="dn">-1.31%</span></div>
         </div>
-        <div class="market-item">
+        <div class="market-item" id="mkt-dow">
           <div class="label">DOW</div>
-          <div class="price">49,686.12</div>
-          <div class="chg"><span class="dn">▼</span> 377.34 &nbsp; <span class="dn">-0.75%</span></div>
+          <div class="price" id="mkt-dow-p">49,686.12</div>
+          <div class="chg" id="mkt-dow-c"><span class="dn">▼</span> 377.34 &nbsp; <span class="dn">-0.75%</span></div>
         </div>
-        <div class="market-item">
+        <div class="market-item" id="mkt-usdkrw">
           <div class="label">USD/KRW</div>
-          <div class="price">1,499.2</div>
-          <div class="chg"><span class="dn">▼</span> 2.1 &nbsp; <span class="dn">-0.14%</span></div>
+          <div class="price" id="mkt-usdkrw-p">1,499.4</div>
+          <div class="chg" id="mkt-usdkrw-c"><span class="dn">▼</span> 2.2 &nbsp; <span class="dn">-0.15%</span></div>
         </div>
     </div>
   </div>
@@ -134,62 +134,63 @@
           <table class="stock-table">
             <thead><tr><th>종목</th><th>현재가</th><th style="text-align:right">등락</th></tr></thead>
             <tbody>
-        <tr>
+        <tr id="s-200470">
           <td><span class="stock-name">에이팩트</span><span class="stock-code">200470</span></td>
-          <td class="stock-price">7,680</td>
-          <td><span class="dn">▼</span> <span class="dn">-0.65%</span></td>
+          <td class="stock-price" id="s-200470-p">7,590</td>
+          <td id="s-200470-c"><span class="dn">▼</span> <span class="dn">-1.81%</span></td>
         </tr>
-        <tr>
+        <tr id="s-014830">
           <td><span class="stock-name">유니드</span><span class="stock-code">014830</span></td>
-          <td class="stock-price">74,100</td>
-          <td><span class="dn">▼</span> <span class="dn">-2.24%</span></td>
+          <td class="stock-price" id="s-014830-p">73,600</td>
+          <td id="s-014830-c"><span class="dn">▼</span> <span class="dn">-2.90%</span></td>
         </tr>
-        <tr>
+        <tr id="s-298000">
           <td><span class="stock-name">효성화학</span><span class="stock-code">298000</span></td>
-          <td class="stock-price">38,900</td>
-          <td><span class="nt">─</span> <span class="nt">0.00%</span></td>
+          <td class="stock-price" id="s-298000-p">38,900</td>
+          <td id="s-298000-c"><span class="nt">─</span> <span class="nt">0.00%</span></td>
         </tr>
-        <tr>
+        <tr id="s-068270">
           <td><span class="stock-name">셀트리온</span><span class="stock-code">068270</span></td>
-          <td class="stock-price">184,100</td>
-          <td><span class="up">▲</span> <span class="up">+0.49%</span></td>
+          <td class="stock-price" id="s-068270-p">183,400</td>
+          <td id="s-068270-c"><span class="up">▲</span> <span class="up">+0.11%</span></td>
         </tr>
-        <tr>
+        <tr id="s-248070">
           <td><span class="stock-name">솔루엠</span><span class="stock-code">248070</span></td>
-          <td class="stock-price">20,150</td>
-          <td><span class="dn">▼</span> <span class="dn">-2.66%</span></td>
+          <td class="stock-price" id="s-248070-p">20,200</td>
+          <td id="s-248070-c"><span class="dn">▼</span> <span class="dn">-2.42%</span></td>
         </tr>
-        <tr>
+        <tr id="s-178320">
           <td><span class="stock-name">서진시스템</span><span class="stock-code">178320</span></td>
-          <td class="stock-price">71,100</td>
-          <td><span class="dn">▼</span> <span class="dn">-2.34%</span></td>
+          <td class="stock-price" id="s-178320-p">71,600</td>
+          <td id="s-178320-c"><span class="dn">▼</span> <span class="dn">-1.65%</span></td>
         </tr>
-        <tr>
+        <tr id="s-194370">
           <td><span class="stock-name">제이에스코퍼레이션</span><span class="stock-code">194370</span></td>
-          <td class="stock-price">12,290</td>
-          <td><span class="dn">▼</span> <span class="dn">-1.84%</span></td>
+          <td class="stock-price" id="s-194370-p">12,250</td>
+          <td id="s-194370-c"><span class="dn">▼</span> <span class="dn">-2.16%</span></td>
         </tr>
-        <tr>
+        <tr id="s-043260">
           <td><span class="stock-name">성호전자</span><span class="stock-code">043260</span></td>
-          <td class="stock-price">37,800</td>
-          <td><span class="dn">▼</span> <span class="dn">-4.30%</span></td>
+          <td class="stock-price" id="s-043260-p">37,100</td>
+          <td id="s-043260-c"><span class="dn">▼</span> <span class="dn">-6.08%</span></td>
         </tr>
-        <tr>
+        <tr id="s-039200">
           <td><span class="stock-name">오스코텍</span><span class="stock-code">039200</span></td>
-          <td class="stock-price">40,100</td>
-          <td><span class="dn">▼</span> <span class="dn">-1.60%</span></td>
+          <td class="stock-price" id="s-039200-p">39,950</td>
+          <td id="s-039200-c"><span class="dn">▼</span> <span class="dn">-1.96%</span></td>
         </tr>
-        <tr>
+        <tr id="s-175250">
           <td><span class="stock-name">아이큐어</span><span class="stock-code">175250</span></td>
-          <td class="stock-price">2,170</td>
-          <td><span class="nt">─</span> <span class="nt">0.00%</span></td>
+          <td class="stock-price" id="s-175250-p">2,170</td>
+          <td id="s-175250-c"><span class="nt">─</span> <span class="nt">0.00%</span></td>
         </tr>
-        <tr>
+        <tr id="s-064260">
           <td><span class="stock-name">다날</span><span class="stock-code">064260</span></td>
-          <td class="stock-price">6,570</td>
-          <td><span class="dn">▼</span> <span class="dn">-0.15%</span></td>
+          <td class="stock-price" id="s-064260-p">6,560</td>
+          <td id="s-064260-c"><span class="dn">▼</span> <span class="dn">-0.30%</span></td>
         </tr></tbody>
           </table>
+          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/19 09:50 KST</div>
         </div>
 
   
@@ -211,7 +212,7 @@
 
   
     <div class="card">
-      <div class="card-title">📰 뉴스 — 24건 · 10개사</div>
+      <div class="card-title">📰 뉴스 — 26건 · 10개사</div>
       
         <div class="company-header">
           <span class="company-name">에이팩트</span><span class="company-code">200470</span><span class="company-code">KOSDAQ</span>
@@ -265,6 +266,10 @@
           <a class="news-title" href="https://news.google.com/rss/articles/CBMic0FVX3lxTE5ldXRkU0pQUVVCWnpwSGpWODRuZllvWUpST3NmU1gzRng1RGI1NkxwNnBBSy10T3BWUzNzWFVfeUVHVlViWTlxQUVTTllYWHgwX01EXzRYb2lDWTQtTkxRSVMwU2NaR0NleWtPbllkUkFTQ1E?oc=5" target="_blank" rel="noopener">솔루엠, 멕시코 법인 통해 북미 자동차 전장 공급망 진입 - 디지털투데이</a>
           <div class="news-meta">디지털투데이</div>
         </div>
+        <div class="news-item">
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE1haDV6emh1U3pRY0dxMU83NlJzZzNlNVpWQmVva0JJT25nZjEtaXFpMDRzQUx2c1lhQzJEU29BcExJZl9rMjc0NzRBR3JDOFR1SDVv?oc=5" target="_blank" rel="noopener">솔루엠, 북미 완성차향 헤드램프 제어기 양산 출하 개시…멕시코 생산법인 통해 공급 - 네이트</a>
+          <div class="news-meta">네이트</div>
+        </div>
         <div class="company-header">
           <span class="company-name">서진시스템</span><span class="company-code">178320</span><span class="company-code">KOSPI</span>
         </div>
@@ -296,8 +301,8 @@
           <div class="news-meta">뉴스핌</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMib0FVX3lxTFBVSE9jenNkYzMtNU1WaUVYUVRUZWtyWG1BZTEzczQzMF95VURJR1RaRGZLVVpBRlJWMFZaNEJvYmFzUmRyNk5nekZqNHVNelNlUERXVWVYQUhnODdocTQ0cHJQZ01nTzBfMldXdTZybw?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 K-POP 중심 외국인 결제 생태계 확장 나서 - 이머니뉴스</a>
-          <div class="news-meta">이머니뉴스</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMibkFVX3lxTE00VmktWk1tNktlSDlCaG44VkNpNUNDN1FjUnBOZHI4aDVyMmhuempJQldqS1dvc010c3lPYXRLQUlFY3daMUJyTFpuVUYzNDBKOU0zeG5nNGlPZmd4dUgteU8tYVZITVdNVFgzWW9R?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 K-POP 중심 외국인 결제 생태계 확장 나서 - 뉴스타운</a>
+          <div class="news-meta">뉴스타운</div>
         </div>
         <div class="news-item">
           <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE95VklzZ1V5UDBucFQ0SmlwNm1ZT3djXzUyNU9vWmtVVmIzLUlXUmZXQ2tHU3pWVXE0YUt5enZMWFp4N2d6SkVpYTVXb0tPVklvekd3eGpqd1NfbGdFWFg0VtIBeEFVX3lxTFBGYjJyenFCSUtNektBNVFmSkc5a1RyakNCUUNzTTFZUFFwSmtKZXJqOUlaaVN1LWRVOXFRUWpBM1kyVlNHbDdpZW9hT1h2V3NwbDRGeDdoUkxUd1JTR0YzMWQ2U2NtcDQ5Uk9NQmd3T0FlMUJLVGwxXw?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 K팝 공동사업 결제 파트너십 - 뉴시스</a>
@@ -306,6 +311,10 @@
         <div class="news-item">
           <a class="news-title" href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBNMzU3NWtPaWRVTDlvNm8yMktQalRCQ0tJYXpEZFA2VDRwTG9QTVdYaHBNX3g1NXV4RGZOUTRMa0lJM0dENEduUGItNldkdFZaSFVxb19aUXctdG5ZQ2pWclJJUUNrQ3VaMEE?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 파트너십 체결…외국인 전용 결제 생태계 구축 - 파이낸스스코프</a>
           <div class="news-meta">파이낸스스코프</div>
+        </div>
+        <div class="news-item">
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMic0FVX3lxTE9YbTVteXkybXhyZXFQcU1IV3R6VG02Rk9YcEYxZkkzbW1XakFWN1hXQ003NUpzblZScnRfV2RaMGRPMmdKQXZMUkl5RzJlUDBNbFBleGxWY3BHX0RwSWg1ek94alZYVnYwcUNabUx1Zlpiblk?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 맞손…외국인 대상 'K-POP 결제 생태계' 구축 - 디지털투데이</a>
+          <div class="news-meta">디지털투데이</div>
         </div>
         <div class="company-header">
           <span class="company-name">리벨리온</span>
@@ -341,7 +350,83 @@
         </div>
     </div>
 
-  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 자동생성 2026-05-19 09:42 KST</div>
+  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 뉴스 생성: 2026-05-19 09:50 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
+
+<script>
+/* 실시간 주가·지수 업데이트 — Yahoo Finance API (CORS 허용) */
+const _DATA = {"market": {"mkt-kospi": {"sym": "^KS11", "invert": false, "fmt": ",.2f"}, "mkt-kosdaq": {"sym": "^KQ11", "invert": false, "fmt": ",.2f"}, "mkt-sp500": {"sym": "^GSPC", "invert": false, "fmt": ",.2f"}, "mkt-dow": {"sym": "^DJI", "invert": false, "fmt": ",.2f"}, "mkt-usdkrw": {"sym": "KRW=X", "invert": true, "fmt": ",.1f"}}, "stock": {"200470": "200470.KQ", "014830": "014830.KS", "298000": "298000.KS", "068270": "068270.KS", "248070": "248070.KS", "178320": "178320.KS", "194370": "194370.KQ", "043260": "043260.KQ", "039200": "039200.KQ", "175250": "175250.KQ", "064260": "064260.KQ"}};
+
+function _fmtNum(v, fmt) {
+  if (fmt === ',.1f') return v.toLocaleString('ko-KR', {minimumFractionDigits:1, maximumFractionDigits:1});
+  return v.toLocaleString('ko-KR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function _arrow(chg) {
+  return chg > 0 ? '<span class="up">▲</span>' : chg < 0 ? '<span class="dn">▼</span>' : '<span class="nt">─</span>';
+}
+function _rateSpan(rate) {
+  const cls = rate > 0 ? 'up' : rate < 0 ? 'dn' : 'nt';
+  const sign = rate > 0 ? '+' : '';
+  return `<span class="${cls}">${sign}${rate.toFixed(2)}%</span>`;
+}
+
+async function _fetch(sym) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=1d`;
+  const r = await fetch(url);
+  const d = await r.json();
+  const m = d?.chart?.result?.[0]?.meta;
+  if (!m) return null;
+  const price = m.regularMarketPrice;
+  const prev  = m.chartPreviousClose || price;
+  return {price, prev, chg: price - prev};
+}
+
+async function updateAll() {
+  const tasks = [];
+
+  /* 지수·환율 */
+  for (const [id, cfg] of Object.entries(_DATA.market)) {
+    tasks.push((async () => {
+      const d = await _fetch(cfg.sym).catch(() => null);
+      if (!d) return;
+      let chg = cfg.invert ? -d.chg : d.chg;
+      const rate = d.prev ? chg / d.prev * 100 : 0;
+      const pEl = document.getElementById(id + '-p');
+      const cEl = document.getElementById(id + '-c');
+      if (!pEl) return;
+      pEl.textContent = _fmtNum(d.price, cfg.fmt);
+      cEl.innerHTML = _arrow(chg) + ' ' + _fmtNum(Math.abs(chg), cfg.fmt) + ' &nbsp; ' + _rateSpan(rate);
+    })());
+  }
+
+  /* 개별 주가 */
+  for (const [code, sym] of Object.entries(_DATA.stock)) {
+    tasks.push((async () => {
+      const d = await _fetch(sym).catch(() => null);
+      if (!d) return;
+      const rate = d.prev ? d.chg / d.prev * 100 : 0;
+      const pEl = document.getElementById('s-' + code + '-p');
+      const cEl = document.getElementById('s-' + code + '-c');
+      if (!pEl) return;
+      pEl.textContent = Math.round(d.price).toLocaleString('ko-KR');
+      pEl.style.color  = d.chg > 0 ? '#16a34a' : d.chg < 0 ? '#dc2626' : '';
+      cEl.innerHTML = _arrow(d.chg) + ' ' + _rateSpan(rate);
+    })());
+  }
+
+  await Promise.allSettled(tasks);
+
+  /* 기준 시각 업데이트 */
+  const ts = document.getElementById('stock-timestamp');
+  if (ts) {
+    const t = new Date();
+    const hhmm = t.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+    ts.innerHTML = '🔄 실시간&nbsp;&nbsp;' + hhmm + ' KST';
+    ts.style.color = '#16a34a';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', updateAll);
+</script>
 </body>
 </html>
