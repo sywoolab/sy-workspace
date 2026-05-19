@@ -121,7 +121,9 @@ h1{{color:#fff;font-size:17px;margin-bottom:3px}}
 .card .label{{font-size:11px;color:#888;margin-top:2px}}
 .card .sub-val{{font-size:11px;color:#aaa;margin-top:3px}}
 .section{{font-size:13px;font-weight:600;color:#fff;margin:14px 0 8px;border-left:3px solid #7c6fff;padding-left:8px}}
-.chart-wrap{{background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:16px}}
+.chart-wrap{{background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}}
+.chart-inner{{min-width:600px;height:180px}}
+@media(max-width:640px){{.chart-inner{{height:200px}}}}
 table{{width:100%;border-collapse:collapse;font-size:11.5px}}
 th{{background:#1a1a2e;color:#777;padding:7px 7px;text-align:left;position:sticky;top:0;z-index:1}}
 td{{padding:5px 7px;border-bottom:1px solid #1a1a28;vertical-align:middle}}
@@ -157,17 +159,33 @@ tr:hover{{background:#15152a}}
 
 <div class="section">훈련 부하 트렌드 (최근 60일)</div>
 <div class="chart-wrap">
-  <canvas id="tlChart" height="80"></canvas>
+  <div class="chart-inner">
+    <canvas id="tlChart"></canvas>
+  </div>
 </div>
 
 <script>
-const labels = {json.dumps(chart_labels, ensure_ascii=False)};
-const tl7Data  = {json.dumps(chart_tl7)};
-const swimData = {json.dumps(chart_swim)};
-const bikeData = {json.dumps(chart_bike)};
-const runData  = {json.dumps(chart_run)};
-const otherData= {json.dumps(chart_other)};
+const isMobile = window.innerWidth < 640;
+// 모바일: 최근 30일, PC: 60일
+const allLabels = {json.dumps(chart_labels, ensure_ascii=False)};
+const allTl7    = {json.dumps(chart_tl7)};
+const allSwim   = {json.dumps(chart_swim)};
+const allBike   = {json.dumps(chart_bike)};
+const allRun    = {json.dumps(chart_run)};
+const allOther  = {json.dumps(chart_other)};
 const raceDates = {json.dumps(list(chart_race_dates))};
+
+const slice = isMobile ? 30 : 60;
+const labels   = allLabels.slice(-slice);
+const tl7Data  = allTl7.slice(-slice);
+const swimData = allSwim.slice(-slice);
+const bikeData = allBike.slice(-slice);
+const runData  = allRun.slice(-slice);
+const otherData= allOther.slice(-slice);
+
+// 모바일: chart-inner 너비를 막대 수에 비례해 늘려 가독성 확보
+const minWidth = Math.max(600, labels.length * (isMobile ? 18 : 14));
+document.querySelector('.chart-inner').style.minWidth = minWidth + 'px';
 
 new Chart(document.getElementById('tlChart'), {{
   data: {{
@@ -203,13 +221,23 @@ new Chart(document.getElementById('tlChart'), {{
   }},
   options: {{
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {{
-      legend: {{ labels: {{ color: '#888', font: {{ size: 10 }}, boxWidth: 10 }} }},
+      legend: {{ labels: {{ color: '#999', font: {{ size: isMobile ? 11 : 10 }}, boxWidth: 12, padding: 8 }} }},
       tooltip: {{ mode: 'index', intersect: false }},
     }},
     scales: {{
-      x: {{ stacked: true, ticks: {{ color: '#555', maxTicksLimit: 12, font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }} }},
-      y: {{ stacked: true, ticks: {{ color: '#555', font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }}, beginAtZero: true }},
+      x: {{
+        stacked: true,
+        ticks: {{ color: '#666', maxTicksLimit: isMobile ? 8 : 12, font: {{ size: isMobile ? 11 : 10 }} }},
+        grid: {{ color: '#1a1a2a' }},
+      }},
+      y: {{
+        stacked: true,
+        ticks: {{ color: '#666', font: {{ size: isMobile ? 11 : 10 }} }},
+        grid: {{ color: '#1a1a2a' }},
+        beginAtZero: true,
+      }},
     }},
   }}
 }});
