@@ -29,13 +29,16 @@
   /* 마켓 그리드 */
   .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .market-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px;
-                 text-decoration: none; color: inherit; display: block; transition: background .15s; }
+                 text-decoration: none; color: inherit;
+                 display: flex; align-items: center; justify-content: space-between;
+                 transition: background .15s; }
   .market-item:hover { background: #f0f4f8; }
+  .market-item-info { flex: 1; min-width: 0; }
   .market-item .label { font-size: 11px; color: #9ca3af; font-weight: 600;
                         text-transform: uppercase; letter-spacing: 0.5px; }
   .market-item .price { font-size: 18px; font-weight: 700; margin: 2px 0; color: #111827; }
   .market-item .chg { font-size: 12px; }
-  .market-spark { margin-top: 6px; }
+  .market-spark { margin-left: 10px; flex-shrink: 0; }
 
   /* 주가 테이블 */
   .stock-table { width: 100%; border-collapse: collapse; }
@@ -117,42 +120,52 @@
 <body>
 <div class="container">
   <div class="header">
-    <h1>신한증권 IB종합금융부 Daily Brief <span class="session-badge">오후</span></h1>
-    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 13:28 KST &nbsp;·&nbsp; 현재가 기준</div>
+    <h1>신한증권 IB종합금융부 Daily Brief <span class="session-badge">오전</span></h1>
+    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 13:32 KST &nbsp;·&nbsp; 현재가 기준</div>
   </div>
 
   <div class="card">
     <div class="card-title">📊 마켓 스냅샷</div>
     <div class="market-grid">
         <a class="market-item" id="mkt-kospi" href="https://finance.naver.com/sise/sise_index.naver?code=KOSPI" target="_blank" rel="noopener">
-          <div class="label">KOSPI</div>
-          <div class="price" id="mkt-kospi-p">7,218.41</div>
-          <div class="chg" id="mkt-kospi-c"><span class="dn">▼</span> 297.63 &nbsp; <span class="dn">-3.96%</span></div>
-          <div class="market-spark"><svg id="spark-mkt-kospi" class="spark-svg" width="70" height="24"></svg></div>
+          <div class="market-item-info">
+            <div class="label">KOSPI</div>
+            <div class="price" id="mkt-kospi-p">7,233.04</div>
+            <div class="chg" id="mkt-kospi-c"><span class="dn">▼</span> 283.00 &nbsp; <span class="dn">-3.77%</span></div>
+          </div>
+          <div class="market-spark"><svg id="spark-mkt-kospi" class="spark-svg" width="70" height="28"></svg></div>
         </a>
         <a class="market-item" id="mkt-kosdaq" href="https://finance.naver.com/sise/sise_index.naver?code=KOSDAQ" target="_blank" rel="noopener">
-          <div class="label">KOSDAQ</div>
-          <div class="price" id="mkt-kosdaq-p">1,068.87</div>
-          <div class="chg" id="mkt-kosdaq-c"><span class="dn">▼</span> 42.22 &nbsp; <span class="dn">-3.80%</span></div>
-          <div class="market-spark"><svg id="spark-mkt-kosdaq" class="spark-svg" width="70" height="24"></svg></div>
+          <div class="market-item-info">
+            <div class="label">KOSDAQ</div>
+            <div class="price" id="mkt-kosdaq-p">1,070.48</div>
+            <div class="chg" id="mkt-kosdaq-c"><span class="dn">▼</span> 40.61 &nbsp; <span class="dn">-3.65%</span></div>
+          </div>
+          <div class="market-spark"><svg id="spark-mkt-kosdaq" class="spark-svg" width="70" height="28"></svg></div>
         </a>
         <a class="market-item" id="mkt-sp500" href="https://finance.yahoo.com/quote/%5EGSPC" target="_blank" rel="noopener">
-          <div class="label">S&P 500</div>
-          <div class="price" id="mkt-sp500-p">7,403.05</div>
-          <div class="chg" id="mkt-sp500-c"><span class="dn">▼</span> 98.19 &nbsp; <span class="dn">-1.31%</span></div>
-          <div class="market-spark"><svg id="spark-mkt-sp500" class="spark-svg" width="70" height="24"></svg></div>
+          <div class="market-item-info">
+            <div class="label">S&P 500</div>
+            <div class="price" id="mkt-sp500-p">7,403.05</div>
+            <div class="chg" id="mkt-sp500-c"><span class="dn">▼</span> 98.19 &nbsp; <span class="dn">-1.31%</span></div>
+          </div>
+          <div class="market-spark"><svg id="spark-mkt-sp500" class="spark-svg" width="70" height="28"></svg></div>
         </a>
         <a class="market-item" id="mkt-dow" href="https://finance.yahoo.com/quote/%5EDJI" target="_blank" rel="noopener">
-          <div class="label">DOW</div>
-          <div class="price" id="mkt-dow-p">49,686.12</div>
-          <div class="chg" id="mkt-dow-c"><span class="dn">▼</span> 377.34 &nbsp; <span class="dn">-0.75%</span></div>
-          <div class="market-spark"><svg id="spark-mkt-dow" class="spark-svg" width="70" height="24"></svg></div>
+          <div class="market-item-info">
+            <div class="label">DOW</div>
+            <div class="price" id="mkt-dow-p">49,686.12</div>
+            <div class="chg" id="mkt-dow-c"><span class="dn">▼</span> 377.34 &nbsp; <span class="dn">-0.75%</span></div>
+          </div>
+          <div class="market-spark"><svg id="spark-mkt-dow" class="spark-svg" width="70" height="28"></svg></div>
         </a>
         <a class="market-item" id="mkt-usdkrw" href="https://finance.naver.com/marketindex/" target="_blank" rel="noopener">
-          <div class="label">USD/KRW</div>
-          <div class="price" id="mkt-usdkrw-p">1,506.2</div>
-          <div class="chg" id="mkt-usdkrw-c"><span class="dn">▼</span> 9.1 &nbsp; <span class="dn">-0.61%</span></div>
-          <div class="market-spark"><svg id="spark-mkt-usdkrw" class="spark-svg" width="70" height="24"></svg></div>
+          <div class="market-item-info">
+            <div class="label">USD/KRW</div>
+            <div class="price" id="mkt-usdkrw-p">1,506.0</div>
+            <div class="chg" id="mkt-usdkrw-c"><span class="dn">▼</span> 8.8 &nbsp; <span class="dn">-0.59%</span></div>
+          </div>
+          <div class="market-spark"><svg id="spark-mkt-usdkrw" class="spark-svg" width="70" height="28"></svg></div>
         </a>
     </div>
   </div>
@@ -165,26 +178,26 @@
             <tbody>
         <tr id="s-005930">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=005930" target="_blank" rel="noopener">삼성전자</a><span class="stock-code">005930</span></td>
-          <td class="stock-price" id="s-005930-p">272,000</td>
-          <td id="s-005930-c"><span class="dn">▼</span> <span class="dn">-3.20%</span></td>
+          <td class="stock-price" id="s-005930-p">273,000</td>
+          <td id="s-005930-c"><span class="dn">▼</span> <span class="dn">-2.85%</span></td>
           <td class="stock-spark"><svg id="spark-s-005930" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-000660">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=000660" target="_blank" rel="noopener">SK하이닉스</a><span class="stock-code">000660</span></td>
-          <td class="stock-price" id="s-000660-p">1,752,000</td>
-          <td id="s-000660-c"><span class="dn">▼</span> <span class="dn">-4.78%</span></td>
+          <td class="stock-price" id="s-000660-p">1,754,000</td>
+          <td id="s-000660-c"><span class="dn">▼</span> <span class="dn">-4.67%</span></td>
           <td class="stock-spark"><svg id="spark-s-000660" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-200470">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=200470" target="_blank" rel="noopener">에이팩트</a><span class="stock-code">200470</span></td>
-          <td class="stock-price" id="s-200470-p">7,510</td>
-          <td id="s-200470-c"><span class="dn">▼</span> <span class="dn">-2.85%</span></td>
+          <td class="stock-price" id="s-200470-p">7,500</td>
+          <td id="s-200470-c"><span class="dn">▼</span> <span class="dn">-2.98%</span></td>
           <td class="stock-spark"><svg id="spark-s-200470" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-014830">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=014830" target="_blank" rel="noopener">유니드</a><span class="stock-code">014830</span></td>
-          <td class="stock-price" id="s-014830-p">73,900</td>
-          <td id="s-014830-c"><span class="dn">▼</span> <span class="dn">-2.51%</span></td>
+          <td class="stock-price" id="s-014830-p">73,800</td>
+          <td id="s-014830-c"><span class="dn">▼</span> <span class="dn">-2.64%</span></td>
           <td class="stock-spark"><svg id="spark-s-014830" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-298000">
@@ -201,26 +214,26 @@
         </tr>
         <tr id="s-248070">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=248070" target="_blank" rel="noopener">솔루엠</a><span class="stock-code">248070</span></td>
-          <td class="stock-price" id="s-248070-p">19,200</td>
-          <td id="s-248070-c"><span class="dn">▼</span> <span class="dn">-7.25%</span></td>
+          <td class="stock-price" id="s-248070-p">19,310</td>
+          <td id="s-248070-c"><span class="dn">▼</span> <span class="dn">-6.71%</span></td>
           <td class="stock-spark"><svg id="spark-s-248070" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-178320">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=178320" target="_blank" rel="noopener">서진시스템</a><span class="stock-code">178320</span></td>
-          <td class="stock-price" id="s-178320-p">70,200</td>
-          <td id="s-178320-c"><span class="dn">▼</span> <span class="dn">-3.57%</span></td>
+          <td class="stock-price" id="s-178320-p">70,700</td>
+          <td id="s-178320-c"><span class="dn">▼</span> <span class="dn">-2.88%</span></td>
           <td class="stock-spark"><svg id="spark-s-178320" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-194370">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=194370" target="_blank" rel="noopener">제이에스코퍼레이션</a><span class="stock-code">194370</span></td>
-          <td class="stock-price" id="s-194370-p">12,120</td>
-          <td id="s-194370-c"><span class="dn">▼</span> <span class="dn">-3.19%</span></td>
+          <td class="stock-price" id="s-194370-p">12,130</td>
+          <td id="s-194370-c"><span class="dn">▼</span> <span class="dn">-3.12%</span></td>
           <td class="stock-spark"><svg id="spark-s-194370" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-043260">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=043260" target="_blank" rel="noopener">성호전자</a><span class="stock-code">043260</span></td>
-          <td class="stock-price" id="s-043260-p">34,650</td>
-          <td id="s-043260-c"><span class="dn">▼</span> <span class="dn">-12.28%</span></td>
+          <td class="stock-price" id="s-043260-p">35,050</td>
+          <td id="s-043260-c"><span class="dn">▼</span> <span class="dn">-11.27%</span></td>
           <td class="stock-spark"><svg id="spark-s-043260" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-039200">
@@ -243,14 +256,14 @@
         </tr>
         <tr id="s-080420">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=080420" target="_blank" rel="noopener">모다이노칩</a><span class="stock-code">080420</span></td>
-          <td class="stock-price" id="s-080420-p">1,700</td>
-          <td id="s-080420-c"><span class="dn">▼</span> <span class="dn">-2.19%</span></td>
+          <td class="stock-price" id="s-080420-p">1,701</td>
+          <td id="s-080420-c"><span class="dn">▼</span> <span class="dn">-2.13%</span></td>
           <td class="stock-spark"><svg id="spark-s-080420" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-033290">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=033290" target="_blank" rel="noopener">코웰패션</a><span class="stock-code">033290</span></td>
-          <td class="stock-price" id="s-033290-p">1,833</td>
-          <td id="s-033290-c"><span class="dn">▼</span> <span class="dn">-3.17%</span></td>
+          <td class="stock-price" id="s-033290-p">1,827</td>
+          <td id="s-033290-c"><span class="dn">▼</span> <span class="dn">-3.49%</span></td>
           <td class="stock-spark"><svg id="spark-s-033290" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-472850">
@@ -267,30 +280,30 @@
         </tr>
         <tr id="s-033160">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=033160" target="_blank" rel="noopener">엠케이전자</a><span class="stock-code">033160</span></td>
-          <td class="stock-price" id="s-033160-p">30,350</td>
-          <td id="s-033160-c"><span class="up">▲</span> <span class="up">+9.57%</span></td>
+          <td class="stock-price" id="s-033160-p">30,300</td>
+          <td id="s-033160-c"><span class="up">▲</span> <span class="up">+9.39%</span></td>
           <td class="stock-spark"><svg id="spark-s-033160" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-034830">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=034830" target="_blank" rel="noopener">한국토지신탁</a><span class="stock-code">034830</span></td>
-          <td class="stock-price" id="s-034830-p">1,424</td>
-          <td id="s-034830-c"><span class="dn">▼</span> <span class="dn">-1.11%</span></td>
+          <td class="stock-price" id="s-034830-p">1,425</td>
+          <td id="s-034830-c"><span class="dn">▼</span> <span class="dn">-1.04%</span></td>
           <td class="stock-spark"><svg id="spark-s-034830" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-005960">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=005960" target="_blank" rel="noopener">동부건설</a><span class="stock-code">005960</span></td>
-          <td class="stock-price" id="s-005960-p">7,380</td>
-          <td id="s-005960-c"><span class="dn">▼</span> <span class="dn">-1.73%</span></td>
+          <td class="stock-price" id="s-005960-p">7,360</td>
+          <td id="s-005960-c"><span class="dn">▼</span> <span class="dn">-2.00%</span></td>
           <td class="stock-spark"><svg id="spark-s-005960" class="spark-svg" width="70" height="24"></svg></td>
         </tr>
         <tr id="s-097230">
           <td><a class="stock-name-link" href="https://finance.naver.com/item/main.naver?code=097230" target="_blank" rel="noopener">HJ중공업</a><span class="stock-code">097230</span></td>
-          <td class="stock-price" id="s-097230-p">21,500</td>
-          <td id="s-097230-c"><span class="dn">▼</span> <span class="dn">-6.93%</span></td>
+          <td class="stock-price" id="s-097230-p">21,550</td>
+          <td id="s-097230-c"><span class="dn">▼</span> <span class="dn">-6.71%</span></td>
           <td class="stock-spark"><svg id="spark-s-097230" class="spark-svg" width="70" height="24"></svg></td>
         </tr></tbody>
           </table>
-          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/19 13:28 KST</div>
+          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/19 13:32 KST</div>
           <div style="margin-top:10px;text-align:right">
             <a href="https://fomonono.com/treemap" target="_blank" rel="noopener"
                style="display:inline-block;background:#f3f4f6;color:#374151;font-size:12px;
@@ -355,29 +368,29 @@
         <div class="top-news-item">
           <div class="top-news-num">2</div>
           <div class="top-news-body">
+            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTFBXQkhJZmJWNnhhUzhMdkhUckxpclI5OEJ4UkVzNDRja0MzdWNnMk8xVHJ2TmtVUXRNTXo3cVp6MDRCRkRBUTlqUmRJVjlFNWc?oc=5" target="_blank" rel="noopener">[디티에스 IPO] 다산네트웍스, 짠물배당에도 '고배당 기업'…자회사 IPO 포석? - 딜사이트</a>
+            <div class="top-news-meta">딜사이트  <span style="color:#d1d5db">|</span>  05/19 07:40</div>
+          </div>
+        </div>
+        <div class="top-news-item">
+          <div class="top-news-num">3</div>
+          <div class="top-news-body">
             <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTFA3VWx6OVZfa0l1N2wyS2NzcFZLczNiZmVUNmhsX09OWk9MTklqcVJkWGNQb01nelJSUjZtamxJczBRLVlfNm9aSTVWR2VvLTRhZXRZendibVJCdUp4STh5OVpzWE1Pb0NjN04yS2lPbGo?oc=5" target="_blank" rel="noopener">"高금리가 달러-원 변수"…채권시장 주목하는 서울환시 - 연합인포맥스</a>
             <div class="top-news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 10:13</div>
           </div>
         </div>
         <div class="top-news-item">
-          <div class="top-news-num">3</div>
+          <div class="top-news-num">4</div>
           <div class="top-news-body">
             <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9fOXFfM05XRmtna1U1c1hMQ25zNmlDTG9mMEN3Q1ZVazYwb1JkcnBGYVdYZHk1Ykhzc0t1bmMxb0JpclFnODhTaTM0SjdqQXZSU2s5U1Z0aEZjX3hZWkVlUWFlMTFua3hTUkUzRTFfTXc?oc=5" target="_blank" rel="noopener">[노현우의 채권분석] 전 세계를 움직이는 단일 중앙은행 - 연합인포맥스</a>
             <div class="top-news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 09:47</div>
           </div>
         </div>
         <div class="top-news-item">
-          <div class="top-news-num">4</div>
+          <div class="top-news-num">5</div>
           <div class="top-news-body">
             <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE00ajhjX3RaM21QQy1oY0NkUVFMUnYwNXpnc1Z6MkR1Z3diYjZhWkw1N0c2aS1EeExTOWNVMEVaT0xZTWl5Nkk0bERhMGh4YmxXTkZ6MHA0cDE1a2kzNWFqaGs2Vll0aUh0T1NLdWU5Z2s?oc=5" target="_blank" rel="noopener">外人, 현선물 적극 매수…국내기관 '매수 파업' 속 채권시장 떠받쳤다 - 연합인포맥스</a>
             <div class="top-news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 10:23</div>
-          </div>
-        </div>
-        <div class="top-news-item">
-          <div class="top-news-num">5</div>
-          <div class="top-news-body">
-            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9VNFZtZ3JhWU1YSTM4anRqdzBrQVNHelBNY0doQ0IzYXBfUWlWY3BGSDNEZ1N3NFZib3llMFlTekIyUlV2NXFwN3AwTkJiVF9aOURVckxaTkFuQlVhYXJnVFdXc3BMbFJPS0ppNTk3b0o?oc=5" target="_blank" rel="noopener">월가 "채권시장, 연준에 강력한 매파 신호 주문" - 연합인포맥스</a>
-            <div class="top-news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 11:19</div>
           </div>
         </div>
     </div>
@@ -401,271 +414,141 @@
 
   
     <div class="card">
-      <div class="card-title">📰 뉴스 — 67건 · 20개사</div>
+      <div class="card-title">📰 뉴스 — 24건 · 10개사</div>
       
         <div class="company-header">
           <span class="company-name">삼성전자</span><span class="company-code">005930</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE02dkZ3OUZOQk1zSTJMTWxEbVBveVlxQ0hnc2R0WmZBQ1czeC1PTnZxY3AydVdUN3lVQ0M2d2tvQ1U2TmZZVV9qT1JWZFdsaFMtaURXMzdQbFdsYTV3alpOd0ZxX2o?oc=5" target="_blank" rel="noopener">삼성전자 노사 '마지막 기회'…영업이익 N%·상한 폐지 묘수 찾나 - 뉴스1</a>
-          <div class="news-meta">뉴스1  <span style="color:#d1d5db">|</span>  05/19 06:11</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMidEFVX3lxTFA1cUFsQ3BMMzNNZFZMMFM0R0RfNGt3VnFvNlZZaXB0TnpQQV9DQjl2WU9ValRuakpBYXFobWxkWHl2NUQ0U0xabl9mblBRUloyUk5JMXQ1ejhjcUltbk0yaEdTLTJUbExVVnBncnFkQkY1MlZp?oc=5" target="_blank" rel="noopener">장동혁, 삼성전자 파업 예고에 "반도체 멈춰 서면 대한민국이 멈춰" | - 연합인포맥스</a>
+          <div class="news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 09:54</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE5BZTVCOC1sRmdiV0xoTjN5U1RlOTR0V084XzU1YlpMSmtmVjBBeWJzcktfb3V0Y21sdXVKbkRUbXMyYkdvNklCVHI2dzYzWVNkR3ZsaUR5WW93M1FXNUttLThQZC1oV25CbUgtSWM2S2I?oc=5" target="_blank" rel="noopener">삼성전자 노사 오전 조정회의 종료…중노위 "조정안은 나와야" - 연합인포맥스</a>
-          <div class="news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 12:38</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9IM2VSdWJCbmNDaUotQ21lX1dUY3V0SXRHbkMzRWQ5UDk3WG1ZYVk3SHhLVklBNC10d3A0ZHNOZlhqNXU5UzdDRVNvNVZlRmxOUmFxWWV1R1F3X3V0NVNiOTl5RTJYVVBmbHk4YlZOX0k?oc=5" target="_blank" rel="noopener">[현장에서] 삼성전자가 디스플레이에 진 20조원의 빚 - 연합인포맥스</a>
+          <div class="news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 09:15</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE52UlRKaGhjQ2F2ZXJMaXBCTG9qd01xMmxOU2ZFNmt6LWJfYU9WZnFKQlVqUkdqVXBXWTVZc1l6bkQwMUkxVGxnd2p6QUlNbzNDZnZ6UkVRd1lTWTRzczdnZzVBMFhmRHczdUtNNmZtMmM?oc=5" target="_blank" rel="noopener">장동혁, 삼성전자 파업 예고에 "반도체 멈춰 서면 대한민국이 멈춰" - 연합인포맥스</a>
-          <div class="news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 09:49</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE5DdkhBdktIanI0ZjBGLUpmRkdpODROa3RudGRaTUNGRVhBQVBCcnduWF96SFY1ckFqejlJZ3lYMmZuMHluOU0xeWtRZHdEYzNpcHladjlBOFZkSEh3NUxCZHRnMWdPZXVLMHNrVHBKd2vSAXRBVV95cUxPdWJLZGRaaGZoaGQ3cHVjd25yV2toUWRyR3pPNXFuN2ZmMG9XOGdBc1ZHU0J1WVJsMUNGT0JGVFR5bG0yTElIak9OU2wyMUJtc3Y4akpITFRudDIwQlRvcjdiZmM2OWp5b2dWdlRqMms4ZEluag?oc=5" target="_blank" rel="noopener">삼성전자 노사 사후조정 회의부터 정용진 사과까지 이시각 주요뉴스 - 연합인포맥스</a>
+          <div class="news-meta">연합인포맥스  <span style="color:#d1d5db">|</span>  05/19 11:36</div>
         </div>
         <div class="company-header">
           <span class="company-name">SK하이닉스</span><span class="company-code">000660</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMib0FVX3lxTFB3VDZVMUtwOEp6UXBrbXg4cVRWMmpKQzBzc2hlRThGUExmNE5LNGJCb01wT3ZqbXpORHRVb2Vqai1zWWg1amk4Yk40ZW5zcndJaWhJa0xtSVZMZ3JTZGRKVnc5WENXQ0NraE1TdDFURdIBc0FVX3lxTE1QX2JOSVA4OEhPdGc0UDBZMlRQVkNwbmF3eHlULWVVSnhPclJiLUxrS0xTYm5SdDRYR092Y1k4TEJNZ1k5YUx0ak5qNDFXYW9iQmtUN0JLaHc4STRudGoyY0ZJQW9TOXhaMU43a0RsbldnWnM?oc=5" target="_blank" rel="noopener">상장사 1분기 실적…삼성전자·하이닉스 '끌고' 알테오젠·에코프로 '밀었다' - 뉴스웍스</a>
-          <div class="news-meta">뉴스웍스  <span style="color:#d1d5db">|</span>  05/19 12:00</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiXkFVX3lxTE95RTJtbTU2LTZOYktwSkhfMDREa250bGw5Nkt2Ykh3RjNCV0VUb210S1RnWHpJTDkwZFBvQ29kRjlsUU04N3lDQjdHazRKUUJHN0dzNFhyUmFFbkI4bFE?oc=5" target="_blank" rel="noopener">[재계 인사이드] 삼성전자가 하이닉스식 ‘영업이익 10% 성과급’ 수용 못하는 이유 - 뉴스투데이</a>
+          <div class="news-meta">뉴스투데이  <span style="color:#d1d5db">|</span>  05/19 09:50</div>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxNM25IclNKVi1NeFF0ZVRJa0pYb3hadC1nTmNtaUhsOHRVTW02VEJGbU5zT050bFJnSkNNYnNxbVJzVFJxaEVweG44VU9kM19fU3JrUGJuVmVQWENGbXI4djZ5eGNhTWdiMDZMMlk5ZlM2OGFaa3FKOHpic3FkVVRCWA?oc=5" target="_blank" rel="noopener">1만원 팔아 1525원 남겨…SK하이닉스 영업이익률 1위[1분기 코스피 결산] - 이데일리</a>
-          <div class="news-meta">이데일리  <span style="color:#d1d5db">|</span>  05/19 12:00</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE95MDA5NXVtLTBjWXhpVUlWLUd4TjFKZVpvalRNWWFLWTlPdzRzaTNZRTVJVVZkMmhldnR6XzR2WmkxejBBY2dGQlNtTXBQQnYyc3R2SFM0bFJ1MWxlMzA5cHhGNHo0WjltZHgtQWdsZ0c?oc=5" target="_blank" rel="noopener">[1% 초고수의 개장선택] ’삼성전자’ 던지고 ’SK하이닉스’ 담았다…AI 수혜주로 ’대이동’ By EBN - Investing.com 한국어</a>
+          <div class="news-meta">Investing.com 한국어  <span style="color:#d1d5db">|</span>  05/19 11:12</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTE9Eb2YxaUpSYWh5aW9VcTRPcjhmWmRJYmNIREdNSllsdGRScnNNXzVsbkUwdW5FdTk1c1hWSE55ZlEyWC1mZTZFQXkyTVAxeUk?oc=5" target="_blank" rel="noopener">코스피 1분기 영업이익 226% 급증…삼성전자·하이닉스가 압도적 - v.daum.net</a>
-          <div class="news-meta">v.daum.net  <span style="color:#d1d5db">|</span>  05/19 12:06</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">에이팩트</span><span class="company-code">200470</span><span class="company-code">KOSDAQ</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQM2RXbHFQMEFKaXZ0eDZkQzNFbk9YM21ieENUekYzS1d0TEVTSXo4TXlYVlpwNF9wSDFoVV9US3pneTRsempycENKanBTNTYyYjBiNXVKdEc4ZUNMcFlfb2R3eE83bjd3VVdxWVNuV1RiUUw4bHMyRFhURWVmQ21qRQ?oc=5" target="_blank" rel="noopener">에이팩트, 1분기 매출 30% 성장…"신규 모듈 테스트 양산 본격화" - 이데일리</a>
-          <div class="news-meta">이데일리  <span style="color:#d1d5db">|</span>  05/18 16:03</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE9uWldhdUJ0eGpfNlFYZ093RS1kM1c4TUc5NzV3cGZPaGU3NkxZQWxqSUJkUHZLeDFDSE4zUV9MQ2VrOHBGT2V1VFNMdVdOOV93eGF6b21wb1pXWk0yX1dlNi04Ykd5TXlf0gFsQVVfeXFMTWNkX0UzZmp5a1daVWx4YXlId1lLb1VCcUkzOUJ3STRpcUdIdG9fSXVKdDlQbGJfV2dFcDZlWGVmclg5M2g0N2hKaXhqMEpvQXRPSFZ5TVNsLXFnTThyUUthbnpmcXk4dmhzRGxo?oc=5" target="_blank" rel="noopener">[메자닌 투자파일] 에이팩트, 제주반도체와 'CB 혈맹' 배경은 - 블로터</a>
-          <div class="news-meta">블로터  <span style="color:#d1d5db">|</span>  05/18 16:57</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMid0FVX3lxTE5hMm1MYzBfSGJyeC1FeFZtS0Znc0xzeWdYZ2l0Q2NKTnNsLW9ZMmp3UW1Nazg2bDVHN3Fqc3Z3QnA5bHI4eUMxOWJ2VFRuTkhoSmlYdDB0cFF2d0FsUXdxM3ZPZ00wR2wwNndLNkV4X0xtSG5aOG9j?oc=5" target="_blank" rel="noopener">키옥시아, 美 ADS 상장 추진…SK하이닉스 지분가치도 부각 - 이코노미트리뷴</a>
+          <div class="news-meta">이코노미트리뷴  <span style="color:#d1d5db">|</span>  05/19 08:35</div>
         </div>
         <div class="company-header">
           <span class="company-name">셀트리온</span><span class="company-code">068270</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTFB1ajg5QnB6akgxd2w2eHlMbFNEcHBQZXBOLVRqRGYzWFk2ZWRHMkR0bG1jVmxQdG9WdzdJUXdIQl8xdVJXcjdqek9SLXdXTlQ3SE9n?oc=5" target="_blank" rel="noopener">셀트리온 "주가 저평가…대주주와 함께 주주가치 제고 방안 검토" - 네이트</a>
-          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 11:07</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE5KZF9GajgwSEdPUVhHcmxFM0tHS3d0dDZXWmJDZ1RPTlZ3ajhybnI5NjJnVjc0LVZSUVlhek9oamFhRVlrWUMyVDU4WmZIZ0p1N0VTd0o5dWdQV1NvSWZvcdIBeEFVX3lxTFBVc005U2R1bkpyaWZqRFY3WmJDUHNxcjVyb1lrYjQ2QXR2RzJER3JxWmdIV0dfSHgwQmY4TEFpTjNSRl92SWpGY0VuVUJxcXdwTm8zTEJYMUVVYUU4WEt1Vk5jNkNHTnpnWjViTTJvWjFvdTA2U0ZmWg?oc=5" target="_blank" rel="noopener">셀트리온 "과도한 저평가…주주가치 제고 검토" - 뉴시스</a>
+          <div class="news-meta">뉴시스  <span style="color:#d1d5db">|</span>  05/19 08:43</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMibkFVX3lxTE1qd0NtbmRxTFFsdTBXeHFzbldvaDVKeV9nc0M0WTJMbTNhV2RvZWdqN3lqLXMtcUV4SzM5T1VPWi1BMGE5WDRFZ0kzdUJySUlJU2xXRk8tNDMyY1A5MmE0X1R2WE9NNERXd2xWZktB?oc=5" target="_blank" rel="noopener">'주가 저평가' 셀트리온, "주주가치 제고 방안 종합 검토" - 팜이데일리</a>
-          <div class="news-meta">팜이데일리  <span style="color:#d1d5db">|</span>  05/19 08:23</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE5DMzQ3bXRMT0JxU3gwUXU1eEtZNk9YUk5SY3J0dG1BeDRSWFhUR0VNSkFVRXpzN1Bzc3NlUGVsMlc2eHl6bEdpTjNqLW9GNHRXSHc?oc=5" target="_blank" rel="noopener">“기대에 부응하겠다”…주가 하락에 ‘주주님께 드리는 글’ 올린 이 회사 - 매일경제 마켓</a>
+          <div class="news-meta">매일경제 마켓  <span style="color:#d1d5db">|</span>  05/19 10:06</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE45QTU3QXppVngzZXRnM0NEbk9YTU1Dd1FYZkhNWENKZUlRRkI3WWNaTjl0bzk1Y0E1SU5ldTdLM1ZWYXk3NFNjcUlMTzk0dGh4Sk5JTkM5M2RQMDdo?oc=5" target="_blank" rel="noopener">셀트리온 "주가 과도한 저평가"…주주가치 제고 방안 검토 - 뉴스핌</a>
-          <div class="news-meta">뉴스핌  <span style="color:#d1d5db">|</span>  05/19 08:52</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">솔루엠</span><span class="company-code">248070</span><span class="company-code">KOSPI</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMidkFVX3lxTE9KRWhrY09Ga203NFNIY0FxcE5lSlZvV1pDOE9Ga2E4bXE2MFYtVkhRNkl6b1dhSG1mRC1rUENHRnNydjZ4OGxSenJ0Rk9tMU1WZ2Q3Yk9pbHZGbGdxVmZLVEpWbHBaZjNKZmhjWUxMaFZvc0VweXfSAWZBVV95cUxQa1hqRC04U29nVHhqTW5rZHRqLVd2QnZYTTdNc0dSX0tMUGZkbFpQejNBYVlVNVdIM21TdUZMYjIzSUg5ZS0yNENpczI1dTRlR2d3clU0QWlHZ1E1ZW1TRy1WanY1NXc?oc=5" target="_blank" rel="noopener">솔루엠, 1분기 매출 1602억 기록…유럽 다변화·북미 공급 확대 추진 - 동아일보</a>
-          <div class="news-meta">동아일보  <span style="color:#d1d5db">|</span>  05/19 10:00</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMiVkFVX3lxTFBmQkphT3lhSFlxSVlYUldoQmpHNjN2ckI2MGxLMU92eGYtX1hTVHFnWHh3U3JMYWNuODVzMkdzUmxKOUx4aWwyYjZrSHJWTlhOUjh3cTBB?oc=5" target="_blank" rel="noopener">솔루엠 “1분기 매출 4782억원, 영업익 217억원” - 중앙일보</a>
-          <div class="news-meta">중앙일보  <span style="color:#d1d5db">|</span>  05/18 14:30</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMic0FVX3lxTE5ldXRkU0pQUVVCWnpwSGpWODRuZllvWUpST3NmU1gzRng1RGI1NkxwNnBBSy10T3BWUzNzWFVfeUVHVlViWTlxQUVTTllYWHgwX01EXzRYb2lDWTQtTkxRSVMwU2NaR0NleWtPbllkUkFTQ1E?oc=5" target="_blank" rel="noopener">솔루엠, 멕시코 법인 통해 북미 자동차 전장 공급망 진입 - 디지털투데이</a>
-          <div class="news-meta">디지털투데이  <span style="color:#d1d5db">|</span>  05/19 09:26</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE5CWDYzb01UdnZ2cXZmckl2UEtoTThOTDBmOVdwckY0R281MWpseFFMQUdrcFBxQnlFQWlhS2NTdkhiNXRrVkFURmx3SXI0dk5JbkpQckowc2pCSjZPQTVCWtIBeEFVX3lxTE1SU1NVU2FkVjVySTRhU2tMVllGZG5SQkMwOVpQX2hGZ3FyUlQwRGFEYk9icktCWkdZZV9UTlJlbjgzT0RHMGFYRGQ0bmlfeVhXbmE1aDBQQkpSU3dkZDhZQzVRS2p0OEhGTzFXOWl6VjZZSWNxV083Ng?oc=5" target="_blank" rel="noopener">셀트리온제약 "고덱스, 10년넘게 간장용제 1위" - 뉴시스</a>
+          <div class="news-meta">뉴시스  <span style="color:#d1d5db">|</span>  05/19 09:05</div>
         </div>
         <div class="company-header">
           <span class="company-name">서진시스템</span><span class="company-code">178320</span><span class="company-code">KOSDAQ</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMidkFVX3lxTFBpSWJhNEtxOWQxa1l5VVhWQzREVDY0M3ZqWk4xUWI1Y21XS0VOcnpZTk1kdUU0bVR0X3JVRldVTDNqQzVnU2dELXc1OEVoMElTeUtWbkRpZnE5N1oyM2E1eDhpQlpJWkFLVkRIWnFWNHY2UFk2SEHSAWZBVV95cUxOOXpIZzYwTVJFaURBMXRwdEZJamJLZ01GbGVoOEFLMVBsazl2dzRLcGdQUXlSSnU2a1RORzBHN3huYkJYX3FIWk84ZzZCaEZvZk51NDNxWHluX1BlR25IMmhaTEpfV1E?oc=5" target="_blank" rel="noopener">“국내 소부장 기업 美 안착 돕는다” … 빌드블록, 서진시스템과 현지 공장 신축·관리 계약 체결 - 동아일보</a>
-          <div class="news-meta">동아일보  <span style="color:#d1d5db">|</span>  05/18 17:28</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiTkFVX3lxTE9HamMxYmJNTnQ4OWN1RmVkeW5GZDZwSGZGQ1l5blJWazNRSXYtRzJ4eG5zWXp1YWVxbm40X1YtWFNpblphZkI2UjZXMXd1QQ?oc=5" target="_blank" rel="noopener">빌드블록, 서진시스템과 미국 플랜트 공장 개발 파트너십 체결 - 전자신문</a>
+          <div class="news-meta">전자신문  <span style="color:#d1d5db">|</span>  05/18 17:10</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMijAFBVV95cUxQNzdfNXVNLVhGUFQyZy1DYnBYUmpwd1dqWmxXOTVEXzJJS0pGeHE1dEd0VmR1SkpJVWI5Rlh5V2U2YVNWajh0S3B0b3BoM29sQ1RKTkxRMmRpTXZ2S2JIQjdYeXJLNjJLZURKYnZCLTZRTm1fbGN0TXhmY2NjVm9WTlB0aC1wWnRWY1k2RdIBoAFBVV95cUxNMnhlTnkwVjdXeWFKWm82c2JOaHM4MS1saVZic0FvS05Wckp1dVk2RWJWMkc1R2l1UkhIb2VZZEpEZlMwa0d5OWVmbFJMM1hqMXV5dEdRVjFvOTZxaThDY0N0ODdPNmJpZDNBODNtZEYxTzl4anJCQm1LVzRhRmxDcmFrTy10dlRkWXo1S3gyVi02NjBOY2RqTDk0OG4xWVFq?oc=5" target="_blank" rel="noopener">빌드블록, 서진시스템과 美 ESS 생산시설 개발 계약 체결 - 조선비즈 - Chosunbiz</a>
-          <div class="news-meta">Chosunbiz  <span style="color:#d1d5db">|</span>  05/18 16:52</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYkFVX3lxTE1tN1VsQjcxbW5PeWpLWGUzWUJMRWtsdkU0LWRlT0ZfZ3V1MnZadzYtRE5lSlRtTVlINXNfZ3B6NkptbDVqejR5czBzS3MxYldRY1hMQmRqVnBZdWpOY0hDY3d3?oc=5" target="_blank" rel="noopener">빌드블록, 서진시스템과 미국 플랜트 공장 개발 협력… 북미 산업용 부동산 시장 공략 - 이코노미스트</a>
+          <div class="news-meta">이코노미스트  <span style="color:#d1d5db">|</span>  05/18 16:39</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMibEFVX3lxTE43VjJpS3pHQ1NqaGJOWWVVTC03eS1mUEJ3ZnVEN1BDeUFGZGd2a0I3bFZrN1pjWnljYU5JN3A2b1pONVJFYkoyMDJIQWdVbXJxV0JWc25OZEVvRklHaDFyWC1WY2M0QjU0RmctdtIBbEFVX3lxTE43VjJpS3pHQ1NqaGJOWWVVTC03eS1mUEJ3ZnVEN1BDeUFGZGd2a0I3bFZrN1pjWnljYU5JN3A2b1pONVJFYkoyMDJIQWdVbXJxV0JWc25OZEVvRklHaDFyWC1WY2M0QjU0Rmctdg?oc=5" target="_blank" rel="noopener">서진시스템, 에이스엔지니어링과 1870억 ESS 설계·개발·제조 계약 - 블로터</a>
-          <div class="news-meta">블로터  <span style="color:#d1d5db">|</span>  05/18 13:51</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiakFVX3lxTE0tYnBldXZxWXhQaU96a3Z5RmZvX3FHR3BYbk1wYXBoLUg0SVBMU2tST3RpYmI0U1JxS3RoenJWT0kxeHlRWWdfZXdBWFJmTFktUWNXWnV0YUJNZGpTSHRJYWJPT1Fvd2dtaHfSAW5BVV95cUxPNWRhTkNEUlZsQWc4d3VQSmdnbERxck5Ibk1aWXJOWEVza0daenNGNFFtMXFQQXF4WWJtd2MzYzBsckJqSHA4T3MwdkM5SUxUQ1RQcnVHYm5NOUtobXBBM3JsaWw1MU9rcW5JbTRQdw?oc=5" target="_blank" rel="noopener">[코스피·코스닥, 삼성중공업 한화 대우건설 신성이엔지 진흥기업 일진홀딩스 서진시스템 쏘카등 18일 주요공시] - 퍼블릭타임스</a>
+          <div class="news-meta">퍼블릭타임스  <span style="color:#d1d5db">|</span>  05/19 08:01</div>
         </div>
         <div class="company-header">
-          <span class="company-name">성호전자</span><span class="company-code">043260</span><span class="company-code">KOSDAQ</span>
+          <span class="company-name">아이큐어</span><span class="company-code">175250</span><span class="company-code">KOSDAQ</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxOZUoxcjVWMjdZSGFicnZRVkQ5XzFrRFJ5Q0Y0Z2VGRU1pRmNQQnhHZzZJYUxFRVBSVkhyaEwtVHRGOW1DT2V5aE42X1A0bGsxQVNjLXkwQ3ktM1FPX2xTN3ZXSmhULXdTVTJsRVNIOVVVZEwwVXZ1STRMbm0ySjVQMw?oc=5" target="_blank" rel="noopener">10곳 중 6곳 순이익 흑자…성호전자 개선 폭 가장 커[1분기 코스닥 결산] - 이데일리</a>
-          <div class="news-meta">이데일리  <span style="color:#d1d5db">|</span>  05/19 12:00</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMieEFVX3lxTE9zZXh4MTVEMXpQT2laSmxZNW1zOFBaSjlyQjVIQ2hISFNpMS1TdVFqS3BTLXRyZEM0dlBkTUxuQ0k5QW15YnJJRFoybXlYNzFpNmNGSUpfVkV2cnhGTndWcjdNdXp3RzkwQktiT3RFMW0zdUthcVdIMA?oc=5" target="_blank" rel="noopener">엔비디아·브로드컴 이어 코닝까지…성호전자, 광통신 장비 수주 '봇물' - 네이트</a>
-          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 12:54</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiVEFVX3lxTE5Qa2pnVGZHVlFCc3BMSkUwMFJiWnhaelBLdFJkUjBtQVhRTHdITmN4WXE0Nlo3bGJIcVJXOHJqck1EblZKbnNDTjh4ak0zZXNvX2RZQdIBVEFVX3lxTE5Qa2pnVGZHVlFCc3BMSkUwMFJiWnhaelBLdFJkUjBtQVhRTHdITmN4WXE0Nlo3bGJIcVJXOHJqck1EblZKbnNDTjh4ak0zZXNvX2RZQQ?oc=5" target="_blank" rel="noopener">아리바이오 “중국 푸싱과 AR1001 상업화 준비…3분기 3상 결과 분수령” - 한국경제</a>
+          <div class="news-meta">한국경제  <span style="color:#d1d5db">|</span>  05/18 14:22</div>
         </div>
         <div class="company-header">
           <span class="company-name">다날</span><span class="company-code">064260</span><span class="company-code">KOSDAQ</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiXEFVX3lxTFB6ZDlZZkxSM1czOVVTREtBcXBWMDZWU1l1Wl9QRHllX19lS3V4dmYwcDFub3ZtR2pMM0V3WmthdnVkQnlWTm1QWXVmNnhXbGw0bW13a0FtY2NEUWM2?oc=5" target="_blank" rel="noopener">다날, 외국인 선불카드 '콘다' 기반 K-POP 결제망 구축 - 뉴스핌</a>
-          <div class="news-meta">뉴스핌  <span style="color:#d1d5db">|</span>  05/19 09:40</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBNMzU3NWtPaWRVTDlvNm8yMktQalRCQ0tJYXpEZFA2VDRwTG9QTVdYaHBNX3g1NXV4RGZOUTRMa0lJM0dENEduUGItNldkdFZaSFVxb19aUXctdG5ZQ2pWclJJUUNrQ3VaMEE?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 파트너십 체결…외국인 전용 결제 생태계 구축 - 파이낸스스코프</a>
+          <div class="news-meta">파이낸스스코프  <span style="color:#d1d5db">|</span>  05/19 09:30</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMibkFVX3lxTE00VmktWk1tNktlSDlCaG44VkNpNUNDN1FjUnBOZHI4aDVyMmhuempJQldqS1dvc010c3lPYXRLQUlFY3daMUJyTFpuVUYzNDBKOU0zeG5nNGlPZmd4dUgteU8tYVZITVdNVFgzWW9R?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 K-POP 중심 외국인 결제 생태계 확장 나서 - 뉴스타운</a>
-          <div class="news-meta">뉴스타운  <span style="color:#d1d5db">|</span>  05/19 09:35</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTFA1Zm9lTTB6MVFFcHl2OUJISzUyYzd0S3V2VWRFSDRReFM0alJLeEZTR21jS29DakJyaWk2eE5WN2RYTkl4SEFmdDVRVFNhbW53OXA4?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 맞손…K팝 중심 외국인 결제 생태계 넓힌다 - 네이트</a>
+          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 09:50</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE1IQloxN3I1V0tTLUVLSW5tY2o2a1RROWtocUpnamRITUJTdVJ0QUtHTGdNWURFXzVSb2YwSGdXN0RETHN6VjhhZUxDb2xQdl9mbFZr?oc=5" target="_blank" rel="noopener">[카드] 다날, 월드케이팝센터와 K-POP 중심 외국인 결제 생태계 본격 확장 - 네이트</a>
-          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 10:39</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE5SZU1nZGlBWjBhWmc1ay12Z2FCQndmblBnNWJjYVl2Mk1xWHNTZlVxQnB5Rm1nTjhpaUR4a2N2cEVfbktnbzA3NEE4cWp3YktiM3Iw?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 손잡고 외국인 대상 K-POP 결제 생태계 확대 - 네이트</a>
+          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 09:42</div>
         </div>
         <div class="company-header">
           <span class="company-name">교보생명</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiakFVX3lxTE1lMFIxWC1vSGw2MDVWOUpJZU5NMjhPaXdUellGVVVYQnpPRW8wd0Zka011anZfYmlIZXBJOGtSNlpGclhQaWU4eUs5RG41NnVVUTFCLUdKeGxReWd5ZGxid3BTaGs4c01nQnfSAW5BVV95cUxON3BDTzhBeWVJaXdNZU1fVXFrRWJWTzBoSDZzTnh1Nm5yY0JCM1ZhUGVWZENnWDk2Z2dBUzY1alRUN3paUFZaN0NjNy1ZWktDSmEtMk95R09NRDhZWkhYTmQ2eEJtd2JScWJGTEREQQ?oc=5" target="_blank" rel="noopener">금리 상승에 채권 흔들…생보사 실적, 투자손익이 갈랐다 - 파이낸셜투데이</a>
-          <div class="news-meta">파이낸셜투데이  <span style="color:#d1d5db">|</span>  05/18 17:32</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiVEFVX3lxTE5TOGFHVFBPR2c5OXdmdGRyQ1ZIOFBYLXBKX3dPdmh4RTJLMGdyWWhkUWdnbFJJOXpqSklvM194MjIzaDktVDRRdnRnMFo1STVjS0ZjLQ?oc=5" target="_blank" rel="noopener">한국 ‘백만달러원탁회의(MDRT)’ 회원 3084명…보험·재정 전문가 글로벌 경쟁력 입증 - 매일경제</a>
-          <div class="news-meta">매일경제  <span style="color:#d1d5db">|</span>  05/19 10:12</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE05ZG5FZnZqT2FqZk1wWFYyeWxxSWFndTN5NTktVFI4aXdQcTJuT1pDR09USDFFWmJTWGFZQ0JSczhBejZqVWM5dUxuYkE2TFRwY0dJck9fVUwzRXJGMUw0RkZpSktQZEHSAWxBVV95cUxPRzFGdmU4ZW1oMDVaQkhEc2hCdk1TZGtsZm9QQU9OeWJvNXRCbXktS19uUUVWRl9XMGRoM2Jodl9nVFFuSE1Fd1k3bDNqZnFCTzk1MFZtVTJ0MnpqQWpXNk44SXRxS2RWcHpKeVk?oc=5" target="_blank" rel="noopener">조부모 사랑 전하는 손주사랑 보험 2종 출시 - 국민일보</a>
-          <div class="news-meta">국민일보  <span style="color:#d1d5db">|</span>  05/18 18:01</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE5JQ2JRNG01eVJoZkZoaW1QUFE2ZTExTU1sMzI4SUstcmZLQ3VLWkZwV1c1RzVtYU1vQUFUUmxxWFd4Q21vb0l1VG5YeURWUXQyQ3FDbjhQOXRCZzg0SmFaStIBeEFVX3lxTE1qaE56Z0tLS3lWV293ajMwYThuY1duUkdCRUZDUHFzRFRYQlM3RTI5UExoMzdTQ1B1bHFkNjVzX0lWanB4ekFHakJ2aEY3RDA5Wk11ZFhvMGthNjRFbUdkbno1U2ZJZlVyVmliWlFqR1FXVEFxVXljbw?oc=5" target="_blank" rel="noopener">원주 키비탄, 내달 6일 장애청소년 축제 - 뉴시스</a>
+          <div class="news-meta">뉴시스  <span style="color:#d1d5db">|</span>  05/18 16:45</div>
         </div>
         <div class="company-header">
-          <span class="company-name">리벨리온</span>
+          <span class="company-name">제노스코</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE5OYXplZVlQX2w5emtoVzhTd3J1WWdiRi12M1h1M21BaktJMUoyN3JXZlF3ak1FUDIxdjRvRXR4VDk0N2swTVRQLUhycmJrVEdMWnAw?oc=5" target="_blank" rel="noopener">"메모리 무한 확장 고속도로 뚫는다"…엑시나, '제2의 리벨리온' 될까 [넘버스] - 네이트</a>
-          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 09:48</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMib0FVX3lxTFBDUUlSbmowUEpGV2E1OXN5ZnpwQlR2cUUtTVJZWXZpUzk3eGNpVW5VejFoSVY2YTBmenh2YzM0WVBxNkRXVVlTN21CQUhXOXNmTkRZYm43SDRwNnhsb1Y0VXpYWWZWaUxzY3dESnlpNA?oc=5" target="_blank" rel="noopener">[기자수첩] 국민성장펀드, IPO ‘보증수표’ 아니다 - 뉴스톱</a>
-          <div class="news-meta">뉴스톱  <span style="color:#d1d5db">|</span>  05/19 08:08</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxPbFZrOGQtUkdGSXRsNDIxbUhvTTd4cElQdU9CaVRGVVV6Q3FJZlhxczNLZmcxbEhnRndXOWNnZzJqek9LSTVTMUpyVXJBeXZVb0tDaFlaQ2dJVTh2TloxMl9TOFFpNU53UFpPcUNLTmhaWUNIYW9IdW9KN3NQdldRYw?oc=5" target="_blank" rel="noopener">"빠르고 과감하게 집행"…국민성장펀드 1호 직접투자 기업 후기 들어보니 - 이데일리</a>
-          <div class="news-meta">이데일리  <span style="color:#d1d5db">|</span>  05/19 07:22</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">뮤직카우</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE5lVnQyb1FrcUQwNTNDR01yWnJmeFktTFZlc1l5ZUdoemJ5dURCS2lsMktldFlqb2dhTk1FQndGNU1kTFBLMGJNcndOSWZOQmdHRlJr?oc=5" target="_blank" rel="noopener">'케데헌' 안효섭×칼리드 음원 나온다…뮤직카우 '팬덤 프로젝트' - 네이트</a>
-          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 10:48</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiZkFVX3lxTFA1NXNfWENLOEZ0eUFZMFlkZjJ4S2FIN2hWY1BHTjEwVmlOREZvX1JrRHRES0VPX08wRVZIenpzY2VqNDY1VTZlSTNxOTltOTV6b05BVWViQVhNdjVzMW0wcmVLU3dqQQ?oc=5" target="_blank" rel="noopener">안효섭X칼리드, 뮤직카우 팬덤 프로젝트 첫 주자…‘Something Special’ D-1 - 싱글리스트</a>
-          <div class="news-meta">싱글리스트  <span style="color:#d1d5db">|</span>  05/19 09:14</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">에치와이</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE5XYTFlUFV5SEk5MWhFUkYtMGE5RjM1NnVBTHM1UzhyWjU5dWxpWkk1UHJYZkVfQmFwY0RiWDVrQkdvajlTc01GcFRKWEU0dzAzUjBGRExBSk1sZklE?oc=5" target="_blank" rel="noopener">서울시, 결식아동 지원 확대를 위해 온라인 가맹점 확대 - 뉴스핌</a>
-          <div class="news-meta">뉴스핌  <span style="color:#d1d5db">|</span>  05/19 11:15</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxNSER6eTVENWE4TExYamJ3bGJYeUhONWYyM2FoSkNXdmt5a1JRRVMwQzFZMjBsM0ROOURBNlNyWkgxX3F1YWRoNk0tWEUwbGRycDF0a19DOWNNRUJLeFlFQk02VFB0dl9Vb1FkYWhHRERwX2FVdDVWbkcybnVXWmcxQg?oc=5" target="_blank" rel="noopener">서울시, 결식아동 '꿈나무카드' 온라인 이용 확대한다 - 이데일리</a>
-          <div class="news-meta">이데일리  <span style="color:#d1d5db">|</span>  05/19 11:15</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE9QR1lVQjhzS0FCeVpKS3BuQzluRWJZSFVzY0ZZcVhaTzd2RTRzUzZ6OVJva0xLNjlQblpVZi1LVmNRdHQwZXF3M3lJNnpHaUJVN0E?oc=5" target="_blank" rel="noopener">서울시, 결식아동 '꿈나무카드' 온라인 이용 확대…"집으로 밀키트 배송" - 뉴스1</a>
-          <div class="news-meta">뉴스1  <span style="color:#d1d5db">|</span>  05/19 11:15</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">비트코퍼레이션</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE91ZHBwekhLZ3JEd18zckx0VXRsWWNOZTBPUUxYNEp2bjJWTWY5VjlreVFrbjhva21DbU92VmU5OHVGREhEZ00yd3Q2WTNvSXBQb2w4WTltOGpGNml1S0hnYdIBeEFVX3lxTE9MbmZyOGtwMDNPUlNldlVvZzV6S1RXZjNZcWRaX090ZWdndldDRzdqYVptMTNLQVNPMUtxUGk5MmVMb1BhaDRtQVpMVGo1VzVfc3NsdTJ2ZEZpUWhDOVd4TTRoVnhIZVdVLVFOWkk5Zk1mVXZpbTVtVg?oc=5" target="_blank" rel="noopener">서울시립대-KBS, 'KOBA 2026'서 방송 제작 AI 자동화 기술 선보여 - 뉴시스</a>
-          <div class="news-meta">뉴시스  <span style="color:#d1d5db">|</span>  05/19 11:29</div>
-        </div>
-        <div class="group-header">
-          <span class="group-name">📂 대명화학 그룹</span>
-          <span class="group-badge">3개사 · 3건</span>
-        </div>
-        <div class="company-header">
-          <span class="company-name">로젠택배</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTE5IckpSd2JXSWtfbzczTDZkMmtab05lQi05cUVtV0gwNDEzTVdLLWl2bEFSbWJpbjBtSngzZUZiaXpaWmExNVdWZzU2ZHBnRmM?oc=5" target="_blank" rel="noopener">“택배기사 과로사 배경엔 갑질 계약”… 쿠팡 등 공정위 철퇴 - v.daum.net</a>
-          <div class="news-meta">v.daum.net  <span style="color:#d1d5db">|</span>  05/19 00:23</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">폰드그룹</span><span class="company-code">472850</span><span class="company-code">KOSDAQ</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTFAxaUt3QUVBQTNsRERoTXduMHhzN04wbTZzVUJOZXRhaS01cE9kajZnMXpuUHIxLXo3STBuSkgydmJlWXQwdW9IVDBxaGdYYlk?oc=5" target="_blank" rel="noopener">폰드그룹, 슈퍼드라이 모델로 박지훈 발탁 - 딜사이트</a>
-          <div class="news-meta">딜사이트  <span style="color:#d1d5db">|</span>  05/18 13:58</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">디에이피</span><span class="company-code">066900</span><span class="company-code">KOSDAQ</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiakFVX3lxTE5wbzRtekptNWwxMmJxYUdRWnlrRDFab1lPQ3FGRUJBNjNrc3VSSDZEWUZHcHJGTVJqMnRwZE1SZXdfc3NNSjVBM2trc0RRU2wtOWFISGNhSmlRZG5XZ3E3QnYzOXNKcE5MZ1E?oc=5" target="_blank" rel="noopener">에어로케이항공, 8월부터 인천공항발 국제선 노선 운영 중단 계획 - 동양일보</a>
-          <div class="news-meta">동양일보  <span style="color:#d1d5db">|</span>  05/18 16:31</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiVEFVX3lxTE1Xc0pnU2lpYzgxT1FnVjk1UmZwaU9UQS1tMHdfWGJTRk8wMDNjZk9GdktxejhFeDVMenk0VzRFc0llaGp2LWU0UlhKbmVyQ0VBeUo2a9IBVEFVX3lxTE1Xc0pnU2lpYzgxT1FnVjk1UmZwaU9UQS1tMHdfWGJTRk8wMDNjZk9GdktxejhFeDVMenk0VzRFc0llaGp2LWU0UlhKbmVyQ0VBeUo2aw?oc=5" target="_blank" rel="noopener">"美기업이 韓서 받은 기술료, 법인세 면제 대상 아니다" - 한국경제</a>
+          <div class="news-meta">한국경제  <span style="color:#d1d5db">|</span>  05/18 17:52</div>
         </div>
         <div class="group-header">
           <span class="group-name">📂 한토신 그룹</span>
-          <span class="group-badge">4개사 · 16건</span>
-        </div>
-        <div class="company-header">
-          <span class="company-name">엠케이전자</span><span class="company-code">033160</span><span class="company-code">KOSDAQ</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiXEFVX3lxTFBFR09EM2Nuek1DbC1sQU5PQkY4WTRWd2lSeml3YnZueWpFdG84ODNISHVkcWlCc25adXNpWk9nX1Qxd3c0WGxaUThEQURPZlFFSk5MeU8zZEVWNmVj?oc=5" target="_blank" rel="noopener">[장중수급포착] 엠케이전자, 외국인/기관 동시 순매수… 주가 +5.78% - 뉴스핌</a>
-          <div class="news-meta">뉴스핌  <span style="color:#d1d5db">|</span>  05/19 10:17</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE5TZ1V4cEEycUE5eTA5NThaeE9rQ2l0OFdBRE02UFRZNzh5YmF6YlVETThYaWw1YjV1dUpqUWg0SlFGX2JIZmRUUlFZNm5RTHpIZ0h4VnVTTzlReEdXaU5vcExpSFQ?oc=5" target="_blank" rel="noopener">"2분기 수익성 더 좋아진다"…현대차증권, 엠케이전자 목표가 상향 - MTN 머니투데이방송</a>
-          <div class="news-meta">MTN 머니투데이방송  <span style="color:#d1d5db">|</span>  05/19 08:36</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">한국토지신탁</span><span class="company-code">034830</span><span class="company-code">KOSPI</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMickFVX3lxTE52c015cjR5QVZXTWlmVnFRSG84ZXU3cWpkQW5RdGRETEx0T1EyZXJGSUdLZ2x5YUFiNkdNM2RxbFdJZDJ6eU1YMTcybnlWeHpaOUNZUTFJR0N2NGhHSlJIYWxuT0pFZ0VzU0kycDljeXBWdw?oc=5" target="_blank" rel="noopener">써밋 클라비온, 6월 분양 예정...신길뉴타운 첫 하이엔드 단지 공급 - 중앙이코노미뉴스</a>
-          <div class="news-meta">중앙이코노미뉴스  <span style="color:#d1d5db">|</span>  05/19 10:51</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5xM1Fqc251anJIdlM2TmQ2N2VPTEJuT3cxTjJJNXA0eHB0UWRJUXgwYkdDeWZvdlVnTzhLdmxWWjhsaWJJblZienVta1JJMlJ3N1I1M0NrNDNMRTJGYjZiclUyUUVZcWEy?oc=5" target="_blank" rel="noopener">한국토지신탁, 용산 서계동 역세권활성화 업무협약 체결 - 한국주택경제신문</a>
-          <div class="news-meta">한국주택경제신문  <span style="color:#d1d5db">|</span>  05/19 11:03</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMimAFBVV95cUxOSENTWXEzWHpFUEF0aF9VakszM0puTGZVMHVTblM4QTJVZmFaTEJ4RkVaQlZfWGh2NW9RNzZ1MlpRM1NIUkdUdzVMRGJKRk5xWUZzdGt6Qmh3SmR2akVlRDY5R2pLX3o2akZ0VDNDQXlvR1hSdHFpTHA3dFd3UUV3LXduZlZwNTluMkd1OWFiLV8xLUpEbVJpRNIBrAFBVV95cUxOWWctY04wVUlJd2dDX2xVV2xIb25nT09hUXd4UlVrekF1Y21VSkRuWU5FSXRBanJudXlzTXc4X2RGSVRTOEJHU1BtdUczM3ZPUldnN254Q0RpMHZCY3Q4VDI2WndHVE9xOHNEUnRqRWR1bXByTzhKMVBVMTJLaUd1MzhQbko4NUdpRGZOR08xbXNRYlNrM1prcG1scUE4cGV3a1JnMXFlVWdxV3c1?oc=5" target="_blank" rel="noopener">용산구 서계동 역세권활성화사업, 한국토지신탁과 업무협약 체결 - 조선비즈 - Chosunbiz</a>
-          <div class="news-meta">Chosunbiz  <span style="color:#d1d5db">|</span>  05/19 09:11</div>
+          <span class="group-badge">2개사 · 6건</span>
         </div>
         <div class="company-header">
           <span class="company-name">동부건설</span><span class="company-code">005960</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMia0FVX3lxTE9HN0NWQXdIU0tqZ1IyZGxVNi05Y2xDNkE0aFdtNkowUVg4aWJRTHNTZlYxRjBHSFdsbUd2aUkzYVhDb1p0eFk4eExWOW9LR28wRG1LMVFWLUg3NFJKQ3JHbWxNUzJqYjBnam5R?oc=5" target="_blank" rel="noopener">동부건설, 1분기 매출 4,346억원...흑자 기조 지속 - yhjindo.com</a>
-          <div class="news-meta">yhjindo.com  <span style="color:#d1d5db">|</span>  05/18 17:51</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQdDZfOTgyVzNHMkVkTkh3U2JfeTc5b0p1Ml9WVm8zMVpFempHZlBOSkVDUVNyRzZXWllod0VhRVRRU01oaXhCV2RVRUo1c2NQNG5YOG5sN3RENVBBVUtiaEdSVC1CdEtmWjhlaDc1RllMVUFPMEZBaHRUT3FPODdIUA?oc=5" target="_blank" rel="noopener">동부건설, 원가 상승 뚫고 순익 유지한 까닭은 - 네이버 프리미엄콘텐츠</a>
+          <div class="news-meta">네이버 프리미엄콘텐츠  <span style="color:#d1d5db">|</span>  05/19 06:50</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE9QMmlnY1RUSk9FWldlVDNaZVg2ZlBMaGNjdlRSZE0wb1VGS0hTV0hVUmZKcmJoQ0x6YnJBc3k0LVN4eUpUTW5qZ1RrOF9LUFlkdXNlejlqengxSXRFak5jaW8zcw?oc=5" target="_blank" rel="noopener">동부건설, 매출 성장 속 수익성 유지…“내실경영 강화” - kukinews.com</a>
-          <div class="news-meta">kukinews.com  <span style="color:#d1d5db">|</span>  05/18 14:01</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMia0FVX3lxTE9MMEtqODFGbFJ1eWJMaGx2YkRULVY1M1ZiRWExZlZfSkYtODRpM1lNMTQ3aDFhRTBIY2xKWU5VQW5RdFhBUlR2ZWdGSHJDMUJPUEtuaUhTTWx5VlBBZ1MxbUxibC1zR241bjZj?oc=5" target="_blank" rel="noopener">동부건설, 중대재해 대응력 강화 위한 비상사태 훈련 실시 - 기계설비신문</a>
+          <div class="news-meta">기계설비신문  <span style="color:#d1d5db">|</span>  05/18 17:25</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiXEFVX3lxTE00OE5od0VsTzM4bnFkUUdKelVUb21kUjFraGZxclpQQ3R3d2djUXBaSU1Eb2czMTJsOEktSjNMejU2NGtKdkNoS3R1bm5hR01CRE05SHRNRHRPZGk4?oc=5" target="_blank" rel="noopener">동부건설, 전국 현장서 실전형 안전 대응훈련 돌입 - 뉴스핌</a>
-          <div class="news-meta">뉴스핌  <span style="color:#d1d5db">|</span>  05/18 15:50</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9abVU2akd5RlE5V3BDdS1zN1IyYWl6d1BXdUNnM0JtNk5KcjNjSFlNRjVKNklLTjdkUk5sWmRxOHBlRHg5alMxLXAtWllycklweFZWckNiZmNXdWFVejFHY3JwZkpnbG9XOGZybE93QkQ?oc=5" target="_blank" rel="noopener">동부건설 1분기 영업익 101억... "본업 안정으로 흑자 지속" - meconomynews.com</a>
+          <div class="news-meta">meconomynews.com  <span style="color:#d1d5db">|</span>  05/18 18:24</div>
         </div>
         <div class="company-header">
           <span class="company-name">HJ중공업</span><span class="company-code">097230</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMiYkFVX3lxTE5xVGFLQktBRlJTWm1UclNGT1Y0dEFsZEdITE5ZRHQyd3B6Y0NWdW9BZ3BCMlRfaEl4WDg4a2NhMGdhQl9uQUR3VHV5S1pkSlRYQUs5YlQ1aE5IcFdCQkpDQXNn?oc=5" target="_blank" rel="noopener">HJ중공업 실적 반등 뚜렷...조선 매출 70% 증가 - 매일신문</a>
-          <div class="news-meta">매일신문  <span style="color:#d1d5db">|</span>  05/19 09:41</div>
+          <a class="news-title high" href="https://news.google.com/rss/articles/CBMib0FVX3lxTE1mWVJrZ1hUQWxYTlVSLXlyZlp0a0hsS0I2NFVHZUNGU2ZYcUVaQVZQZEMxQVpvRWxOUHpHYWh3R0s1R3hWNzhRdDM4S2kyaGxFS1BvR0VqTnRUZnBDMjE1eGk1UHhiLWdja1pEMElJb9IBb0FVX3lxTE1mWVJrZ1hUQWxYTlVSLXlyZlp0a0hsS0I2NFVHZUNGU2ZYcUVaQVZQZEMxQVpvRWxOUHpHYWh3R0s1R3hWNzhRdDM4S2kyaGxFS1BvR0VqTnRUZnBDMjE1eGk1UHhiLWdja1pEMElJbw?oc=5" target="_blank" rel="noopener">HJ중공업 1분기 영업이익 347% 증가, 성장세 지속 - 머니투데이 - 머니투데이</a>
+          <div class="news-meta">머니투데이  <span style="color:#d1d5db">|</span>  05/18 16:46</div>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMibEFVX3lxTE9CakJYc2pkMGQtZm1aRE9IMWlkclpaVVZpTzFpWDlNSkFyaWViTFBVUVVNNV9MN0NxSGEtc3Awa0JxWksxUDdPcVFET2xVeXBTM1BQbDBJSWVUWC1sVHNLUEFoQ0c3MzRqMWNraw?oc=5" target="_blank" rel="noopener">HJ중공업, 1분기 실적 대폭 개선…영업이익 3배 이상 증가 - 중도일보</a>
-          <div class="news-meta">중도일보  <span style="color:#d1d5db">|</span>  05/18 17:08</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTFBDTWpwRXB0cWNEcjRJSDhmcnc1VjE1VHR6eFRVQmwwZE5ITUMxS1lReXFtQmZ5VmZ4Y2IxYUIySU44M19yWjdnYnNrQjAyUnRRcEhJ?oc=5" target="_blank" rel="noopener">HJ중공업, 1분기 영업이익 347% 증가…조선부문 고부가 선박 효과 - 네이트</a>
+          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/19 09:31</div>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxQYnhkbDZkdmZwRlBxYUt3YzBlNnNzOGZKRHNDWWEyc01vc250aWx0WTFtaEphQ2M3MTB6MzluVS1PQm1TV1d2VExSN0lmd1gzb0lKZkJBdGY5blUwNjJSaS1hWnNuZVNHbzRvT0t2eFJGRk9hUWdyWFJqVlNqd3RmTTBnSThmc25VUk42bVR3?oc=5" target="_blank" rel="noopener">HJ중공업 1분기 영업이익 347% 급등… 매출액은 5414억 원 - 국제신문</a>
-          <div class="news-meta">국제신문  <span style="color:#d1d5db">|</span>  05/18 13:38</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMid0FVX3lxTE15bkdkdVRLS1ROdXYwa21OTzNJczRleDFVdk9NSllrY3I0bm5hYndyZ1hkRjRFd0EteEJYVk9FRlNRN3hfMjMweDlLN3hDZk9LVk41cDVXZk9RSVE3MUVlMmx4UHBidmg0T24ySFZNY3A0NEdyR2ZZ0gF3QVVfeXFMTXluR2R1VEtLVE51djBrbU5PM0lzNGV4MVV2T01KWWtjcjRubmFid3JnWGRGNEV3QS14QlhWT0VGU1E3eF8yMzB4OUs3eENmT0tWTjVwNVdmT1FJUTcxRWUybHhQcGJ2aDRPbjJIVk1jcDQ0R3JHZlk?oc=5" target="_blank" rel="noopener">HJ중공업, 1분기 영업이익 246억원…친환경 선박 효과에 347% 증가 - 스트레이트뉴스</a>
+          <div class="news-meta">스트레이트뉴스  <span style="color:#d1d5db">|</span>  05/18 15:41</div>
         </div>
     </div>
 
-  <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: 2026-05-19 13:28 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
+  <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: 2026-05-19 13:32 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
 
 <script>

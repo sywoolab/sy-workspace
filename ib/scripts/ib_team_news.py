@@ -436,13 +436,16 @@ HTML_STYLE = """
   /* 마켓 그리드 */
   .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .market-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px;
-                 text-decoration: none; color: inherit; display: block; transition: background .15s; }
+                 text-decoration: none; color: inherit;
+                 display: flex; align-items: center; justify-content: space-between;
+                 transition: background .15s; }
   .market-item:hover { background: #f0f4f8; }
+  .market-item-info { flex: 1; min-width: 0; }
   .market-item .label { font-size: 11px; color: #9ca3af; font-weight: 600;
                         text-transform: uppercase; letter-spacing: 0.5px; }
   .market-item .price { font-size: 18px; font-weight: 700; margin: 2px 0; color: #111827; }
   .market-item .chg { font-size: 12px; }
-  .market-spark { margin-top: 6px; }
+  .market-spark { margin-left: 10px; flex-shrink: 0; }
 
   /* 주가 테이블 */
   .stock-table { width: 100%; border-collapse: collapse; }
@@ -601,10 +604,12 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
             js_spark_market[hid] = ysym
         market_html += f"""
         <a class="market-item" id="{hid}" href="{nurl}" target="_blank" rel="noopener">
-          <div class="label">{m['label']}</div>
-          <div class="price" id="{hid}-p">{m['price_str']}</div>
-          <div class="chg" id="{hid}-c">{ar} {chg_str} &nbsp; {rt}</div>
-          <div class="market-spark"><svg id="spark-{hid}" class="spark-svg" width="70" height="24"></svg></div>
+          <div class="market-item-info">
+            <div class="label">{m['label']}</div>
+            <div class="price" id="{hid}-p">{m['price_str']}</div>
+            <div class="chg" id="{hid}-c">{ar} {chg_str} &nbsp; {rt}</div>
+          </div>
+          <div class="market-spark"><svg id="spark-{hid}" class="spark-svg" width="70" height="28"></svg></div>
         </a>"""
 
     # ── 주가 테이블 (스파크라인 + 네이버 링크 + JS id) ──
