@@ -209,6 +209,83 @@ _ONEDRIVE_BACKUP = os.path.expanduser(
 )
 
 
+def _push_and_update_dashboard(has_new_activity: bool):
+    """Mac 로컬 sync 후 git push + 대시보드 자동 업데이트 (2026-05-20 추가).
+
+    GH Actions에선 별도 workflow가 처리하므로 skip.
+    새 활동 있을 때만 push → 변경 없는 날 불필요한 commit 방지.
+    """
+    if os.environ.get('GITHUB_ACTIONS'):
+        return
+    import subprocess
+    from pathlib import Path
+
+    # 변경된 파일 있어야 push
+    staged = subprocess.run(
+        ['git', 'diff', '--name-only', 'HEAD'],
+        capture_output=True, text=True, cwd=BASE_DIR
+    ).stdout.strip()
+    unstaged = subprocess.run(
+        ['git', 'status', '--porcelain'],
+        capture_output=True, text=True, cwd=BASE_DIR
+    ).stdout.strip()
+
+    if not unstaged and not staged:
+        print('  [git] 변경 없음 — push 생략')
+    else:
+        subprocess.run(
+            ['git', 'add',
+             'workout/workout_log.json',
+             'workout/data/garmin_health.json',
+             'workout/data/sync_state.json'],
+            cwd=BASE_DIR, capture_output=True
+        )
+        label = '새 활동' if has_new_activity else '헬스 데이터'
+        subprocess.run(
+            ['git', 'commit', '--allow-empty', '-m', f'garmin sync: {label} ({TODAY} local)'],
+            cwd=BASE_DIR, capture_output=True
+        )
+        result = subprocess.run(
+            ['git', 'pull', '--rebase', '--autostash'],
+            capture_output=True, text=True, cwd=BASE_DIR
+        )
+        result2 = subprocess.run(
+            ['git', 'push'],
+            capture_output=True, text=True, cwd=BASE_DIR
+        )
+        if result2.returncode == 0:
+            print('  [git] push 완료')
+        else:
+            print(f'  [git] push 실패: {result2.stderr[:100]}')
+
+    # 대시보드 HTML 재생성 + training-dashboard repo push
+    try:
+        dashboard_script = Path(BASE_DIR) / 'workout' / 'scripts' / 'generate_dashboard.py'
+        dashboard_repo   = Path.home() / 'tmp' / 'training-dashboard'
+        if dashboard_script.exists():
+            subprocess.run(
+                [sys.executable, str(dashboard_script)],
+                cwd=str(Path(BASE_DIR) / 'workout'),
+                capture_output=True
+            )
+            # training-dashboard repo 업데이트
+            html_src = Path(BASE_DIR) / 'workout' / 'data' / 'training_report.html'
+            td_path = Path('/tmp/training-dashboard')
+            if td_path.exists() and html_src.exists():
+                import shutil
+                shutil.copy2(html_src, td_path / 'index.html')
+                subprocess.run(['git', 'add', 'index.html'], cwd=str(td_path), capture_output=True)
+                subprocess.run(
+                    ['git', 'commit', '-m', f'update: {TODAY} sync'],
+                    cwd=str(td_path), capture_output=True
+                )
+                r = subprocess.run(['git', 'push'], cwd=str(td_path), capture_output=True, text=True)
+                if r.returncode == 0:
+                    print('  [dashboard] 업데이트 완료')
+    except Exception as e:
+        print(f'  [dashboard] 업데이트 실패: {e}')
+
+
 def _backup_to_onedrive():
     """workout 핵심 데이터 OneDrive 자동 백업 (Mac 로컬 실행 시만, 2026-05-19 추가).
 
@@ -1922,6 +1999,7 @@ def sync():
         _save_sync_state(sync_state)
 
         _backup_to_onedrive()
+        _push_and_update_dashboard(has_new_activity=True)
         return True  # 변경 있음
     else:
         # 새 활동 없어도 로그인 성공 = sync 정상
@@ -1932,6 +2010,7 @@ def sync():
         _save_sync_state(sync_state)
 
         _backup_to_onedrive()
+        _push_and_update_dashboard(has_new_activity=False)
         print("  새 활동 없음 — 조용히 종료")
         return False  # 변경 없음
 
