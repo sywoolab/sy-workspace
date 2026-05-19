@@ -91,8 +91,15 @@ def main():
     # ── 그래프 데이터 (최근 60일) ──
     chart_entries = entries[-60:]
     chart_labels = [e['date'][5:] for e in chart_entries]  # MM-DD
-    chart_tl     = [e['total_tl'] for e in chart_entries]
     chart_tl7    = [e['tl_7d'] for e in chart_entries]
+    # 종목별 TL 분리 (스택 바)
+    def type_tl(e, t):
+        return sum((m.get('training_load') or 0) for m in e['metrics'] if m.get('type') == t)
+    chart_swim = [type_tl(e, 'swim') for e in chart_entries]
+    chart_bike = [type_tl(e, 'bike') for e in chart_entries]
+    chart_run  = [type_tl(e, 'run')  for e in chart_entries]
+    chart_other= [max(0, e['total_tl'] - chart_swim[i] - chart_bike[i] - chart_run[i])
+                  for i, e in enumerate(chart_entries)]
     # 대회 날짜에 vertical line 표시
     chart_race_dates = {r[0][5:] for r in races}
 
@@ -155,55 +162,54 @@ tr:hover{{background:#15152a}}
 
 <script>
 const labels = {json.dumps(chart_labels, ensure_ascii=False)};
-const tlData = {json.dumps(chart_tl)};
-const tl7Data = {json.dumps(chart_tl7)};
+const tl7Data  = {json.dumps(chart_tl7)};
+const swimData = {json.dumps(chart_swim)};
+const bikeData = {json.dumps(chart_bike)};
+const runData  = {json.dumps(chart_run)};
+const otherData= {json.dumps(chart_other)};
 const raceDates = {json.dumps(list(chart_race_dates))};
-
-// 대회일 세로선
-const raceAnnotations = {{}};
-raceDates.forEach((d,i) => {{
-  const idx = labels.indexOf(d);
-  if (idx >= 0) raceAnnotations['r'+i] = {{
-    type: 'line', xMin: idx, xMax: idx,
-    borderColor: '#ffd56c', borderWidth: 1.5, borderDash: [4,3],
-  }};
-}});
 
 new Chart(document.getElementById('tlChart'), {{
   data: {{
     labels: labels,
     datasets: [
       {{
-        type: 'bar',
-        label: '일별 부하',
-        data: tlData,
-        backgroundColor: tlData.map(v => v > 400 ? '#ff6c6c44' : v > 200 ? '#ffd56c44' : '#7c6fff44'),
-        borderColor:     tlData.map(v => v > 400 ? '#ff6c6c' : v > 200 ? '#ffd56c' : '#7c6fff'),
-        borderWidth: 1,
-        order: 2,
+        type: 'bar', label: '🏊 수영', data: swimData,
+        backgroundColor: '#6ab4ff66', borderColor: '#6ab4ff', borderWidth: 1,
+        stack: 'tl', order: 2,
       }},
       {{
-        type: 'line',
-        label: '7일 누적',
+        type: 'bar', label: '🚴 자전거', data: bikeData,
+        backgroundColor: '#ffa06a66', borderColor: '#ffa06a', borderWidth: 1,
+        stack: 'tl', order: 2,
+      }},
+      {{
+        type: 'bar', label: '🏃 러닝', data: runData,
+        backgroundColor: '#6affa066', borderColor: '#6affa0', borderWidth: 1,
+        stack: 'tl', order: 2,
+      }},
+      {{
+        type: 'bar', label: '기타', data: otherData,
+        backgroundColor: '#7c6fff44', borderColor: '#7c6fff', borderWidth: 1,
+        stack: 'tl', order: 2,
+      }},
+      {{
+        type: 'line', label: '∑7일 누적',
         data: tl7Data,
-        borderColor: '#6affa0',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        pointRadius: 0,
-        tension: 0.3,
-        order: 1,
+        borderColor: '#fff', backgroundColor: 'transparent',
+        borderWidth: 1.5, pointRadius: 0, tension: 0.3, order: 1,
       }},
     ]
   }},
   options: {{
     responsive: true,
     plugins: {{
-      legend: {{ labels: {{ color: '#888', font: {{ size: 11 }} }} }},
+      legend: {{ labels: {{ color: '#888', font: {{ size: 10 }}, boxWidth: 10 }} }},
       tooltip: {{ mode: 'index', intersect: false }},
     }},
     scales: {{
-      x: {{ ticks: {{ color: '#555', maxTicksLimit: 12, font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }} }},
-      y: {{ ticks: {{ color: '#555', font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }}, beginAtZero: true }},
+      x: {{ stacked: true, ticks: {{ color: '#555', maxTicksLimit: 12, font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }} }},
+      y: {{ stacked: true, ticks: {{ color: '#555', font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }}, beginAtZero: true }},
     }},
   }}
 }});
