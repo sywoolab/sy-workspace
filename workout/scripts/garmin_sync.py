@@ -1963,6 +1963,24 @@ def sync():
                     entry['planned'] = ''
                 # garmin_ids 리스트 초기화
                 entry['garmin_ids'] = [new_gid] if new_gid else []
+                # all_metrics 초기화 — 첫 활동도 반드시 채움 (대시보드 그래프용)
+                if 'all_metrics' not in entry:
+                    m = entry.get('metrics', {})
+                    first_am = {
+                        'type': m.get('type', ''),
+                        'distance_m': (m.get('distance_km') or 0) * 1000 or None,
+                        'duration_sec': (m.get('duration_min') or 0) * 60 or None,
+                        'avg_hr': m.get('avg_hr'),
+                        'max_hr': m.get('max_hr'),
+                        'avg_pace': m.get('avg_pace') or m.get('pace_per_km'),
+                        'avg_speed': (m.get('avg_speed_kmh') / 3.6) if m.get('avg_speed_kmh') else None,
+                        'training_load': m.get('training_load'),
+                        'garmin_id': new_gid,
+                        'laps': m.get('laps'),
+                        'open_water': m.get('open_water', False),
+                        'start_time': entry.get('start_time'),
+                    }
+                    entry['all_metrics'] = [first_am]
                 workout_log[date_key] = entry
 
         # 브릭 자동 감지: 같은 날 자전거→러닝 30분 이내

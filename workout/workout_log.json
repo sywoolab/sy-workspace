@@ -4324,7 +4324,7 @@
         "training_load": 44,
         "garmin_id": 22941462430,
         "laps": null,
-        "open_water": null,
+        "open_water": false,
         "start_time": "06:11"
       }
     ]
