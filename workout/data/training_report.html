@@ -1,34 +1,39 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>철인3종 훈련 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;background:#0f0f13;color:#e0e0e0;padding:16px;max-width:900px;margin:0 auto}
-h1{color:#fff;font-size:18px;margin-bottom:4px}
-.sub{color:#666;font-size:12px;margin-bottom:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:18px}
-.card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:10px;padding:12px 14px}
-.card .val{font-size:26px;font-weight:700;color:#7c6fff}
-.card .label{font-size:12px;color:#888;margin-top:2px}
-.card .sub-val{font-size:12px;color:#aaa;margin-top:4px}
-.section{font-size:14px;font-weight:600;color:#fff;margin:16px 0 8px;border-left:3px solid #7c6fff;padding-left:8px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{background:#1a1a2e;color:#888;padding:7px 8px;text-align:left;position:sticky;top:0}
-td{padding:6px 8px;border-bottom:1px solid #1e1e2e;vertical-align:middle}
+body{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;background:#0f0f13;color:#e0e0e0;padding:14px;max-width:960px;margin:0 auto}
+h1{color:#fff;font-size:17px;margin-bottom:3px}
+.sub{color:#555;font-size:11px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px;margin-bottom:16px}
+.card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:10px;padding:10px 13px}
+.card .val{font-size:24px;font-weight:700;color:#7c6fff}
+.card .label{font-size:11px;color:#888;margin-top:2px}
+.card .sub-val{font-size:11px;color:#aaa;margin-top:3px}
+.section{font-size:13px;font-weight:600;color:#fff;margin:14px 0 8px;border-left:3px solid #7c6fff;padding-left:8px}
+.chart-wrap{background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{background:#1a1a2e;color:#777;padding:7px 7px;text-align:left;position:sticky;top:0;z-index:1}
+td{padding:5px 7px;border-bottom:1px solid #1a1a28;vertical-align:middle}
 tr:hover{background:#15152a}
-.badge{display:inline-block;font-size:11px;padding:2px 6px;border-radius:8px;margin:1px;white-space:nowrap}
+.badge{display:inline-block;font-size:10.5px;padding:2px 5px;border-radius:7px;margin:1px;white-space:nowrap}
 .swim{background:#0d2a45;color:#6ab4ff}.bike{background:#2d1e0d;color:#ffa06a}
 .run{background:#0d2a1e;color:#6affa0}.brick{background:#2d0d2d;color:#ff6aff}
-.rest{color:#444}
-.g{color:#6affa0}.y{color:#ffd56c}.r{color:#ff6c6c}.dim{color:#555}
+.rest-row td{color:#3a3a3a}
+.rest-badge{color:#333;font-size:10px}
 .race-row td{background:#1a1a2e!important;color:#ffd56c;font-weight:600}
-.today-row td{background:#1a2a1a!important}
-.tl-cell{white-space:nowrap}
-.tl{display:inline-block;height:5px;border-radius:2px;margin-left:4px;vertical-align:middle}
+.today-row td{background:#0d2a0d!important}
+.g{color:#6affa0}.y{color:#ffd56c}.r{color:#ff6c6c}.dim{color:#444}
+.tl-bar-wrap{display:inline-flex;align-items:center;gap:4px}
+.tl-bar{width:36px;height:5px;background:#222;border-radius:2px;display:inline-block}
+.tl-fill{height:100%;border-radius:2px}
+.tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">마지막 업데이트: 2026-05-19 09:45 KST</div>
+<div class="sub">업데이트: 2026-05-19 10:00 KST</div>
 
 <div class="grid">
 <div class="card"><div class="val" style="color:#ffd56c">D-19</div><div class="label">한강 쉬엄쉬엄 (1+20+10)</div><div class="sub-val">T1 연습</div></div>
@@ -40,61 +45,141 @@ tr:hover{background:#15152a}
 <div class="card"><div class="val" style="color:#6ab4ff">0km</div><div class="label">이번주 러닝</div></div>
 <div class="card"><div class="val" style="color:#ff6aff">75</div><div class="label">이번주 누적부하</div></div>
 </div>
-<div class="section">훈련 기록 (최근 60일)</div>
-<table><thead><tr><th>날짜</th><th>운동</th><th>부하</th><th>수면</th><th>RHR</th><th>HRV</th></tr></thead><tbody>
-<tr class="today-row"><td>05-19 (화)</td><td><span class="badge swim">🏊 1475m</span></td><td class="tl-cell"><span style="color:#7c6fff">75</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td><span class="y">6h41m</span></td><td><span class="y">47</span></td><td><span class="g">67</span>/<span class="y">49</span></td></tr>
-<tr><td>05-17 (일)</td><td><span class="badge bike">🚴 46km</span></td><td class="tl-cell"><span style="color:#ffd56c">232</span><span class="tl" style="width:19px;background:#ffd56c"></span></td><td><span class="g">7h57m</span></td><td><span class="y">46</span></td><td><span class="g">62</span>/<span class="y">49</span></td></tr>
-<tr><td>05-16 (토)</td><td><span class="badge bike">🚴 85km</span></td><td class="tl-cell"><span style="color:#ff6c6c">519</span><span class="tl" style="width:43px;background:#ff6c6c"></span></td><td><span class="y">6h29m</span></td><td><span class="r">51</span></td><td><span class="r">39</span>/<span class="y">49</span></td></tr>
-<tr><td>05-14 (목)</td><td><span class="badge swim">🏊 1525m</span></td><td class="tl-cell"><span style="color:#7c6fff">123</span><span class="tl" style="width:10px;background:#7c6fff"></span></td><td><span class="g">7h40m</span></td><td><span class="y">49</span></td><td><span class="r">37</span>/<span class="y">50</span></td></tr>
-<tr><td>05-10 (일)</td><td><span class="badge run">🏃 9.5km</span><span class="badge bike">🚴 39km</span><span class="badge swim">🏊 1398m</span><span class="badge swim">🏊 230m</span></td><td class="tl-cell"><span style="color:#ff6c6c">924</span><span class="tl" style="width:50px;background:#ff6c6c"></span></td><td><span class="g">7h04m</span></td><td><span class="g">42</span></td><td><span class="g">64</span>/<span class="g">64</span></td></tr>
-<tr><td>05-09 (토)</td><td><span class="badge swim">🏊 295m</span></td><td class="tl-cell"><span style="color:#7c6fff">24</span><span class="tl" style="width:2px;background:#7c6fff"></span></td><td><span class="y">6h53m</span></td><td><span class="g">43</span></td><td><span class="g">62</span>/<span class="g">64</span></td></tr>
-<tr><td>05-08 (금)</td><td><span class="badge swim">🏊 1000m</span></td><td class="tl-cell"><span style="color:#7c6fff">25</span><span class="tl" style="width:2px;background:#7c6fff"></span></td><td><span class="g">8h33m</span></td><td><span class="y">46</span></td><td><span class="y">52</span>/<span class="g">65</span></td></tr>
-<tr><td>05-07 (목)</td><td><span class="badge run">🏃 4.6km</span></td><td class="tl-cell"><span style="color:#7c6fff">44</span><span class="tl" style="width:4px;background:#7c6fff"></span></td><td><span class="g">7h45m</span></td><td><span class="g">43</span></td><td><span class="g">71</span>/<span class="g">68</span></td></tr>
-<tr><td>05-06 (수)</td><td><span class="badge run">🏃 4.9km</span></td><td class="tl-cell"><span style="color:#7c6fff">54</span><span class="tl" style="width:4px;background:#7c6fff"></span></td><td><span class="r">5h43m</span></td><td><span class="g">44</span></td><td><span class="g">62</span>/<span class="g">68</span></td></tr>
-<tr><td>05-05 (화)</td><td><span class="badge run">🏃 5.4km</span><span class="badge swim">🏊 1059m</span></td><td class="tl-cell"><span style="color:#7c6fff">55</span><span class="tl" style="width:5px;background:#7c6fff"></span></td><td><span class="y">6h34m</span></td><td><span class="g">40</span></td><td><span class="g">74</span>/<span class="g">68</span></td></tr>
-<tr><td>05-03 (일)</td><td><span class="badge swim">🏊 1107m</span></td><td class="tl-cell"><span style="color:#7c6fff">44</span><span class="tl" style="width:4px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>05-02 (토)</td><td><span class="badge swim">🏊 1325m</span></td><td class="tl-cell"><span style="color:#7c6fff">66</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>05-01 (금)</td><td><span class="badge run">🏃 3.2km</span><span class="badge bike">🚴 38km</span></td><td class="tl-cell"><span style="color:#ffd56c">297</span><span class="tl" style="width:25px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-30 (목)</td><td><span class="badge run">🏃 5.4km</span></td><td class="tl-cell"><span style="color:#7c6fff">103</span><span class="tl" style="width:9px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-29 (수)</td><td><span class="badge swim">🏊 1500m</span></td><td class="tl-cell"><span style="color:#7c6fff">93</span><span class="tl" style="width:8px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-26 (일)</td><td><span class="badge swim">🏊 1500m</span><span class="badge swim">🏊 200m</span></td><td class="tl-cell"><span style="color:#7c6fff">62</span><span class="tl" style="width:5px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-25 (토)</td><td><span class="badge run">🏃 10.0km</span><span class="badge bike">🚴 40km</span></td><td class="tl-cell"><span style="color:#ffd56c">345</span><span class="tl" style="width:29px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-23 (목)</td><td><span class="badge run">🏃 6.1km</span></td><td class="tl-cell"><span style="color:#7c6fff">76</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-22 (수)</td><td><span class="badge swim">🏊 825m</span></td><td class="tl-cell"><span style="color:#7c6fff">45</span><span class="tl" style="width:4px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-21 (화)</td><td><span class="badge run">🏃 6.4km</span></td><td class="tl-cell"><span style="color:#7c6fff">117</span><span class="tl" style="width:10px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-19 (일)</td><td><span class="badge swim">🏊 800m</span><span class="badge run">🏃 5.0km</span><span class="badge run">🏃 5.0km</span><span class="badge swim">🏊 800m</span><span class="badge swim">🏊 100m</span></td><td class="tl-cell"><span style="color:#ffd56c">350</span><span class="tl" style="width:29px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-18 (토)</td><td><span class="badge swim">🏊 1350m</span></td><td class="tl-cell"><span style="color:#7c6fff">101</span><span class="tl" style="width:8px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-17 (금)</td><td><span class="badge swim">🏊 1000m</span></td><td class="tl-cell"><span style="color:#7c6fff">53</span><span class="tl" style="width:4px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-16 (목)</td><td><span class="badge bike">🚴 42km</span></td><td class="tl-cell"><span style="color:#7c6fff">169</span><span class="tl" style="width:14px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-15 (수)</td><td><span class="badge swim">🏊 950m</span></td><td class="tl-cell"><span style="color:#7c6fff">78</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-14 (화)</td><td><span class="badge run">🏃 7.4km</span></td><td class="tl-cell"><span style="color:#7c6fff">78</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-13 (월)</td><td><span class="badge swim">🏊 475m</span><span class="badge swim">🏊 1075m</span></td><td class="tl-cell"><span style="color:#7c6fff">97</span><span class="tl" style="width:8px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-09 (목)</td><td><span class="badge swim">🏊 1500m</span></td><td class="tl-cell"><span style="color:#7c6fff">97</span><span class="tl" style="width:8px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-06 (월)</td><td><span class="badge swim">🏊 975m</span></td><td class="tl-cell"><span style="color:#7c6fff">63</span><span class="tl" style="width:5px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-05 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-04 (토)</td><td><span class="badge swim">🏊 1200m</span><span class="badge run">🏃 5.5km</span></td><td class="tl-cell"><span style="color:#ffd56c">203</span><span class="tl" style="width:17px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-03 (금)</td><td><span class="badge swim">🏊 1675m</span><span class="badge run">🏃 5.4km</span></td><td class="tl-cell"><span style="color:#ffd56c">243</span><span class="tl" style="width:20px;background:#ffd56c"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-02 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>04-01 (수)</td><td><span class="badge swim">🏊 1075m</span></td><td class="tl-cell"><span style="color:#7c6fff">98</span><span class="tl" style="width:8px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-31 (화)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-30 (월)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-29 (일)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-28 (토)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-27 (금)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-26 (목)</td><td><span class="rest">휴식</span></td><td class="tl-cell">-</td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-25 (수)</td><td><span class="badge swim">🏊 950m</span></td><td class="tl-cell"><span style="color:#7c6fff">64</span><span class="tl" style="width:5px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-23 (월)</td><td><span class="badge swim">🏊 1000m</span></td><td class="tl-cell"><span style="color:#7c6fff">78</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-22 (일)</td><td><span class="badge strength">💪 </span></td><td class="tl-cell"><span style="color:#7c6fff">1</span><span class="tl" style="width:0px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-21 (토)</td><td><span class="badge swim">🏊 2275m</span><span class="badge bike">🚴 32km</span><span class="badge run">🏃 5.2km</span></td><td class="tl-cell"><span style="color:#ff6c6c">469</span><span class="tl" style="width:39px;background:#ff6c6c"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-19 (목)</td><td><span class="badge run">🏃 5.6km</span></td><td class="tl-cell"><span style="color:#7c6fff">62</span><span class="tl" style="width:5px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-18 (수)</td><td><span class="badge swim">🏊 950m</span></td><td class="tl-cell"><span style="color:#7c6fff">105</span><span class="tl" style="width:9px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-17 (화)</td><td><span class="badge swim">🏊 1375m</span></td><td class="tl-cell"><span style="color:#7c6fff">124</span><span class="tl" style="width:10px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-<tr><td>03-16 (월)</td><td><span class="badge run">🏃 7.6km</span><span class="badge run">🏃 7.6km</span></td><td class="tl-cell"><span style="color:#7c6fff">74</span><span class="tl" style="width:6px;background:#7c6fff"></span></td><td>-</td><td>-</td><td>-</td></tr>
-</tbody></table><div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody><tr><td style="color:#ffd56c;font-weight:600;white-space:nowrap">D-19 (06-07)</td><td>한강 쉬엄쉬엄</td><td style="color:#888;font-size:11px">수영 1+자전거 20+러닝 10km</td><td style="color:#6affa0;font-size:11px">T1 수트 탈의 연습 + 자전거 풀 push</td></tr>
-<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-33 (06-21)</td><td>한강리버크로스스위밍</td><td style="color:#888;font-size:11px">OW 2km 도강</td><td style="color:#6affa0;font-size:11px">OW 패닉 대응 실전 / 사이팅 거리 감</td></tr>
-<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-40 (06-28)</td><td>고령 대가야 스탠다드</td><td style="color:#888;font-size:11px">수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:11px">🎯 목표 sub-2:42 (5/10 -8:39)</td></tr>
-<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-100 (08-27)</td><td>거제 스탠다드</td><td style="color:#888;font-size:11px">수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:11px">🎯 목표 sub-2:35 (가을 시즌)</td></tr>
+
+<div class="section">훈련 부하 트렌드 (최근 60일)</div>
+<div class="chart-wrap">
+  <canvas id="tlChart" height="80"></canvas>
+</div>
+
+<script>
+const labels = ["03-21", "03-22", "03-23", "03-24", "03-25", "03-26", "03-27", "03-28", "03-29", "03-30", "03-31", "04-01", "04-02", "04-03", "04-04", "04-05", "04-06", "04-07", "04-08", "04-09", "04-10", "04-11", "04-12", "04-13", "04-14", "04-15", "04-16", "04-17", "04-18", "04-19", "04-20", "04-21", "04-22", "04-23", "04-24", "04-25", "04-26", "04-27", "04-28", "04-29", "04-30", "05-01", "05-02", "05-03", "05-04", "05-05", "05-06", "05-07", "05-08", "05-09", "05-10", "05-11", "05-12", "05-13", "05-14", "05-15", "05-16", "05-17", "05-18", "05-19"];
+const tlData = [469, 1, 78, 0, 64, 0, 0, 0, 0, 0, 0, 98, 0, 243, 203, 0, 63, 0, 0, 97, 0, 0, 0, 97, 78, 78, 169, 53, 101, 350, 0, 117, 45, 76, 0, 345, 62, 0, 0, 93, 103, 297, 66, 44, 0, 55, 54, 44, 25, 24, 924, 0, 0, 0, 123, 0, 519, 232, 0, 75];
+const tl7Data = [834, 835, 839, 715, 674, 612, 612, 143, 142, 64, 64, 98, 98, 341, 544, 544, 607, 607, 509, 606, 363, 160, 160, 194, 272, 350, 422, 475, 576, 926, 829, 868, 835, 742, 689, 933, 645, 645, 528, 576, 603, 900, 621, 603, 603, 658, 619, 560, 288, 246, 1126, 1126, 1071, 1017, 1096, 1071, 1566, 874, 874, 949];
+const raceDates = ["06-07", "06-21", "08-27", "06-28"];
+
+// 대회일 세로선
+const raceAnnotations = {};
+raceDates.forEach((d,i) => {
+  const idx = labels.indexOf(d);
+  if (idx >= 0) raceAnnotations['r'+i] = {
+    type: 'line', xMin: idx, xMax: idx,
+    borderColor: '#ffd56c', borderWidth: 1.5, borderDash: [4,3],
+  };
+});
+
+new Chart(document.getElementById('tlChart'), {
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        type: 'bar',
+        label: '일별 부하',
+        data: tlData,
+        backgroundColor: tlData.map(v => v > 400 ? '#ff6c6c44' : v > 200 ? '#ffd56c44' : '#7c6fff44'),
+        borderColor:     tlData.map(v => v > 400 ? '#ff6c6c' : v > 200 ? '#ffd56c' : '#7c6fff'),
+        borderWidth: 1,
+        order: 2,
+      },
+      {
+        type: 'line',
+        label: '7일 누적',
+        data: tl7Data,
+        borderColor: '#6affa0',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        order: 1,
+      },
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: '#888', font: { size: 11 } } },
+      tooltip: { mode: 'index', intersect: false },
+    },
+    scales: {
+      x: { ticks: { color: '#555', maxTicksLimit: 12, font: { size: 10 } }, grid: { color: '#1a1a2a' } },
+      y: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: '#1a1a2a' }, beginAtZero: true },
+    },
+  }
+});
+</script>
+
+<div class="section">훈련 기록 (3/16~, 전체 65일)</div>
+<table><thead><tr>
+<th>날짜</th><th>운동</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
+</tr></thead><tbody>
+<tr class="today-row"><td>05-19 (화)</td><td><span class="badge swim">🏊 1475m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">75</span><div class="tl-bar"><div class="tl-fill" style="width:12%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ff6c6c">∑7d 949</div></td><td><span class="y">6h41m</span></td><td><span class="y">47</span></td><td><span class="g">67</span>/<span class="y">49</span></td></tr>
+<tr class="rest-row"><td>05-18 (월)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 874</div></td><td><span class="g">7h24m</span></td><td><span class="r">51</span></td><td><span class="y">53</span>/<span class="y">49</span></td></tr>
+<tr><td>05-17 (일)</td><td><span class="badge bike">🚴 46km 21.8km/h</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">232</span><div class="tl-bar"><div class="tl-fill" style="width:39%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 874</div></td><td><span class="g">7h57m</span></td><td><span class="y">46</span></td><td><span class="g">62</span>/<span class="y">49</span></td></tr>
+<tr><td>05-16 (토)</td><td><span class="badge bike">🚴 85km 29.7km/h</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ff6c6c">519</span><div class="tl-bar"><div class="tl-fill" style="width:86%;background:#ff6c6c"></div></div></div><div class="tl7" style="color:#ff6c6c">∑7d 1566</div></td><td><span class="y">6h29m</span></td><td><span class="r">51</span></td><td><span class="r">39</span>/<span class="y">49</span></td></tr>
+<tr class="rest-row"><td>05-15 (금)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ff6c6c">∑7d 1071</div></td><td><span class="r">5h44m</span></td><td><span class="g">42</span></td><td><span class="g">69</span>/<span class="y">52</span></td></tr>
+<tr><td>05-14 (목)</td><td><span class="badge swim">🏊 1525m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">123</span><div class="tl-bar"><div class="tl-fill" style="width:20%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ff6c6c">∑7d 1096</div></td><td><span class="g">7h40m</span></td><td><span class="y">49</span></td><td><span class="r">37</span>/<span class="y">50</span></td></tr>
+<tr class="rest-row"><td>05-13 (수)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ff6c6c">∑7d 1017</div></td><td><span class="y">6h04m</span></td><td><span class="y">48</span></td><td><span class="r">33</span>/<span class="y">55</span></td></tr>
+<tr class="rest-row"><td>05-12 (화)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ff6c6c">∑7d 1071</div></td><td><span class="y">6h26m</span></td><td><span class="y">45</span></td><td><span class="g">62</span>/<span class="g">60</span></td></tr>
+<tr class="rest-row"><td>05-11 (월)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ff6c6c">∑7d 1126</div></td><td><span class="r">3h02m</span></td><td><span class="y">47</span></td><td><span class="y">51</span>/<span class="g">62</span></td></tr>
+<tr><td>05-10 (일)</td><td><span class="badge run">🏃 9.5km</span><span class="badge bike">🚴 39km</span><span class="badge swim">🏊 1398m</span><span class="badge swim">🏊 230m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ff6c6c">924</span><div class="tl-bar"><div class="tl-fill" style="width:100%;background:#ff6c6c"></div></div></div><div class="tl7" style="color:#ff6c6c">∑7d 1126</div></td><td><span class="g">7h04m</span></td><td><span class="g">42</span></td><td><span class="g">64</span>/<span class="g">64</span></td></tr>
+<tr><td>05-09 (토)</td><td><span class="badge swim">🏊 295m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">24</span><div class="tl-bar"><div class="tl-fill" style="width:4%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 246</div></td><td><span class="y">6h53m</span></td><td><span class="g">43</span></td><td><span class="g">62</span>/<span class="g">64</span></td></tr>
+<tr><td>05-08 (금)</td><td><span class="badge swim">🏊 1000m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">25</span><div class="tl-bar"><div class="tl-fill" style="width:4%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 288</div></td><td><span class="g">8h33m</span></td><td><span class="y">46</span></td><td><span class="y">52</span>/<span class="g">65</span></td></tr>
+<tr><td>05-07 (목)</td><td><span class="badge run">🏃 4.6km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">44</span><div class="tl-bar"><div class="tl-fill" style="width:7%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 560</div></td><td><span class="g">7h45m</span></td><td><span class="g">43</span></td><td><span class="g">71</span>/<span class="g">68</span></td></tr>
+<tr><td>05-06 (수)</td><td><span class="badge run">🏃 4.9km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">54</span><div class="tl-bar"><div class="tl-fill" style="width:9%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 619</div></td><td><span class="r">5h43m</span></td><td><span class="g">44</span></td><td><span class="g">62</span>/<span class="g">68</span></td></tr>
+<tr><td>05-05 (화)</td><td><span class="badge run">🏃 5.4km</span><span class="badge swim">🏊 1059m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">55</span><div class="tl-bar"><div class="tl-fill" style="width:9%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 658</div></td><td><span class="y">6h34m</span></td><td><span class="g">40</span></td><td><span class="g">74</span>/<span class="g">68</span></td></tr>
+<tr class="rest-row"><td>05-04 (월)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 603</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>05-03 (일)</td><td><span class="badge swim">🏊 1107m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">44</span><div class="tl-bar"><div class="tl-fill" style="width:7%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 603</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>05-02 (토)</td><td><span class="badge swim">🏊 1325m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">66</span><div class="tl-bar"><div class="tl-fill" style="width:11%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 621</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>05-01 (금)</td><td><span class="badge run">🏃 3.2km</span><span class="badge bike">🚴 38km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">297</span><div class="tl-bar"><div class="tl-fill" style="width:50%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 900</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-30 (목)</td><td><span class="badge run">🏃 5.4km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">103</span><div class="tl-bar"><div class="tl-fill" style="width:17%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 603</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-29 (수)</td><td><span class="badge swim">🏊 1500m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">93</span><div class="tl-bar"><div class="tl-fill" style="width:16%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 576</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-28 (화)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 528</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-27 (월)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 645</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-26 (일)</td><td><span class="badge swim">🏊 1500m</span><span class="badge swim">🏊 200m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">62</span><div class="tl-bar"><div class="tl-fill" style="width:10%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 645</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-25 (토)</td><td><span class="badge run">🏃 10.0km</span><span class="badge bike">🚴 40km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">345</span><div class="tl-bar"><div class="tl-fill" style="width:57%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ff6c6c">∑7d 933</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-24 (금)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 689</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-23 (목)</td><td><span class="badge run">🏃 6.1km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">76</span><div class="tl-bar"><div class="tl-fill" style="width:13%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 742</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-22 (수)</td><td><span class="badge swim">🏊 825m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">45</span><div class="tl-bar"><div class="tl-fill" style="width:8%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 835</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-21 (화)</td><td><span class="badge run">🏃 6.4km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">117</span><div class="tl-bar"><div class="tl-fill" style="width:20%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 868</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-20 (월)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 829</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-19 (일)</td><td><span class="badge swim">🏊 800m</span><span class="badge run">🏃 5.0km</span><span class="badge run">🏃 5.0km</span><span class="badge swim">🏊 800m</span><span class="badge swim">🏊 100m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">350</span><div class="tl-bar"><div class="tl-fill" style="width:58%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ff6c6c">∑7d 926</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-18 (토)</td><td><span class="badge swim">🏊 1350m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">101</span><div class="tl-bar"><div class="tl-fill" style="width:17%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 576</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-17 (금)</td><td><span class="badge swim">🏊 1000m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">53</span><div class="tl-bar"><div class="tl-fill" style="width:9%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 475</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-16 (목)</td><td><span class="badge bike">🚴 42km 21.4km/h</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">169</span><div class="tl-bar"><div class="tl-fill" style="width:28%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 422</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-15 (수)</td><td><span class="badge swim">🏊 950m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">78</span><div class="tl-bar"><div class="tl-fill" style="width:13%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 350</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-14 (화)</td><td><span class="badge run">🏃 7.4km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">78</span><div class="tl-bar"><div class="tl-fill" style="width:13%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 272</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-13 (월)</td><td><span class="badge swim">🏊 475m</span><span class="badge swim">🏊 1075m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">97</span><div class="tl-bar"><div class="tl-fill" style="width:16%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 194</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-12 (일)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 160</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-11 (토)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 160</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-10 (금)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 363</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-09 (목)</td><td><span class="badge swim">🏊 1500m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">97</span><div class="tl-bar"><div class="tl-fill" style="width:16%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 606</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-08 (수)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 509</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-07 (화)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 607</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-06 (월)</td><td><span class="badge swim">🏊 975m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">63</span><div class="tl-bar"><div class="tl-fill" style="width:10%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 607</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-05 (일)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 544</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-04 (토)</td><td><span class="badge swim">🏊 1200m</span><span class="badge run">🏃 5.5km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">203</span><div class="tl-bar"><div class="tl-fill" style="width:34%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 544</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-03 (금)</td><td><span class="badge swim">🏊 1675m</span><span class="badge run">🏃 5.4km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">243</span><div class="tl-bar"><div class="tl-fill" style="width:40%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 341</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>04-02 (목)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 98</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>04-01 (수)</td><td><span class="badge swim">🏊 1075m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">98</span><div class="tl-bar"><div class="tl-fill" style="width:16%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 98</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-31 (화)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 64</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-30 (월)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 64</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-29 (일)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 142</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-28 (토)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 143</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-27 (금)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 612</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-26 (목)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 612</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-25 (수)</td><td><span class="badge swim">🏊 950m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">64</span><div class="tl-bar"><div class="tl-fill" style="width:11%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 674</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-24 (화)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 715</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-23 (월)</td><td><span class="badge swim">🏊 1000m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">78</span><div class="tl-bar"><div class="tl-fill" style="width:13%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 839</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-22 (일)</td><td><span class="badge strength">💪 </span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">1</span><div class="tl-bar"><div class="tl-fill" style="width:0%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 835</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-21 (토)</td><td><span class="badge swim">🏊 2275m</span><span class="badge bike">🚴 32km</span><span class="badge run">🏃 5.2km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ff6c6c">469</span><div class="tl-bar"><div class="tl-fill" style="width:78%;background:#ff6c6c"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 834</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr class="rest-row"><td>03-20 (금)</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 365</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-19 (목)</td><td><span class="badge run">🏃 5.6km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">62</span><div class="tl-bar"><div class="tl-fill" style="width:10%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 365</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-18 (수)</td><td><span class="badge swim">🏊 950m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">105</span><div class="tl-bar"><div class="tl-fill" style="width:18%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 303</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-17 (화)</td><td><span class="badge swim">🏊 1375m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">124</span><div class="tl-bar"><div class="tl-fill" style="width:21%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 198</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>03-16 (월)</td><td><span class="badge run">🏃 7.6km</span><span class="badge run">🏃 7.6km</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">74</span><div class="tl-bar"><div class="tl-fill" style="width:12%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 74</div></td><td>-</td><td>-</td><td>-</td></tr>
+</tbody></table><div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody><tr><td style="color:#ffd56c;font-weight:600;white-space:nowrap">D-19 (06-07)</td><td>한강 쉬엄쉬엄</td><td style="color:#888;font-size:10.5px">수영 1+자전거 20+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">T1 수트 탈의 연습 + 자전거 풀 push</td></tr>
+<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-33 (06-21)</td><td>한강리버크로스스위밍</td><td style="color:#888;font-size:10.5px">OW 2km 도강</td><td style="color:#6affa0;font-size:10.5px">OW 패닉 대응 실전 / 사이팅 거리 감</td></tr>
+<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-40 (06-28)</td><td>고령 대가야 스탠다드</td><td style="color:#888;font-size:10.5px">수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">🎯 목표 sub-2:42 (5/10 -8:39)</td></tr>
+<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-100 (08-27)</td><td>거제 스탠다드</td><td style="color:#888;font-size:10.5px">수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">🎯 목표 sub-2:35 (가을 시즌)</td></tr>
 </tbody></table>
-<div style="color:#333;font-size:11px;margin-top:14px;text-align:center">
-sy-workspace / workout_log.json · 2026-05-19 09:45 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-05-19 10:00 KST</div>
 </body></html>

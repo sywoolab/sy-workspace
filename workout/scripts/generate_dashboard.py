@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """훈련 대시보드 HTML 생성 (자동 업데이트용)"""
-import json
+import json, re as _re
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
@@ -12,7 +12,6 @@ HEALTH_FILE = BASE / 'data' / 'garmin_health.json'
 SCHED_FILE = BASE / 'workout_schedule.json'
 OUT_FILE = BASE / 'data' / 'training_report.html'
 
-from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -35,7 +34,6 @@ def type_emoji(t):
 def main():
     log = json.loads(LOG_FILE.read_text(encoding='utf-8'))
     health = json.loads(HEALTH_FILE.read_text(encoding='utf-8')) if HEALTH_FILE.exists() else {}
-    sched = json.loads(SCHED_FILE.read_text(encoding='utf-8')) if SCHED_FILE.exists() else {}
 
     races = [
         ("2026-06-07", "한강 쉬엄쉬엄 (1+20+10)", "T1 연습"),
@@ -44,177 +42,284 @@ def main():
         ("2026-08-27", "거제 스탠다드", "🎯 sub-2:35"),
     ]
 
+    now = datetime.now(KST)
+    today = now.strftime('%Y-%m-%d')
+    start = datetime(2026, 3, 16, tzinfo=KST)
+
+    # ── 날짜 연속 생성 (하루도 빠짐없이 3/16~오늘) ──
+    all_dates = []
+    cur = start
+    while cur.strftime('%Y-%m-%d') <= today:
+        all_dates.append(cur.strftime('%Y-%m-%d'))
+        cur += timedelta(days=1)
+
+    # ── 각 날짜 entry 구성 ──
     entries = []
-    for dk in sorted(log.keys()):
-        if dk < '2026-03-16': continue
-        e = log[dk]
+    for dk in all_dates:
+        e = log.get(dk) or {}
         actual = e.get('actual', '') or ''
         mets = e.get('all_metrics', [])
         total_tl = sum((m.get('training_load') or 0) for m in mets)
         h = health.get(dk) or {}
         hrv_d = h.get('hrv') or {}
-        rhr = h.get('resting_hr')
-        sleep_min = (h.get('sleep') or {}).get('duration_min')
         entries.append({
-            'date': dk, 'actual': actual, 'total_tl': total_tl,
-            'metrics': mets, 'rhr': rhr,
+            'date': dk,
+            'actual': actual,
+            'total_tl': total_tl,
+            'metrics': mets,
+            'rhr': h.get('resting_hr'),
             'hrv_last': hrv_d.get('last_night'),
             'hrv_weekly': hrv_d.get('weekly_avg'),
-            'sleep_min': sleep_min,
-            'planned': e.get('planned',''),
-            'log_metrics': e.get('metrics') or {},  # 단일 주 종목 metrics (fallback)
+            'sleep_min': (h.get('sleep') or {}).get('duration_min'),
+            'log_metrics': e.get('metrics') or {},
+            'is_rest': not actual.strip(),
         })
 
-    now_str = datetime.now(KST).strftime('%Y-%m-%d %H:%M KST')
-    today = datetime.now(KST).strftime('%Y-%m-%d')
+    # ── rolling 7일 TL 계산 ──
+    tl_by_date = {e['date']: e['total_tl'] for e in entries}
+    for i, e in enumerate(entries):
+        window = [tl_by_date.get(all_dates[j], 0) for j in range(max(0, i-6), i+1)]
+        e['tl_7d'] = int(sum(window))
 
-    # 이번주 실적 요약
+    # 이번주 실적
     week_entries = [e for e in entries if e['date'] >= '2026-05-18']
     week_swim = sum(m.get('distance_m',0) or 0 for e in week_entries for m in e['metrics'] if m.get('type')=='swim')
     week_bike = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='bike')
-    week_run = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='run')
-    week_tl = sum(e['total_tl'] for e in week_entries)
+    week_run  = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='run')
+    week_tl   = sum(e['total_tl'] for e in week_entries)
+
+    # ── 그래프 데이터 (최근 60일) ──
+    chart_entries = entries[-60:]
+    chart_labels = [e['date'][5:] for e in chart_entries]  # MM-DD
+    chart_tl     = [e['total_tl'] for e in chart_entries]
+    chart_tl7    = [e['tl_7d'] for e in chart_entries]
+    # 대회 날짜에 vertical line 표시
+    chart_race_dates = {r[0][5:] for r in races}
+
+    now_str = now.strftime('%Y-%m-%d %H:%M KST')
 
     html = f"""<!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>철인3종 훈련 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
-body{{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;background:#0f0f13;color:#e0e0e0;padding:16px;max-width:900px;margin:0 auto}}
-h1{{color:#fff;font-size:18px;margin-bottom:4px}}
-.sub{{color:#666;font-size:12px;margin-bottom:16px}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:18px}}
-.card{{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:10px;padding:12px 14px}}
-.card .val{{font-size:26px;font-weight:700;color:#7c6fff}}
-.card .label{{font-size:12px;color:#888;margin-top:2px}}
-.card .sub-val{{font-size:12px;color:#aaa;margin-top:4px}}
-.section{{font-size:14px;font-weight:600;color:#fff;margin:16px 0 8px;border-left:3px solid #7c6fff;padding-left:8px}}
-table{{width:100%;border-collapse:collapse;font-size:12px}}
-th{{background:#1a1a2e;color:#888;padding:7px 8px;text-align:left;position:sticky;top:0}}
-td{{padding:6px 8px;border-bottom:1px solid #1e1e2e;vertical-align:middle}}
+body{{font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;background:#0f0f13;color:#e0e0e0;padding:14px;max-width:960px;margin:0 auto}}
+h1{{color:#fff;font-size:17px;margin-bottom:3px}}
+.sub{{color:#555;font-size:11px;margin-bottom:14px}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:9px;margin-bottom:16px}}
+.card{{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:10px;padding:10px 13px}}
+.card .val{{font-size:24px;font-weight:700;color:#7c6fff}}
+.card .label{{font-size:11px;color:#888;margin-top:2px}}
+.card .sub-val{{font-size:11px;color:#aaa;margin-top:3px}}
+.section{{font-size:13px;font-weight:600;color:#fff;margin:14px 0 8px;border-left:3px solid #7c6fff;padding-left:8px}}
+.chart-wrap{{background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:16px}}
+table{{width:100%;border-collapse:collapse;font-size:11.5px}}
+th{{background:#1a1a2e;color:#777;padding:7px 7px;text-align:left;position:sticky;top:0;z-index:1}}
+td{{padding:5px 7px;border-bottom:1px solid #1a1a28;vertical-align:middle}}
 tr:hover{{background:#15152a}}
-.badge{{display:inline-block;font-size:11px;padding:2px 6px;border-radius:8px;margin:1px;white-space:nowrap}}
+.badge{{display:inline-block;font-size:10.5px;padding:2px 5px;border-radius:7px;margin:1px;white-space:nowrap}}
 .swim{{background:#0d2a45;color:#6ab4ff}}.bike{{background:#2d1e0d;color:#ffa06a}}
 .run{{background:#0d2a1e;color:#6affa0}}.brick{{background:#2d0d2d;color:#ff6aff}}
-.rest{{color:#444}}
-.g{{color:#6affa0}}.y{{color:#ffd56c}}.r{{color:#ff6c6c}}.dim{{color:#555}}
+.rest-row td{{color:#3a3a3a}}
+.rest-badge{{color:#333;font-size:10px}}
 .race-row td{{background:#1a1a2e!important;color:#ffd56c;font-weight:600}}
-.today-row td{{background:#1a2a1a!important}}
-.tl-cell{{white-space:nowrap}}
-.tl{{display:inline-block;height:5px;border-radius:2px;margin-left:4px;vertical-align:middle}}
+.today-row td{{background:#0d2a0d!important}}
+.g{{color:#6affa0}}.y{{color:#ffd56c}}.r{{color:#ff6c6c}}.dim{{color:#444}}
+.tl-bar-wrap{{display:inline-flex;align-items:center;gap:4px}}
+.tl-bar{{width:36px;height:5px;background:#222;border-radius:2px;display:inline-block}}
+.tl-fill{{height:100%;border-radius:2px}}
+.tl7{{font-size:10px;color:#888}}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">마지막 업데이트: {now_str}</div>
+<div class="sub">업데이트: {now_str}</div>
 
 <div class="grid">
 """
     for rdate, rname, goal in races:
         d = days_until(rdate)
-        if d < 0: continue
-        col = '#ff6c6c' if d < 7 else '#ffd56c' if d < 21 else '#7c6fff'
+        col = '#ff6c6c' if d<7 else '#ffd56c' if d<21 else '#7c6fff'
         html += f'<div class="card"><div class="val" style="color:{col}">D-{d}</div><div class="label">{rname}</div><div class="sub-val">{goal}</div></div>\n'
 
-    # 이번주 실적
     html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_swim//100/10:.1f}km</div><div class="label">이번주 수영</div></div>
 <div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">이번주 자전거</div></div>
 <div class="card"><div class="val" style="color:#6ab4ff">{week_run:.0f}km</div><div class="label">이번주 러닝</div></div>
 <div class="card"><div class="val" style="color:#ff6aff">{int(week_tl)}</div><div class="label">이번주 누적부하</div></div>
+</div>
+
+<div class="section">훈련 부하 트렌드 (최근 60일)</div>
+<div class="chart-wrap">
+  <canvas id="tlChart" height="80"></canvas>
+</div>
+
+<script>
+const labels = {json.dumps(chart_labels, ensure_ascii=False)};
+const tlData = {json.dumps(chart_tl)};
+const tl7Data = {json.dumps(chart_tl7)};
+const raceDates = {json.dumps(list(chart_race_dates))};
+
+// 대회일 세로선
+const raceAnnotations = {{}};
+raceDates.forEach((d,i) => {{
+  const idx = labels.indexOf(d);
+  if (idx >= 0) raceAnnotations['r'+i] = {{
+    type: 'line', xMin: idx, xMax: idx,
+    borderColor: '#ffd56c', borderWidth: 1.5, borderDash: [4,3],
+  }};
+}});
+
+new Chart(document.getElementById('tlChart'), {{
+  data: {{
+    labels: labels,
+    datasets: [
+      {{
+        type: 'bar',
+        label: '일별 부하',
+        data: tlData,
+        backgroundColor: tlData.map(v => v > 400 ? '#ff6c6c44' : v > 200 ? '#ffd56c44' : '#7c6fff44'),
+        borderColor:     tlData.map(v => v > 400 ? '#ff6c6c' : v > 200 ? '#ffd56c' : '#7c6fff'),
+        borderWidth: 1,
+        order: 2,
+      }},
+      {{
+        type: 'line',
+        label: '7일 누적',
+        data: tl7Data,
+        borderColor: '#6affa0',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        order: 1,
+      }},
+    ]
+  }},
+  options: {{
+    responsive: true,
+    plugins: {{
+      legend: {{ labels: {{ color: '#888', font: {{ size: 11 }} }} }},
+      tooltip: {{ mode: 'index', intersect: false }},
+    }},
+    scales: {{
+      x: {{ ticks: {{ color: '#555', maxTicksLimit: 12, font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }} }},
+      y: {{ ticks: {{ color: '#555', font: {{ size: 10 }} }}, grid: {{ color: '#1a1a2a' }}, beginAtZero: true }},
+    }},
+  }}
+}});
+</script>
+
+<div class="section">훈련 기록 (3/16~, 전체 {len(all_dates)}일)</div>
+<table><thead><tr>
+<th>날짜</th><th>운동</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
+</tr></thead><tbody>
 """
-    html += """</div>
-<div class="section">훈련 기록 (최근 60일)</div>
-<table><thead><tr><th>날짜</th><th>운동</th><th>부하</th><th>수면</th><th>RHR</th><th>HRV</th></tr></thead><tbody>
-"""
-    for e in sorted(entries, key=lambda x:x['date'], reverse=True)[:60]:
+
+    for e in reversed(entries):
         dk = e['date']
         actual = e['actual']
         tl = e['total_tl']
+        tl7 = e['tl_7d']
         rhr = e['rhr']
         hrv_l = e['hrv_last']
         hrv_w = e['hrv_weekly']
         sleep_min = e['sleep_min']
+        is_rest = e['is_rest']
 
         dt = datetime.strptime(dk, '%Y-%m-%d')
         dow = ['월','화','수','목','금','토','일'][dt.weekday()]
         date_s = f"{dk[5:]} ({dow})"
 
-        # actual 텍스트에서 거리 파싱 (all_metrics distance_m=None 보완)
-        import re as _re
-        actual_text = e.get('actual', '') or ''
-        badges = ''
-        for m in e['metrics']:
-            t = m.get('type','')
-            dist = m.get('distance_m') or 0
-            pace = m.get('avg_pace','') or ''
-            spd = m.get('avg_speed') or 0
-            # fallback: actual 텍스트에서 거리 추출
-            if not dist:
-                patterns = {'bike': r'자전거\s+([\d.]+)km', 'run': r'러닝\s+([\d.]+)km', 'swim': r'수영\s+(\d+)m|OW\s+(\d+)m'}
-                pat = patterns.get(t, '')
-                if pat:
-                    for chunk in actual_text.split('+'):
-                        m2 = _re.search(pat, chunk.strip())
-                        if m2:
-                            v = next(g for g in m2.groups() if g)
-                            dist = float(v) * (1000 if t == 'bike' or t == 'run' else 1)
-                            break
-            if t=='swim': info=f"{int(dist)}m {pace}"
-            elif t=='bike': info=f"{dist/1000:.0f}km {spd*3.6:.1f}km/h" if spd else f"{dist/1000:.0f}km"
-            elif t=='run': info=f"{dist/1000:.1f}km {pace}"
-            else: info=f"{dist/1000:.1f}km" if dist else ''
-            badges+=f'<span class="badge {t}">{type_emoji(t)} {info.strip()}</span>'
-        if not badges: badges='<span class="rest">휴식</span>'
+        # 뱃지
+        if is_rest:
+            badges = '<span class="rest-badge">—</span>'
+        else:
+            single_m = e.get('log_metrics') or {}
+            badges = ''
+            for m in e['metrics']:
+                t = m.get('type','')
+                dist = m.get('distance_m') or 0
+                pace = m.get('avg_pace','') or ''
+                spd  = m.get('avg_speed') or 0
+                if not dist:
+                    patterns = {'bike': r'자전거\s+([\d.]+)km', 'run': r'러닝\s+([\d.]+)km',
+                                'swim': r'수영\s+(\d+)m|OW\s+(\d+)m'}
+                    pat = patterns.get(t, '')
+                    if pat:
+                        for chunk in actual.split('+'):
+                            m2 = _re.search(pat, chunk.strip())
+                            if m2:
+                                v = next(g for g in m2.groups() if g)
+                                dist = float(v) * (1000 if t in ('bike','run') else 1)
+                                break
+                if not spd and t=='bike' and single_m.get('avg_speed_kmh'):
+                    spd = single_m['avg_speed_kmh'] / 3.6
+                if t=='swim':   info = f"{int(dist)}m {pace}".strip()
+                elif t=='bike': info = f"{dist/1000:.0f}km {spd*3.6:.1f}km/h".strip() if spd else f"{dist/1000:.0f}km"
+                elif t=='run':  info = f"{dist/1000:.1f}km {pace}".strip()
+                else:           info = f"{dist/1000:.1f}km" if dist else ''
+                badges += f'<span class="badge {t}">{type_emoji(t)} {info}</span>'
+            if not badges:
+                badges = f'<span class="rest-badge">{actual[:60]}</span>'
 
-        tl_pct = min(100, tl/600*100)
-        tc = '#ff6c6c' if tl>400 else '#ffd56c' if tl>200 else '#7c6fff'
-        tl_s = f'<span style="color:{tc}">{int(tl)}</span><span class="tl" style="width:{tl_pct*0.5:.0f}px;background:{tc}"></span>' if tl else '-'
+        # 부하 + 7일 누적
+        if tl:
+            tl_pct = min(100, tl/600*100)
+            tc = '#ff6c6c' if tl>400 else '#ffd56c' if tl>200 else '#7c6fff'
+            # 7일 누적 색상
+            t7c = '#ff6c6c' if tl7>900 else '#ffd56c' if tl7>500 else '#6affa0'
+            tl_s = (f'<div class="tl-bar-wrap">'
+                    f'<span style="color:{tc}">{int(tl)}</span>'
+                    f'<div class="tl-bar"><div class="tl-fill" style="width:{tl_pct:.0f}%;background:{tc}"></div></div>'
+                    f'</div>'
+                    f'<div class="tl7" style="color:{t7c}">∑7d {tl7}</div>')
+        else:
+            t7c = '#ff6c6c' if tl7>900 else '#ffd56c' if tl7>500 else '#6affa0'
+            tl_s = f'<div class="tl7" style="color:{t7c}">∑7d {tl7}</div>' if tl7 else '-'
 
+        # 수면
         if sleep_min:
-            sh,sm=sleep_min//60,sleep_min%60
-            sc='g' if sleep_min>=420 else 'y' if sleep_min>=360 else 'r'
-            sleep_s=f'<span class="{sc}">{sh}h{sm:02d}m</span>'
-        else: sleep_s='-'
+            sh,sm = sleep_min//60, sleep_min%60
+            sc = 'g' if sleep_min>=420 else 'y' if sleep_min>=360 else 'r'
+            sleep_s = f'<span class="{sc}">{sh}h{sm:02d}m</span>'
+        else: sleep_s = '-'
 
-        rhr_s=f'<span class="{"g" if (rhr or 99)<45 else "y" if (rhr or 99)<50 else "r"}">{rhr}</span>' if rhr else '-'
+        rhr_s = f'<span class="{"g" if (rhr or 99)<45 else "y" if (rhr or 99)<50 else "r"}">{rhr}</span>' if rhr else '-'
 
         def hc(v): return 'g' if (v or 0)>=60 else 'y' if (v or 0)>=45 else 'r' if v else 'dim'
-        hrv_s=f'<span class="{hc(hrv_l)}">{hrv_l}</span>/<span class="{hc(hrv_w)}">{hrv_w}</span>' if hrv_l and hrv_w else (f'<span class="{hc(hrv_l)}">{hrv_l}</span>' if hrv_l else '-')
+        hrv_s = f'<span class="{hc(hrv_l)}">{hrv_l}</span>/<span class="{hc(hrv_w)}">{hrv_w}</span>' if (hrv_l and hrv_w) else (f'<span class="{hc(hrv_l)}">{hrv_l}</span>' if hrv_l else '-')
 
-        is_race = any(dk==r[0] for r in races)
-        is_today = dk==today
-        rc = ' class="race-row"' if is_race else (' class="today-row"' if is_today else '')
-        html += f'<tr{rc}><td>{date_s}</td><td>{badges}</td><td class="tl-cell">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
+        is_race_day = any(dk==r[0] for r in races)
+        is_today_day = dk==today
+        rc = ' class="race-row"' if is_race_day else (' class="today-row"' if is_today_day else (' class="rest-row"' if is_rest else ''))
+        html += f'<tr{rc}><td>{date_s}</td><td>{badges}</td><td style="white-space:nowrap">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
 
     html += "</tbody></table>"
 
-    # 주요 대회 일정 섹션
-    all_races = [
+    # 대회 일정 섹션
+    all_races_ext = [
         ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
         ("2026-06-21", "한강리버크로스스위밍", "OW 2km 도강", "OW 패닉 대응 실전 / 사이팅 거리 감"),
         ("2026-06-28", "고령 대가야 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:42 (5/10 -8:39)"),
         ("2026-08-27", "거제 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:35 (가을 시즌)"),
     ]
     html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
-    for rdate, rname, rdist, rgoal in all_races:
+    for rdate, rname, rdist, rgoal in all_races_ext:
         d = days_until(rdate)
-        if d < 0:
-            dstr, dcol = f'완료 ({rdate[5:]})', '#444'
-        elif d == 0:
-            dstr, dcol = '🏁 오늘!', '#ff6c6c'
+        if d < 0: dstr, dcol = f'완료 ({rdate[5:]})', '#444'
+        elif d == 0: dstr, dcol = '🏁 오늘!', '#ff6c6c'
         else:
             dcol = '#ff6c6c' if d<7 else '#ffd56c' if d<21 else '#7c6fff'
             dstr = f'D-{d} ({rdate[5:]})'
-        html += f'<tr><td style="color:{dcol};font-weight:600;white-space:nowrap">{dstr}</td><td>{rname}</td><td style="color:#888;font-size:11px">{rdist}</td><td style="color:#6affa0;font-size:11px">{rgoal}</td></tr>\n'
+        html += f'<tr><td style="color:{dcol};font-weight:600;white-space:nowrap">{dstr}</td><td>{rname}</td><td style="color:#888;font-size:10.5px">{rdist}</td><td style="color:#6affa0;font-size:10.5px">{rgoal}</td></tr>\n'
     html += '</tbody></table>'
 
-    html += f"""
-<div style="color:#333;font-size:11px;margin-top:14px;text-align:center">
-sy-workspace / workout_log.json · {now_str}</div>
-</body></html>"""
+    html += f'\n<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · {now_str}</div>\n</body></html>'
 
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUT_FILE.write_text(html, encoding='utf-8')
-    print(f'[OK] {OUT_FILE} ({len(html)//1024}KB, {len(entries)} entries)')
+    n_rest = sum(1 for e in entries if e['is_rest'])
+    print(f'[OK] {OUT_FILE} ({len(html)//1024}KB, {len(all_dates)}일, 운동 {len(all_dates)-n_rest}일 / 휴식 {n_rest}일)')
 
 if __name__ == '__main__':
     main()
