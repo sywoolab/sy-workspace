@@ -369,6 +369,16 @@ HTML_STYLE = """
   .stock-code { font-size: 11px; color: #9ca3af; margin-left: 4px; }
   .stock-price { font-weight: 700; font-size: 15px; }
 
+  /* 그룹 헤더 */
+  .group-header { display: flex; align-items: center; gap: 8px;
+                  padding: 12px 0 4px; border-bottom: 2px solid #e5e7eb;
+                  margin-bottom: 4px; margin-top: 16px; }
+  .group-header:first-child { margin-top: 0; }
+  .group-name { font-weight: 800; font-size: 13px; color: #374151;
+                text-transform: uppercase; letter-spacing: 0.4px; }
+  .group-badge { font-size: 11px; color: #9ca3af; background: #f3f4f6;
+                 border-radius: 4px; padding: 1px 6px; }
+
   /* 뉴스 */
   .company-header { display: flex; align-items: center; gap: 8px;
                     padding: 10px 0 6px; border-bottom: 1px solid #f3f4f6;
@@ -542,28 +552,58 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     import json as _json
     js_data = _json.dumps({'market': js_market_symbols, 'stock': js_stock_symbols})
 
-    # ── 뉴스 섹션 ──────────────────────────────────
-    news_html = ''
-    total = 0
-    for comp, picks in sections:
-        code_badge = ''
-        if comp.get('listed') and comp.get('stock_code'):
-            code_badge = f'<span class="company-code">{comp["stock_code"]}</span>'
+    # ── 뉴스 섹션 (그룹 있으면 그룹 헤더로 묶기) ────
+    # sections = [(comp_dict, [article, ...]), ...]
+    # 그룹화: group 필드 기준으로 묶은 후 개별 기업 렌더링
+
+    def _comp_news_html(comp, picks):
+        code_badge   = f'<span class="company-code">{comp["stock_code"]}</span>' if comp.get('listed') and comp.get('stock_code') else ''
         market_badge = f'<span class="company-code">{comp["market"]}</span>' if comp.get('market') else ''
-        news_html += f"""
+        out = f"""
         <div class="company-header">
           <span class="company-name">{comp['name']}</span>{code_badge}{market_badge}
         </div>"""
         for a in picks:
-            t      = a['title']
-            cls    = 'news-title high' if a['score'] >= 5 else 'news-title'
-            src    = a.get('source') or ''
-            news_html += f"""
+            t   = a['title']
+            cls = 'news-title high' if a['score'] >= 5 else 'news-title'
+            src = a.get('source') or ''
+            out += f"""
         <div class="news-item">
           <a class="{cls}" href="{a['link']}" target="_blank" rel="noopener">{t}</a>
           <div class="news-meta">{src}</div>
         </div>"""
-            total += 1
+        return out
+
+    # 그룹별로 묶기
+    from collections import OrderedDict
+    grouped   = OrderedDict()  # group_name → [(comp, picks)]
+    ungrouped = []
+    for comp, picks in sections:
+        g = comp.get('group')
+        if g:
+            grouped.setdefault(g, []).append((comp, picks))
+        else:
+            ungrouped.append((comp, picks))
+
+    news_html = ''
+    total = 0
+
+    # 개별 기업 (그룹 없음) 먼저
+    for comp, picks in ungrouped:
+        news_html += _comp_news_html(comp, picks)
+        total += len(picks)
+
+    # 그룹 섹션
+    for grp_name, items in grouped.items():
+        n_items = sum(len(p) for _, p in items)
+        news_html += f"""
+        <div class="group-header">
+          <span class="group-name">📂 {grp_name}</span>
+          <span class="group-badge">{len(items)}개사 · {n_items}건</span>
+        </div>"""
+        for comp, picks in items:
+            news_html += _comp_news_html(comp, picks)
+            total += len(picks)
 
     if not news_html:
         news_html = '<p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>'

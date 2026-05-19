@@ -29,7 +29,15 @@
     {"name": "수양켐텍", "dart_code": "00963684", "stock_code": null, "listed": false},
     {"name": "비트코퍼레이션", "dart_code": "01834811", "stock_code": null, "listed": false, "alias": ["b;eat", "BEAT"], "note": "다날 그룹 푸드테크 자회사. AI 스마트 리테일 전환"},
     {"name": "지디케이화장품", "dart_code": "01079733", "stock_code": null, "listed": false, "alias": ["GDK", "GDK화장품"], "note": "솔루엠헬스케어(솔루엠 자회사) 54.6% 보유 (2025.06 인수)"},
-    {"name": "제노스코", "dart_code": null, "stock_code": null, "listed": false, "note": "美 법인(오스코텍 자회사). DART 없음, 뉴스만 모니터링", "alias": ["Genosco"]}
+    {"name": "제노스코", "dart_code": null, "stock_code": null, "listed": false, "note": "美 법인(오스코텍 자회사). DART 없음, 뉴스만 모니터링", "alias": ["Genosco"]},
+    {"name": "모다이노칩", "dart_code": null, "stock_code": "080420", "listed": true, "market": "KOSDAQ", "group": "대명화학 그룹", "alias": ["모다아울렛"], "note": "전자부품 + 모다아울렛 유통. 매출 3,800억 중 3,300억이 유통"},
+    {"name": "코웰패션", "dart_code": null, "stock_code": "033290", "listed": true, "market": "KOSDAQ", "group": "대명화학 그룹", "alias": ["Cowell"], "note": "로젠택배 100% 보유. 매출 ~8,000억"},
+    {"name": "폰드그룹", "dart_code": null, "stock_code": "472850", "listed": true, "market": "KOSDAQ", "group": "대명화학 그룹", "alias": ["Fond Group"], "note": "DKNY·퓨마·아디다스·마뗑킴·마리떼 등 패션 브랜드. 2023년 코웰패션에서 인적분할"},
+    {"name": "디에이피", "dart_code": null, "stock_code": "066900", "listed": true, "market": "KOSDAQ", "group": "대명화학 그룹", "alias": ["에어로케이", "Aero-K"], "note": "에어로케이(LCC) 운영. A320-200 6대 → 연내 11대"},
+    {"name": "엠케이전자", "dart_code": null, "stock_code": "033160", "listed": true, "market": "KOSDAQ", "group": "한토신 그룹", "alias": ["MK전자"], "note": "그룹 중간지주 역할. 반도체 소재·부품"},
+    {"name": "한국토지신탁", "dart_code": null, "stock_code": "034830", "listed": true, "market": "KOSPI", "group": "한토신 그룹", "alias": ["한토신", "KLTS"], "note": "부동산 신탁·개발 업계 1위. 차정훈 회장. 1Q25 영업이익 적자전환"},
+    {"name": "동부건설", "dart_code": null, "stock_code": "005960", "listed": true, "market": "KOSPI", "group": "한토신 그룹", "note": "건설"},
+    {"name": "HJ중공업", "dart_code": null, "stock_code": "097230", "listed": true, "market": "KOSPI", "group": "한토신 그룹", "alias": ["한진중공업", "HJ Heavy Industries"], "note": "조선·중공업. 구 한진중공업"}
   ],
   "group_mapping": [
     {"parent": "솔루엠", "child": "지디케이화장품", "relation": "솔루엠헬스케어(자회사)가 54.6% 보유"},
