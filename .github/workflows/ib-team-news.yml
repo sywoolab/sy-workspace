@@ -35,6 +35,6 @@ jobs:
           git add ib/data/team_news_sent.json 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "ib-team news: daily brief update"
-            git pull --rebase
+            git pull --rebase --autostash
             git push
           fi
