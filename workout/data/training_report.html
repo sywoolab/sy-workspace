@@ -33,7 +33,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-05-19 10:21 KST</div>
+<div class="sub">업데이트: 2026-05-19 10:44 KST</div>
 
 <div class="grid">
 <div class="card"><div class="val" style="color:#ffd56c">D-19</div><div class="label">한강 쉬엄쉬엄 (1+20+10)</div><div class="sub-val">T1 연습</div></div>
@@ -58,7 +58,7 @@ const swimData = [162, 0, 78, 0, 64, 0, 0, 0, 0, 0, 0, 98, 0, 118, 114, 0, 63, 0
 const bikeData = [213, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 169, 0, 0, 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 0, 238, 0, 0, 0, 0, 0, 0, 0, 0, 381, 0, 0, 0, 0, 0, 519, 232, 0, 0];
 const runData  = [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 0, 0, 304, 0, 117, 0, 76, 0, 181, 0, 0, 0, 0, 103, 59, 0, 0, 0, 52, 54, 44, 0, 0, 466, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const otherData= [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["06-21", "06-07", "08-27", "06-28"];
+const raceDates = ["06-28", "06-21", "06-07", "08-27"];
 
 new Chart(document.getElementById('tlChart'), {
   data: {
@@ -106,6 +106,24 @@ new Chart(document.getElementById('tlChart'), {
 });
 </script>
 
+<div class="section">📅 훈련 계획 (오늘~14일)</div>
+<table><thead><tr><th>날짜</th><th>계획</th></tr></thead><tbody>
+<tr style="background:#0d2a0d"><td style="color:#fff;font-weight:600;white-space:nowrap">05-19 (화)</td><td style="color:#6affa0">🏊 자유수영 1475m @2:07/100m</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-20 (수)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-21 (목)</td><td style="color:#ccc">🏃 인터벌 5×1km @5:00 (회복 1:00)</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-22 (금)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-23 (토)</td><td style="color:#ccc">TBD + 🏊 OW 1회 (한강 OW 클래스 가능 시)</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-24 (일)</td><td style="color:#ccc">🚴 자전거 70km Easy (장거리)</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-25 (월)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-26 (화)</td><td style="color:#ccc">🏃 러닝 8km Easy</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-27 (수)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-28 (목)</td><td style="color:#ccc">🏃 인터벌 또는 템포 6km</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-29 (금)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-30 (토)</td><td style="color:#ccc">TBD + 🏊 OW 1회 (사이팅 + 직진성)</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">05-31 (일)</td><td style="color:#ccc">🚴 자전거 80km — 단일 능력 유지 라이드 (5/16 85km 달성 후 두 번째)</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">06-01 (월)</td><td style="color:#ccc">🏊 수영 강습 06시 (Easy)</td></tr>
+<tr><td style="color:#888;font-weight:400;white-space:nowrap">06-02 (화)</td><td style="color:#ccc">🏃 러닝 5km Easy</td></tr>
+</tbody></table>
 <div class="section">훈련 기록 (3/16~, 전체 65일)</div>
 <table><thead><tr>
 <th>날짜</th><th>운동</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
@@ -180,5 +198,5 @@ new Chart(document.getElementById('tlChart'), {
 <tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-40 (06-28)</td><td>고령 대가야 스탠다드</td><td style="color:#888;font-size:10.5px">수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">🎯 목표 sub-2:42 (5/10 -8:39)</td></tr>
 <tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-100 (08-27)</td><td>거제 스탠다드</td><td style="color:#888;font-size:10.5px">수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">🎯 목표 sub-2:35 (가을 시즌)</td></tr>
 </tbody></table>
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-05-19 10:21 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-05-19 10:44 KST</div>
 </body></html>

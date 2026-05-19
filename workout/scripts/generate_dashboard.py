@@ -215,6 +215,39 @@ new Chart(document.getElementById('tlChart'), {{
 }});
 </script>
 
+<div class="section">📅 훈련 계획 (오늘~14일)</div>
+"""
+
+    # 다음 14일 스케줄 표 생성
+    sched_data = json.loads(SCHED_FILE.read_text(encoding='utf-8')) if SCHED_FILE.exists() else {}
+    overrides = sched_data.get('overrides', {})
+    race_dates_set = {r[0] for r in races}
+
+    html += '<table><thead><tr><th>날짜</th><th>계획</th></tr></thead><tbody>\n'
+    for i in range(15):
+        d = datetime.now(KST) + timedelta(days=i)
+        dk = d.strftime('%Y-%m-%d')
+        dow = ['월','화','수','목','금','토','일'][d.weekday()]
+        date_s = f"{dk[5:]} ({dow})"
+        plan = (overrides.get(dk) or {}).get('workout', '')
+        if not plan and dk in race_dates_set:
+            plan = '🏁 대회'
+        if not plan:
+            # 고정 강습일 (월/수/금)
+            if d.weekday() in (0,2,4):
+                plan = '🏊 수영 강습 06시'
+        if not plan:
+            plan = '—'
+
+        is_today_r = dk == today
+        is_race_r = dk in race_dates_set
+        plan_color = '#ffd56c' if is_race_r else ('#6affa0' if is_today_r else '#ccc')
+        bg = ' style="background:#1a1a2e"' if is_race_r else (' style="background:#0d2a0d"' if is_today_r else '')
+        date_color = '#ffd56c' if is_race_r else ('#fff' if is_today_r else '#888')
+        html += f'<tr{bg}><td style="color:{date_color};font-weight:{"600" if is_today_r or is_race_r else "400"};white-space:nowrap">{date_s}</td><td style="color:{plan_color}">{plan}</td></tr>\n'
+    html += '</tbody></table>'
+
+    html += f"""
 <div class="section">훈련 기록 (3/16~, 전체 {len(all_dates)}일)</div>
 <table><thead><tr>
 <th>날짜</th><th>운동</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
