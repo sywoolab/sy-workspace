@@ -136,9 +136,10 @@ def fetch_stock_price(code):
     try:
         r = requests.get(url, headers=HEADERS, timeout=10)
         d = r.json().get('datas', [{}])[0]
-        return {'price': _n(d.get('closePrice') or d.get('price')),
+        return {'price':  _n(d.get('closePrice') or d.get('price')),
                 'change': _n(d.get('compareToPreviousClosePrice')),
-                'rate':   _n(d.get('fluctuationsRatio'))}
+                'rate':   _n(d.get('fluctuationsRatio')),
+                'mktcap': _n(d.get('marketValueFull') or d.get('marketValueFullRaw'))}
     except Exception as e:
         print(f'  [stock {code}] err: {e}')
         return None
@@ -261,8 +262,22 @@ def collect_stock_data(companies):
 
         rows.append({'name': comp['name'], 'code': code, 'market': mkt,
                      'price': int(d['price']), 'change': d['change'], 'rate': d['rate'],
-                     'yahoo_sym': ysym})
+                     'yahoo_sym': ysym, 'mktcap': d.get('mktcap', 0)})
     return rows
+
+
+def fmt_mktcap(val):
+    """시가총액 포맷: 1596조 / 40.4조 / 318억"""
+    if not val or val <= 0:
+        return ''
+    if val >= 100e12:        # 100조+
+        return f'{val/1e12:,.0f}조'
+    elif val >= 1e12:        # 1조~100조
+        return f'{val/1e12:.1f}조'
+    elif val >= 1e8:         # 1억~1조
+        return f'{val/1e8:,.0f}억'
+    else:
+        return f'{val/1e6:,.0f}백만'
 
 
 # ─────────────────────────────────────────
@@ -437,15 +452,16 @@ HTML_STYLE = """
   .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .market-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px;
                  text-decoration: none; color: inherit;
-                 display: flex; align-items: center; justify-content: space-between;
-                 transition: background .15s; }
+                 display: flex; flex-direction: row; flex-wrap: nowrap;
+                 align-items: center; justify-content: space-between;
+                 gap: 8px; transition: background .15s; }
   .market-item:hover { background: #f0f4f8; }
-  .market-item-info { flex: 1; min-width: 0; }
+  .market-item-info { flex: 1; min-width: 0; overflow: hidden; }
   .market-item .label { font-size: 11px; color: #9ca3af; font-weight: 600;
                         text-transform: uppercase; letter-spacing: 0.5px; }
-  .market-item .price { font-size: 18px; font-weight: 700; margin: 2px 0; color: #111827; }
-  .market-item .chg { font-size: 12px; }
-  .market-spark { margin-left: 10px; flex-shrink: 0; }
+  .market-item .price { font-size: 17px; font-weight: 700; margin: 2px 0; color: #111827; white-space: nowrap; }
+  .market-item .chg { font-size: 11px; white-space: nowrap; }
+  .market-spark { flex-shrink: 0; display: flex; align-items: center; }
 
   /* 주가 테이블 */
   .stock-table { width: 100%; border-collapse: collapse; }
@@ -609,7 +625,7 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
             <div class="price" id="{hid}-p">{m['price_str']}</div>
             <div class="chg" id="{hid}-c">{ar} {chg_str} &nbsp; {rt}</div>
           </div>
-          <div class="market-spark"><svg id="spark-{hid}" class="spark-svg" width="70" height="28"></svg></div>
+          <div class="market-spark"><svg id="spark-{hid}" class="spark-svg" width="60" height="26" style="display:block"></svg></div>
         </a>"""
 
     # ── 주가 테이블 (스파크라인 + 네이버 링크 + JS id) ──
@@ -625,12 +641,14 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
         if ysym:
             js_stock_symbols[code] = ysym
             js_spark_stock[code]   = ysym
+        mktcap_str = fmt_mktcap(s.get('mktcap', 0))
+        mktcap_html = f'<div style="font-size:10px;color:#9ca3af;margin-top:1px">{mktcap_str}</div>' if mktcap_str else ''
         stock_rows += f"""
         <tr id="s-{code}">
           <td><a class="stock-name-link" href="{naver_url}" target="_blank" rel="noopener">{s['name']}</a><span class="stock-code">{code}</span></td>
-          <td class="stock-price" id="s-{code}-p">{s['price']:,}</td>
+          <td><div class="stock-price" id="s-{code}-p">{s['price']:,}</div>{mktcap_html}</td>
           <td id="s-{code}-c">{ar} {rt}</td>
-          <td class="stock-spark"><svg id="spark-s-{code}" class="spark-svg" width="70" height="24"></svg></td>
+          <td class="stock-spark"><svg id="spark-s-{code}" class="spark-svg" width="60" height="26" style="display:block"></svg></td>
         </tr>"""
 
     # 생성 시각 표시 (JS가 실시간으로 교체)
