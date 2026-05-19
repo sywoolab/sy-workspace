@@ -283,6 +283,19 @@ def article_hash(title, link):
     return hashlib.md5(f'{title[:80]}{link[:80]}'.encode()).hexdigest()[:12]
 
 
+def _parse_pub_date(raw):
+    """Google News RSS pubDate → 'MM/DD HH:MM' KST 형식"""
+    if not raw:
+        return ''
+    try:
+        from email.utils import parsedate_to_datetime
+        dt_utc = parsedate_to_datetime(raw)
+        dt_kst = dt_utc.astimezone(KST)
+        return dt_kst.strftime('%m/%d %H:%M')
+    except Exception:
+        return raw[:10]
+
+
 def fetch_news(company_name, aliases=None):
     terms = [company_name] + (aliases or [])
     query = '+OR+'.join([f'%22{t}%22' for t in terms])
@@ -291,33 +304,82 @@ def fetch_news(company_name, aliases=None):
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
         for item in ET.fromstring(resp.content).findall('.//item'):
-            title  = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
-            link   = item.findtext('link', '').strip()
-            source = item.findtext('source', '').strip()
+            title   = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
+            link    = item.findtext('link', '').strip()
+            source  = item.findtext('source', '').strip()
+            pub_raw = item.findtext('pubDate', '').strip()
             if title and link:
-                out.append({'title': title, 'link': link, 'source': source})
+                out.append({'title': title, 'link': link, 'source': source,
+                            'pub': _parse_pub_date(pub_raw)})
     except Exception as e:
         print(f'  뉴스 에러 ({company_name}): {e}')
     return out
 
 
+# 신한증권 IB 딜 관련 뉴스 필터 키워드
+SHINHAN_IB_KEYWORDS = [
+    'IPO', '기업공개', '상장주관', '주관사', '공동주관', '대표주관',
+    '발행어음', 'ABS', 'MBS', 'PF', '프로젝트파이낸싱', '부동산금융',
+    'M&A', '인수금융', '매각주관', '구조화금융', 'DCM', 'ECM',
+    '채권발행', '회사채', 'CB', 'EB', 'BW', '증자', '유증',
+    '딜', '투자은행', 'IB', '인수합병',
+]
+SHINHAN_NOISE_KEYWORDS = [
+    'ETF', '펀드', '연금', 'ISA', 'CMA', '적금', '이자', '예금',
+    '신용카드', '개인금융', '리테일', '소매', '개인대출', '주택대출',
+    '모바일뱅킹', '앱', '이벤트', '경품', '프로모션',
+]
+
+
+def fetch_shinhan_ib_news(n=5):
+    """신한증권/신한IB 뉴스 — IB 딜 관련만 필터"""
+    query = '%22신한투자증권%22+OR+%22신한증권%22+OR+%22신한IB%22'
+    url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
+    arts  = []
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        for item in ET.fromstring(resp.content).findall('.//item'):
+            title   = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
+            link    = item.findtext('link', '').strip()
+            source  = item.findtext('source', '').strip()
+            pub_raw = item.findtext('pubDate', '').strip()
+            if not (title and link):
+                continue
+            # 노이즈 키워드 포함 → 제외
+            if any(k in title for k in SHINHAN_NOISE_KEYWORDS):
+                continue
+            # IB 딜 키워드 없으면 점수 0 → 낮은 점수
+            ib_score = sum(3 for k in SHINHAN_IB_KEYWORDS if k in title)
+            src_score = next((w for k, w in SOURCE_WEIGHT.items() if k in source), 0)
+            arts.append({'title': title, 'link': link, 'source': source,
+                         'pub': _parse_pub_date(pub_raw), 'score': ib_score + src_score})
+    except Exception as e:
+        print(f'  [신한IB 뉴스] err: {e}')
+    # IB 점수 높은 순, 점수 0 이하 제외
+    arts = [a for a in arts if a['score'] > 0]
+    arts.sort(key=lambda x: -x['score'])
+    print(f'  신한IB 뉴스: 총 {len(arts)}건 필터됨 → 상위 {min(n, len(arts))}건')
+    return arts[:n]
+
+
 def fetch_top_market_news(n=5):
-    """IB 시장 주요 뉴스 — 기업 무관, 매체 가중치 상위 N건"""
+    """IB 시장 주요 뉴스 — 기업 무관, 매체 가중치 상위 N건 (날짜 포함)"""
     query = 'IPO+OR+상장+OR+M%26A+OR+인수+OR+채권+OR+기업공개+OR+사모펀드+OR+PE+OR+딜'
     url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
     arts  = []
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
         for item in ET.fromstring(resp.content).findall('.//item'):
-            title  = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
-            link   = item.findtext('link', '').strip()
-            source = item.findtext('source', '').strip()
+            title   = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
+            link    = item.findtext('link', '').strip()
+            source  = item.findtext('source', '').strip()
+            pub_raw = item.findtext('pubDate', '').strip()
             if title and link:
                 score = next((w for k, w in SOURCE_WEIGHT.items() if k in source), 0)
-                arts.append({'title': title, 'link': link, 'source': source, 'score': score})
+                arts.append({'title': title, 'link': link, 'source': source,
+                             'pub': _parse_pub_date(pub_raw), 'score': score})
     except Exception as e:
         print(f'  [top news] err: {e}')
-    # 매체 점수 높은 순 → 상위 N건
     arts.sort(key=lambda x: -x['score'])
     return arts[:n]
 
@@ -496,7 +558,7 @@ def build_rates_section(us_rates, rates_cfg):
     </div>"""
 
 
-def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None, top_news=None):
+def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None, top_news=None, shinhan_news=None):
     _days_ko = ['월', '화', '수', '목', '금', '토', '일']
     date_str = f'{now.strftime("%Y년 %m월 %d일")} ({_days_ko[now.weekday()]})'
     time_str = now.strftime('%H:%M') + ' KST'
@@ -575,14 +637,16 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
         <div class="company-header">
           <span class="company-name">{comp['name']}</span>{code_badge}{market_badge}
         </div>"""
-        for a in picks:
+        for a in picks[:3]:  # 기업당 최대 3건
             t   = a['title']
             cls = 'news-title high' if a['score'] >= 5 else 'news-title'
             src = a.get('source') or ''
+            pub = a.get('pub') or ''
+            meta = f'{src}  <span style="color:#d1d5db">|</span>  {pub}' if src and pub else (src or pub)
             out += f"""
         <div class="news-item">
           <a class="{cls}" href="{a['link']}" target="_blank" rel="noopener">{t}</a>
-          <div class="news-meta">{src}</div>
+          <div class="news-meta">{meta}</div>
         </div>"""
         return out
 
@@ -620,17 +684,21 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     if not news_html:
         news_html = '<p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>'
 
+    def _news_meta_str(a):
+        src = a.get('source','')
+        pub = a.get('pub','')
+        return f'{src}  <span style="color:#d1d5db">|</span>  {pub}' if src and pub else (src or pub)
+
     # ── 주요 뉴스 5 ─────────────────────────────────
     top_news_html = ''
     for i, a in enumerate(top_news or [], 1):
-        t   = a['title']
-        src = a.get('source', '')
+        t = a['title']
         top_news_html += f"""
         <div class="top-news-item">
           <div class="top-news-num">{i}</div>
           <div class="top-news-body">
             <a class="top-news-title" href="{a['link']}" target="_blank" rel="noopener">{t}</a>
-            <div class="top-news-meta">{src}</div>
+            <div class="top-news-meta">{_news_meta_str(a)}</div>
           </div>
         </div>"""
     top_section = ''
@@ -639,6 +707,26 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     <div class="card">
       <div class="card-title">📌 오늘의 주요 뉴스</div>
       {top_news_html}
+    </div>"""
+
+    # ── 신한증권 IB 뉴스 ─────────────────────────────
+    shinhan_html = ''
+    for i, a in enumerate(shinhan_news or [], 1):
+        t = a['title']
+        shinhan_html += f"""
+        <div class="top-news-item">
+          <div class="top-news-num">{i}</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="{a['link']}" target="_blank" rel="noopener">{t}</a>
+            <div class="top-news-meta">{_news_meta_str(a)}</div>
+          </div>
+        </div>"""
+    shinhan_section = ''
+    if shinhan_html:
+        shinhan_section = f"""
+    <div class="card">
+      <div class="card-title">🏦 신한증권 IB 뉴스</div>
+      {shinhan_html}
     </div>"""
 
     # ── 금리 매트릭스 ────────────────────────────────
@@ -672,6 +760,8 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
   </div>
 
   {stock_section}
+
+  {shinhan_section}
 
   {top_section}
 
@@ -825,10 +915,11 @@ def main():
     us_rates    = fetch_us_rates()
     rates_cfg   = load_rates_config()
 
-    # ── 2. 주요 뉴스 5 (기업 무관 IB 시장) ──────────
+    # ── 2. 주요 뉴스 5 + 신한IB 뉴스 ────────────────
     print('  주요 뉴스 수집...')
-    top_news = fetch_top_market_news(5)
-    print(f'  주요 뉴스: {len(top_news)}건')
+    top_news     = fetch_top_market_news(5)
+    shinhan_news = fetch_shinhan_ib_news(5)
+    print(f'  주요 뉴스: {len(top_news)}건 / 신한IB: {len(shinhan_news)}건')
 
     # ── 3. 기업별 뉴스 수집 ──────────────────────────
     sections       = []
@@ -861,7 +952,8 @@ def main():
 
     # ── 3. HTML 생성 & 저장 ───────────────────────
     html     = build_html_report(market_data, stock_data, sections, now, session,
-                                  us_rates=us_rates, rates_cfg=rates_cfg, top_news=top_news)
+                                  us_rates=us_rates, rates_cfg=rates_cfg,
+                                  top_news=top_news, shinhan_news=shinhan_news)
     page_url = save_html_report(html, session)
 
     # ── 4. 텔레그램: 링크 + 요약만 ───────────────

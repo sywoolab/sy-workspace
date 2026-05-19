@@ -8,6 +8,8 @@
     }
   },
   "companies": [
+    {"name": "삼성전자", "dart_code": "00126380", "stock_code": "005930", "listed": true, "market": "KOSPI", "alias": ["Samsung Electronics"], "note": "주가 지표용 — 상단 고정"},
+    {"name": "SK하이닉스", "dart_code": "00164779", "stock_code": "000660", "listed": true, "market": "KOSPI", "alias": ["SK Hynix", "하이닉스"], "note": "주가 지표용 — 상단 고정"},
     {"name": "에이팩트", "dart_code": "00445054", "stock_code": "200470", "listed": true, "market": "KOSDAQ", "alias": ["APACT"], "note": "오로라 3호 펀드 인수딜 대상 (2026.06.10 거래종결)"},
     {"name": "유니드", "dart_code": null, "stock_code": "014830", "listed": true, "market": "KOSPI", "alias": ["UNID"], "note": "에이팩트 우선매수제안권 행사자"},
     {"name": "효성화학", "dart_code": null, "stock_code": "298000", "listed": true, "market": "KOSPI", "alias": ["Hyosung Chemical"], "note": "오로라 3호 펀드 LP (500억)"},
