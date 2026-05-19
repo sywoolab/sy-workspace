@@ -4311,6 +4311,22 @@
     "start_time": "06:11",
     "garmin_ids": [
       22941462430
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1150,
+        "duration_sec": 2950,
+        "avg_hr": 115,
+        "max_hr": 156,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 44,
+        "garmin_id": 22941462430,
+        "laps": null,
+        "open_water": null,
+        "start_time": "06:11"
+      }
     ]
   }
 }
