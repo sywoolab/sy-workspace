@@ -594,10 +594,22 @@ function _rateSpan(rate) {{
   return `<span class="${{cls}}">${{sign}}${{rate.toFixed(2)}}%</span>`;
 }}
 
+/* Yahoo Finance는 브라우저 직접 CORS 차단 → corsproxy.io 경유 */
 async function _fetch(sym) {{
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${{encodeURIComponent(sym)}}?interval=1d&range=1d`;
-  const r = await fetch(url);
-  const d = await r.json();
+  const yahoo = `https://query1.finance.yahoo.com/v8/finance/chart/${{encodeURIComponent(sym)}}?interval=1d&range=1d`;
+  const proxy = `https://corsproxy.io/?${{encodeURIComponent(yahoo)}}`;
+  let d = null;
+  /* 1차: corsproxy.io */
+  try {{
+    const r = await fetch(proxy, {{signal: AbortSignal.timeout(6000)}});
+    d = await r.json();
+  }} catch(e) {{
+    /* 2차: allorigins.win fallback */
+    try {{
+      const r2 = await fetch(`https://api.allorigins.win/raw?url=${{encodeURIComponent(yahoo)}}`, {{signal: AbortSignal.timeout(6000)}});
+      d = await r2.json();
+    }} catch(e2) {{ return null; }}
+  }}
   const m = d?.chart?.result?.[0]?.meta;
   if (!m) return null;
   const price = m.regularMarketPrice;
