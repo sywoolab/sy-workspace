@@ -61,10 +61,19 @@
   .news-title.high { font-weight: 700; color: #1e40af; }
   .news-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
 
-  /* 색상 */
-  .up { color: #16a34a; }
-  .dn { color: #dc2626; }
+  /* 색상 — 한국 증권 관행: 상승=빨강, 하락=파랑 */
+  .up { color: #dc2626; }
+  .dn { color: #1d4ed8; }
   .nt { color: #9ca3af; }
+
+  /* 주요 뉴스 */
+  .top-news-item { padding: 8px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 10px; align-items: flex-start; }
+  .top-news-item:last-child { border-bottom: none; }
+  .top-news-num { font-size: 11px; font-weight: 700; color: #6b7280; min-width: 18px; padding-top: 2px; }
+  .top-news-body { flex: 1; }
+  .top-news-title { font-size: 14px; color: #1a56db; text-decoration: none; font-weight: 500; display: block; line-height: 1.45; }
+  .top-news-title:hover { text-decoration: underline; }
+  .top-news-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
 
   /* 금리 매트릭스 */
   .rate-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -94,7 +103,7 @@
 <div class="container">
   <div class="header">
     <h1>📋 IB 뉴스브리프 <span class="session-badge">오전</span></h1>
-    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 10:01 KST &nbsp;·&nbsp; 전일 종가 기준</div>
+    <div class="meta">2026년 05월 19일 (화) &nbsp;·&nbsp; 11:03 KST &nbsp;·&nbsp; 전일 종가 기준</div>
   </div>
 
   <div class="card">
@@ -102,13 +111,13 @@
     <div class="market-grid">
         <div class="market-item" id="mkt-kospi">
           <div class="label">KOSPI</div>
-          <div class="price" id="mkt-kospi-p">7,309.51</div>
-          <div class="chg" id="mkt-kospi-c"><span class="dn">▼</span> 206.53 &nbsp; <span class="dn">-2.75%</span></div>
+          <div class="price" id="mkt-kospi-p">7,176.27</div>
+          <div class="chg" id="mkt-kospi-c"><span class="dn">▼</span> 339.77 &nbsp; <span class="dn">-4.52%</span></div>
         </div>
         <div class="market-item" id="mkt-kosdaq">
           <div class="label">KOSDAQ</div>
-          <div class="price" id="mkt-kosdaq-p">1,090.62</div>
-          <div class="chg" id="mkt-kosdaq-c"><span class="dn">▼</span> 20.47 &nbsp; <span class="dn">-1.84%</span></div>
+          <div class="price" id="mkt-kosdaq-p">1,066.79</div>
+          <div class="chg" id="mkt-kosdaq-c"><span class="dn">▼</span> 44.30 &nbsp; <span class="dn">-3.99%</span></div>
         </div>
         <div class="market-item" id="mkt-sp500">
           <div class="label">S&P 500</div>
@@ -122,8 +131,8 @@
         </div>
         <div class="market-item" id="mkt-usdkrw">
           <div class="label">USD/KRW</div>
-          <div class="price" id="mkt-usdkrw-p">1,499.7</div>
-          <div class="chg" id="mkt-usdkrw-c"><span class="dn">▼</span> 2.5 &nbsp; <span class="dn">-0.17%</span></div>
+          <div class="price" id="mkt-usdkrw-p">1,501.7</div>
+          <div class="chg" id="mkt-usdkrw-c"><span class="dn">▼</span> 4.6 &nbsp; <span class="dn">-0.31%</span></div>
         </div>
     </div>
   </div>
@@ -136,13 +145,13 @@
             <tbody>
         <tr id="s-200470">
           <td><span class="stock-name">에이팩트</span><span class="stock-code">200470</span></td>
-          <td class="stock-price" id="s-200470-p">7,410</td>
-          <td id="s-200470-c"><span class="dn">▼</span> <span class="dn">-4.14%</span></td>
+          <td class="stock-price" id="s-200470-p">7,480</td>
+          <td id="s-200470-c"><span class="dn">▼</span> <span class="dn">-3.23%</span></td>
         </tr>
         <tr id="s-014830">
           <td><span class="stock-name">유니드</span><span class="stock-code">014830</span></td>
-          <td class="stock-price" id="s-014830-p">73,200</td>
-          <td id="s-014830-c"><span class="dn">▼</span> <span class="dn">-3.43%</span></td>
+          <td class="stock-price" id="s-014830-p">72,400</td>
+          <td id="s-014830-c"><span class="dn">▼</span> <span class="dn">-4.49%</span></td>
         </tr>
         <tr id="s-298000">
           <td><span class="stock-name">효성화학</span><span class="stock-code">298000</span></td>
@@ -151,33 +160,33 @@
         </tr>
         <tr id="s-068270">
           <td><span class="stock-name">셀트리온</span><span class="stock-code">068270</span></td>
-          <td class="stock-price" id="s-068270-p">183,100</td>
-          <td id="s-068270-c"><span class="dn">▼</span> <span class="dn">-0.05%</span></td>
+          <td class="stock-price" id="s-068270-p">180,000</td>
+          <td id="s-068270-c"><span class="dn">▼</span> <span class="dn">-1.75%</span></td>
         </tr>
         <tr id="s-248070">
           <td><span class="stock-name">솔루엠</span><span class="stock-code">248070</span></td>
-          <td class="stock-price" id="s-248070-p">20,050</td>
-          <td id="s-248070-c"><span class="dn">▼</span> <span class="dn">-3.14%</span></td>
+          <td class="stock-price" id="s-248070-p">19,510</td>
+          <td id="s-248070-c"><span class="dn">▼</span> <span class="dn">-5.75%</span></td>
         </tr>
         <tr id="s-178320">
           <td><span class="stock-name">서진시스템</span><span class="stock-code">178320</span></td>
-          <td class="stock-price" id="s-178320-p">71,200</td>
-          <td id="s-178320-c"><span class="dn">▼</span> <span class="dn">-2.20%</span></td>
+          <td class="stock-price" id="s-178320-p">69,700</td>
+          <td id="s-178320-c"><span class="dn">▼</span> <span class="dn">-4.26%</span></td>
         </tr>
         <tr id="s-194370">
           <td><span class="stock-name">제이에스코퍼레이션</span><span class="stock-code">194370</span></td>
-          <td class="stock-price" id="s-194370-p">12,170</td>
-          <td id="s-194370-c"><span class="dn">▼</span> <span class="dn">-2.80%</span></td>
+          <td class="stock-price" id="s-194370-p">12,010</td>
+          <td id="s-194370-c"><span class="dn">▼</span> <span class="dn">-4.07%</span></td>
         </tr>
         <tr id="s-043260">
           <td><span class="stock-name">성호전자</span><span class="stock-code">043260</span></td>
-          <td class="stock-price" id="s-043260-p">36,550</td>
-          <td id="s-043260-c"><span class="dn">▼</span> <span class="dn">-7.47%</span></td>
+          <td class="stock-price" id="s-043260-p">33,950</td>
+          <td id="s-043260-c"><span class="dn">▼</span> <span class="dn">-14.05%</span></td>
         </tr>
         <tr id="s-039200">
           <td><span class="stock-name">오스코텍</span><span class="stock-code">039200</span></td>
-          <td class="stock-price" id="s-039200-p">39,750</td>
-          <td id="s-039200-c"><span class="dn">▼</span> <span class="dn">-2.45%</span></td>
+          <td class="stock-price" id="s-039200-p">39,050</td>
+          <td id="s-039200-c"><span class="dn">▼</span> <span class="dn">-4.17%</span></td>
         </tr>
         <tr id="s-175250">
           <td><span class="stock-name">아이큐어</span><span class="stock-code">175250</span></td>
@@ -186,12 +195,53 @@
         </tr>
         <tr id="s-064260">
           <td><span class="stock-name">다날</span><span class="stock-code">064260</span></td>
-          <td class="stock-price" id="s-064260-p">6,520</td>
-          <td id="s-064260-c"><span class="dn">▼</span> <span class="dn">-0.91%</span></td>
+          <td class="stock-price" id="s-064260-p">6,370</td>
+          <td id="s-064260-c"><span class="dn">▼</span> <span class="dn">-3.19%</span></td>
         </tr></tbody>
           </table>
-          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/19 10:01 KST</div>
+          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/19 11:03 KST</div>
         </div>
+
+  
+    <div class="card">
+      <div class="card-title">📌 오늘의 주요 뉴스</div>
+      
+        <div class="top-news-item">
+          <div class="top-news-num">1</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTFBSQWtfQ210eGRDVjRiNE50Ykl6dkpKTF9GMGdQaFg5MXFZNHhfQTI5TzNoY21hM2tudzNBV2hYNDdDbWhDSUstWEpFWHQ2bXM?oc=5" target="_blank" rel="noopener">김남구 회장의 약속 "연내 보험사 인수하겠다" - 딜사이트</a>
+            <div class="top-news-meta">딜사이트</div>
+          </div>
+        </div>
+        <div class="top-news-item">
+          <div class="top-news-num">2</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTFA3VWx6OVZfa0l1N2wyS2NzcFZLczNiZmVUNmhsX09OWk9MTklqcVJkWGNQb01nelJSUjZtamxJczBRLVlfNm9aSTVWR2VvLTRhZXRZendibVJCdUp4STh5OVpzWE1Pb0NjN04yS2lPbGo?oc=5" target="_blank" rel="noopener">"高금리가 달러-원 변수"…채권시장 주목하는 서울환시 - 연합인포맥스</a>
+            <div class="top-news-meta">연합인포맥스</div>
+          </div>
+        </div>
+        <div class="top-news-item">
+          <div class="top-news-num">3</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9fOXFfM05XRmtna1U1c1hMQ25zNmlDTG9mMEN3Q1ZVazYwb1JkcnBGYVdYZHk1Ykhzc0t1bmMxb0JpclFnODhTaTM0SjdqQXZSU2s5U1Z0aEZjX3hZWkVlUWFlMTFua3hTUkUzRTFfTXc?oc=5" target="_blank" rel="noopener">[노현우의 채권분석] 전 세계를 움직이는 단일 중앙은행 - 연합인포맥스</a>
+            <div class="top-news-meta">연합인포맥스</div>
+          </div>
+        </div>
+        <div class="top-news-item">
+          <div class="top-news-num">4</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMiT0FVX3lxTE94dW5GMUh4WGc3TFFKVFpOQnFuY0pwNExybFN2YVVzNm9ON1RuQ25PakRJREEweTZLcGlSQkFPeHloODQwcmhMTU5PLTI3UjQ?oc=5" target="_blank" rel="noopener">카카오모빌리티, TPG 엑시트 9년째 '미완'…美 상장·매각 총동원 - 딜사이트</a>
+            <div class="top-news-meta">딜사이트</div>
+          </div>
+        </div>
+        <div class="top-news-item">
+          <div class="top-news-num">5</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="https://news.google.com/rss/articles/CBMicEFVX3lxTE00ajhjX3RaM21QQy1oY0NkUVFMUnYwNXpnc1Z6MkR1Z3diYjZhWkw1N0c2aS1EeExTOWNVMEVaT0xZTWl5Nkk0bERhMGh4YmxXTkZ6MHA0cDE1a2kzNWFqaGs2Vll0aUh0T1NLdWU5Z2s?oc=5" target="_blank" rel="noopener">外人, 현선물 적극 매수…국내기관 '매수 파업' 속 채권시장 떠받쳤다 - 연합인포맥스</a>
+            <div class="top-news-meta">연합인포맥스</div>
+          </div>
+        </div>
+    </div>
 
   
     <div class="card">
@@ -212,7 +262,7 @@
 
   
     <div class="card">
-      <div class="card-title">📰 뉴스 — 27건 · 10개사</div>
+      <div class="card-title">📰 뉴스 — 31건 · 11개사</div>
       
         <div class="company-header">
           <span class="company-name">에이팩트</span><span class="company-code">200470</span><span class="company-code">KOSDAQ</span>
@@ -259,6 +309,10 @@
           <span class="company-name">솔루엠</span><span class="company-code">248070</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
+          <a class="news-title high" href="https://news.google.com/rss/articles/CBMidkFVX3lxTE9KRWhrY09Ga203NFNIY0FxcE5lSlZvV1pDOE9Ga2E4bXE2MFYtVkhRNkl6b1dhSG1mRC1rUENHRnNydjZ4OGxSenJ0Rk9tMU1WZ2Q3Yk9pbHZGbGdxVmZLVEpWbHBaZjNKZmhjWUxMaFZvc0VweXfSAWZBVV95cUxQa1hqRC04U29nVHhqTW5rZHRqLVd2QnZYTTdNc0dSX0tMUGZkbFpQejNBYVlVNVdIM21TdUZMYjIzSUg5ZS0yNENpczI1dTRlR2d3clU0QWlHZ1E1ZW1TRy1WanY1NXc?oc=5" target="_blank" rel="noopener">솔루엠, 1분기 매출 1602억 기록…유럽 다변화·북미 공급 확대 추진 - 동아일보</a>
+          <div class="news-meta">동아일보</div>
+        </div>
+        <div class="news-item">
           <a class="news-title high" href="https://news.google.com/rss/articles/CBMiVkFVX3lxTFBmQkphT3lhSFlxSVlYUldoQmpHNjN2ckI2MGxLMU92eGYtX1hTVHFnWHh3U3JMYWNuODVzMkdzUmxKOUx4aWwyYjZrSHJWTlhOUjh3cTBB?oc=5" target="_blank" rel="noopener">솔루엠 “1분기 매출 4782억원, 영업익 217억원” - 중앙일보</a>
           <div class="news-meta">중앙일보</div>
         </div>
@@ -267,8 +321,8 @@
           <div class="news-meta">디지털투데이</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE1haDV6emh1U3pRY0dxMU83NlJzZzNlNVpWQmVva0JJT25nZjEtaXFpMDRzQUx2c1lhQzJEU29BcExJZl9rMjc0NzRBR3JDOFR1SDVv?oc=5" target="_blank" rel="noopener">솔루엠, 북미 완성차향 헤드램프 제어기 양산 출하 개시…멕시코 생산법인 통해 공급 - 네이트</a>
-          <div class="news-meta">네이트</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE5EUVY0aC12bE5iemZxUmhQN3dONDhyRDNzOUhfSlhBdlJld1lvUFRPY0xnX21iNFI2bW0zUDhjamdkYnkyWUVrTUpfTVJucHl1ZXRJeTZ0ODRqZGVGODBtOElEaUM?oc=5" target="_blank" rel="noopener">솔루엠 멕시코 법인, 북미 완성차 헤드램프 통합제어기 양산 출하 - 디지털데일리</a>
+          <div class="news-meta">디지털데일리</div>
         </div>
         <div class="company-header">
           <span class="company-name">서진시스템</span><span class="company-code">178320</span><span class="company-code">KOSPI</span>
@@ -305,6 +359,10 @@
           <div class="news-meta">뉴스타운</div>
         </div>
         <div class="news-item">
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE1IQloxN3I1V0tTLUVLSW5tY2o2a1RROWtocUpnamRITUJTdVJ0QUtHTGdNWURFXzVSb2YwSGdXN0RETHN6VjhhZUxDb2xQdl9mbFZr?oc=5" target="_blank" rel="noopener">[카드] 다날, 월드케이팝센터와 K-POP 중심 외국인 결제 생태계 본격 확장 - 네이트</a>
+          <div class="news-meta">네이트</div>
+        </div>
+        <div class="news-item">
           <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE95VklzZ1V5UDBucFQ0SmlwNm1ZT3djXzUyNU9vWmtVVmIzLUlXUmZXQ2tHU3pWVXE0YUt5enZMWFp4N2d6SkVpYTVXb0tPVklvekd3eGpqd1NfbGdFWFg0VtIBeEFVX3lxTFBGYjJyenFCSUtNektBNVFmSkc5a1RyakNCUUNzTTFZUFFwSmtKZXJqOUlaaVN1LWRVOXFRUWpBM1kyVlNHbDdpZW9hT1h2V3NwbDRGeDdoUkxUd1JTR0YzMWQ2U2NtcDQ5Uk9NQmd3T0FlMUJLVGwxXw?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 K팝 공동사업 결제 파트너십 - 뉴시스</a>
           <div class="news-meta">뉴시스</div>
         </div>
@@ -312,9 +370,16 @@
           <a class="news-title" href="https://news.google.com/rss/articles/CBMic0FVX3lxTE9YbTVteXkybXhyZXFQcU1IV3R6VG02Rk9YcEYxZkkzbW1XakFWN1hXQ003NUpzblZScnRfV2RaMGRPMmdKQXZMUkl5RzJlUDBNbFBleGxWY3BHX0RwSWg1ek94alZYVnYwcUNabUx1Zlpiblk?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 맞손…외국인 대상 'K-POP 결제 생태계' 구축 - 디지털투데이</a>
           <div class="news-meta">디지털투데이</div>
         </div>
+        <div class="company-header">
+          <span class="company-name">교보생명</span>
+        </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiakFVX3lxTFBNMzU3NWtPaWRVTDlvNm8yMktQalRCQ0tJYXpEZFA2VDRwTG9QTVdYaHBNX3g1NXV4RGZOUTRMa0lJM0dENEduUGItNldkdFZaSFVxb19aUXctdG5ZQ2pWclJJUUNrQ3VaMEE?oc=5" target="_blank" rel="noopener">다날, 월드케이팝센터와 파트너십 체결…외국인 전용 결제 생태계 구축 - 파이낸스스코프</a>
-          <div class="news-meta">파이낸스스코프</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiVEFVX3lxTE5TOGFHVFBPR2c5OXdmdGRyQ1ZIOFBYLXBKX3dPdmh4RTJLMGdyWWhkUWdnbFJJOXpqSklvM194MjIzaDktVDRRdnRnMFo1STVjS0ZjLQ?oc=5" target="_blank" rel="noopener">한국 ‘백만달러원탁회의(MDRT)’ 회원 3084명…보험·재정 전문가 글로벌 경쟁력 입증 - 매일경제</a>
+          <div class="news-meta">매일경제</div>
+        </div>
+        <div class="news-item">
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE1VZC1Zb0NsR054UUdaRHZlZzNscFlHNTJ5aHp1bjNLTmtYNFowWXhPV3BMQ3pIX3hreEp1aV9xLUJfbXpzeEFjT2JpN0h4TUhFT3ZsN3pjSGc2d9IBXkFVX3lxTE9ZTnFBT0FTeHBoUWhkb2lQZDJwN1FLMHk4MV9wY2twM1BtOU5IdmxMeEdLM3ctbWVrNGlLcnNUVDZNY0VUbFJua0JpQ0ttVjJrSHZBVXB5bC1iVnlua1E?oc=5" target="_blank" rel="noopener">교보교육재단, 한·대만 사회정서교육 협력 논의 - 파이낸셜뉴스</a>
+          <div class="news-meta">파이낸셜뉴스</div>
         </div>
         <div class="company-header">
           <span class="company-name">리벨리온</span>
@@ -335,6 +400,10 @@
           <span class="company-name">뮤직카우</span>
         </div>
         <div class="news-item">
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFBJLUEtQURjVmVZUGxEUVpaSjlKUjh2cWlnaUF6NU9FR0plR1dIRE5lSW9QUk85N0FsUFBpOWdtNks5bG5GdUl0QzRBdzdDSHlZRGh4bDFuRGRzbTlrSC1BUtIBeEFVX3lxTE1XdTVLM0JtTkhUZlBXcjVSbU5tTkozZDBNbW8wd3lOaThsQ29JNWNzWjhqMXpEdWticnZJTVFxUTlZNWplUzhTYlFsWmZ1OW1SM0hfNWlzbUxZb29fSEdEbFJwUTRFbGVzUVpRTUhLajZwRzdCZHBXYw?oc=5" target="_blank" rel="noopener">'케데헌' 안효섭×칼리드 음원 나온다…뮤직카우 '팬덤 프로젝트' - 뉴시스</a>
+          <div class="news-meta">뉴시스</div>
+        </div>
+        <div class="news-item">
           <a class="news-title" href="https://news.google.com/rss/articles/CBMiZkFVX3lxTFA1NXNfWENLOEZ0eUFZMFlkZjJ4S2FIN2hWY1BHTjEwVmlOREZvX1JrRHRES0VPX08wRVZIenpzY2VqNDY1VTZlSTNxOTltOTV6b05BVWViQVhNdjVzMW0wcmVLU3dqQQ?oc=5" target="_blank" rel="noopener">안효섭X칼리드, 뮤직카우 팬덤 프로젝트 첫 주자…‘Something Special’ D-1 - 싱글리스트</a>
           <div class="news-meta">싱글리스트</div>
         </div>
@@ -342,7 +411,7 @@
           <span class="company-name">에치와이</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMickFVX3lxTE9zWlVJb3o0SUhWdHlneVcwTXJITWdqN1E2ZG1uUWxMVHF5dDItaXF4TkNlekhIUWR4U3Z0enB4YTNxTEZMYngxQXVHaENGRTVEUmhHUFdLY3BteEJiZXdqWGpyVUJTMEprbDU0Z1VPcUdNZ9IBckFVX3lxTE9zWlVJb3o0SUhWdHlneVcwTXJITWdqN1E2ZG1uUWxMVHF5dDItaXF4TkNlekhIUWR4U3Z0enB4YTNxTEZMYngxQXVHaENGRTVEUmhHUFdLY3BteEJiZXdqWGpyVUJTMEprbDU0Z1VPcUdNZw?oc=5" target="_blank" rel="noopener">HY 이공계 편입학원 본점, 편입수학 6개월 완성반 개강 - 시선뉴스</a>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMibkFVX3lxTE1LZXF1aUFHYUhyTVVBMlNOTTJpcVpJbVhMT2MyRlZBSDhYajZBeG1mVWNkZVFlM3JYbDRKT1ZScXFYN25BWUh2bUdjWldReWJmOTI2WE51WXNNQXZuaEJjTnBkTXlCWWplMmFSNDZB0gFyQVVfeXFMT3NaVUlvejRJSFZ0eWd5VzBNckhNZ2o3UTZkbW5RbExUcXl0Mi1pcXhOQ2V6SEhRZHhTdnR6cHhhM3FMRkxieDFBdUdoQ0ZFNURSaEdQV0tjcG14QmJld2pYanJVQlMwSmtsNTRnVU9xR01n?oc=5" target="_blank" rel="noopener">HY 이공계 편입학원 본점, 편입수학 6개월 완성반 개강 - 시선뉴스</a>
           <div class="news-meta">시선뉴스</div>
         </div>
         <div class="company-header">
@@ -354,7 +423,7 @@
         </div>
     </div>
 
-  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 뉴스 생성: 2026-05-19 10:01 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
+  <div class="footer">신한투자증권 IB &nbsp;·&nbsp; 뉴스 생성: 2026-05-19 11:03 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
 
 <script>
@@ -425,7 +494,7 @@ async function updateAll() {
       const cEl = document.getElementById('s-' + code + '-c');
       if (!pEl) return;
       pEl.textContent = Math.round(d.price).toLocaleString('ko-KR');
-      pEl.style.color  = d.chg > 0 ? '#16a34a' : d.chg < 0 ? '#dc2626' : '';
+      pEl.style.color  = d.chg > 0 ? '#dc2626' : d.chg < 0 ? '#1d4ed8' : '';
       cEl.innerHTML = _arrow(d.chg) + ' ' + _rateSpan(rate);
     })());
   }

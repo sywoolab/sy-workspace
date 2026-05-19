@@ -289,6 +289,27 @@ def fetch_news(company_name, aliases=None):
     return out
 
 
+def fetch_top_market_news(n=5):
+    """IB 시장 주요 뉴스 — 기업 무관, 매체 가중치 상위 N건"""
+    query = 'IPO+OR+상장+OR+M%26A+OR+인수+OR+채권+OR+기업공개+OR+사모펀드+OR+PE+OR+딜'
+    url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
+    arts  = []
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        for item in ET.fromstring(resp.content).findall('.//item'):
+            title  = re.sub(r'<[^>]+>', '', item.findtext('title', '')).strip()
+            link   = item.findtext('link', '').strip()
+            source = item.findtext('source', '').strip()
+            if title and link:
+                score = next((w for k, w in SOURCE_WEIGHT.items() if k in source), 0)
+                arts.append({'title': title, 'link': link, 'source': source, 'score': score})
+    except Exception as e:
+        print(f'  [top news] err: {e}')
+    # 매체 점수 높은 순 → 상위 N건
+    arts.sort(key=lambda x: -x['score'])
+    return arts[:n]
+
+
 def score_article(article, company):
     title, source, score = article['title'], article['source'], 0
     for k, w in SOURCE_WEIGHT.items():
@@ -364,10 +385,19 @@ HTML_STYLE = """
   .news-title.high { font-weight: 700; color: #1e40af; }
   .news-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
 
-  /* 색상 */
-  .up { color: #16a34a; }
-  .dn { color: #dc2626; }
+  /* 색상 — 한국 증권 관행: 상승=빨강, 하락=파랑 */
+  .up { color: #dc2626; }
+  .dn { color: #1d4ed8; }
   .nt { color: #9ca3af; }
+
+  /* 주요 뉴스 */
+  .top-news-item { padding: 8px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 10px; align-items: flex-start; }
+  .top-news-item:last-child { border-bottom: none; }
+  .top-news-num { font-size: 11px; font-weight: 700; color: #6b7280; min-width: 18px; padding-top: 2px; }
+  .top-news-body { flex: 1; }
+  .top-news-title { font-size: 14px; color: #1a56db; text-decoration: none; font-weight: 500; display: block; line-height: 1.45; }
+  .top-news-title:hover { text-decoration: underline; }
+  .top-news-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
 
   /* 금리 매트릭스 */
   .rate-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -444,7 +474,7 @@ def build_rates_section(us_rates, rates_cfg):
     </div>"""
 
 
-def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None):
+def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None, top_news=None):
     _days_ko = ['월', '화', '수', '목', '금', '토', '일']
     date_str = f'{now.strftime("%Y년 %m월 %d일")} ({_days_ko[now.weekday()]})'
     time_str = now.strftime('%H:%M') + ' KST'
@@ -538,6 +568,27 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     if not news_html:
         news_html = '<p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>'
 
+    # ── 주요 뉴스 5 ─────────────────────────────────
+    top_news_html = ''
+    for i, a in enumerate(top_news or [], 1):
+        t   = a['title']
+        src = a.get('source', '')
+        top_news_html += f"""
+        <div class="top-news-item">
+          <div class="top-news-num">{i}</div>
+          <div class="top-news-body">
+            <a class="top-news-title" href="{a['link']}" target="_blank" rel="noopener">{t}</a>
+            <div class="top-news-meta">{src}</div>
+          </div>
+        </div>"""
+    top_section = ''
+    if top_news_html:
+        top_section = f"""
+    <div class="card">
+      <div class="card-title">📌 오늘의 주요 뉴스</div>
+      {top_news_html}
+    </div>"""
+
     # ── 금리 매트릭스 ────────────────────────────────
     rates_section = build_rates_section(us_rates or {}, rates_cfg or {})
 
@@ -569,6 +620,8 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
   </div>
 
   {stock_section}
+
+  {top_section}
 
   {rates_section}
 
@@ -645,7 +698,7 @@ async function updateAll() {{
       const cEl = document.getElementById('s-' + code + '-c');
       if (!pEl) return;
       pEl.textContent = Math.round(d.price).toLocaleString('ko-KR');
-      pEl.style.color  = d.chg > 0 ? '#16a34a' : d.chg < 0 ? '#dc2626' : '';
+      pEl.style.color  = d.chg > 0 ? '#dc2626' : d.chg < 0 ? '#1d4ed8' : '';
       cEl.innerHTML = _arrow(d.chg) + ' ' + _rateSpan(rate);
     }})());
   }}
@@ -720,7 +773,12 @@ def main():
     us_rates    = fetch_us_rates()
     rates_cfg   = load_rates_config()
 
-    # ── 2. 뉴스 수집 ─────────────────────────────
+    # ── 2. 주요 뉴스 5 (기업 무관 IB 시장) ──────────
+    print('  주요 뉴스 수집...')
+    top_news = fetch_top_market_news(5)
+    print(f'  주요 뉴스: {len(top_news)}건')
+
+    # ── 3. 기업별 뉴스 수집 ──────────────────────────
     sections       = []
     total_fetched  = 0
     total_skip_dup = 0
@@ -751,7 +809,7 @@ def main():
 
     # ── 3. HTML 생성 & 저장 ───────────────────────
     html     = build_html_report(market_data, stock_data, sections, now, session,
-                                  us_rates=us_rates, rates_cfg=rates_cfg)
+                                  us_rates=us_rates, rates_cfg=rates_cfg, top_news=top_news)
     page_url = save_html_report(html, session)
 
     # ── 4. 텔레그램: 링크 + 요약만 ───────────────
