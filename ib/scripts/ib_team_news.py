@@ -642,6 +642,13 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
             <tbody>{stock_rows}</tbody>
           </table>
           {stock_ts}
+          <div style="margin-top:10px;text-align:right">
+            <a href="https://fomonono.com/treemap" target="_blank" rel="noopener"
+               style="display:inline-block;background:#f3f4f6;color:#374151;font-size:12px;
+                      font-weight:600;padding:5px 12px;border-radius:6px;text-decoration:none;">
+              🗺️ 시장 전체 히트맵 (fomonono) &rarr;
+            </a>
+          </div>
         </div>"""
 
     # ── JS 심볼 테이블 (Python → JS로 전달) ────────
@@ -888,16 +895,7 @@ async function updateAll() {{
 }}
 
 /* ── 스파크라인 ────────────────────────────────── */
-async function _fetchSpark3M(sym) {{
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${{encodeURIComponent(sym)}}?interval=1d&range=3mo`;
-  const proxy = `https://corsproxy.io/?${{encodeURIComponent(url)}}`;
-  try {{
-    const r = await fetch(proxy, {{signal: AbortSignal.timeout(8000)}});
-    const d = await r.json();
-    return d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v => v != null) || [];
-  }} catch {{ return []; }}
-}}
-
+/* 스파크라인: Actions에서 생성한 prices3m.json을 같은 도메인에서 직접 읽기 (CORS 없음) */
 function _drawSpark(svgId, closes) {{
   const el = document.getElementById(svgId);
   if (!el || closes.length < 3) return;
@@ -914,20 +912,17 @@ function _drawSpark(svgId, closes) {{
 }}
 
 async function drawAllSparks() {{
-  /* 마켓 스냅샷 스파크라인 */
-  for (const [id, sym] of Object.entries(_DATA.spark_market || {{}})) {{
-    (async()=>{{
-      const closes = await _fetchSpark3M(sym).catch(()=>[]);
+  try {{
+    const r = await fetch('prices3m.json', {{cache: 'no-cache'}});
+    if (!r.ok) return;
+    const data = await r.json();
+    for (const [id, closes] of Object.entries(data.market || {{}})) {{
       _drawSpark('spark-' + id, closes);
-    }})();
-  }}
-  /* 워치리스트 주가 스파크라인 */
-  for (const [code, sym] of Object.entries(_DATA.spark_stock || {{}})) {{
-    (async()=>{{
-      const closes = await _fetchSpark3M(sym).catch(()=>[]);
+    }}
+    for (const [code, closes] of Object.entries(data.stock || {{}})) {{
       _drawSpark('spark-s-' + code, closes);
-    }})();
-  }}
+    }}
+  }} catch(e) {{ console.log('spark load err', e); }}
 }}
 
 document.addEventListener('DOMContentLoaded', updateAll);
@@ -938,12 +933,59 @@ document.addEventListener('DOMContentLoaded', updateAll);
 
 def save_html_report(html, session):
     os.makedirs(DOCS_DIR, exist_ok=True)
-    filename = 'morning.html' if session == '오전' else 'afternoon.html'
-    path = os.path.join(DOCS_DIR, filename)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write(html)
-    print(f'  HTML 저장: {path}')
-    return f'{PAGES_BASE}/{filename}'
+    # 단일 파일 (index.html) + 세션별 복사
+    for fname in ['index.html']:
+        path = os.path.join(DOCS_DIR, fname)
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(html)
+    print(f'  HTML 저장: docs/index.html')
+    return f'{PAGES_BASE}/index.html'
+
+
+def save_prices3m(stock_data, market_data):
+    """3개월 주가 데이터 → docs/prices3m.json (스파크라인용, CORS 없이 직접 읽기)"""
+    os.makedirs(DOCS_DIR, exist_ok=True)
+    result = {'market': {}, 'stock': {}}
+
+    # 마켓 지수
+    for m in market_data:
+        hid  = m.get('html_id', '')
+        ysym = m.get('yahoo_sym', '')
+        if not (hid and ysym):
+            continue
+        try:
+            url = f'https://query1.finance.yahoo.com/v8/finance/chart/{ysym.replace("^","%5E")}?interval=1d&range=3mo'
+            r   = requests.get(url, headers=HEADERS, timeout=15)
+            q   = r.json()['chart']['result'][0]['indicators']['quote'][0]
+            closes = [v for v in q.get('close', []) if v is not None]
+            if closes:
+                result['market'][hid] = [round(v, 2) for v in closes]
+                print(f'    spark {hid}: {len(closes)}개')
+        except Exception as e:
+            print(f'    spark err {hid}: {e}')
+
+    # 개별 종목
+    for s in stock_data:
+        code = s['code']
+        ysym = s.get('yahoo_sym', '')
+        if not ysym:
+            continue
+        try:
+            url = f'https://query1.finance.yahoo.com/v8/finance/chart/{ysym}?interval=1d&range=3mo'
+            r   = requests.get(url, headers=HEADERS, timeout=15)
+            q   = r.json()['chart']['result'][0]['indicators']['quote'][0]
+            closes = [v for v in q.get('close', []) if v is not None]
+            if closes:
+                result['stock'][code] = [round(v, 0) for v in closes]
+        except Exception as e:
+            print(f'    spark err {code}: {e}')
+
+    out_path = os.path.join(DOCS_DIR, 'prices3m.json')
+    with open(out_path, 'w') as f:
+        json.dump(result, f)
+    n_mkt = len(result['market'])
+    n_stk = len(result['stock'])
+    print(f'  prices3m.json 저장 (마켓 {n_mkt}개 / 종목 {n_stk}개)')
 
 
 # ─────────────────────────────────────────
@@ -1023,11 +1065,13 @@ def main():
 
     total_news = sum(len(p) for _, p in sections)
 
-    # ── 3. HTML 생성 & 저장 ───────────────────────
+    # ── 3. HTML 생성 & 저장 + 3M 스파크라인 데이터 ──
     html     = build_html_report(market_data, stock_data, sections, now, session,
                                   us_rates=us_rates, rates_cfg=rates_cfg,
                                   top_news=top_news, shinhan_news=shinhan_news)
     page_url = save_html_report(html, session)
+    print('  3M 스파크라인 데이터 수집...')
+    save_prices3m(stock_data, market_data)
 
     # ── 4. 텔레그램: 링크 + 요약만 ───────────────
     # 마켓 스냅샷 1줄 요약
@@ -1045,7 +1089,7 @@ def main():
         skip_info = f'\n⚠️ 전체 SKIP — fetch {total_fetched}건'
 
     tg_msg = (
-        f'<b>📋 IB 뉴스브리프</b>  {date_str}  [{session}]\n'
+        f'<b>📋 신한증권 IB종합금융부 Daily Brief</b>  {date_str}\n'
         f'\n'
         f'<b>🔗 리포트 보기</b>\n'
         f'<a href="{page_url}">{page_url}</a>\n'
