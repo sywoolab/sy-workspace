@@ -1111,11 +1111,12 @@ def main():
     if total_fetched > 0 and total_news == 0:
         skip_info = f'\n⚠️ 전체 SKIP — fetch {total_fetched}건'
 
+    date_tag = now.strftime('%y%m%d')  # 260520 형식
     tg_msg = (
         f'<b>📋 신한증권 IB종합금융부 Daily Brief</b>  {date_str}\n'
         f'\n'
         f'<b>🔗 리포트 보기</b>\n'
-        f'<a href="{page_url}">{page_url}</a>\n'
+        f'<a href="{page_url}">{date_tag} | {page_url}</a>\n'
         f'\n'
         f'{mkt_summary.strip()}\n'
         f'\n'
