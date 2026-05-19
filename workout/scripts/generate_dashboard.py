@@ -88,6 +88,17 @@ def main():
     week_run  = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='run')
     week_tl   = sum(e['total_tl'] for e in week_entries)
 
+    # ── 날짜 → 가민 활동 ID 매핑 (클릭 시 가민 커넥트로 이동) ──
+    garmin_id_map = {}
+    for dk in all_dates:
+        mets = (log.get(dk) or {}).get('all_metrics', [])
+        if mets:
+            # TL이 가장 큰 활동 (대회처럼 여러 활동인 날은 메인 활동)
+            best = max(mets, key=lambda m: m.get('training_load') or 0)
+            gid = best.get('garmin_id')
+            if gid:
+                garmin_id_map[dk[5:]] = gid  # key: MM-DD
+
     # ── 그래프 데이터 (최근 60일) ──
     chart_entries = entries[-60:]
     chart_labels = [e['date'][5:] for e in chart_entries]  # MM-DD
@@ -166,6 +177,8 @@ tr:hover{{background:#15152a}}
 
 <script>
 const isMobile = window.innerWidth < 640;
+// 날짜(MM-DD) → 가민 활동 ID 매핑
+const garminIdMap = {json.dumps(garmin_id_map, ensure_ascii=False)};
 // 모바일: 최근 30일, PC: 60일
 const allLabels = {json.dumps(chart_labels, ensure_ascii=False)};
 const allTl7    = {json.dumps(chart_tl7)};
@@ -222,9 +235,28 @@ new Chart(document.getElementById('tlChart'), {{
   options: {{
     responsive: true,
     maintainAspectRatio: false,
+    onClick: (evt, elements) => {{
+      if (!elements.length) return;
+      const label = labels[elements[0].index];  // MM-DD
+      const gid = garminIdMap[label];
+      if (gid) {{
+        window.open('https://connect.garmin.com/modern/activity/' + gid, '_blank');
+      }}
+    }},
+    onHover: (evt, elements) => {{
+      evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+    }},
     plugins: {{
       legend: {{ labels: {{ color: '#999', font: {{ size: isMobile ? 11 : 10 }}, boxWidth: 12, padding: 8 }} }},
-      tooltip: {{ mode: 'index', intersect: false }},
+      tooltip: {{
+        mode: 'index', intersect: false,
+        callbacks: {{
+          footer: (items) => {{
+            const label = items[0]?.label;
+            return garminIdMap[label] ? '👆 탭하면 가민 상세 보기' : '';
+          }}
+        }}
+      }},
     }},
     scales: {{
       x: {{
