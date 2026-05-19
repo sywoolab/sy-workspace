@@ -153,6 +153,26 @@ elif skipped > 0:
 - 코스 확인 없이 "평속이 느리다"고 단정 금지
 - 본인은 아마추어 선수 출신, 평지 항속 35km/h+
 
+### 훈련 대시보드 (역사 기록 + 코칭 참조)
+
+- **URL**: https://sywoolab.github.io/training-dashboard/
+- **용도**: 3/16~현재 전체 훈련 기록의 역사적 스냅샷. gsync 시 자동 업데이트.
+- **철학**: 역사책처럼 누적. 매 gsync 시 새 데이터 추가, 과거 기록 삭제 X.
+- **백업**: sy-workspace 레포 `workout/data/training_report.html` + training-dashboard repo 이중 보관.
+
+### 운동 코칭 시 필수 데이터 참조 (의무 — 추측 금지)
+
+운동 관련 질문(컨디션·일정·목표·약점·오늘 운동 여부) 답변 시 메인 단독 추측 금지. 반드시 직접 Read:
+
+| 참조 파일 | 무엇 확인 | 방법 |
+| ------ | ------ | ------ |
+| `workout_log.json` 최근 14일 | 실제 훈련 기록, 부하, 페이스 | python3 코드로 최근 14일 추출 |
+| `workout/data/garmin_health.json` 최근 7일 | HRV last/weekly, RHR, 수면점수 | 직접 read |
+| `workout_schedule.json` overrides | 다음 14일 계획 | overrides 섹션 |
+
+hook 자동 첨부(workout_schedule, workout_log)로 이미 제공되지만, garmin_health는 추가 조회 필요.
+**"컨디션 어때?" / "오늘 운동 해야 해?" 질문 시 garmin_health 7일 데이터 반드시 직접 확인**.
+
 ### 운동 데이터 수동 요청 시
 가민 동기화가 자동이지만 누락될 수 있음. 사용자가 "운동 업데이트해줘"라고 하면:
 1. `git pull`
