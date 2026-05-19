@@ -360,5 +360,17 @@ new Chart(document.getElementById('tlChart'), {{
     n_rest = sum(1 for e in entries if e['is_rest'])
     print(f'[OK] {OUT_FILE} ({len(html)//1024}KB, {len(all_dates)}일, 운동 {len(all_dates)-n_rest}일 / 휴식 {n_rest}일)')
 
+    # OneDrive 백업 (Mac 로컬 실행 시만)
+    import os as _os, shutil as _shutil
+    if not _os.environ.get('GITHUB_ACTIONS'):
+        onedrive = Path.home() / 'Library' / 'CloudStorage' / 'OneDrive-개인' / '바탕 화면' / 'workspace' / 'workout_backup'
+        if onedrive.parent.exists():
+            try:
+                onedrive.mkdir(parents=True, exist_ok=True)
+                _shutil.copy2(OUT_FILE, onedrive / 'training_report.html')
+                print(f'[OK] OneDrive 백업: {onedrive}/training_report.html')
+            except Exception as e:
+                print(f'[WARN] OneDrive 백업 실패: {e}')
+
 if __name__ == '__main__':
     main()

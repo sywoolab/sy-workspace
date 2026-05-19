@@ -204,6 +204,39 @@ def _update_tokens_secret():
 
 SYNC_STATE_FILE = os.path.join(BASE_DIR, 'data', 'sync_state.json')
 
+_ONEDRIVE_BACKUP = os.path.expanduser(
+    '~/Library/CloudStorage/OneDrive-개인/바탕 화면/workspace/workout_backup'
+)
+
+
+def _backup_to_onedrive():
+    """workout 핵심 데이터 OneDrive 자동 백업 (Mac 로컬 실행 시만, 2026-05-19 추가).
+
+    GH Actions에선 OneDrive 없으므로 skip.
+    백업 대상: workout_log.json, garmin_health.json, training_report.html
+    """
+    if os.environ.get('GITHUB_ACTIONS'):
+        return
+    import shutil
+    from pathlib import Path
+    dst = Path(_ONEDRIVE_BACKUP)
+    if not dst.parent.exists():
+        return  # OneDrive 마운트 안 된 환경
+    try:
+        dst.mkdir(parents=True, exist_ok=True)
+        files = [
+            (Path(BASE_DIR) / 'workout_log.json',        dst / 'workout_log.json'),
+            (Path(BASE_DIR) / 'data' / 'garmin_health.json', dst / 'garmin_health.json'),
+            (Path(BASE_DIR) / 'data' / 'training_report.html', dst / 'training_report.html'),
+            (Path(BASE_DIR) / 'data' / 'sync_state.json', dst / 'sync_state.json'),
+        ]
+        for src, d in files:
+            if src.exists():
+                shutil.copy2(src, d)
+        print('[OK] OneDrive 백업 완료')
+    except Exception as e:
+        print(f'[WARN] OneDrive 백업 실패: {e}')
+
 
 def _is_rate_limited(err):
     """429 계열 에러인지 판별"""
@@ -1888,6 +1921,7 @@ def sync():
         sync_state['last_success_date'] = TODAY
         _save_sync_state(sync_state)
 
+        _backup_to_onedrive()
         return True  # 변경 있음
     else:
         # 새 활동 없어도 로그인 성공 = sync 정상
@@ -1897,6 +1931,7 @@ def sync():
         sync_state['last_success_date'] = TODAY
         _save_sync_state(sync_state)
 
+        _backup_to_onedrive()
         print("  새 활동 없음 — 조용히 종료")
         return False  # 변경 없음
 
