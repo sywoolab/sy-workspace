@@ -147,29 +147,38 @@ def fetch_stock_price(code):
 def collect_market_data():
     """지수·환율 데이터 리스트 (html_id, yahoo_sym 포함 — JS 실시간 업데이트용)"""
     items = []
-    for code, label, html_id, ysym in [
-        ('KOSPI',  'KOSPI',   'mkt-kospi',  '^KS11'),
-        ('KOSDAQ', 'KOSDAQ',  'mkt-kosdaq', '^KQ11'),
-    ]:
-        d = fetch_naver_index(code)
+    MKT_CFG = [
+        # (naver_code, label, html_id, yahoo_sym, invert, naver_url)
+        ('KOSPI',  'KOSPI',   'mkt-kospi',  '^KS11',  False,
+         'https://finance.naver.com/sise/sise_index.naver?code=KOSPI'),
+        ('KOSDAQ', 'KOSDAQ',  'mkt-kosdaq', '^KQ11',  False,
+         'https://finance.naver.com/sise/sise_index.naver?code=KOSDAQ'),
+    ]
+    for naver_code, label, html_id, ysym, invert, nurl in MKT_CFG:
+        d = fetch_naver_index(naver_code)
         if d:
             items.append({'label': label, 'price_str': f'{d["price"]:,.2f}',
                           'change': d['change'], 'rate': d['rate'],
-                          'html_id': html_id, 'yahoo_sym': ysym, 'invert': False})
-    for sym, label, html_id, ysym in [
-        ('%5EGSPC', 'S&P 500', 'mkt-sp500', '^GSPC'),
-        ('%5EDJI',  'DOW',     'mkt-dow',   '^DJI'),
+                          'html_id': html_id, 'yahoo_sym': ysym,
+                          'invert': invert, 'naver_url': nurl})
+    for sym, label, html_id, ysym, nurl in [
+        ('%5EGSPC', 'S&P 500', 'mkt-sp500', '^GSPC',
+         'https://finance.yahoo.com/quote/%5EGSPC'),
+        ('%5EDJI',  'DOW',     'mkt-dow',   '^DJI',
+         'https://finance.yahoo.com/quote/%5EDJI'),
     ]:
         d = fetch_yahoo(sym)
         if d:
             items.append({'label': label, 'price_str': f'{d["price"]:,.2f}',
                           'change': d['change'], 'rate': d['rate'],
-                          'html_id': html_id, 'yahoo_sym': ysym, 'invert': False})
+                          'html_id': html_id, 'yahoo_sym': ysym,
+                          'invert': False, 'naver_url': nurl})
     fx = fetch_yahoo('KRW=X')
     if fx:
         items.append({'label': 'USD/KRW', 'price_str': f'{fx["price"]:,.1f}',
                       'change': -fx['change'], 'rate': -fx['rate'],
-                      'html_id': 'mkt-usdkrw', 'yahoo_sym': 'KRW=X', 'invert': True})
+                      'html_id': 'mkt-usdkrw', 'yahoo_sym': 'KRW=X',
+                      'invert': True, 'naver_url': 'https://finance.naver.com/marketindex/'})
     return items
 
 
@@ -426,22 +435,27 @@ HTML_STYLE = """
 
   /* 마켓 그리드 */
   .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .market-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px; }
+  .market-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px;
+                 text-decoration: none; color: inherit; display: block; transition: background .15s; }
+  .market-item:hover { background: #f0f4f8; }
   .market-item .label { font-size: 11px; color: #9ca3af; font-weight: 600;
                         text-transform: uppercase; letter-spacing: 0.5px; }
   .market-item .price { font-size: 18px; font-weight: 700; margin: 2px 0; color: #111827; }
   .market-item .chg { font-size: 12px; }
+  .market-spark { margin-top: 6px; }
 
   /* 주가 테이블 */
   .stock-table { width: 100%; border-collapse: collapse; }
   .stock-table th { font-size: 11px; color: #9ca3af; font-weight: 600;
                     text-align: left; padding: 4px 0 8px; border-bottom: 1px solid #f3f4f6; }
-  .stock-table th:last-child, .stock-table td:last-child { text-align: right; }
-  .stock-table td { padding: 8px 0; font-size: 14px; border-bottom: 1px solid #f9fafb; }
+  .stock-table td { padding: 7px 0; font-size: 14px; border-bottom: 1px solid #f9fafb; }
   .stock-table tr:last-child td { border-bottom: none; }
-  .stock-name { font-weight: 600; }
+  .stock-name-link { font-weight: 600; color: #1a202c; text-decoration: none; }
+  .stock-name-link:hover { color: #1a56db; text-decoration: underline; }
   .stock-code { font-size: 11px; color: #9ca3af; margin-left: 4px; }
   .stock-price { font-weight: 700; font-size: 15px; }
+  .stock-spark { text-align: right; }
+  .spark-svg { display: inline-block; vertical-align: middle; overflow: visible; }
 
   /* 그룹 헤더 */
   .group-header { display: flex; align-items: center; gap: 8px;
@@ -564,9 +578,10 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     time_str = now.strftime('%H:%M') + ' KST'
     price_label = '전일 종가' if now.hour < 12 else '현재가'
 
-    # ── 마켓 카드 (JS 실시간 업데이트용 id 부여) ──────
+    # ── 마켓 카드 (스파크라인 + 링크 + JS id) ──────────
     market_html = ''
-    js_market_symbols = {}  # {html_id: {sym, invert, fmt}}
+    js_market_symbols = {}
+    js_spark_market   = {}  # {html_id: yahoo_sym} — 스파크라인용
     for m in market_data:
         ar  = _arrow_html(m['change'])
         rt  = _rate_html(m['rate'])
@@ -577,33 +592,40 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
             chg_str = f'{chg_abs:.3f}pp'
         else:
             chg_str = f'{chg_abs:,.2f}'
-        hid = m.get('html_id', '')
+        hid  = m.get('html_id', '')
         ysym = m.get('yahoo_sym', '')
+        nurl = m.get('naver_url', '#')
         if hid and ysym:
             js_market_symbols[hid] = {'sym': ysym, 'invert': m.get('invert', False),
                                        'fmt': ',.1f' if 'KRW' in m['label'] else ',.2f'}
+            js_spark_market[hid] = ysym
         market_html += f"""
-        <div class="market-item" id="{hid}">
+        <a class="market-item" id="{hid}" href="{nurl}" target="_blank" rel="noopener">
           <div class="label">{m['label']}</div>
           <div class="price" id="{hid}-p">{m['price_str']}</div>
           <div class="chg" id="{hid}-c">{ar} {chg_str} &nbsp; {rt}</div>
-        </div>"""
+          <div class="market-spark"><svg id="spark-{hid}" class="spark-svg" width="70" height="24"></svg></div>
+        </a>"""
 
-    # ── 주가 테이블 (JS 실시간 업데이트용 id 부여) ────
+    # ── 주가 테이블 (스파크라인 + 네이버 링크 + JS id) ──
     stock_rows = ''
-    js_stock_symbols = {}  # {code: yahoo_sym}
+    js_stock_symbols = {}
+    js_spark_stock   = {}  # {code: yahoo_sym}
     for s in stock_data:
         ar   = _arrow_html(s['change'])
         rt   = _rate_html(s['rate'])
         code = s['code']
         ysym = s.get('yahoo_sym', '')
+        naver_url = f'https://finance.naver.com/item/main.naver?code={code}'
         if ysym:
             js_stock_symbols[code] = ysym
+            js_spark_stock[code]   = ysym
         stock_rows += f"""
         <tr id="s-{code}">
-          <td><span class="stock-name">{s['name']}</span><span class="stock-code">{code}</span></td>
+          <td><a class="stock-name-link" href="{naver_url}" target="_blank" rel="noopener">{s['name']}</a><span class="stock-code">{code}</span></td>
           <td class="stock-price" id="s-{code}-p">{s['price']:,}</td>
           <td id="s-{code}-c">{ar} {rt}</td>
+          <td class="stock-spark"><svg id="spark-s-{code}" class="spark-svg" width="70" height="24"></svg></td>
         </tr>"""
 
     # 생성 시각 표시 (JS가 실시간으로 교체)
@@ -616,7 +638,7 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
         <div class="card">
           <div class="card-title">📈 워치리스트 주가</div>
           <table class="stock-table">
-            <thead><tr><th>종목</th><th>현재가</th><th style="text-align:right">등락</th></tr></thead>
+            <thead><tr><th>종목</th><th>현재가</th><th style="text-align:center">등락</th><th style="text-align:right">3M 추이</th></tr></thead>
             <tbody>{stock_rows}</tbody>
           </table>
           {stock_ts}
@@ -624,7 +646,12 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 
     # ── JS 심볼 테이블 (Python → JS로 전달) ────────
     import json as _json
-    js_data = _json.dumps({'market': js_market_symbols, 'stock': js_stock_symbols})
+    js_data = _json.dumps({
+        'market': js_market_symbols,
+        'stock':  js_stock_symbols,
+        'spark_market': js_spark_market,
+        'spark_stock':  js_spark_stock,
+    })
 
     # ── 뉴스 섹션 (그룹 있으면 그룹 헤더로 묶기) ────
     # sections = [(comp_dict, [article, ...]), ...]
@@ -854,6 +881,52 @@ async function updateAll() {{
     const hhmm = t.toLocaleTimeString('ko-KR', {{hour:'2-digit', minute:'2-digit'}});
     ts.innerHTML = '🔄 실시간&nbsp;&nbsp;' + hhmm + ' KST';
     ts.style.color = '#16a34a';
+  }}
+
+  /* 스파크라인 렌더링 (비동기, 백그라운드) */
+  drawAllSparks();
+}}
+
+/* ── 스파크라인 ────────────────────────────────── */
+async function _fetchSpark3M(sym) {{
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${{encodeURIComponent(sym)}}?interval=1d&range=3mo`;
+  const proxy = `https://corsproxy.io/?${{encodeURIComponent(url)}}`;
+  try {{
+    const r = await fetch(proxy, {{signal: AbortSignal.timeout(8000)}});
+    const d = await r.json();
+    return d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v => v != null) || [];
+  }} catch {{ return []; }}
+}}
+
+function _drawSpark(svgId, closes) {{
+  const el = document.getElementById(svgId);
+  if (!el || closes.length < 3) return;
+  const W=70, H=24;
+  const min=Math.min(...closes), max=Math.max(...closes), rng=max-min||1;
+  const pts = closes.map((v,i)=>{{
+    const x=(i/(closes.length-1)*W).toFixed(1);
+    const y=(H-(v-min)/rng*(H-2)-1).toFixed(1);
+    return `${{x}},${{y}}`;
+  }}).join(' ');
+  const col = closes[closes.length-1] >= closes[0] ? '#dc2626' : '#1d4ed8';
+  el.setAttribute('viewBox',`0 0 ${{W}} ${{H}}`);
+  el.innerHTML = `<polyline points="${{pts}}" fill="none" stroke="${{col}}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+}}
+
+async function drawAllSparks() {{
+  /* 마켓 스냅샷 스파크라인 */
+  for (const [id, sym] of Object.entries(_DATA.spark_market || {{}})) {{
+    (async()=>{{
+      const closes = await _fetchSpark3M(sym).catch(()=>[]);
+      _drawSpark('spark-' + id, closes);
+    }})();
+  }}
+  /* 워치리스트 주가 스파크라인 */
+  for (const [code, sym] of Object.entries(_DATA.spark_stock || {{}})) {{
+    (async()=>{{
+      const closes = await _fetchSpark3M(sym).catch(()=>[]);
+      _drawSpark('spark-s-' + code, closes);
+    }})();
   }}
 }}
 
