@@ -233,14 +233,26 @@ def collect_stock_data(companies):
         if not comp.get('listed') or not comp.get('stock_code'):
             continue
         d = fetch_stock_price(comp['stock_code'])
-        if d:
-            mkt = comp.get('market', '')
-            suffix = '.KQ' if mkt == 'KOSDAQ' else '.KS'
-            rows.append({'name': comp['name'], 'code': comp['stock_code'],
-                         'market': mkt,
-                         'price': int(d['price']), 'change': d['change'],
-                         'rate': d['rate'],
-                         'yahoo_sym': f"{comp['stock_code']}{suffix}"})
+        if not d:
+            continue
+        mkt    = comp.get('market', '')
+        code   = comp['stock_code']
+        suffix = '.KQ' if mkt == 'KOSDAQ' else '.KS'
+        ysym   = f'{code}{suffix}'
+
+        # ── Yahoo 심볼 교차 검증 (네이버 vs Yahoo, 10% 이상 괴리 시 경고 + 차단) ──
+        naver_p = d['price']
+        if naver_p > 0:
+            ydata = fetch_yahoo(ysym.replace('^', '%5E'))
+            if ydata and ydata['price'] > 0:
+                diff_rate = abs(ydata['price'] - naver_p) / naver_p
+                if diff_rate > 0.10:
+                    print(f'  ⚠️ [{comp["name"]}] Yahoo심볼 불일치 (네이버={naver_p:,} Yahoo={ydata["price"]:,.0f} {diff_rate:.0%}) — Yahoo 사용 차단')
+                    ysym = ''  # JS에서 해당 종목 실시간 업데이트 안 함
+
+        rows.append({'name': comp['name'], 'code': code, 'market': mkt,
+                     'price': int(d['price']), 'change': d['change'], 'rate': d['rate'],
+                     'yahoo_sym': ysym})
     return rows
 
 
