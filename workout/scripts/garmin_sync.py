@@ -1782,14 +1782,12 @@ def sync():
     health = fetch_health_data(api, TODAY)
     print(f"  건강 데이터 수집 완료")
 
-    # 건강 데이터 저장 (rolling 14일)
+    # 건강 데이터 저장 (대시보드 표시를 위해 전체 보관 — 삭제 로직 제거)
     health_history = load_json(HEALTH_FILE)
     if not isinstance(health_history, dict):
         health_history = {}
     health_history[TODAY] = health
-    # 14일 이전 데이터 정리
-    cutoff = (NOW - timedelta(days=14)).strftime('%Y-%m-%d')
-    health_history = {k: v for k, v in health_history.items() if k >= cutoff}
+    # 과거 데이터 정리 안 함 (대시보드 전체 기록 보관용)
     save_json(HEALTH_FILE, health_history)
 
     # 6. 새 활동이 있으면 workout_log 업데이트
