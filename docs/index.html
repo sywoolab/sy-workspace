@@ -88,6 +88,17 @@
   .dn { color: #1d4ed8; }
   .nt { color: #9ca3af; }
 
+  /* 공시 테이블 */
+  .dart-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .dart-table th { font-size: 11px; color: #9ca3af; font-weight: 600; text-align: left;
+                   padding: 4px 8px 8px; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
+  .dart-table td { padding: 6px 8px; border-bottom: 1px solid #f9fafb; font-size: 13px; }
+  .dart-table tr:last-child td { border-bottom: none; }
+  .dart-corp { font-weight: 700; color: #374151; white-space: nowrap; }
+  .dart-date { color: #9ca3af; white-space: nowrap; font-size: 12px; }
+  .dart-title a { color: #1a56db; text-decoration: none; }
+  .dart-title a:hover { text-decoration: underline; }
+
   /* 주요 뉴스 */
   .top-news-item { padding: 8px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 10px; align-items: flex-start; }
   .top-news-item:last-child { border-bottom: none; }
@@ -125,7 +136,7 @@
 <div class="container">
   <div class="header">
     <h1>신한증권 IB종합금융부 Daily Brief <span class="session-badge">오전</span></h1>
-    <div class="meta">2026년 05월 20일 (수) &nbsp;·&nbsp; 08:38 KST &nbsp;·&nbsp; 전일 종가 기준</div>
+    <div class="meta">2026년 05월 20일 (수) &nbsp;·&nbsp; 08:52 KST &nbsp;·&nbsp; 전일 종가 기준</div>
   </div>
 
   <div class="card">
@@ -134,16 +145,16 @@
         <a class="market-item" id="mkt-kospi" href="https://finance.naver.com/sise/sise_index.naver?code=KOSPI" target="_blank" rel="noopener">
           <div class="market-item-info">
             <div class="label">KOSPI</div>
-            <div class="price" id="mkt-kospi-p">7,271.66</div>
-            <div class="chg" id="mkt-kospi-c"><span class="nt">─</span> 0.00 &nbsp; <span class="nt">0.00%</span></div>
+            <div class="price" id="mkt-kospi-p">7,041.43</div>
+            <div class="chg" id="mkt-kospi-c"><span class="dn">▼</span> 230.23 &nbsp; <span class="dn">-3.17%</span></div>
           </div>
           <div class="market-spark"><svg id="spark-mkt-kospi" class="spark-svg" width="60" height="26" style="display:block"></svg></div>
         </a>
         <a class="market-item" id="mkt-kosdaq" href="https://finance.naver.com/sise/sise_index.naver?code=KOSDAQ" target="_blank" rel="noopener">
           <div class="market-item-info">
             <div class="label">KOSDAQ</div>
-            <div class="price" id="mkt-kosdaq-p">1,084.36</div>
-            <div class="chg" id="mkt-kosdaq-c"><span class="nt">─</span> 0.00 &nbsp; <span class="nt">0.00%</span></div>
+            <div class="price" id="mkt-kosdaq-p">1,060.80</div>
+            <div class="chg" id="mkt-kosdaq-c"><span class="dn">▼</span> 23.56 &nbsp; <span class="dn">-2.17%</span></div>
           </div>
           <div class="market-spark"><svg id="spark-mkt-kosdaq" class="spark-svg" width="60" height="26" style="display:block"></svg></div>
         </a>
@@ -307,7 +318,7 @@
           <td class="stock-spark"><svg id="spark-s-097230" class="spark-svg" width="60" height="26" style="display:block"></svg></td>
         </tr></tbody>
           </table>
-          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/20 08:38 KST</div>
+          <div id="stock-timestamp" class="rate-source" style="margin-top:8px;text-align:right">생성: 05/20 08:52 KST</div>
           <div style="margin-top:10px;text-align:right">
             <a href="https://fomonono.com/treemap" target="_blank" rel="noopener"
                style="display:inline-block;background:#f3f4f6;color:#374151;font-size:12px;
@@ -342,6 +353,20 @@
             <div class="top-news-meta">파이낸셜뉴스  <span style="color:#d1d5db">|</span>  05/20 07:55</div>
           </div>
         </div>
+    </div>
+
+  
+    <div class="card">
+      <div class="card-title">📢 워치리스트 공시 <span style="font-size:10px;color:#9ca3af">(최근 3일 · DART)</span></div>
+      <table class="dart-table">
+        <thead><tr><th>기업</th><th>일자</th><th>공시명</th></tr></thead>
+        <tbody>
+        <tr>
+          <td class="dart-corp">서진시스템</td>
+          <td class="dart-date">05/18</td>
+          <td class="dart-title"><a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260518900352" target="_blank" rel="noopener">단일판매ㆍ공급계약체결</a></td>
+        </tr></tbody>
+      </table>
     </div>
 
   
@@ -404,63 +429,41 @@
 
   
     <div class="card">
-      <div class="card-title">📰 뉴스 — 14건 · 4개사</div>
+      <div class="card-title">📰 뉴스 — 10건 · 2개사</div>
       
         <div class="company-header">
           <span class="company-name">삼성전자</span><span class="company-code">005930</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title high" href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE8xRnFmZXJ4djRpTEhwLWU5S1pGRFNKUXY3OHFlTnhocklBX1l5SzZoYjNMcTAzTFFKaURNVm5PVzIzRE5zTG9kU3ZxSEVKVU9YbWtWWnp5Wkw0TzQyOUdN?oc=5" target="_blank" rel="noopener">한투證 "삼성전자 57만원 간다…실적 모멘텀+주주환원정책" - 뉴스1</a>
-          <div class="news-meta">뉴스1  <span style="color:#d1d5db">|</span>  05/20 08:15</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMidkFVX3lxTE54ZjBxN3pUSDRJVGVkVnU3d2tnLWJZT1BGZEZfUlFOYm9iNVE5ZVdMemlqMUhZMld1cWd2WnlJVW9PUy1XWURiZWRmMko1RmtXVVhqZHRfQVFORFJyRnRObnVZczdQSFNxUHZDY0c4empLRzFBRVHSAWZBVV95cUxNY05OZ0NXRU5yM000NzJwamFGTWIwYktaN0poTnJoUUdqamk0eEVXRHdzSkIxQnJneXNkcFAyNl9KeG9rNEVrbHFzWndFdUt1TDdfUndaLTJ1TnFOR2R6V19iWXhYWUE?oc=5" target="_blank" rel="noopener">삼성전자 총파업 앞두고… 성과급 한시 명문화 접근 - 동아일보</a>
+          <div class="news-meta">동아일보  <span style="color:#d1d5db">|</span>  05/20 04:30</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYkFVX3lxTE52WTVMVDdjcnNKUUpBYmUwVTVENGlKR1owaV94SzJMelRwLUc3Ty1FdDJhdHRROEhNRnZTV0hBcnRnUlpSdEhmMGhkSjdZWGFBeWp3cU1Fc0lONlpJOTl3YWF3?oc=5" target="_blank" rel="noopener">[버핏 리포트] 삼성전자, 2Q 영업이익 90조 전망…불확실성 선반영 - KB - 버핏연구소</a>
-          <div class="news-meta">버핏연구소  <span style="color:#d1d5db">|</span>  05/20 08:23</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiZEFVX3lxTFBndF9WQ0pxNzEtQ3p6QUgxX0t2aTBYVEdSbWZWVlZIUkRqOHFEc2h5dFJkU2tPVmh0dlRnakNMNEs3TzNidUpHM01KWDU2eWRUU0QzUzUyaFI0UjV5cFJnNWl1VHI?oc=5" target="_blank" rel="noopener">삼성전자 협상 '9부 능선'…"이견은 1개…오늘 오전 중 결론" - 뉴스1</a>
+          <div class="news-meta">뉴스1  <span style="color:#d1d5db">|</span>  05/20 06:00</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE56VlBFejVkZ0xvcHpNT1dsa05zelFBRlp3VWM5NjlNTnFha0x1VzNzSEkzd3dQZ21fM0R1eU1RUGM0RG9BaUdNb2RMVTU0LWNWcFROV3JiYVA?oc=5" target="_blank" rel="noopener">삼성전자·구글, ‘AI 글라스’ 첫 공개…하반기 출시 예고 - 뷰어스</a>
-          <div class="news-meta">뷰어스  <span style="color:#d1d5db">|</span>  05/20 08:29</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMigwFBVV95cUxQUW41MF96dG1BSldscE1EUUZkc1RXT1BuWG5ETzhGUDJFUS1FR3FDRlNMQnNhZkRFQ3hHR0JRdTlkYzBaOF9BZDgwRVJkVFFGNExTTXk5VndMQXM2UW1TZmZISVJfbFFIRWpPSzhHUm1pajFCZDFFV19HS3NRVVdHVXZpMA?oc=5" target="_blank" rel="noopener">삼성전자의 ‘스마트 글라스’ 드디어 베일 벗어...구글 I/O에서 첫선 - 조선일보</a>
+          <div class="news-meta">조선일보  <span style="color:#d1d5db">|</span>  05/20 03:04</div>
         </div>
         <div class="company-header">
           <span class="company-name">SK하이닉스</span><span class="company-code">000660</span><span class="company-code">KOSPI</span>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFBPUGxSME5lNDl4NjA1VkVacjVvNjhlNnBfbFBZaUYzb3NpY3dINXpFVmlONEExdERVN19tM1llMGpQRzliTWZXTjA5bVcwa2luajh6azNxbTBTN25jSl9wTF9GWTBzX01P?oc=5" target="_blank" rel="noopener">삼성전자·SK하이닉스 반등에도 한미반도체 급락…외인 흔들기에 춤추는 반도체주 - CBC뉴스</a>
-          <div class="news-meta">CBC뉴스  <span style="color:#d1d5db">|</span>  05/20 07:24</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE4tWXZrWE9EN0FGaEIwalhVd2Q0akItanhsa3dSN21weW44NVJ0Q0ZFVHJqQkktX2dMNnpSX2JCVmlNaGdSemJlUElKbk1PWElOcFl2SlRHVnY5RkZCZ3Zr?oc=5" target="_blank" rel="noopener">"삼성전자 주가, 파업 리스크 해소되면 SK하이닉스보다 잘 나가" - 스마트투데이</a>
+          <div class="news-meta">스마트투데이  <span style="color:#d1d5db">|</span>  05/20 08:32</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE1CLW8wc3BrU3NKYWZKX0dTNHVzWDZ1cklrSXhWbENVdTktNHRDUjlKaDlJSzFpeXRHcXhxV1FNMkNfU1pydnBKWGtxd0lpMjh2alpLSXJmOEtWWl9NV2FVWnlLRmk4UE5m0gFuQVVfeXFMTkY1NEMwLWt4RkxmMHk5X0hVUmh6RF8tb1BLMWpuNkZtdF9GZVJOb0QwZkJoRzhEWW1oZHVXUUNUOUpQM19iZXJSZFk3WWIwa0lISkpIbXFWYmxzenhRSXMxZW1YWElOejNlVi1qMHc?oc=5" target="_blank" rel="noopener">한투證, SK하이닉스 목표가 380만원 제시…국내 최고치 - 머니투데이 - 머니투데이</a>
-          <div class="news-meta">머니투데이  <span style="color:#d1d5db">|</span>  05/20 08:34</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFBFNDlEMHVrVWIwUEljUHRqSldxalk3NDdnWlh5aW1PdWI4a1VMLUo3QmZCeWpEeWlCemdmWk9FVHZIaEh0RzNZRlFrUmxjTnpaSlplNW9kUldQOXNRaHJIbTItejJPRk5E?oc=5" target="_blank" rel="noopener">SK하이닉스, AI 반도체 질주 통했다…500대 기업 평가 1위 - ebn.co.kr</a>
+          <div class="news-meta">ebn.co.kr  <span style="color:#d1d5db">|</span>  05/20 08:14</div>
         </div>
         <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMidkFVX3lxTE1jUWhSNEdXNmEtY2Y3eC1QZkhXdnZWSVpwSTlrQ1BJNlRmVWlSVXJkdDhSNGRpNDNpdms0SWxHWHcxTzRkTGVsVWlHTklyVVVScndHX3ROMWxLb0xBWmd5UWM4ZFVLR2RhQnZpa0JqdGg3T2tuUmc?oc=5" target="_blank" rel="noopener">SK스퀘어, SK하이닉스 따라 주가 변동성 커...‘주주환원 정책’도 투자 포인트-DB - 인포스탁데일리</a>
-          <div class="news-meta">인포스탁데일리  <span style="color:#d1d5db">|</span>  05/20 08:24</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">셀트리온</span><span class="company-code">068270</span><span class="company-code">KOSPI</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiU0FVX3lxTE8xUGI5ck9nRFp2V2ZkYXI1ZnMzNmZuQlJUZVJvdEEyRWEzaU9GOFl2UTNTRldQUXRJQWVsU1ZrQlVqb0NaN0NoYmZqd2dwbG0ya1lN?oc=5" target="_blank" rel="noopener">[모닝 리포트] "셀트리온, 합병 노이즈 해소에 목표가 28만원" - 네이트</a>
-          <div class="news-meta">네이트  <span style="color:#d1d5db">|</span>  05/20 08:25</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE9FTjZVcm5LdDkwQkZWdEZoOGh5VmwtN0p3ZFozMHFzb29vdllETjVrTWticVdRakN2eVI5d25FRVhrdmdFVFZoc3U2amRMeXc5eUHSAVNBVV95cUxOWHdBa0xBcnRQeWh6TlhEYlBlQmE4WXFIUW5vcV9yMk5zb1JGZDZzemY0N1NpZzdoTkYzV3F5QVdOZGlpTlRqeS1obUJmc0lkajNMYw?oc=5" target="_blank" rel="noopener">셀트리온 “저평가 해소할 특단 조치 모색할 것” - 서울경제</a>
-          <div class="news-meta">서울경제  <span style="color:#d1d5db">|</span>  05/20 07:01</div>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYkFVX3lxTE5PbkZUclhRNWp4T2RXbDlpTEVqekF5LURUSWpoTzZCMHBYcjl1YVBFSkl1N2xQYnhmTmx2T0F4di1fMlFNWENVT0t5dmlzZXVTNlV1elFyc3hEQ3Y2WGdmRnpB?oc=5" target="_blank" rel="noopener">[버핏 리포트] 셀트리온, 제품 믹스 개선 가속화...펀더멘탈 성장 궤도 올라 - 대신 - 버핏연구소</a>
-          <div class="news-meta">버핏연구소  <span style="color:#d1d5db">|</span>  05/20 08:24</div>
-        </div>
-        <div class="company-header">
-          <span class="company-name">리벨리온</span>
-        </div>
-        <div class="news-item">
-          <a class="news-title" href="https://news.google.com/rss/articles/CBMiYkFVX3lxTE1hb2E5cVVJQXROMEx6SEJ1Qkw3NGRxY3dnSmZUemkyQjNBWWt6Q2UyZFFQMTJBWklNSzBDV3pyTzVPSzY5amZFUEZlTGplY3QwelpoRGN6TzlJX0VIQTBWdURB?oc=5" target="_blank" rel="noopener">초기딜 판도 바꾼 '피지컬 AI'…벤처투자, AI·반도체에 88% 쏠렸다 - 뉴스1</a>
-          <div class="news-meta">뉴스1  <span style="color:#d1d5db">|</span>  05/20 06:10</div>
+          <a class="news-title" href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE90TXA3ZkpKTU45b1Y0OF9DRjQ3dWE0TEZkcWNZaUJSSWY2cElWX2tYRHZJN2gydnJfbzg2SExBbXNuMUp0YUh0Z1N3QUNDTlM2WDRxSjMzQk1TVUREMV85SWs4MDktQ1U?oc=5" target="_blank" rel="noopener">SK하이닉스, 2년 연속 경영평가 1위…삼성전자 2위 차지 - 청년일보</a>
+          <div class="news-meta">청년일보  <span style="color:#d1d5db">|</span>  05/20 08:45</div>
         </div>
     </div>
 
-  <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: 2026-05-20 08:38 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
+  <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: 2026-05-20 08:52 KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
 
 <script>

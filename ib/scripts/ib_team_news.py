@@ -34,8 +34,9 @@ except ImportError:
 
 KST = timezone(timedelta(hours=9))
 
-BOT_TOKEN = os.environ.get('IB_TEAM_BOT_TOKEN', '')
-CHAT_ID   = os.environ.get('IB_TEAM_CHAT_ID', '')
+BOT_TOKEN    = os.environ.get('IB_TEAM_BOT_TOKEN', '')
+CHAT_ID      = os.environ.get('IB_TEAM_CHAT_ID', '')
+DART_API_KEY = os.environ.get('DART_API_KEY', '')
 
 BASE_DIR       = str(Path(__file__).resolve().parent.parent)   # ib/
 REPO_ROOT      = str(Path(__file__).resolve().parent.parent.parent)  # repo root
@@ -386,6 +387,50 @@ def fetch_shinhan_ib_news(n=5):
     return arts[:n]
 
 
+def fetch_dart_disclosures(companies, days=3):
+    """워치리스트 기업 최근 N일 DART 공시 수집"""
+    if not DART_API_KEY:
+        print('  [DART] API key 없음 — 공시 섹션 스킵')
+        return []
+    now_kst = datetime.now(KST)
+    bgn = (now_kst - timedelta(days=days)).strftime('%Y%m%d')
+    end = now_kst.strftime('%Y%m%d')
+    results = []  # [(date_str, corp_name, report_nm, rcept_no)]
+    for comp in companies:
+        dart_code = comp.get('dart_code')
+        if not dart_code:
+            continue
+        try:
+            resp = requests.get(
+                'https://opendart.fss.or.kr/api/list.json',
+                params={'crtfc_key': DART_API_KEY, 'corp_code': dart_code,
+                        'bgn_de': bgn, 'end_de': end, 'page_count': 20},
+                headers=HEADERS, timeout=15)
+            data = resp.json()
+            if data.get('status') == '000':
+                for d in data.get('list', []):
+                    rcept_no  = d.get('rcept_no', '')
+                    report_nm = d.get('report_nm', '').strip()
+                    rcept_dt  = d.get('rcept_dt', '')  # YYYYMMDD
+                    # 날짜 포맷
+                    try:
+                        date_fmt = f"{rcept_dt[4:6]}/{rcept_dt[6:8]}"
+                    except Exception:
+                        date_fmt = rcept_dt
+                    dart_url = f'https://dart.fss.or.kr/dsaf001/main.do?rcpNo={rcept_no}'
+                    results.append({
+                        'corp': comp['name'], 'date': date_fmt,
+                        'title': report_nm, 'url': dart_url,
+                        'rcept_dt': rcept_dt,
+                    })
+        except Exception as e:
+            print(f'  [DART {comp["name"]}] err: {e}')
+    # 최신순 정렬
+    results.sort(key=lambda x: x['rcept_dt'], reverse=True)
+    print(f'  DART 공시: {len(results)}건 (최근 {days}일)')
+    return results
+
+
 def fetch_top_market_news(n=5):
     """IB 시장 주요 뉴스 — 기업 무관, 매체 가중치 상위 N건 (날짜 포함)"""
     query = 'IPO+OR+상장+OR+M%26A+OR+인수+OR+채권+OR+기업공개+OR+사모펀드+OR+PE+OR+딜'
@@ -507,6 +552,17 @@ HTML_STYLE = """
   .dn { color: #1d4ed8; }
   .nt { color: #9ca3af; }
 
+  /* 공시 테이블 */
+  .dart-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .dart-table th { font-size: 11px; color: #9ca3af; font-weight: 600; text-align: left;
+                   padding: 4px 8px 8px; border-bottom: 1px solid #f3f4f6; white-space: nowrap; }
+  .dart-table td { padding: 6px 8px; border-bottom: 1px solid #f9fafb; font-size: 13px; }
+  .dart-table tr:last-child td { border-bottom: none; }
+  .dart-corp { font-weight: 700; color: #374151; white-space: nowrap; }
+  .dart-date { color: #9ca3af; white-space: nowrap; font-size: 12px; }
+  .dart-title a { color: #1a56db; text-decoration: none; }
+  .dart-title a:hover { text-decoration: underline; }
+
   /* 주요 뉴스 */
   .top-news-item { padding: 8px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 10px; align-items: flex-start; }
   .top-news-item:last-child { border-bottom: none; }
@@ -591,7 +647,7 @@ def build_rates_section(us_rates, rates_cfg):
     </div>"""
 
 
-def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None, top_news=None, shinhan_news=None):
+def build_html_report(market_data, stock_data, sections, now, session, us_rates=None, rates_cfg=None, top_news=None, shinhan_news=None, dart_disclosures=None):
     _days_ko = ['월', '화', '수', '목', '금', '토', '일']
     date_str = f'{now.strftime("%Y년 %m월 %d일")} ({_days_ko[now.weekday()]})'
     time_str = now.strftime('%H:%M') + ' KST'
@@ -786,6 +842,27 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
       {shinhan_html}
     </div>"""
 
+    # ── DART 공시 섹션 ───────────────────────────────
+    dart_rows = ''
+    for d in (dart_disclosures or []):
+        t = d['title'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+        dart_rows += f"""
+        <tr>
+          <td class="dart-corp">{d['corp']}</td>
+          <td class="dart-date">{d['date']}</td>
+          <td class="dart-title"><a href="{d['url']}" target="_blank" rel="noopener">{t}</a></td>
+        </tr>"""
+    dart_section = ''
+    if dart_rows:
+        dart_section = f"""
+    <div class="card">
+      <div class="card-title">📢 워치리스트 공시 <span style="font-size:10px;color:#9ca3af">(최근 3일 · DART)</span></div>
+      <table class="dart-table">
+        <thead><tr><th>기업</th><th>일자</th><th>공시명</th></tr></thead>
+        <tbody>{dart_rows}</tbody>
+      </table>
+    </div>"""
+
     # ── 금리 매트릭스 ────────────────────────────────
     rates_section = build_rates_section(us_rates or {}, rates_cfg or {})
 
@@ -822,6 +899,8 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
   {stock_section}
 
   {shinhan_section}
+
+  {dart_section}
 
   {top_section}
 
@@ -1056,10 +1135,11 @@ def main():
     us_rates    = fetch_us_rates()
     rates_cfg   = load_rates_config()
 
-    # ── 2. 주요 뉴스 5 + 신한IB 뉴스 ────────────────
+    # ── 2. 주요 뉴스 5 + 신한IB 뉴스 + DART 공시 ─────
     print('  주요 뉴스 수집...')
-    top_news     = fetch_top_market_news(5)
-    shinhan_news = fetch_shinhan_ib_news(5)
+    top_news         = fetch_top_market_news(5)
+    shinhan_news     = fetch_shinhan_ib_news(5)
+    dart_disclosures = fetch_dart_disclosures(companies, days=3)
     print(f'  주요 뉴스: {len(top_news)}건 / 신한IB: {len(shinhan_news)}건')
 
     # ── 3. 기업별 뉴스 수집 ──────────────────────────
@@ -1094,7 +1174,8 @@ def main():
     # ── 3. HTML 생성 & 저장 + 3M 스파크라인 데이터 ──
     html     = build_html_report(market_data, stock_data, sections, now, session,
                                   us_rates=us_rates, rates_cfg=rates_cfg,
-                                  top_news=top_news, shinhan_news=shinhan_news)
+                                  top_news=top_news, shinhan_news=shinhan_news,
+                                  dart_disclosures=dart_disclosures)
     page_url = save_html_report(html, session)
     print('  3M 스파크라인 데이터 수집...')
     save_prices3m(stock_data, market_data)
