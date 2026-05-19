@@ -1880,6 +1880,8 @@ def sync():
         if non_dup_skip > 0:
             non_dup_parts = [f"{k}={v}" for k, v in skip_reasons.items() if v > 0 and k != 'duplicate_id']
             msg += f"\n\n[필터 SKIP {non_dup_skip}건: {', '.join(non_dup_parts)}]"
+        # 대시보드 링크
+        msg += "\n\n📊 [전체 훈련 대시보드](https://sywoolab.github.io/training-dashboard/)"
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
 
@@ -2047,6 +2049,7 @@ def resend_today():
 
     plan_adj = check_plan_adherence(workout_log, schedule_data)
     msg = format_workout_message(parsed_list, health, plan_adj, schedule_data, workout_log)
+    msg += "\n\n📊 [전체 훈련 대시보드](https://sywoolab.github.io/training-dashboard/)"
     ok = send_telegram(msg)
     print(f"  텔레그램 전송: {'성공' if ok else '실패'} ({len(parsed_list)}건)")
 
