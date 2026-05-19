@@ -800,7 +800,10 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>신한증권 IB종합금융부 Daily Brief — {date_str}</title>
+  <title>{now.strftime('%y%m%d')} 신한증권 IB종합금융부 Daily Brief</title>
+  <meta property="og:title" content="{now.strftime('%y%m%d')} 신한증권 IB종합금융부 Daily Brief">
+  <meta property="og:description" content="{date_str} 마켓 스냅샷 · 워치리스트 주가 · IB 뉴스">
+  <meta property="og:type" content="website">
   {HTML_STYLE}
 </head>
 <body>
