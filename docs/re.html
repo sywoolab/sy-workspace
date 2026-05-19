@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>260520 MS 부동산 Dashboard</title>
+  <meta property="og:title" content="260520 MS 부동산 Dashboard">
+  <meta property="og:description" content="2026년 05월 20일 (수) 서울/분당 신혼부부 매수 의사결정 대시보드">
+  
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+         background: #f0f4f8; color: #1a202c; font-size: 14px; line-height: 1.5; }
+  .container { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+  /* 헤더 */
+  .header { background: linear-gradient(135deg, #1a3c5e 0%, #2d6a4f 100%);
+            color: #fff; border-radius: 12px; padding: 20px 24px; margin-bottom: 14px; }
+  .header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+  .header .meta { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+  .badge { display: inline-block; border-radius: 6px; padding: 2px 10px;
+           font-size: 12px; font-weight: 700; margin-left: 8px; }
+  .badge-yellow { background: rgba(251,191,36,0.3); color: #fef08a; }
+  .badge-green  { background: rgba(52,211,153,0.3); color: #a7f3d0; }
+  .badge-red    { background: rgba(248,113,113,0.3); color: #fca5a5; }
+
+  /* 카드 */
+  .card { background: #fff; border-radius: 10px; padding: 16px 18px;
+          margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: 0.8px; color: #6b7280; margin-bottom: 12px; }
+
+  /* 시장 스냅샷 그리드 */
+  .snap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .snap-item { background: #f8fafc; border-radius: 8px; padding: 11px 13px; }
+  .snap-item .label { font-size: 10px; color: #9ca3af; font-weight: 600;
+                      text-transform: uppercase; letter-spacing: 0.5px; }
+  .snap-item .value { font-size: 20px; font-weight: 800; margin: 3px 0; color: #111827; }
+  .snap-item .sub   { font-size: 11px; color: #6b7280; }
+
+  /* 신호등 */
+  .signal-card { display: flex; align-items: center; gap: 16px; }
+  .signal-dot  { width: 48px; height: 48px; border-radius: 50%;
+                 display: flex; align-items: center; justify-content: center;
+                 font-size: 22px; flex-shrink: 0; }
+  .signal-yellow { background: #fef9c3; }
+  .signal-green  { background: #dcfce7; }
+  .signal-red    { background: #fee2e2; }
+  .signal-info h3 { font-size: 15px; font-weight: 700; color: #1a202c; }
+  .signal-info p  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  /* 청약 카드 그리드 */
+  .chungyak-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .chungyak-item { background: #f8fafc; border-radius: 8px; padding: 12px 14px;
+                   border-left: 3px solid #2d6a4f; }
+  .chungyak-item .cname { font-weight: 700; font-size: 14px; color: #1a202c; }
+  .chungyak-item .ctype { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+  .chungyak-item .cloc  { font-size: 12px; color: #374151; margin-top: 4px; }
+  .chungyak-item a { font-size: 11px; color: #2563eb; text-decoration: none; margin-top: 6px; display: inline-block; }
+  .chungyak-item a:hover { text-decoration: underline; }
+
+  /* 테이블 */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { font-size: 11px; color: #6b7280; font-weight: 700; text-align: center;
+             padding: 6px 8px; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+  tbody td { padding: 7px 8px; border-bottom: 1px solid #f3f4f6; text-align: center;
+             white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f9fafb; }
+  .td-name { text-align: left; font-weight: 600; color: #1a202c; }
+  .td-rank { font-weight: 700; color: #6b7280; width: 30px; }
+  .score-high { color: #dc2626; font-weight: 700; }
+  .score-mid  { color: #d97706; font-weight: 600; }
+  .score-low  { color: #6b7280; }
+  .trend-up  { color: #dc2626; font-weight: 600; }
+  .trend-dn  { color: #1d4ed8; font-weight: 600; }
+  .trend-nt  { color: #9ca3af; }
+  .tag { display: inline-block; background: #f3f4f6; border-radius: 4px;
+         padding: 1px 5px; font-size: 10px; color: #374151; }
+  .tag-gap  { background: #dcfce7; color: #166534; }
+  .tag-live { background: #dbeafe; color: #1e40af; }
+
+  /* 로직 섹션 */
+  .logic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .logic-item { background: #f8fafc; border-radius: 8px; padding: 10px 12px; }
+  .logic-item .var { font-size: 11px; font-weight: 800; color: #374151; }
+  .logic-item .desc { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .logic-item .wt { font-size: 10px; margin-top: 4px; }
+  .wt-gap  { color: #166534; }
+  .wt-live { color: #1e40af; }
+
+  /* 뉴스 */
+  .news-item { padding: 7px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 10px; }
+  .news-item:last-child { border-bottom: none; }
+  .news-num  { font-size: 11px; font-weight: 700; color: #9ca3af; min-width: 16px; padding-top: 2px; }
+  .news-body { flex: 1; }
+  .news-title { font-size: 13px; color: #2563eb; text-decoration: none; display: block; }
+  .news-title:hover { text-decoration: underline; }
+  .news-meta  { font-size: 10px; color: #9ca3af; margin-top: 1px; }
+
+  /* 푸터 */
+  .footer { text-align: center; font-size: 11px; color: #9ca3af; padding: 16px 0 8px; }
+
+  @media (max-width: 600px) {
+    .snap-grid { grid-template-columns: repeat(2, 1fr); }
+    .chungyak-grid { grid-template-columns: 1fr; }
+    .logic-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>🏠 MS 부동산 Dashboard <span class="badge badge-yellow">관망 (매수 보류)</span></h1>
+    <div class="meta">2026년 05월 20일 (수) &nbsp;·&nbsp; 08:42 KST &nbsp;·&nbsp; 실거래가 기준 · 매수자: 무주택 신혼부부 · 서울/분당</div>
+  </div>
+
+  <!-- 1. 시장 스냅샷 -->
+  <div class="card">
+    <div class="card-title">📊 시장 스냅샷 &nbsp;<span style="font-size:10px;color:#9ca3af">금리: 수동 업데이트 (2026-05-20) &nbsp;|&nbsp; 시장 상태</span></div>
+    <div class="snap-grid">
+        <div class="snap-item">
+          <div class="label">기준금리</div>
+          <div class="value">2.75%</div>
+          <div class="sub">한국은행</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">주담대(고정)</div>
+          <div class="value">3.4%</div>
+          <div class="sub">5대은행 평균</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">주담대(변동)</div>
+          <div class="value">3.1%</div>
+          <div class="sub">5대은행 평균</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">전세대출</div>
+          <div class="value">3.8%</div>
+          <div class="sub">버팀목 제외</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">현금 가용</div>
+          <div class="value">6억원</div>
+          <div class="sub">세전 연 3억+ 기준</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">매수 상한</div>
+          <div class="value">11.6억원</div>
+          <div class="sub">취득세 포함 총비용</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">서울 전세가율</div>
+          <div class="value">50.9%</div>
+          <div class="sub">2026-03 (KB부동산)</div>
+        </div>
+        <div class="snap-item">
+          <div class="label">목표 매수창</div>
+          <div class="value">2026 하반기 ~ 2027 상반기</div>
+          <div class="sub">5월 양도세 중과 복원 후 급</div>
+        </div>
+    </div>
+  </div>
+
+  <!-- 2. 매수 신호등 -->
+  <div class="card">
+    <div class="card-title">🎯 매수 전략 현황</div>
+    <div class="signal-card">
+      <div class="signal-dot signal-yellow">🟡</div>
+      <div class="signal-info">
+        <h3>관망 (매수 보류)</h3>
+        <p>목표 창: 2026 하반기 ~ 2027 상반기</p>
+        <p style="margin-top:2px">5월 양도세 중과 복원 후 급매물 대기</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 청약 Today -->
+  <div class="card">
+    <div class="card-title">📋 청약·임대 등록 단지 (7개) &nbsp;<span style="font-size:10px;color:#9ca3af">소득 제한 없는 줍줍·임의공급 포함</span></div>
+    <div class="chungyak-grid">
+        <div class="chungyak-item">
+          <div class="cname">SH 제7차 미리내집 (장기전세2)</div>
+          <div class="ctype">장기전세 (분양전환 가능, 신혼특화)</div>
+          <div class="cloc">📍 서울 동작 상도/신대방, 강북 미아 (신규 124호) </div>
+          <div class="cloc">📅 2026-05-06</div>
+          <a href="https://www.i-sh.co.kr/app/lay2/program/S48T6792C6814/m_14/appNoti/appUser_list.do?splyTy=03" target="_blank" rel="noopener">신청 →</a>
+        </div>
+        <div class="chungyak-item">
+          <div class="cname">SH 제50차 장기전세주택</div>
+          <div class="ctype">장기전세 (분양전환 X, 임대 20년)</div>
+          <div class="cloc">📍 서울 전역 (신규: 강북 미아, 동작 상도, 동작 신대</div>
+          <div class="cloc">📅 2026-05-13</div>
+          <a href="https://www.i-sh.co.kr/app/lay2/program/S48T1587C612/m_14/appNoti/appUser_list.do?splyTy=03" target="_blank" rel="noopener">신청 →</a>
+        </div>
+        <div class="chungyak-item">
+          <div class="cname">SH 2026년 전세임대형 든든주택</div>
+          <div class="ctype">전세임대 (다가구·다세대)</div>
+          <div class="cloc">📍 서울 전역 (입주자가 매물 직접 선정)</div>
+          <div class="cloc">📅 2026-05-18</div>
+          <a href="https://www.i-sh.co.kr/app/index.do" target="_blank" rel="noopener">신청 →</a>
+        </div>
+        <div class="chungyak-item">
+          <div class="cname">래미안 라그란데 잔여세대 일반공급</div>
+          <div class="ctype">잔여세대 일반공급 (취소후재공급, 추첨)</div>
+          <div class="cloc">📍 서울 동대문구 이문로35길 12 (이문동)</div>
+          <div class="cloc">📅 2026-05-12</div>
+          <a href="https://www.applyhome.co.kr/co/coa/selectMainView.do" target="_blank" rel="noopener">신청 →</a>
+        </div>
+        <div class="chungyak-item">
+          <div class="cname">안양 에버포레 자연앤 e편한세상 A2BL</div>
+          <div class="ctype">민영 분양가상한제</div>
+          <div class="cloc">📍 경기 안양시 동안구 관양동 521 일원</div>
+          <div class="cloc">📅 2026-05-11</div>
+          <a href="https://www.applyhome.co.kr/co/coa/selectMainView.do" target="_blank" rel="noopener">신청 →</a>
+        </div>
+        <div class="chungyak-item">
+          <div class="cname">더샵 분당센트로 (무지개마을4단지 리모델링)</div>
+          <div class="ctype">임의공급 (잔여세대 줍줍)</div>
+          <div class="cloc">📍 경기 성남시 분당구 미금로 66 (분당구)</div>
+          <div class="cloc">📅 2026-05-07</div>
+          <a href="https://www.applyhome.co.kr/co/coa/selectMainView.do" target="_blank" rel="noopener">신청 →</a>
+        </div>
+    </div>
+  </div>
+
+  <!-- 4. Top 20 관심 단지 -->
+  <div class="card">
+    <div class="card-title">🏆 관심 단지 Top 20 &nbsp;<span style="font-size:10px;color:#9ca3af">매수상한 11.6억 이내 · 실거주 총점 기준 · 데이터: scored_all.csv (2026-05-20 기준)</span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+            <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+            <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="td-rank">1</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B3%B4%EB%9D%BC%EB%A7%A4%20%EC%8B%A0%EB%8F%99%EC%95%84%20%ED%8C%8C%EB%B0%80%EB%A6%AC%EC%97%90%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">보라매 신동아 파밀리에</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>10.3억</b></td>
+          <td class="trend-up">+8.9%</td>
+          <td>47.5%</td>
+          <td>32분</td>
+          <td>4.7억</td>
+          <td>4.7억</td>
+          <td>2016</td>
+          <td>9</td>
+          <td class="score-high"><b>79.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">2</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%84%B1%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남성</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.2억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.6억</td>
+          <td>4.6억</td>
+          <td>1983</td>
+          <td>5</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">3</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C1%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌1차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+15.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>5.5억</td>
+          <td>1997</td>
+          <td>2</td>
+          <td class="score-high"><b>75.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">4</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%AC%B8%ED%99%94%EC%B4%8C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">문화촌현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>8.0억</b></td>
+          <td class="trend-up">+16.3%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>2.6억</td>
+          <td>2.6억</td>
+          <td>2002</td>
+          <td>5</td>
+          <td class="score-high"><b>74.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">5</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제삼성래미안</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>8.7억</b></td>
+          <td class="trend-up">+12.1%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.0억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">6</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%AD%EA%B5%AC1%EC%B0%A8%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">청구1차</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+8.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.5억</td>
+          <td>5.5억</td>
+          <td>1994</td>
+          <td>8</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">7</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%95%84%20%EC%A2%85%EB%A1%9C%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동아</a></td>
+          <td>종로구</td>
+          <td>84㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+12.8%</td>
+          <td>57.1%</td>
+          <td>39분</td>
+          <td>-</td>
+          <td>3.2억</td>
+          <td>1995</td>
+          <td>3</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">8</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%9C%EC%97%B0%EB%9C%A8%EB%9E%80%EC%B1%84%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">천연뜨란채</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.6%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>7</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">9</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%9E%91%EC%83%81%EB%96%BC%EB%B9%8C%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동작상떼빌</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.4%</td>
+          <td>47.8%</td>
+          <td>36분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>4</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">10</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.1억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.4억</td>
+          <td>4.4억</td>
+          <td>1999</td>
+          <td>5</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">11</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%ED%98%B8%EA%B7%B8%EB%A6%B0%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼호그린</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>7.8억</b></td>
+          <td class="trend-up">+11.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>2.5억</td>
+          <td>1999</td>
+          <td>2</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">12</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%8C%8C%ED%81%AC%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악파크푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>10.0억</b></td>
+          <td class="trend-up">+8.3%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>4.2억</td>
+          <td>4.4억</td>
+          <td>2014</td>
+          <td>8</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">13</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%96%91%ED%8F%89%EB%B2%BD%EC%82%B0%EB%B8%94%EB%A3%A8%EB%B0%8D%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">양평벽산블루밍</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+10.5%</td>
+          <td>47.5%</td>
+          <td>37분</td>
+          <td>3.2억</td>
+          <td>3.2억</td>
+          <td>1990</td>
+          <td>4</td>
+          <td class="score-high"><b>70.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">14</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C2%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌2차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.0억</b></td>
+          <td class="trend-up">+5.8%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>4.3억</td>
+          <td>1998</td>
+          <td>2</td>
+          <td class="score-high"><b>70.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">15</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>9.5억</b></td>
+          <td class="trend-up">+14.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.8억</td>
+          <td>1992</td>
+          <td>3</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">16</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%94%BC%EC%96%B4%EB%A6%AC%EC%8A%A4%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">피어리스</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>7.5억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>55.1%</td>
+          <td>36분</td>
+          <td>-</td>
+          <td>2.4억</td>
+          <td>1987</td>
+          <td>2</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">17</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%EC%9B%90%ED%98%84%EB%8C%80%28459-0%29%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제원현대(459-0)</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>10.6억</b></td>
+          <td class="trend-up">+5.9%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>4.9억</td>
+          <td>4.9억</td>
+          <td>2000</td>
+          <td>4</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">18</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%EB%8F%99%EB%B6%80%EC%84%BC%ED%8A%B8%EB%A0%88%EB%B9%8C%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악동부센트레빌</a></td>
+          <td>관악구</td>
+          <td>59㎡</td>
+          <td><b>11.2억</b></td>
+          <td class="trend-up">+16.4%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>5.6억</td>
+          <td>5.6억</td>
+          <td>2004</td>
+          <td>4</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">19</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B4%89%EC%B2%9C%EC%9A%B0%EC%84%B1%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">봉천우성</a></td>
+          <td>관악구</td>
+          <td>59㎡</td>
+          <td><b>9.0억</b></td>
+          <td class="trend-up">+11.0%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>3.3억</td>
+          <td>3.3억</td>
+          <td>2000</td>
+          <td>10</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">20</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%EB%93%9C%EB%A6%BC%28%EB%8F%99%EC%95%84%29%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악드림(동아)</a></td>
+          <td>관악구</td>
+          <td>59㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+10.7%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2003</td>
+          <td>5</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:8px">
+      단지명 클릭 → 네이버 부동산 검색 &nbsp;|&nbsp; 갭현금 ≤5.5억: 갭투자 적합 &nbsp;|&nbsp; 실거주현금 ≤6억: 실거주 가능
+    </div>
+  </div>
+
+  <!-- 5. 추천 로직 -->
+  <div class="card">
+    <div class="card-title">⚙️ 추천 로직 — 스코어링 변수 (S1~S8)</div>
+    <div class="logic-grid">
+        <div class="logic-item">
+          <div class="var">S1 · 가격 추세</div>
+          <div class="desc">최근 거래가 상승률</div>
+          <div class="wt">
+            <span class="wt-gap">갭30</span> &nbsp;
+            <span class="wt-live">실5</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S2 · 가격대</div>
+          <div class="desc">매수상한(11.6억) 이내 적합도</div>
+          <div class="wt">
+            <span class="wt-gap">갭15</span> &nbsp;
+            <span class="wt-live">실0</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S3 · 거래량</div>
+          <div class="desc">실거래 건수 유동성</div>
+          <div class="wt">
+            <span class="wt-gap">갭10</span> &nbsp;
+            <span class="wt-live">실0</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S4 · 통근</div>
+          <div class="desc">여의도×0.4+청계산×0.6</div>
+          <div class="wt">
+            <span class="wt-gap">갭15</span> &nbsp;
+            <span class="wt-live">실5</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S5 · 독립문</div>
+          <div class="desc">친가(독립문역) 접근성</div>
+          <div class="wt">
+            <span class="wt-gap">갭5</span> &nbsp;
+            <span class="wt-live">실0</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S6 · 연식</div>
+          <div class="desc">준공연도(신축일수록↑)</div>
+          <div class="wt">
+            <span class="wt-gap">갭5</span> &nbsp;
+            <span class="wt-live">실0</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S7 · 할인율</div>
+          <div class="desc">KB시세 대비 실거래가</div>
+          <div class="wt">
+            <span class="wt-gap">갭5</span> &nbsp;
+            <span class="wt-live">실0</span>
+          </div>
+        </div>
+        <div class="logic-item">
+          <div class="var">S8 · 전세가율</div>
+          <div class="desc">KB전세가율(높을수록↑)</div>
+          <div class="wt">
+            <span class="wt-gap">갭15</span> &nbsp;
+            <span class="wt-live">실</span>
+          </div>
+        </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:#6b7280;background:#f8fafc;border-radius:8px;padding:10px 12px">
+      <b>전략별 가중치</b>: 갭투자(S1:30, S4:15, S2:15, S8:15) · 실거주(S4:25, S1:25, S6:10, S5:10) · 전월세(S4:30, S8:15, S5:15, S1:10)<br>
+      <b>매수자 기준</b>: 현금 6억 · 여의도 + 청계산입구 통근 각 60분 이내 · 매매가 11.6억 이하 · 부부 무주택 생애최초 (LTV 70%)
+    </div>
+  </div>
+
+  <!-- 6. 부동산 뉴스 -->
+  <div class="card">
+    <div class="card-title">📰 부동산 뉴스 (최근 12시간)</div>
+    
+        <div class="news-item">
+          <div class="news-num">1</div>
+          <div class="news-body">
+            <a class="news-title" href="https://news.google.com/rss/articles/CBMiYEFVX3lxTFA4b3JXNEV1anA3Tzk1bVhIcE1QYzYtNXlWOTh6RENaVUlrSXhSakRBdE5nN2pzTVNxUEZOVWdBaWozS2NSbjNKeXZpaFRBQXNLbkVIaXFWZmp5MHBTZVczUNIBeEFVX3lxTE1fQWYwRnQ2Vnd6eWI4NDZPNkNhVEdzR1dUR2I0ZGhNclFPV25xWW5fNmRvenQzeUdZZTJaNHBmRlZwNHQ2MmhJcXM5THNLUGVIWnBVRU5FUXlnbGF2ZFdDbjZNSUZCbHdYcDFHOXh6Nm1VaTJlc1B2QQ?oc=5" target="_blank" rel="noopener">100대1 경쟁률은 기본…신축 기근에 서울 청약시장 '과열' - 뉴시스</a>
+            <div class="news-meta">뉴시스  05/20 06:00</div>
+          </div>
+        </div>
+  </div>
+
+  <div class="footer">
+    MS 부동산 Dashboard &nbsp;·&nbsp; 가격: 국토부 실거래가 API 로우데이터 기반 (추정치 포함 금지) &nbsp;·&nbsp; 생성: 2026-05-20 08:42 KST
+  </div>
+</div>
+</body>
+</html>

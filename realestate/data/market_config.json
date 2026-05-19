@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "updated": "2026-05-20",
+    "note": "수동 업데이트 파일. 금리·지수는 변경 시 이 파일만 수정."
+  },
+  "rates": {
+    "base_rate":      { "value": 2.75, "label": "기준금리",     "note": "한국은행 2025.02 인하" },
+    "mortgage_fixed": { "value": 3.40, "label": "주담대(고정)", "note": "5대은행 평균" },
+    "mortgage_var":   { "value": 3.10, "label": "주담대(변동)", "note": "5대은행 평균" },
+    "jeonse_loan":    { "value": 3.80, "label": "전세대출",     "note": "버팀목 제외" }
+  },
+  "budget": {
+    "cash_avail":    600000000,
+    "max_purchase":  1160000000,
+    "note": "현금 6억 기준 취득세 역산 매수상한 11.6억"
+  },
+  "strategy": {
+    "current_rec": "관망 (매수 보류)",
+    "target_window": "2026 하반기 ~ 2027 상반기",
+    "trigger": "5월 양도세 중과 복원 후 급매물 대기",
+    "color": "yellow"
+  },
+  "market_index": {
+    "seoul_jeonse_rate": 50.9,
+    "updated": "2026-03 (KB부동산)",
+    "note": "서울 평균 전세가율"
+  }
+}

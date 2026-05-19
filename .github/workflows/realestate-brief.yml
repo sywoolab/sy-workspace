@@ -1,0 +1,46 @@
+name: realestate-brief
+
+on:
+  schedule:
+    - cron: '30 22 * * 0'   # 매주 월요일 07:30 KST (UTC 일요일 22:30)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - name: MS 부동산 Dashboard HTML 생성
+        env:
+          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python realestate/scripts/re_brief.py
+
+      - name: 실패 시 텔레그램 알림
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.REALESTATE_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="⚠️ MS 부동산 Dashboard 생성 실패 ($(date '+%Y-%m-%d %H:%M KST'))" || true
+
+      - name: Commit HTML
+        if: always()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add docs/re.html realestate/data/market_config.json 2>/dev/null || true
+          if ! git diff --staged --quiet; then
+            git commit -m "realestate: MS 부동산 Dashboard update"
+            git pull --rebase --autostash
+            git push
+          fi
