@@ -323,7 +323,7 @@ def _parse_pub_date(raw):
 def fetch_news(company_name, aliases=None):
     terms = [company_name] + (aliases or [])
     query = '+OR+'.join([f'%22{t}%22' for t in terms])
-    url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
+    url   = f'https://news.google.com/rss/search?q={query}+when:12h&hl=ko&gl=KR&ceid=KR:ko'
     out   = []
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
@@ -358,7 +358,7 @@ SHINHAN_NOISE_KEYWORDS = [
 def fetch_shinhan_ib_news(n=5):
     """신한증권/신한IB 뉴스 — IB 딜 관련만 필터"""
     query = '%22신한투자증권%22+OR+%22신한증권%22+OR+%22신한IB%22'
-    url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
+    url   = f'https://news.google.com/rss/search?q={query}+when:12h&hl=ko&gl=KR&ceid=KR:ko'
     arts  = []
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
@@ -389,7 +389,7 @@ def fetch_shinhan_ib_news(n=5):
 def fetch_top_market_news(n=5):
     """IB 시장 주요 뉴스 — 기업 무관, 매체 가중치 상위 N건 (날짜 포함)"""
     query = 'IPO+OR+상장+OR+M%26A+OR+인수+OR+채권+OR+기업공개+OR+사모펀드+OR+PE+OR+딜'
-    url   = f'https://news.google.com/rss/search?q={query}+when:1d&hl=ko&gl=KR&ceid=KR:ko'
+    url   = f'https://news.google.com/rss/search?q={query}+when:12h&hl=ko&gl=KR&ceid=KR:ko'
     arts  = []
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)

@@ -26,6 +26,14 @@ jobs:
           IB_TEAM_CHAT_ID: ${{ secrets.IB_TEAM_CHAT_ID }}
         run: python ib/scripts/ib_team_news.py
 
+      - name: 실패 시 텔레그램 알림
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.IB_TEAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.IB_TEAM_CHAT_ID }}" \
+            -d text="⚠️ <b>IB Daily Brief 자동 발송 실패</b>%0A$(date +'%Y-%m-%d %H:%M KST')" \
+            -d parse_mode="HTML" || true
+
       - name: Commit HTML & sent record
         if: always()
         run: |
