@@ -62,6 +62,7 @@ def main():
             'hrv_weekly': hrv_d.get('weekly_avg'),
             'sleep_min': sleep_min,
             'planned': e.get('planned',''),
+            'log_metrics': e.get('metrics') or {},  # 단일 주 종목 metrics (fallback)
         })
 
     now_str = datetime.now(KST).strftime('%Y-%m-%d %H:%M KST')
@@ -137,12 +138,26 @@ tr:hover{{background:#15152a}}
         dow = ['월','화','수','목','금','토','일'][dt.weekday()]
         date_s = f"{dk[5:]} ({dow})"
 
+        # actual 텍스트에서 거리 파싱 (all_metrics distance_m=None 보완)
+        import re as _re
+        actual_text = e.get('actual', '') or ''
         badges = ''
         for m in e['metrics']:
             t = m.get('type','')
             dist = m.get('distance_m') or 0
             pace = m.get('avg_pace','') or ''
             spd = m.get('avg_speed') or 0
+            # fallback: actual 텍스트에서 거리 추출
+            if not dist:
+                patterns = {'bike': r'자전거\s+([\d.]+)km', 'run': r'러닝\s+([\d.]+)km', 'swim': r'수영\s+(\d+)m|OW\s+(\d+)m'}
+                pat = patterns.get(t, '')
+                if pat:
+                    for chunk in actual_text.split('+'):
+                        m2 = _re.search(pat, chunk.strip())
+                        if m2:
+                            v = next(g for g in m2.groups() if g)
+                            dist = float(v) * (1000 if t == 'bike' or t == 'run' else 1)
+                            break
             if t=='swim': info=f"{int(dist)}m {pace}"
             elif t=='bike': info=f"{dist/1000:.0f}km {spd*3.6:.1f}km/h" if spd else f"{dist/1000:.0f}km"
             elif t=='run': info=f"{dist/1000:.1f}km {pace}"
@@ -170,7 +185,29 @@ tr:hover{{background:#15152a}}
         rc = ' class="race-row"' if is_race else (' class="today-row"' if is_today else '')
         html += f'<tr{rc}><td>{date_s}</td><td>{badges}</td><td class="tl-cell">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
 
-    html += f"""</tbody></table>
+    html += "</tbody></table>"
+
+    # 주요 대회 일정 섹션
+    all_races = [
+        ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
+        ("2026-06-21", "한강리버크로스스위밍", "OW 2km 도강", "OW 패닉 대응 실전 / 사이팅 거리 감"),
+        ("2026-06-28", "고령 대가야 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:42 (5/10 -8:39)"),
+        ("2026-08-27", "거제 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:35 (가을 시즌)"),
+    ]
+    html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
+    for rdate, rname, rdist, rgoal in all_races:
+        d = days_until(rdate)
+        if d < 0:
+            dstr, dcol = f'완료 ({rdate[5:]})', '#444'
+        elif d == 0:
+            dstr, dcol = '🏁 오늘!', '#ff6c6c'
+        else:
+            dcol = '#ff6c6c' if d<7 else '#ffd56c' if d<21 else '#7c6fff'
+            dstr = f'D-{d} ({rdate[5:]})'
+        html += f'<tr><td style="color:{dcol};font-weight:600;white-space:nowrap">{dstr}</td><td>{rname}</td><td style="color:#888;font-size:11px">{rdist}</td><td style="color:#6affa0;font-size:11px">{rgoal}</td></tr>\n'
+    html += '</tbody></table>'
+
+    html += f"""
 <div style="color:#333;font-size:11px;margin-top:14px;text-align:center">
 sy-workspace / workout_log.json · {now_str}</div>
 </body></html>"""
