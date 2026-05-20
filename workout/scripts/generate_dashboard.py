@@ -307,10 +307,73 @@ new Chart(document.getElementById('tlChart'), {{
         html += f'<tr{bg}><td style="color:{date_color};font-weight:{"600" if is_today_r or is_race_r else "400"};white-space:nowrap">{date_s}</td><td style="color:{plan_color}">{plan}</td></tr>\n'
     html += '</tbody></table>'
 
+    # ── 종목별 주차 트렌드 계산 ──
+    sched_full = json.loads(SCHED_FILE.read_text(encoding='utf-8')) if SCHED_FILE.exists() else {}
+    history = sched_full.get('analysis_history', [])
+    trend_rows = []
+    for h in history:
+        ws = h.get('week_start', '')
+        if not ws:
+            continue
+        sp = h.get('swim_pace_100m', 0)
+        bs = h.get('bike_speed_kmh', 0)
+        rm = h.get('run_min_standalone', 0)
+        pm = h.get('pure_sport_min', 0)
+        trend_rows.append((ws, sp, bs, rm, pm))
+    trend_rows.sort(key=lambda x: x[0])
+
+    # ── 날짜별 준수 여부 ──
+    def _plan_types(text):
+        t = (text or '').lower()
+        types = set()
+        if any(k in t for k in ('러닝', 'run', '달리기')): types.add('run')
+        if any(k in t for k in ('수영', 'swim', 'ow')): types.add('swim')
+        if any(k in t for k in ('자전거', 'bike', '사이클')): types.add('bike')
+        if any(k in t for k in ('브릭', 'brick')): types.update({'run', 'bike'})
+        return types
+
+    def _actual_types(e):
+        if not e or not e.get('done'): return set()
+        ts = set()
+        for m in (e.get('all_metrics') or []):
+            if m.get('type') in ('swim', 'run', 'bike'): ts.add(m['type'])
+        if not ts:
+            a = (e.get('actual') or '').lower()
+            if any(k in a for k in ('러닝', 'run')): ts.add('run')
+            if any(k in a for k in ('수영', 'swim', 'ow')): ts.add('swim')
+            if any(k in a for k in ('자전거', 'bike')): ts.add('bike')
+        return ts
+
+    compliance_map = {}
+    overrides = sched_full.get('overrides', {})
+    today_dt2 = datetime.now(KST)
+    for dk in all_dates:
+        d = datetime.strptime(dk, '%Y-%m-%d').replace(tzinfo=KST)
+        if d.date() >= today_dt2.date():
+            compliance_map[dk] = 'future'
+            continue
+        entry = log.get(dk) or {}
+        planned_text = entry.get('planned') or (overrides.get(dk) or {}).get('workout', '')
+        is_rest_p = any(k in (planned_text or '').lower() for k in ('휴식', 'rest'))
+        plan_types = _plan_types(planned_text)
+        act_types = _actual_types(entry)
+        if is_rest_p and not act_types:
+            compliance_map[dk] = 'rest'
+        elif is_rest_p and act_types:
+            compliance_map[dk] = 'extra'
+        elif not plan_types:
+            compliance_map[dk] = 'none'
+        elif plan_types & act_types:
+            compliance_map[dk] = 'ok'
+        elif not act_types:
+            compliance_map[dk] = 'miss'
+        else:
+            compliance_map[dk] = 'partial'
+
     html += f"""
 <div class="section">훈련 기록 (3/16~, 전체 {len(all_dates)}일)</div>
 <table><thead><tr>
-<th>날짜</th><th>운동</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
+<th>날짜</th><th>계획</th><th>운동 (준수)</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
 </tr></thead><tbody>
 """
 
@@ -388,12 +451,62 @@ new Chart(document.getElementById('tlChart'), {{
         def hc(v): return 'g' if (v or 0)>=60 else 'y' if (v or 0)>=45 else 'r' if v else 'dim'
         hrv_s = f'<span class="{hc(hrv_l)}">{hrv_l}</span>/<span class="{hc(hrv_w)}">{hrv_w}</span>' if (hrv_l and hrv_w) else (f'<span class="{hc(hrv_l)}">{hrv_l}</span>' if hrv_l else '-')
 
+        # 계획 컬럼
+        entry_log = log.get(dk) or {}
+        planned_text = entry_log.get('planned') or (overrides.get(dk) or {}).get('workout', '')
+        planned_short = (planned_text or '').replace('🏊 ','').replace('🏃 ','').replace('🚴 ','').replace('🏁 ','')
+        planned_short = planned_short[:28] + ('…' if len(planned_short) > 28 else '')
+        planned_s = f'<span style="color:#666;font-size:10.5px">{planned_short}</span>' if planned_short else '-'
+
+        # 준수 마크
+        comp = compliance_map.get(dk, 'none')
+        comp_icon = {'ok': '✅', 'miss': '❌', 'partial': '⚠️', 'extra': '💪', 'rest': '😴', 'future': '', 'none': ''}.get(comp, '')
+        badges_with_comp = f'{badges} {comp_icon}' if comp_icon else badges
+
         is_race_day = any(dk==r[0] for r in races)
         is_today_day = dk==today
         rc = ' class="race-row"' if is_race_day else (' class="today-row"' if is_today_day else (' class="rest-row"' if is_rest else ''))
-        html += f'<tr{rc}><td>{date_s}</td><td>{badges}</td><td style="white-space:nowrap">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
+        html += f'<tr{rc}><td>{date_s}</td><td>{planned_s}</td><td>{badges_with_comp}</td><td style="white-space:nowrap">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
 
     html += "</tbody></table>"
+
+    # ── 종목별 실력 트렌드 섹션 ──
+    if trend_rows:
+        def fmt_pace(sec):
+            if not sec: return '—'
+            return f"{int(sec)//60}:{int(sec)%60:02d}"
+
+        html += '<div class="section">📈 종목별 실력 트렌드 (주차별)</div>'
+        html += '<table><thead><tr><th>주차</th><th>🏊 수영 pace/100m</th><th>🚴 자전거 km/h</th><th>🏃 러닝 10km 예측</th><th>순수 운동합계</th></tr></thead><tbody>'
+        for i, (ws, sp, bs, rm, pm) in enumerate(trend_rows):
+            d_ws = datetime.strptime(ws, '%Y-%m-%d')
+            week_label = f"{ws[5:]} ~"
+            sp_s = fmt_pace(sp) if sp else '—'
+            bs_s = f'{bs:.1f}' if bs else '—'
+            rm_s = f'{rm:.0f}분' if rm else '—'
+            pm_h, pm_m = divmod(int(pm or 0), 60)
+            pm_s = f'{pm_h}:{pm_m:02d}' if pm else '—'
+
+            # 개선 화살표 vs 전주
+            sp_trend = bs_trend = rm_trend = pm_trend = ''
+            if i > 0:
+                prev_sp = trend_rows[i-1][1]
+                prev_bs = trend_rows[i-1][2]
+                prev_rm = trend_rows[i-1][3]
+                prev_pm = trend_rows[i-1][4]
+                if sp and prev_sp and abs(sp - prev_sp) >= 2:
+                    sp_trend = f' <span style="color:{"#6affa0" if sp < prev_sp else "#ff6c6c"}">{"▼" if sp < prev_sp else "▲"}</span>'
+                if bs and prev_bs and abs(bs - prev_bs) >= 0.5:
+                    bs_trend = f' <span style="color:{"#6affa0" if bs > prev_bs else "#ff6c6c"}">{"▲" if bs > prev_bs else "▼"}</span>'
+                if rm and prev_rm and abs(rm - prev_rm) >= 0.5:
+                    rm_trend = f' <span style="color:{"#6affa0" if rm < prev_rm else "#ff6c6c"}">{"▼" if rm < prev_rm else "▲"}</span>'
+                if pm and prev_pm and abs(pm - prev_pm) >= 0.5:
+                    pm_trend = f' <span style="color:{"#6affa0" if pm < prev_pm else "#ff6c6c"}">{"▼" if pm < prev_pm else "▲"}</span>'
+
+            is_current = (i == len(trend_rows) - 1)
+            row_style = ' style="background:#0d2a0d"' if is_current else ''
+            html += f'<tr{row_style}><td style="color:#888;white-space:nowrap">{week_label}</td><td>{sp_s}{sp_trend}</td><td>{bs_s}{bs_trend}</td><td>{rm_s}{rm_trend}</td><td>{pm_s}{pm_trend}</td></tr>\n'
+        html += '</tbody></table>'
 
     # 대회 일정 섹션
     all_races_ext = [

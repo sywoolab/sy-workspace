@@ -378,6 +378,195 @@ def load_last_analysis():
 HEALTH_FILE = os.path.join(BASE_DIR, 'data', 'garmin_health.json')
 
 
+def _planned_sport_types(planned_text):
+    """계획 텍스트에서 기대 종목 집합 반환"""
+    t = (planned_text or '').lower()
+    types = set()
+    if any(k in t for k in ('러닝', 'run', '달리기')):
+        types.add('run')
+    if any(k in t for k in ('수영', 'swim', 'ow')):
+        types.add('swim')
+    if any(k in t for k in ('자전거', 'bike', '사이클', '라이딩')):
+        types.add('bike')
+    if any(k in t for k in ('브릭', 'brick')):
+        types.add('run')
+        types.add('bike')
+    return types
+
+
+def _actual_sport_types(entry):
+    """실제 로그 entry에서 수행한 종목 집합 반환"""
+    if not entry or not entry.get('done'):
+        return set()
+    types = set()
+    for m in entry.get('all_metrics', []):
+        t = m.get('type', '')
+        if t in ('swim', 'run', 'bike'):
+            types.add(t)
+    if not types and entry.get('actual'):
+        a = entry['actual'].lower()
+        if any(k in a for k in ('러닝', 'run')):
+            types.add('run')
+        if any(k in a for k in ('수영', 'swim', 'ow')):
+            types.add('swim')
+        if any(k in a for k in ('자전거', 'bike')):
+            types.add('bike')
+    return types
+
+
+def _calc_week_compliance():
+    """이번 주 (월~오늘) 스케줄 준수율 계산.
+    반환: (준수일, 계획된운동일, 준수율%, 전주비교 run_pace_delta 초)
+    """
+    today_d = NOW.date()
+    monday = today_d - timedelta(days=today_d.weekday())
+    last_monday = monday - timedelta(days=7)
+
+    compliant = 0
+    planned_workout_days = 0
+    run_paces_this = []
+    run_paces_last = []
+
+    for week_offset, mon in ((0, monday), (-1, last_monday)):
+        for i in range(7):
+            d = mon + timedelta(days=i)
+            if week_offset == 0 and d > today_d:
+                break
+            dk = d.strftime('%Y-%m-%d')
+            entry = WORKOUT_LOG.get(dk) or {}
+            planned_text = entry.get('planned') or (SCHEDULE_OVERRIDES.get(dk) or {}).get('workout', '')
+            planned_types = _planned_sport_types(planned_text)
+            is_rest = any(k in (planned_text or '').lower() for k in ('휴식', 'rest'))
+
+            if week_offset == 0:
+                if is_rest or not planned_types:
+                    pass
+                else:
+                    planned_workout_days += 1
+                    actual_types = _actual_sport_types(entry)
+                    if planned_types & actual_types:  # 계획 종목 중 1개 이상 수행
+                        compliant += 1
+
+            # 러닝 페이스 수집 (전주 대비용)
+            actual_types = _actual_sport_types(entry)
+            if 'run' in actual_types:
+                for m in entry.get('all_metrics', []):
+                    if m.get('type') == 'run' and m.get('avg_pace'):
+                        p = m['avg_pace']
+                        try:
+                            parts = p.split(':')
+                            sec = int(parts[0]) * 60 + int(parts[1])
+                            if week_offset == 0:
+                                run_paces_this.append(sec)
+                            else:
+                                run_paces_last.append(sec)
+                        except (ValueError, IndexError):
+                            pass
+
+    compliance_pct = round(compliant / planned_workout_days * 100) if planned_workout_days else 0
+
+    pace_delta = None
+    if run_paces_this and run_paces_last:
+        avg_this = sum(run_paces_this) / len(run_paces_this)
+        avg_last = sum(run_paces_last) / len(run_paces_last)
+        pace_delta = avg_this - avg_last  # 음수 = 개선(빨라짐)
+
+    return compliant, planned_workout_days, compliance_pct, pace_delta
+
+
+def _seconds_to_pace(sec):
+    """초 → 'MM:SS' 형식"""
+    m, s = divmod(abs(int(sec)), 60)
+    return f"{m}:{s:02d}"
+
+
+def format_fitness_split(analysis):
+    """현재 체력 기반 종목별 예상 분할 + 스케줄 준수율"""
+    splits = analysis.get('splits', {})
+    paces = analysis.get('sport_paces', {})
+    history = []
+    try:
+        with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
+            history = json.load(f).get('analysis_history', [])
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    lines = ["📊 현재 체력 기반 예상 분할 (바꿈터 제외)"]
+
+    swim_min = splits.get('swim_min', 0)
+    bike_min = splits.get('bike_min', 0)
+    run_min = splits.get('run_min', 0)
+    pure_min = splits.get('pure_sport_min', 0)
+    total_min = splits.get('total_min', 0)
+    swim_pace = paces.get('swim_pace_100m', 0)
+    bike_spd = paces.get('bike_speed_kmh', 0)
+    vdot = paces.get('run_vdot', analysis.get('vdot', 36))
+
+    if swim_min:
+        p_str = _seconds_to_pace(swim_pace) if swim_pace else '—'
+        lines.append(f"  🏊 수영  1.5km → {swim_min:.0f}분 (avg {p_str}/100m)")
+    if bike_min:
+        spd_str = f"{bike_spd:.1f}km/h" if bike_spd else '—'
+        lines.append(f"  🚴 자전거 40km → {bike_min:.0f}분 (avg {spd_str})")
+    if run_min:
+        lines.append(f"  🏃 러닝  10km → {run_min:.0f}분 (VDOT {vdot})")
+
+    if pure_min:
+        h, m = divmod(int(pure_min), 60)
+        lines.append(f"  ─────────────────")
+        lines.append(f"  순수 운동합계: {h}:{m:02d}")
+    if total_min:
+        th, tm = divmod(int(total_min), 60)
+        lines.append(f"  바꿈터 포함 전체: {th}:{tm:02d}")
+
+    # 전주 대비 트렌드 (history 2개 이상 있을 때)
+    if len(history) >= 2:
+        prev = history[-2]
+        curr_pure = splits.get('pure_sport_min', 0)
+        prev_pure = prev.get('pure_sport_min', 0)
+        curr_swim = paces.get('swim_pace_100m', 0)
+        prev_swim = prev.get('swim_pace_100m', 0)
+        curr_bike = paces.get('bike_speed_kmh', 0)
+        prev_bike = prev.get('bike_speed_kmh', 0)
+        curr_run = splits.get('run_min', 0)
+        prev_run = prev.get('run_min_standalone', 0)
+
+        trends = []
+        if curr_swim and prev_swim:
+            d = curr_swim - prev_swim
+            if abs(d) >= 2:
+                trends.append(f"수영 {'▼' if d < 0 else '▲'}{abs(d):.0f}초/100m {'💪' if d < 0 else '⚠️'}")
+        if curr_bike and prev_bike:
+            d = curr_bike - prev_bike
+            if abs(d) >= 0.5:
+                trends.append(f"자전거 {'▲' if d > 0 else '▼'}{abs(d):.1f}km/h {'💪' if d > 0 else '⚠️'}")
+        if curr_run and prev_run:
+            d = curr_run - prev_run
+            if abs(d) >= 0.5:
+                trends.append(f"러닝 {'▼' if d < 0 else '▲'}{abs(d):.1f}분/10km {'💪' if d < 0 else '⚠️'}")
+        if curr_pure and prev_pure:
+            d = curr_pure - prev_pure
+            sign = '▼' if d < 0 else '▲'
+            color = '💪' if d < 0 else ('⚠️' if d > 2 else '→')
+            trends.insert(0, f"순수 운동합계 {sign}{abs(d):.1f}분 {color}")
+
+        if trends:
+            lines.append(f"  전주 대비: {' | '.join(trends)}")
+
+    # 스케줄 준수율
+    compliant, total_planned, pct, pace_delta = _calc_week_compliance()
+    if total_planned > 0:
+        bar = '✅' * compliant + '⬜' * (total_planned - compliant)
+        lines.append("")
+        lines.append(f"📅 이번 주 스케줄 준수: {bar} {compliant}/{total_planned} ({pct}%)")
+        if pace_delta is not None:
+            dir_str = f"▼{_seconds_to_pace(-pace_delta)}/km 빨라짐 💪" if pace_delta < -3 else (
+                f"▲{_seconds_to_pace(pace_delta)}/km 느려짐 ⚠️" if pace_delta > 3 else "→ 전주와 유사")
+            lines.append(f"  러닝 페이스 전주 대비: {dir_str}")
+
+    return "\n".join(lines)
+
+
 def format_training_progress(analysis):
     """전체 훈련 진척도 — 대회 목표 달성 트래킹"""
     lines = []
@@ -504,6 +693,13 @@ def format_morning():
     if progress:
         lines.append(progress)
         lines.append("")
+
+    # 현재 체력 기반 종목별 분할 + 스케줄 준수율
+    if analysis.get('splits'):
+        fitness_split = format_fitness_split(analysis)
+        if fitness_split:
+            lines.append(fitness_split)
+            lines.append("")
 
     # 이번 주
     lines.append(format_week(CURRENT_WEEK, is_current_week=True))

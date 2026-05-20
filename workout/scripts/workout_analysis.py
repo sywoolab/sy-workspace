@@ -532,6 +532,8 @@ def estimate_finish_time(log):
         "brick_count": brick_count,
         "ow_count": ow_count,
         "ow_correction": ow_correction,
+        "avg_swim_pace_sec": round(avg_swim_pace),
+        "avg_bike_speed_kmh": round(avg_speed, 1) if bike_entries else 0,
     }
 
 
@@ -993,7 +995,8 @@ def format_analysis_message(log):
 
     # schedule 업데이트
     total_status = "green" if total <= 175 else ("yellow" if total <= 185 else "red")
-    schedule['last_analysis'] = {
+    pure_sport_min = round(estimate['swim'] + estimate['bike'] + estimate['run_brick'], 1)
+    new_analysis = {
         "date": TODAY,
         "estimated_finish": minutes_to_hhmm(total),
         "status": total_status,
@@ -1010,7 +1013,38 @@ def format_analysis_message(log):
         "intensity_split": {"easy_pct": week_stats['easy_pct'], "hard_pct": week_stats['hard_pct']},
         "training_load": {"current": week_stats['total_load'], "target": tgt_load},
         "adjustments": [a['message'] for a in adjustments],
+        "splits": {
+            "swim_min": estimate['swim'],
+            "t1_min": estimate['t1'],
+            "bike_min": estimate['bike'],
+            "t2_min": estimate['t2'],
+            "run_min": estimate['run_brick'],
+            "pure_sport_min": pure_sport_min,
+            "total_min": estimate['total'],
+        },
+        "sport_paces": {
+            "swim_pace_100m": estimate.get('avg_swim_pace_sec', 0),
+            "bike_speed_kmh": estimate.get('avg_bike_speed_kmh', 0),
+            "run_vdot": current_vdot,
+        },
     }
+    schedule['last_analysis'] = new_analysis
+
+    # 주차별 이력 (최근 8주 — 트렌드 추적용)
+    week_start = get_week_monday(NOW).strftime('%Y-%m-%d')
+    history = schedule.get('analysis_history', [])
+    history = [h for h in history if h.get('week_start') != week_start]
+    history.append({
+        "week_start": week_start,
+        "date": TODAY,
+        "vdot": current_vdot,
+        "pure_sport_min": pure_sport_min,
+        "total_min": estimate['total'],
+        "swim_pace_100m": estimate.get('avg_swim_pace_sec', 0),
+        "bike_speed_kmh": estimate.get('avg_bike_speed_kmh', 0),
+        "run_min_standalone": estimate['run_standalone'],
+    })
+    schedule['analysis_history'] = history[-8:]
     save_json(SCHEDULE_FILE, schedule)
 
     return "\n".join(lines)
