@@ -369,14 +369,29 @@ def analyze_week(log, dt=None):
 
 
 def get_latest_metrics(log, workout_type, n=3):
+    """최근 N개의 해당 종목 entry 반환.
+    복합 활동(브릭·대회)의 경우 top-level metrics.type이 다른 종목이어도
+    all_metrics에 해당 종목이 있으면 포함 — 레이스 데이터 누락 방지.
+    """
     entries = []
     for date_key in sorted(log.keys(), reverse=True):
         entry = log[date_key]
         if not entry.get('done'):
             continue
         metrics = entry.get('metrics', {})
+        # top-level 매칭 (단일 종목 훈련)
         if metrics.get('type') == workout_type:
             entries.append((date_key, entry))
+            if len(entries) >= n:
+                break
+            continue
+        # all_metrics에 해당 종목이 있는 복합 활동 (브릭·대회)
+        all_m = entry.get('all_metrics', [])
+        if any(m.get('type') == workout_type for m in all_m):
+            # 해당 종목의 all_metrics 데이터를 top-level처럼 노출하는 래퍼 entry 생성
+            target_m = next(m for m in all_m if m.get('type') == workout_type)
+            wrapped = {**entry, 'metrics': target_m}
+            entries.append((date_key, wrapped))
             if len(entries) >= n:
                 break
     return entries

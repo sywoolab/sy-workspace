@@ -31,8 +31,117 @@ except Exception:
     _ANALYSIS_AVAILABLE = False
 
 
+def _find_recent_race(log, within_days=120):
+    """최근 N일 내 레이스(수영+자전거+러닝 복합 활동) 탐색.
+    반환: (date_key, swim_m, t1_min, bike_m, t2_min, run_m, swim_pace_sec, bike_spd_kmh) 또는 None
+    """
+    from datetime import datetime, timezone, timedelta
+    KST = timezone(timedelta(hours=9))
+    today = datetime.now(KST).date()
+    cutoff = (today - timedelta(days=within_days)).strftime('%Y-%m-%d')
+
+    for dk in sorted(log.keys(), reverse=True):
+        if dk < cutoff:
+            break
+        entry = log[dk]
+        if not entry.get('done'):
+            continue
+        all_m = entry.get('all_metrics', [])
+        types = {m.get('type') for m in all_m}
+        if not ({'swim', 'bike', 'run'} <= types):
+            continue
+        # 레이스 활동 확인 (수영 OW + 자전거 HR 높음)
+        swim_m_list = [m for m in all_m if m.get('type') == 'swim' and m.get('distance_m', 0) > 500]
+        bike_m_list = [m for m in all_m if m.get('type') == 'bike']
+        run_m_list  = [m for m in all_m if m.get('type') == 'run']
+        if not (swim_m_list and bike_m_list and run_m_list):
+            continue
+
+        swim_m = swim_m_list[0]
+        bike_m_obj = bike_m_list[0]
+        run_m_obj  = run_m_list[0]
+
+        # start_time으로 T1/T2 계산
+        def parse_hm(s):
+            try:
+                h, m_ = s.split(':')
+                return int(h) * 60 + int(m_)
+            except Exception:
+                return None
+
+        sw_start = parse_hm(swim_m.get('start_time', ''))
+        bk_start = parse_hm(bike_m_obj.get('start_time', ''))
+        rn_start = parse_hm(run_m_obj.get('start_time', ''))
+
+        sw_dur = swim_m.get('duration_min', 30)
+        bk_dur = bike_m_obj.get('duration_min', 70)
+
+        t1 = (bk_start - (sw_start + sw_dur)) if (sw_start and bk_start) else 4.5
+        t2 = (rn_start - (bk_start + bk_dur)) if (bk_start and rn_start) else 2.5
+        t1 = max(1.0, min(t1, 15.0))
+        t2 = max(0.5, min(t2, 10.0))
+
+        # 표준 거리 환산
+        swim_pace_sec = None
+        p = swim_m.get('pace_per_100m', '')
+        if p:
+            try:
+                pm, ps = p.split(':')
+                swim_pace_sec = int(pm) * 60 + int(ps)
+            except Exception:
+                pass
+        swim_1500 = (swim_pace_sec * 15 / 60) if swim_pace_sec else sw_dur * 1500 / max(swim_m.get('distance_m', 1500), 1)
+
+        bike_spd = bike_m_obj.get('avg_speed_kmh', 0)
+        bike_40  = (40 / bike_spd * 60) if bike_spd else bk_dur
+
+        run_dist_km = run_m_obj.get('distance_km', 0)
+        run_dur     = run_m_obj.get('duration_min') or (run_dist_km * 340 / 60 if run_dist_km else 57)
+        run_10 = (run_dur / run_dist_km * 10) if run_dist_km else run_dur
+
+        total = swim_1500 + t1 + bike_40 + t2 + run_10
+        return {
+            'date': dk,
+            'swim': round(swim_1500, 1),
+            't1':   round(t1, 1),
+            'bike': round(bike_40, 1),
+            't2':   round(t2, 1),
+            'run_brick': round(run_10, 1),
+            'total': round(total, 1),
+            'avg_swim_pace_sec': swim_pace_sec or 134,
+            'avg_bike_speed_kmh': round(bike_spd, 1) if bike_spd else 33.0,
+            'vdot': None,
+            'race_actual': {
+                'swim_actual_min': round(sw_dur, 1),
+                'swim_actual_m':   swim_m.get('distance_m', 0),
+                'bike_actual_min': round(bk_dur, 1),
+                'bike_actual_km':  bike_m_obj.get('distance_km', 0),
+                'run_actual_min':  round(run_dur, 1),
+                'run_actual_km':   run_dist_km,
+            },
+        }
+    return None
+
+
 def _compute_estimate(log, sched):
-    """현재 체력 기반 예상 완주 분할 계산. workout_analysis 사용 가능하면 그쪽, 아니면 last_analysis 폴백."""
+    """현재 체력 기반 예상 완주 분할 계산.
+    우선순위: 최근 레이스 데이터(실측 보정) > workout_analysis > last_analysis 폴백
+    """
+    # 1순위: 최근 레이스 실측 보정
+    race_est = _find_recent_race(log)
+    if race_est:
+        # VDOT은 알고리즘에서 보완
+        if _ANALYSIS_AVAILABLE:
+            try:
+                vdot = update_vdot(log)
+                race_est['vdot'] = vdot
+            except Exception:
+                pass
+        if not race_est.get('vdot'):
+            race_est['vdot'] = sched.get('current_vdot', 36)
+        return race_est, race_est['vdot']
+
+    # 2순위: workout_analysis 알고리즘
     if _ANALYSIS_AVAILABLE:
         try:
             est = estimate_finish_time(log)
@@ -40,7 +149,8 @@ def _compute_estimate(log, sched):
             return est, vdot
         except Exception:
             pass
-    # 폴백: last_analysis에서 읽기
+
+    # 3순위: last_analysis 폴백
     la = sched.get('last_analysis', {})
     splits = la.get('splits', {})
     if splits:
@@ -328,8 +438,10 @@ tr:hover{{background:#15152a}}
         bike_spd_s = f'{bike_spd:.1f}km/h' if bike_spd else '—'
         run_vdot_s = f'VDOT {cur_vdot}'
 
-        html += f"""
-<div class="section">🏁 현재 체력 기반 예상 완주</div>
+        race_info = est.get('race_actual') if est else None
+    race_date_label = f'대구 {est["date"][5:]} 실적 기반' if race_info else '알고리즘 추정'
+    html += f"""
+<div class="section">🏁 현재 체력 기반 예상 완주 <span style="font-size:11px;color:#555;font-weight:400">({race_date_label})</span></div>
 <div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
     <span style="font-size:32px;font-weight:700;color:#7c6fff">{_fmt_min(total_m)}</span>
