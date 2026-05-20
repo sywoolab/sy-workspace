@@ -872,6 +872,38 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
       {news_html}
     </div>"""
 
+    # ── 워치리스트 기업 목록 ──────────────────────────
+    try:
+        import json as _json
+        _wl_path = Path(__file__).resolve().parent.parent / 'watchlist_team.json'
+        _wl = _json.loads(_wl_path.read_text(encoding='utf-8')) if _wl_path.exists() else {}
+        _companies = _wl.get('companies', [])
+        _listed   = [c for c in _companies if c.get('listed')]
+        _unlisted = [c for c in _companies if not c.get('listed')]
+
+        def _co_badge(c):
+            mkt = c.get('market', '')
+            mkt_label = f'<span style="font-size:10px;color:#9ca3af;margin-left:4px">{mkt}</span>' if mkt else ''
+            return f'<span style="background:#1e293b;border-radius:4px;padding:2px 7px;font-size:12px;color:#e2e8f0;display:inline-block;margin:2px">{c["name"]}{mkt_label}</span>'
+
+        _listed_html   = ' '.join(_co_badge(c) for c in _listed)
+        _unlisted_html = ' '.join(_co_badge(c) for c in _unlisted)
+
+        watchlist_section = f"""
+    <div class="card">
+      <div class="card-title">📋 워치리스트 — 총 {len(_companies)}개사</div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">상장 ({len(_listed)})</div>
+        <div>{_listed_html}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">비상장 ({len(_unlisted)})</div>
+        <div>{_unlisted_html}</div>
+      </div>
+    </div>"""
+    except Exception:
+        watchlist_section = ''
+
     return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -907,6 +939,8 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
   {rates_section}
 
   {news_section}
+
+  {watchlist_section}
 
   <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: {now.strftime("%Y-%m-%d %H:%M")} KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
 </div>
@@ -1200,7 +1234,7 @@ def main():
         f'<b>📋 신한증권 IB종합금융부 Daily Brief</b>  {date_str}\n'
         f'\n'
         f'<b>🔗 리포트 보기</b>\n'
-        f'<a href="{page_url}">{date_tag} | {page_url}</a>\n'
+        f'<a href="{page_url}">{page_url}</a>\n'
         f'\n'
         f'{mkt_summary.strip()}\n'
         f'\n'
