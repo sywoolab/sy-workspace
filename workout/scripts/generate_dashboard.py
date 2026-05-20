@@ -24,6 +24,39 @@ try:
 except ImportError:
     pass
 
+try:
+    from workout_analysis import estimate_finish_time, update_vdot
+    _ANALYSIS_AVAILABLE = True
+except Exception:
+    _ANALYSIS_AVAILABLE = False
+
+
+def _compute_estimate(log, sched):
+    """현재 체력 기반 예상 완주 분할 계산. workout_analysis 사용 가능하면 그쪽, 아니면 last_analysis 폴백."""
+    if _ANALYSIS_AVAILABLE:
+        try:
+            est = estimate_finish_time(log)
+            vdot = update_vdot(log)
+            return est, vdot
+        except Exception:
+            pass
+    # 폴백: last_analysis에서 읽기
+    la = sched.get('last_analysis', {})
+    splits = la.get('splits', {})
+    if splits:
+        est = {
+            'swim': splits.get('swim_min', 0),
+            't1': splits.get('t1_min', 4.5),
+            'bike': splits.get('bike_min', 0),
+            't2': splits.get('t2_min', 2.5),
+            'run_brick': splits.get('run_min', 0),
+            'total': splits.get('total_min', 0),
+            'avg_swim_pace_sec': la.get('sport_paces', {}).get('swim_pace_100m', 0),
+            'avg_bike_speed_kmh': la.get('sport_paces', {}).get('bike_speed_kmh', 0),
+        }
+        return est, la.get('vdot', 36)
+    return None, sched.get('current_vdot', 36)
+
 def days_until(d):
     target = datetime.strptime(d, '%Y-%m-%d').replace(tzinfo=KST)
     return (target.date() - datetime.now(KST).date()).days
@@ -34,6 +67,10 @@ def type_emoji(t):
 def main():
     log = json.loads(LOG_FILE.read_text(encoding='utf-8'))
     health = json.loads(HEALTH_FILE.read_text(encoding='utf-8')) if HEALTH_FILE.exists() else {}
+    sched_data = json.loads(SCHED_FILE.read_text(encoding='utf-8')) if SCHED_FILE.exists() else {}
+
+    # 현재 체력 기반 예상 완주 계산 (페이지 상단 표시용)
+    est, cur_vdot = _compute_estimate(log, sched_data)
 
     races = [
         ("2026-06-07", "한강 쉬엄쉬엄 (1+20+10)", "T1 연습"),
@@ -166,6 +203,88 @@ tr:hover{{background:#15152a}}
 <div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">이번주 자전거</div></div>
 <div class="card"><div class="val" style="color:#6ab4ff">{week_run:.0f}km</div><div class="label">이번주 러닝</div></div>
 <div class="card"><div class="val" style="color:#ff6aff">{int(week_tl)}</div><div class="label">이번주 누적부하</div></div>
+</div>
+"""
+
+    # ── 현재 체력 기반 예상 완주 vs 목표 섹션 ──
+    if est:
+        swim_m = est.get('swim', 0)
+        t1_m = est.get('t1', 4.5)
+        bike_m = est.get('bike', 0)
+        t2_m = est.get('t2', 2.5)
+        run_m = est.get('run_brick', 0)
+        total_m = est.get('total', 0)
+        pure_m = swim_m + bike_m + run_m
+        swim_pace = est.get('avg_swim_pace_sec', 0)
+        bike_spd = est.get('avg_bike_speed_kmh', 0)
+
+        def _fmt_min(m):
+            h, mn = divmod(int(m), 60)
+            return f"{h}:{mn:02d}"
+
+        def _fmt_pace(sec):
+            if not sec: return '—'
+            return f"{int(sec)//60}:{int(sec)%60:02d}"
+
+        # 가장 가까운 목표 대회 gap 계산
+        # 대가야 목표: 2:42 = 162분, 거제 목표: 2:35 = 155분
+        next_target_race = None
+        next_target_min = None
+        next_target_label = None
+        for rdate, rname, rgoal in races:
+            if days_until(rdate) > 0 and 'sub-' in rgoal:
+                t_str = rgoal.replace('🎯 sub-', '')
+                th, tm_str = t_str.split(':')
+                target_total = int(th)*60 + int(tm_str)
+                next_target_race = rname
+                next_target_min = target_total
+                next_target_label = rgoal
+                break
+
+        gap_html = ''
+        if next_target_min and total_m:
+            gap = total_m - next_target_min
+            if gap > 0:
+                gap_color = '#ff6c6c' if gap > 20 else '#ffd56c'
+                gap_html = f'<div style="margin-top:6px;font-size:12px;color:{gap_color}">목표 {next_target_label} 까지 <b>-{gap:.0f}분</b> 필요</div>'
+            else:
+                gap_html = f'<div style="margin-top:6px;font-size:12px;color:#6affa0">✅ 목표 {next_target_label} 달성 가능 (+{abs(gap):.0f}분 여유)</div>'
+
+        swim_pace_s = f'{_fmt_pace(swim_pace)}/100m' if swim_pace else '—'
+        bike_spd_s = f'{bike_spd:.1f}km/h' if bike_spd else '—'
+        run_vdot_s = f'VDOT {cur_vdot}'
+
+        html += f"""
+<div class="section">🏁 현재 체력 기반 예상 완주</div>
+<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:16px">
+  <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+    <span style="font-size:32px;font-weight:700;color:#7c6fff">{_fmt_min(total_m)}</span>
+    <span style="font-size:14px;color:#888">바꿈터 포함 전체</span>
+    <span style="font-size:20px;font-weight:600;color:#6affa0;margin-left:8px">{_fmt_min(pure_m)}</span>
+    <span style="font-size:13px;color:#888">순수 운동합계 (바꿈터 제외)</span>
+  </div>
+  {gap_html}
+  <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+    <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
+      <div style="font-size:18px;font-weight:600;color:#6ab4ff">{swim_m:.0f}분</div>
+      <div style="font-size:11px;color:#777;margin-top:2px">🏊 수영 1.5km</div>
+      <div style="font-size:10.5px;color:#555">{swim_pace_s}</div>
+    </div>
+    <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
+      <div style="font-size:14px;font-weight:500;color:#666">T1 {t1_m:.0f}분 / T2 {t2_m:.0f}분</div>
+      <div style="font-size:11px;color:#555;margin-top:2px">바꿈터</div>
+    </div>
+    <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
+      <div style="font-size:18px;font-weight:600;color:#ffa06a">{bike_m:.0f}분</div>
+      <div style="font-size:11px;color:#777;margin-top:2px">🚴 자전거 40km</div>
+      <div style="font-size:10.5px;color:#555">{bike_spd_s}</div>
+    </div>
+    <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
+      <div style="font-size:18px;font-weight:600;color:#6affa0">{run_m:.0f}분</div>
+      <div style="font-size:11px;color:#777;margin-top:2px">🏃 러닝 10km</div>
+      <div style="font-size:10.5px;color:#555">{run_vdot_s}</div>
+    </div>
+  </div>
 </div>
 
 <div class="section">훈련 부하 트렌드 (최근 60일)</div>
