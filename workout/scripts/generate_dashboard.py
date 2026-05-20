@@ -72,6 +72,80 @@ def main():
     # 현재 체력 기반 예상 완주 계산 (페이지 상단 표시용)
     est, cur_vdot = _compute_estimate(log, sched_data)
 
+    # ── 목표별 처방 계산 ──
+    # race_targets: (대회날짜, 이름, 목표분)
+    race_targets = [
+        ("2026-06-28", "대가야", 162),   # sub-2:42
+        ("2026-08-27", "거제",  155),    # sub-2:35
+    ]
+
+    def _prescription(est, target_total_min):
+        """현재 분할 → 목표 달성 처방 반환."""
+        if not est:
+            return None
+        T12 = est.get('t1', 4.5) + est.get('t2', 2.5)
+        sport_budget = target_total_min - T12
+        cur_swim = est.get('swim', 33)
+        cur_bike = est.get('bike', 75)
+        cur_run  = est.get('run_brick', 61)
+        cur_pure = cur_swim + cur_bike + cur_run
+        gap = cur_pure - sport_budget
+        if gap <= 0:
+            return {'gap': gap, 'achieved': True}
+
+        # 종목별 단축 목표 — swim 35% / bike 45% / run 20%
+        need_swim = round(gap * 0.35, 1)
+        need_bike = round(gap * 0.45, 1)
+        need_run  = round(gap - need_swim - need_bike, 1)
+
+        tgt_swim = cur_swim - need_swim
+        tgt_bike = cur_bike - need_bike
+        tgt_run  = cur_run  - need_run
+
+        # 목표 pace/speed 역산
+        tgt_swim_pace = round(tgt_swim * 60 / 15)   # sec/100m  (1.5km = 15×100m)
+        tgt_bike_spd  = round(40 / tgt_bike * 60, 1) # km/h
+        # VDOT 역산: predict_10k_time(v)*brick_factor = tgt_run → 근사 탐색
+        est_vdot = est.get('vdot', cur_vdot)
+        tgt_vdot = est_vdot
+        if _ANALYSIS_AVAILABLE:
+            try:
+                from workout_analysis import predict_10k_time
+                brick = 1.06 * 0.97
+                for v in range(est_vdot, est_vdot + 10):
+                    if predict_10k_time(v) * brick <= tgt_run:
+                        tgt_vdot = v
+                        break
+            except Exception:
+                pass
+
+        cur_swim_pace_s = f'{est.get("avg_swim_pace_sec",125)//60}:{est.get("avg_swim_pace_sec",125)%60:02d}'
+        tgt_swim_pace_s = f'{tgt_swim_pace//60}:{tgt_swim_pace%60:02d}'
+        cur_bike_spd    = est.get('avg_bike_speed_kmh', 32)
+
+        # 종목별 핵심 훈련 처방
+        swim_rx  = f'강습 주3 + 개인강습 지속, OW 경험 축적 → pace {cur_swim_pace_s}→{tgt_swim_pace_s}/100m'
+        bike_rx  = f'장거리 라이딩 주1 (70km+) + 브릭 2회 → {cur_bike_spd:.0f}→{tgt_bike_spd}km/h'
+        vdot_paces_str = ''
+        if _ANALYSIS_AVAILABLE:
+            try:
+                from workout_analysis import get_vdot_paces, seconds_to_pace
+                p = get_vdot_paces(tgt_vdot)
+                vdot_paces_str = f'템포 {seconds_to_pace(p["tempo"])}/km'
+            except Exception:
+                pass
+        run_rx = f'템포런 주1 ({vdot_paces_str}) → VDOT {est_vdot}→{tgt_vdot}'
+
+        return {
+            'gap': round(gap, 1),
+            'achieved': False,
+            'items': [
+                {'sport': '🏊 수영',   'cur_t': cur_swim, 'tgt_t': round(tgt_swim,1), 'save': need_swim, 'rx': swim_rx},
+                {'sport': '🚴 자전거', 'cur_t': cur_bike, 'tgt_t': round(tgt_bike,1), 'save': need_bike, 'rx': bike_rx},
+                {'sport': '🏃 러닝',   'cur_t': cur_run,  'tgt_t': round(tgt_run,1),  'save': need_run,  'rx': run_rx},
+            ],
+        }
+
     races = [
         ("2026-06-07", "한강 쉬엄쉬엄 (1+20+10)", "T1 연습"),
         ("2026-06-21", "한강리버크로스 2km OW", "OW 적응"),
@@ -286,7 +360,48 @@ tr:hover{{background:#15152a}}
     </div>
   </div>
 </div>
+"""
 
+    # ── 목표 달성 처방 섹션 ──
+    for r_date, r_name, r_target_min in race_targets:
+        d_left = days_until(r_date)
+        if d_left <= 0:
+            continue
+        rx = _prescription(est, r_target_min)
+        if not rx:
+            continue
+        th, tm_ = divmod(r_target_min, 60)
+        target_str = f'{th}:{tm_:02d}'
+
+        if rx.get('achieved'):
+            html += f'<div style="background:#0d2a0d;border:1px solid #2a4a2a;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px;color:#6affa0">✅ {r_name} 목표 sub-{target_str} 이미 달성 가능 (현재 예상 {_fmt_min(est["total"])})</div>\n'
+            continue
+
+        gap = rx['gap']
+        html += f'<div class="section">🎯 {r_name} sub-{target_str} 달성 처방 (D-{d_left}, -{gap:.0f}분 필요)</div>\n'
+        html += '<table><thead><tr><th>종목</th><th>현재</th><th>목표</th><th>단축</th><th>핵심 훈련</th></tr></thead><tbody>\n'
+        total_save = 0
+        for item in rx['items']:
+            total_save += item['save']
+            save_c = '#6affa0' if item['save'] > 0 else '#888'
+            html += (f'<tr>'
+                     f'<td style="font-weight:600">{item["sport"]}</td>'
+                     f'<td style="color:#aaa">{item["cur_t"]:.0f}분</td>'
+                     f'<td style="color:#ffd56c">{item["tgt_t"]:.0f}분</td>'
+                     f'<td style="color:{save_c};font-weight:600">-{item["save"]:.1f}분</td>'
+                     f'<td style="color:#888;font-size:10.5px">{item["rx"]}</td>'
+                     f'</tr>\n')
+        # 합계 행
+        html += (f'<tr style="background:#1a1a2e;font-weight:600">'
+                 f'<td>합계</td>'
+                 f'<td style="color:#aaa">{(est["swim"]+est["bike"]+est["run_brick"]):.0f}분</td>'
+                 f'<td style="color:#6affa0">{(est["swim"]+est["bike"]+est["run_brick"]-total_save):.0f}분</td>'
+                 f'<td style="color:#6affa0">-{total_save:.1f}분</td>'
+                 f'<td style="color:#6affa0;font-size:11px">바꿈터({est["t1"]+est["t2"]:.0f}분) 포함 전체 → sub-{target_str} 달성</td>'
+                 f'</tr>\n')
+        html += '</tbody></table>\n'
+
+    html += """
 <div class="section">훈련 부하 트렌드 (최근 60일)</div>
 <div class="chart-wrap">
   <div class="chart-inner">
