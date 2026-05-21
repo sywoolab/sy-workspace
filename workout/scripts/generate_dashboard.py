@@ -404,12 +404,25 @@ tr:hover{{background:#15152a}}
         bike_spd = est.get('avg_bike_speed_kmh', 0)
 
         def _fmt_min(m):
+            """총 시간 H:MM"""
             h, mn = divmod(int(m), 60)
             return f"{h}:{mn:02d}"
+
+        def _fmt_mmss(m):
+            """분할 시간 MM:SS"""
+            total_sec = round(m * 60)
+            mm, ss = divmod(total_sec, 60)
+            return f"{mm}:{ss:02d}"
 
         def _fmt_pace(sec):
             if not sec: return '—'
             return f"{int(sec)//60}:{int(sec)%60:02d}"
+
+        def _run_pace_from_min(run_min, dist_km=10.0):
+            """러닝 예상 페이스 (분/km) → MM:SS/km"""
+            if not run_min or not dist_km: return '—'
+            pace_sec = run_min * 60 / dist_km
+            return f"{int(pace_sec)//60}:{int(pace_sec)%60:02d}/km"
 
         # 가장 가까운 목표 대회 gap 계산
         # 대가야 목표: 2:42 = 162분, 거제 목표: 2:35 = 155분
@@ -436,8 +449,8 @@ tr:hover{{background:#15152a}}
                 gap_html = f'<div style="margin-top:6px;font-size:12px;color:#6affa0">✅ 목표 {next_target_label} 달성 가능 (+{abs(gap):.0f}분 여유)</div>'
 
         swim_pace_s = f'{_fmt_pace(swim_pace)}/100m' if swim_pace else '—'
-        bike_spd_s = f'{bike_spd:.1f}km/h' if bike_spd else '—'
-        run_vdot_s = f'VDOT {cur_vdot}'
+        bike_spd_s  = f'{bike_spd:.1f}km/h' if bike_spd else '—'
+        run_pace_s  = _run_pace_from_min(run_m)
 
         race_info = est.get('race_actual') if est else None
     race_date_label = f'대구 {est["date"][5:]} 실적 기반' if race_info else '알고리즘 추정'
@@ -451,25 +464,25 @@ tr:hover{{background:#15152a}}
     <span style="font-size:13px;color:#888">순수 운동합계 (바꿈터 제외)</span>
   </div>
   {gap_html}
-  <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+  <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px">
     <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
-      <div style="font-size:18px;font-weight:600;color:#6ab4ff">{swim_m:.0f}분</div>
+      <div style="font-size:20px;font-weight:700;color:#6ab4ff">{_fmt_mmss(swim_m)}</div>
       <div style="font-size:11px;color:#777;margin-top:2px">🏊 수영 1.5km</div>
-      <div style="font-size:10.5px;color:#555">{swim_pace_s}</div>
+      <div style="font-size:11px;color:#6ab4ff;margin-top:1px">{swim_pace_s}</div>
     </div>
     <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
-      <div style="font-size:14px;font-weight:500;color:#666">T1 {t1_m:.0f}분 / T2 {t2_m:.0f}분</div>
-      <div style="font-size:11px;color:#555;margin-top:2px">바꿈터</div>
-    </div>
-    <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
-      <div style="font-size:18px;font-weight:600;color:#ffa06a">{bike_m:.0f}분</div>
+      <div style="font-size:20px;font-weight:700;color:#ffa06a">{_fmt_mmss(bike_m)}</div>
       <div style="font-size:11px;color:#777;margin-top:2px">🚴 자전거 40km</div>
-      <div style="font-size:10.5px;color:#555">{bike_spd_s}</div>
+      <div style="font-size:11px;color:#ffa06a;margin-top:1px">{bike_spd_s}</div>
     </div>
     <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
-      <div style="font-size:18px;font-weight:600;color:#6affa0">{run_m:.0f}분</div>
+      <div style="font-size:20px;font-weight:700;color:#6affa0">{_fmt_mmss(run_m)}</div>
       <div style="font-size:11px;color:#777;margin-top:2px">🏃 러닝 10km</div>
-      <div style="font-size:10.5px;color:#555">{run_vdot_s}</div>
+      <div style="font-size:11px;color:#6affa0;margin-top:1px">{run_pace_s}</div>
+    </div>
+    <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px;opacity:0.5">
+      <div style="font-size:14px;font-weight:500;color:#666">T1 {_fmt_mmss(t1_m)} / T2 {_fmt_mmss(t2_m)}</div>
+      <div style="font-size:11px;color:#444;margin-top:2px">바꿈터 (별도)</div>
     </div>
   </div>
 </div>
