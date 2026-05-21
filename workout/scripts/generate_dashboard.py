@@ -893,6 +893,72 @@ new Chart(document.getElementById('tlChart'), {{
         html += f'<tr><td style="color:{dcol};font-weight:600;white-space:nowrap">{dstr}</td><td>{rname}</td><td style="color:#888;font-size:10.5px">{rdist}</td><td style="color:#6affa0;font-size:10.5px">{rgoal}</td></tr>\n'
     html += '</tbody></table>'
 
+    # ── 완주 대회 아카이브 ──
+    race_records_file = BASE / 'data' / 'race_records.json'
+    if race_records_file.exists():
+        race_records = json.loads(race_records_file.read_text(encoding='utf-8'))
+        if race_records:
+            html += '<div class="section">🏅 완주 대회 아카이브</div>\n'
+            for rec in race_records:
+                rdate = rec.get('date', '')
+                rname = rec.get('name', '')
+                rtype = rec.get('type', '')
+                official = rec.get('official_time', '')
+                std_ext  = rec.get('standard_extrapolated', '')
+                sp = rec.get('splits', {})
+                swim_s = sp.get('swim', {})
+                bike_s = sp.get('bike', {})
+                run_s  = sp.get('run', {})
+                t1 = sp.get('t1', '')
+                t2 = sp.get('t2', '')
+                notes = rec.get('notes', [])
+
+                dt_r = datetime.strptime(rdate, '%Y-%m-%d')
+                dow_r = ['월','화','수','목','금','토','일'][dt_r.weekday()]
+                date_label = f"{rdate} ({dow_r})"
+
+                html += f'<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:14px">\n'
+                html += f'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">\n'
+                html += f'  <span style="font-size:16px;font-weight:700;color:#ffd56c">{rname}</span>\n'
+                html += f'  <span style="font-size:12px;color:#666">{date_label} · {rtype}</span>\n'
+                html += f'  <span style="font-size:22px;font-weight:700;color:#7c6fff;margin-left:auto">{official}</span>\n'
+                if std_ext:
+                    html += f'  <span style="font-size:11px;color:#555">(표준거리 환산 {std_ext})</span>\n'
+                html += '</div>\n'
+
+                # 분할 기록
+                html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">\n'
+                for label, color, val, sub in [
+                    ('🏊 수영', '#6ab4ff',
+                     swim_s.get('time','—'),
+                     f"{swim_s.get('distance_m','')}m · {swim_s.get('pace_per_100m','')}/100m"),
+                    ('T1', '#555', t1, '바꿈터'),
+                    ('🚴 자전거', '#ffa06a',
+                     bike_s.get('time','—'),
+                     f"{bike_s.get('distance_km','')}km · {bike_s.get('speed_kmh','')}km/h"),
+                    ('T2', '#555', t2, '바꿈터'),
+                    ('🏃 러닝', '#6affa0',
+                     run_s.get('time','—'),
+                     f"{run_s.get('distance_km','')}km · {run_s.get('pace_per_km','')}/km"),
+                ]:
+                    opacity = '0.4' if label in ('T1','T2') else '1'
+                    html += (f'<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:{opacity}">'
+                             f'<div style="font-size:16px;font-weight:600;color:{color}">{val}</div>'
+                             f'<div style="font-size:10px;color:#666;margin-top:1px">{label}</div>'
+                             f'<div style="font-size:10px;color:#444">{sub}</div>'
+                             f'</div>\n')
+                html += '</div>\n'
+
+                # 시사점 노트
+                if notes:
+                    html += '<div style="border-top:1px solid #1a1a2e;padding-top:8px">\n'
+                    html += '<div style="font-size:11px;color:#666;margin-bottom:5px">📝 시사점</div>\n'
+                    for note in notes:
+                        html += f'<div style="font-size:11.5px;color:#aaa;margin-bottom:3px;padding-left:8px">• {note}</div>\n'
+                    html += '</div>\n'
+
+                html += '</div>\n'
+
     html += f'\n<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · {now_str}</div>\n</body></html>'
 
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
