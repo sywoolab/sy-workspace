@@ -166,24 +166,24 @@
     },
     "2026-05-23": {
       "date": "2026-05-23",
-      "workout": "TBD + 🏊 OW 1회 (한강 OW 클래스 가능 시)",
-      "detail": "",
+      "workout": "🚴 브릭 (업힐 자전거 40~50km + 런 5~8km) + 🏊 수영 교습 12시",
+      "detail": "토요일. 오전 7~10시: 남북 업힐 포함 자전거 → 바로 런 전환(브릭). 12시 수영 교습. 자전거는 과부하 금지 — 일요일 100km 위해 남겨둘 것.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-24": {
       "date": "2026-05-24",
-      "workout": "🚴 자전거 70km Easy (장거리)",
-      "detail": "",
+      "workout": "🚴 장거리 라이딩 100km",
+      "detail": "일요일. Zone 2 기반 (HR 135~150). 전반 50km 억지로 밟지 말 것. 후반 여유 있으면 33~35km/h 구간 추가. 750ml/시간 수분 보충.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-05-25": {
       "date": "2026-05-25",
-      "workout": "🏊 수영 강습 06시",
-      "detail": "",
+      "workout": "🏃 러닝 10km Easy (공휴일)",
+      "detail": "월요일 공휴일. 이틀 누적 부하 후라 다리 무거움 정상. Easy 6:00~6:20/km. 15km 금지 — 부상 위험. 아침 컨디션 보고 HRV 낮으면 8km로 축소.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
