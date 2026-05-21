@@ -203,9 +203,10 @@ def main():
         if gap <= 0:
             return {'gap': gap, 'achieved': True}
 
-        # 종목별 단축 목표 — swim 35% / bike 45% / run 20%
-        need_swim = round(gap * 0.35, 1)
-        need_bike = round(gap * 0.45, 1)
+        # 종목별 단축 목표 — swim 22% / bike 36% / run 42%
+        # 수영은 39일 내 최대 2분 개선이 현실적 상한 (풀 pace 5초/100m 개선)
+        need_swim = min(round(gap * 0.22, 1), 2.0)
+        need_bike = round(gap * 0.36, 1)
         need_run  = round(gap - need_swim - need_bike, 1)
 
         tgt_swim = cur_swim - need_swim
@@ -511,6 +512,13 @@ tr:hover{{background:#15152a}}
                  f'<td style="color:#6affa0">-{total_save:.1f}분</td>'
                  f'<td style="color:#6affa0;font-size:11px">바꿈터({est["t1"]+est["t2"]:.0f}분) 포함 전체 → sub-{target_str} 달성</td>'
                  f'</tr>\n')
+        # T1/T2 단축 가능성 주석
+        t1_actual = est.get('t1', 4.5)
+        if t1_actual > 3.5:
+            t12_save = round(t1_actual - 3.0, 1)
+            html += f'<div style="font-size:11px;color:#6ab4ff;margin:6px 0 12px;padding-left:4px">💡 바꿈터 단축 추가 가능: 대구 T1 {t1_actual:.0f}분 → 목표 3분 이하 = -{t12_save:.0f}분 (연습으로 해결 가능)</div>\n'
+        else:
+            html += '<div style="margin-bottom:12px"></div>\n'
         html += '</tbody></table>\n'
 
     html += """
