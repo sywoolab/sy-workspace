@@ -521,7 +521,7 @@ tr:hover{{background:#15152a}}
             html += '<div style="margin-bottom:12px"></div>\n'
         html += '</tbody></table>\n'
 
-    html += """
+    html += f"""
 <div class="section">훈련 부하 트렌드 (최근 60일)</div>
 <div class="chart-wrap">
   <div class="chart-inner">
