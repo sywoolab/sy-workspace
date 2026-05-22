@@ -1,0 +1,209 @@
+[
+  {
+    "run_date": "2026-05-22 09:32 KST",
+    "period_days": 3,
+    "top_signals": [
+      {
+        "corp_name": "세아홀딩스",
+        "corp_code": "00377610",
+        "total_score": 38,
+        "categories": [
+          "M&A",
+          "IB이벤트",
+          "자사주"
+        ],
+        "top_report": "공개매수에관한의견표명서"
+      },
+      {
+        "corp_name": "한국유니온제약",
+        "corp_code": "00532855",
+        "total_score": 31,
+        "categories": [
+          "M&A",
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "최대주주변경              "
+      },
+      {
+        "corp_name": "에이프로젠",
+        "corp_code": "00152385",
+        "total_score": 30,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "주요사항보고서(전환사채권발행결정)(자회사의 주요경영사항)              "
+      },
+      {
+        "corp_name": "비트플래닛",
+        "corp_code": "00351579",
+        "total_score": 30,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "탑선",
+        "corp_code": "00874937",
+        "total_score": 30,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[첨부정정]주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "해성에어로보틱스",
+        "corp_code": "00453442",
+        "total_score": 30,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[첨부정정]주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "캔버스엔",
+        "corp_code": "00550082",
+        "total_score": 30,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "빛과전자",
+        "corp_code": "00367482",
+        "total_score": 24,
+        "categories": [
+          "M&A",
+          "IB이벤트"
+        ],
+        "top_report": "[첨부정정]주요사항보고서(회사합병결정)"
+      },
+      {
+        "corp_name": "성창기업지주",
+        "corp_code": "00133335",
+        "total_score": 24,
+        "categories": [
+          "M&A",
+          "IB이벤트"
+        ],
+        "top_report": "[첨부정정]주요사항보고서(회사합병결정)"
+      },
+      {
+        "corp_name": "더코디",
+        "corp_code": "00530413",
+        "total_score": 24,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "JW신약",
+        "corp_code": "00110431",
+        "total_score": 21,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "이마트",
+        "corp_code": "00872984",
+        "total_score": 21,
+        "categories": [
+          "M&A",
+          "IB이벤트"
+        ],
+        "top_report": "[기재정정]주요사항보고서(주식교환ㆍ이전결정)"
+      },
+      {
+        "corp_name": "제주반도체",
+        "corp_code": "00447487",
+        "total_score": 20,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(신주인수권부사채매수선택권행사자지정)"
+      },
+      {
+        "corp_name": "DKME",
+        "corp_code": "00108746",
+        "total_score": 20,
+        "categories": [
+          "M&A"
+        ],
+        "top_report": "최대주주등소유주식변동신고서(최대주주변경시)              "
+      },
+      {
+        "corp_name": "플루토스",
+        "corp_code": "00110750",
+        "total_score": 18,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "주요사항보고서(전환사채권발행결정)"
+      },
+      {
+        "corp_name": "파크시스템스",
+        "corp_code": "00244747",
+        "total_score": 18,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "주요사항보고서(신주인수권부사채권발행결정)"
+      },
+      {
+        "corp_name": "에이전트AI",
+        "corp_code": "00367695",
+        "total_score": 18,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(유상증자결정)"
+      },
+      {
+        "corp_name": "한솔홀딩스",
+        "corp_code": "00171636",
+        "total_score": 18,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(유상증자결정)(자회사의 주요경영사항)              "
+      },
+      {
+        "corp_name": "한솔테크닉스",
+        "corp_code": "00157399",
+        "total_score": 18,
+        "categories": [
+          "IB이벤트",
+          "자금조달"
+        ],
+        "top_report": "[기재정정]주요사항보고서(유상증자결정)"
+      },
+      {
+        "corp_name": "아이패밀리에스씨",
+        "corp_code": "00692254",
+        "total_score": 17,
+        "categories": [
+          "IB이벤트",
+          "자사주"
+        ],
+        "top_report": "주요사항보고서(자기주식처분결정)"
+      }
+    ]
+  }
+]

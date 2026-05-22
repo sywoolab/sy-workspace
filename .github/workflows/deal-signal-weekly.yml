@@ -1,0 +1,43 @@
+name: deal-signal-weekly
+
+on:
+  schedule:
+    - cron: '0 23 * * 0'   # 매주 월요일 08:00 KST (일 23:00 UTC)
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '조회 기간 (일)'
+        default: '7'
+      top_n:
+        description: '상위 N개사'
+        default: '15'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests python-dotenv
+
+      - name: 딜 소싱 신호 탐지
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          BOT_TOKEN:    ${{ secrets.IB_BOT_TOKEN }}
+          CHAT_ID:      ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          DAYS="${{ github.event.inputs.days || '7' }}"
+          TOP="${{ github.event.inputs.top_n || '15' }}"
+          python3 ib/scripts/deal_signal.py $DAYS $TOP
+
+      - name: 결과 저장
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deal-signals-${{ github.run_id }}
+          path: ib/data/deal_signals.json
+          retention-days: 90
