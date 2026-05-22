@@ -1,0 +1,43 @@
+name: ib-dashboard-deploy
+
+on:
+  push:
+    paths:
+      - 'ib/data/deal_signals.json'
+      - 'ib/data/valuation_*.md'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests python-dotenv
+
+      - name: Generate deal signal dashboard
+        run: python ib/scripts/generate_deal_dashboard.py
+
+      - name: Generate valuation dashboard
+        run: python ib/scripts/generate_valuation_dashboard.py
+
+      - name: Deploy to ib-dashboard repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          cd /tmp
+          git clone https://x-access-token:${GH_TOKEN}@github.com/sywoolab/ib-dashboard.git
+          cp $GITHUB_WORKSPACE/ib/data/deal_dashboard.html ib-dashboard/index.html
+          cp $GITHUB_WORKSPACE/ib/data/valuation_dashboard.html ib-dashboard/valuation.html
+          cd ib-dashboard
+          git add index.html valuation.html
+          if ! git diff --staged --quiet; then
+            git commit -m "auto: IB 대시보드 업데이트 $(date '+%Y-%m-%d %H:%M')"
+            git push
+          fi

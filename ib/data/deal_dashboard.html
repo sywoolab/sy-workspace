@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB 딜 소싱 신호 대시보드</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f13;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 0 0 48px 0;
+    }
+
+    /* ── 헤더 ── */
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-bottom: 1px solid #2a2a4a;
+      padding: 28px 32px 20px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e0e0e0;
+      letter-spacing: -0.3px;
+    }
+    .header h1 span {
+      color: #7c6fff;
+    }
+    .header .meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #666;
+    }
+    .header .meta strong {
+      color: #999;
+    }
+
+    /* ── 콘텐츠 래퍼 ── */
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px 0;
+    }
+
+    /* ── 섹션 헤더 ── */
+    .section-header {
+      border-left: 3px solid #7c6fff;
+      padding-left: 12px;
+      margin-bottom: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #c0b8ff;
+    }
+
+    /* ── 요약 카드 grid ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .summary-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent, #7c6fff);
+    }
+    .summary-card .label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .summary-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent, #7c6fff);
+    }
+    .summary-card .sub {
+      font-size: 11px;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    /* ── 차트 섹션 ── */
+    .chart-section {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+    .chart-section .section-header {
+      margin-bottom: 16px;
+    }
+    .chart-wrap {
+      height: 220px;
+      position: relative;
+    }
+
+    /* ── 테이블 섹션 ── */
+    .table-section {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+      border-bottom: 1px solid #2a2a4a;
+      padding: 8px 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid #1e1e30;
+      transition: background 0.15s;
+    }
+    tbody tr:hover {
+      background: rgba(124, 111, 255, 0.07) !important;
+    }
+    tbody td {
+      padding: 10px 12px;
+      vertical-align: middle;
+    }
+
+    .rank-col   { width: 48px; text-align: center; color: #555; font-size: 12px; }
+    .name-col   { min-width: 120px; }
+    .score-col  { width: 80px; text-align: center; }
+    .cat-col    { min-width: 180px; }
+    .report-col { font-size: 12px; color: #888; }
+
+    .corp-link {
+      color: #c0b8ff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .corp-link:hover { color: #7c6fff; text-decoration: underline; }
+
+    .score-badge {
+      display: inline-block;
+      background: #2a2a4a;
+      color: #7c6fff;
+      border: 1px solid #3a3a6a;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    .cat-badge {
+      display: inline-block;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      margin: 1px 2px 1px 0;
+      white-space: nowrap;
+    }
+
+    .report-col a {
+      color: #6ab4ff;
+      text-decoration: none;
+    }
+    .report-col a:hover { text-decoration: underline; }
+
+    /* ── 푸터 ── */
+    .footer {
+      text-align: center;
+      color: #3a3a5a;
+      font-size: 11px;
+      padding-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <div class="header">
+    <h1>IB 딜 소싱 <span>신호 대시보드</span></h1>
+    <div class="meta">
+      생성: <strong>2026-05-22 09:42 KST</strong> &nbsp;|&nbsp;
+      마지막 실행: <strong>2026-05-22 09:32 KST</strong>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 요약 카드 -->
+    <div class="section-header">요약</div>
+    <div class="summary-grid">
+      <div class="summary-card" style="--accent:#7c6fff;">
+        <div class="label">이번 주 신호 기업</div>
+        <div class="value">20</div>
+        <div class="sub">최신 탐지 기준</div>
+      </div>
+      <div class="summary-card" style="--accent:#ffd56c;">
+        <div class="label">M&amp;A 신호</div>
+        <div class="value">6</div>
+        <div class="sub">경영권·합병·공개매수</div>
+      </div>
+      <div class="summary-card" style="--accent:#6ab4ff;">
+        <div class="label">자금조달 신호</div>
+        <div class="value">14</div>
+        <div class="sub">CB·BW·유증</div>
+      </div>
+      <div class="summary-card" style="--accent:#ffd56c;">
+        <div class="label">워치리스트 히트 ⭐</div>
+        <div class="value">0</div>
+        <div class="sub">기존 관심 기업</div>
+      </div>
+    </div>
+
+    <!-- 주간 트렌드 차트 -->
+    <div class="chart-section">
+      <div class="section-header">주간 신호 트렌드 (최근 1회 탐지)</div>
+      <div class="chart-wrap">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- TOP 신호 기업 테이블 -->
+    <div class="table-section">
+      <div class="section-header">TOP 신호 기업 (최신 탐지 기준)</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="rank-col">#</th>
+            <th class="name-col">기업명</th>
+            <th class="score-col">점수</th>
+            <th class="cat-col">카테고리</th>
+            <th class="report-col">주요 공시</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        <tr style="background-color:rgba(124, 111, 255, 0.18);">
+            <td class="rank-col">1</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00377610" target="_blank" class="corp-link">세아홀딩스</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">38</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#ffd56c22;color:#ffd56c;border:1px solid #ffd56c66;">🏢 M&A</span> <span class="cat-badge" style="background:#45aaf222;color:#45aaf2;border:1px solid #45aaf266;">🔵 자사주</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00377610" target="_blank" title="공개매수에관한의견표명서">공개매수에관한의견표명서</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.18);">
+            <td class="rank-col">2</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00532855" target="_blank" class="corp-link">한국유니온제약</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">31</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#ffd56c22;color:#ffd56c;border:1px solid #ffd56c66;">🏢 M&A</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00532855" target="_blank" title="최대주주변경">최대주주변경</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">3</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00152385" target="_blank" class="corp-link">에이프로젠</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">30</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00152385" target="_blank" title="주요사항보고서(전환사채권발행결정)(자회사의 주요경영사항)">주요사항보고서(전환사채권발행결정)(자회사의 주…</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">4</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00351579" target="_blank" class="corp-link">비트플래닛</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">30</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00351579" target="_blank" title="[기재정정]주요사항보고서(전환사채권발행결정)">[기재정정]주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">5</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00874937" target="_blank" class="corp-link">탑선</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">30</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00874937" target="_blank" title="[첨부정정]주요사항보고서(전환사채권발행결정)">[첨부정정]주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">6</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00453442" target="_blank" class="corp-link">해성에어로보틱스</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">30</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00453442" target="_blank" title="[첨부정정]주요사항보고서(전환사채권발행결정)">[첨부정정]주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">7</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00550082" target="_blank" class="corp-link">캔버스엔</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">30</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00550082" target="_blank" title="[기재정정]주요사항보고서(전환사채권발행결정)">[기재정정]주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">8</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00367482" target="_blank" class="corp-link">빛과전자</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">24</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#ffd56c22;color:#ffd56c;border:1px solid #ffd56c66;">🏢 M&A</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00367482" target="_blank" title="[첨부정정]주요사항보고서(회사합병결정)">[첨부정정]주요사항보고서(회사합병결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">9</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00133335" target="_blank" class="corp-link">성창기업지주</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">24</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#ffd56c22;color:#ffd56c;border:1px solid #ffd56c66;">🏢 M&A</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00133335" target="_blank" title="[첨부정정]주요사항보고서(회사합병결정)">[첨부정정]주요사항보고서(회사합병결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">10</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00530413" target="_blank" class="corp-link">더코디</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">24</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00530413" target="_blank" title="[기재정정]주요사항보고서(전환사채권발행결정)">[기재정정]주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">11</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00110431" target="_blank" class="corp-link">JW신약</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">21</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00110431" target="_blank" title="주요사항보고서(전환사채권발행결정)">주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">12</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00872984" target="_blank" class="corp-link">이마트</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">21</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#ffd56c22;color:#ffd56c;border:1px solid #ffd56c66;">🏢 M&A</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00872984" target="_blank" title="[기재정정]주요사항보고서(주식교환ㆍ이전결정)">[기재정정]주요사항보고서(주식교환ㆍ이전결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">13</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00447487" target="_blank" class="corp-link">제주반도체</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">20</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00447487" target="_blank" title="[기재정정]주요사항보고서(신주인수권부사채매수선택권행사자지정)">[기재정정]주요사항보고서(신주인수권부사채매수선…</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.09);">
+            <td class="rank-col">14</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00108746" target="_blank" class="corp-link">DKME</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">20</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#ffd56c22;color:#ffd56c;border:1px solid #ffd56c66;">🏢 M&A</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00108746" target="_blank" title="최대주주등소유주식변동신고서(최대주주변경시)">최대주주등소유주식변동신고서(최대주주변경시)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.04);">
+            <td class="rank-col">15</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00110750" target="_blank" class="corp-link">플루토스</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">18</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00110750" target="_blank" title="주요사항보고서(전환사채권발행결정)">주요사항보고서(전환사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.04);">
+            <td class="rank-col">16</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00244747" target="_blank" class="corp-link">파크시스템스</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">18</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00244747" target="_blank" title="주요사항보고서(신주인수권부사채권발행결정)">주요사항보고서(신주인수권부사채권발행결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.04);">
+            <td class="rank-col">17</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00367695" target="_blank" class="corp-link">에이전트AI</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">18</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00367695" target="_blank" title="[기재정정]주요사항보고서(유상증자결정)">[기재정정]주요사항보고서(유상증자결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.04);">
+            <td class="rank-col">18</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00171636" target="_blank" class="corp-link">한솔홀딩스</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">18</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00171636" target="_blank" title="[기재정정]주요사항보고서(유상증자결정)(자회사의 주요경영사항)">[기재정정]주요사항보고서(유상증자결정)(자회사…</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.04);">
+            <td class="rank-col">19</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00157399" target="_blank" class="corp-link">한솔테크닉스</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">18</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#6ab4ff22;color:#6ab4ff;border:1px solid #6ab4ff66;">💵 자금조달</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00157399" target="_blank" title="[기재정정]주요사항보고서(유상증자결정)">[기재정정]주요사항보고서(유상증자결정)</a></td>
+        </tr>
+
+        <tr style="background-color:rgba(124, 111, 255, 0.04);">
+            <td class="rank-col">20</td>
+            <td class="name-col">
+                <a href="https://dart.fss.or.kr/corp/searchCorpInfo.do?textCrpCik=00692254" target="_blank" class="corp-link">아이패밀리에스씨</a>
+            </td>
+            <td class="score-col">
+                <span class="score-badge">17</span>
+            </td>
+            <td class="cat-col"><span class="cat-badge" style="background:#7c6fff22;color:#7c6fff;border:1px solid #7c6fff66;">📌 IB이벤트</span> <span class="cat-badge" style="background:#45aaf222;color:#45aaf2;border:1px solid #45aaf266;">🔵 자사주</span></td>
+            <td class="report-col"><a href="https://dart.fss.or.kr/dsab007/main.do?autoSearch=true&textCrpCik=00692254" target="_blank" title="주요사항보고서(자기주식처분결정)">주요사항보고서(자기주식처분결정)</a></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      ⭐ = 워치리스트 기업 &nbsp;|&nbsp; 기업명 클릭 → DART 기업 정보 &nbsp;|&nbsp; 점수 기준: M&amp;A 10점 ~ 약신호 3점
+    </div>
+
+  </div><!-- /content -->
+
+  <script>
+    // 주간 트렌드 차트
+    (function() {
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["05/22"],
+          datasets: [{
+            label: '신호 감지 기업 수',
+            data: [20],
+            backgroundColor: 'rgba(124, 111, 255, 0.55)',
+            borderColor: 'rgba(124, 111, 255, 1)',
+            borderWidth: 1,
+            borderRadius: 4,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a2e',
+              borderColor: '#2a2a4a',
+              borderWidth: 1,
+              titleColor: '#c0b8ff',
+              bodyColor: '#e0e0e0',
+              callbacks: {
+                label: function(ctx) {
+                  return ' ' + ctx.parsed.y + '개사';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(42,42,74,0.5)', drawBorder: false },
+              ticks: { color: '#666', font: { size: 11 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(42,42,74,0.5)', drawBorder: false },
+              ticks: {
+                color: '#666',
+                font: { size: 11 },
+                stepSize: 5,
+              }
+            }
+          }
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

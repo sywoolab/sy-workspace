@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IB 밸류에이션 대시보드</title>
+  <style>
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: #0f0f13;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 24px;
+}
+h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #a0a8ff;
+    margin-bottom: 4px;
+}
+.subtitle {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 28px;
+}
+h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #c4c4f0;
+    border-left: 3px solid #7c6fff;
+    padding-left: 10px;
+    margin: 20px 0 12px 0;
+}
+h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #b0b0e0;
+    margin: 14px 0 8px 0;
+}
+hr { border: none; border-top: 1px solid #2a2a4a; margin: 12px 0; }
+blockquote {
+    border-left: 3px solid #7c6fff;
+    padding-left: 10px;
+    color: #999;
+    font-size: 12px;
+    margin: 8px 0;
+}
+ul { padding-left: 20px; margin: 6px 0; }
+li { margin: 3px 0; }
+p { margin: 6px 0; }
+br { display: block; margin: 2px 0; content: ""; }
+
+/* 요약 테이블 */
+.summary-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 28px;
+}
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+.summary-table th {
+    background: #1a1a2e;
+    color: #9090c0;
+    font-weight: 600;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid #2a2a4a;
+    white-space: nowrap;
+}
+.summary-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #1e1e32;
+    white-space: nowrap;
+}
+.summary-table tr.row-clickable:hover td {
+    background: #1e1e38;
+    cursor: pointer;
+}
+.summary-table .no-data { color: #555; }
+.up   { color: #6affa0; font-weight: 600; }
+.down { color: #ff6c6c; font-weight: 600; }
+
+/* 아코디언 상세 카드 */
+.detail-row td {
+    padding: 0 !important;
+    border-bottom: 2px solid #2a2a4a !important;
+}
+.detail-inner {
+    display: none;
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 4px 0 8px 0;
+}
+.detail-inner.open { display: block; }
+
+/* 상세 내부 테이블 */
+.detail-inner table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8px 0;
+}
+.detail-inner th, .detail-inner td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #2a2a4a;
+    text-align: left;
+}
+.detail-inner th {
+    background: #13132a;
+    color: #9090c0;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.detail-inner td { color: #d0d0e8; }
+.detail-inner strong { color: #e0e0ff; }
+.detail-inner em { font-style: italic; color: #aaa; }
+
+/* 빈 상태 */
+.empty-state {
+    text-align: center;
+    color: #555;
+    padding: 48px;
+    background: #1a1a2e;
+    border-radius: 6px;
+}
+
+  </style>
+</head>
+<body>
+  <h1>IB 밸류에이션 대시보드</h1>
+  <p class="subtitle">업데이트: 2026-05-22 09:42 KST &nbsp;|&nbsp; 분석 기업 1개 &nbsp;|&nbsp; 행 클릭 시 상세 보기</p>
+
+  <h2>분석 기업 요약</h2>
+  
+<div class="summary-table-wrap">
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>기업명</th>
+        <th>분석일</th>
+        <th>LTM EBIT</th>
+        <th>순차입금</th>
+        <th>EV 하단</th>
+        <th>EV 상단</th>
+        <th>현재 시총</th>
+        <th>업사이드</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row-clickable" onclick="toggleDetail(0)"><td>주식회사 솔루엠</td><td>2026-05-22</td><td>793억</td><td>2,539억</td><td>3,803억</td><td>8,559억</td><td>58억</td><td><span class="up">UP 10471.4%</span></td></tr>
+<tr class="detail-row"><td colspan="8"><div class="detail-inner" id="detail-0"><h2>밸류에이션 초안: 주식회사 솔루엠</h2>
+<blockquote>생성: 2026-05-22 09:36 KST | ⚠️ 초안 — 수치 검증 필수, 내부 의사결정용</blockquote>
+<br>
+<hr>
+<br>
+<h2>1. 기본 정보</h2>
+<ul>
+<li><strong>기업명</strong>: 주식회사 솔루엠</li>
+<li><strong>종목코드</strong>: 248070</li>
+<li><strong>현재가</strong>: 19,820원</li>
+<li><strong>시가총액</strong>: 58억원</li>
+</ul>
+<br>
+<h2>2. 재무 현황 (단위: 억원)</h2>
+<br>
+<table><thead><tr>
+<th>항목</th>
+<th>FY2024</th>
+<th>LTM(1Q 2026)</th>
+</tr></thead><tbody>
+<tr>
+<td>매출액</td>
+<td>15,944</td>
+<td>16,753</td>
+</tr>
+<tr>
+<td>영업이익(EBIT)</td>
+<td>691</td>
+<td>793</td>
+</tr>
+<tr>
+<td>당기순이익</td>
+<td>377</td>
+<td>—</td>
+</tr>
+<tr>
+<td>D&A</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>EBITDA</strong></td>
+<td><strong>—</strong></td>
+<td><strong>—</strong></td>
+</tr>
+</tbody></table>
+<br>
+<h3>순차입금</h3>
+<ul>
+<li><strong>순차입금</strong>: 2,539억원 (2026 1Q BS)</li>
+<li>총차입금: 4,348억원</li>
+<li>현금/금융상품: 1,809억원</li>
+</ul>
+<br>
+<h2>4. 밸류에이션 범위 (단위: 억원)</h2>
+<br>
+<h3>EV/EBIT (8x ~ 14x)</h3>
+<table><thead><tr>
+<th>항목</th>
+<th>하단</th>
+<th>상단</th>
+</tr></thead><tbody>
+<tr>
+<td>LTM EBIT</td>
+<td>793</td>
+<td>793</td>
+</tr>
+<tr>
+<td>EV</td>
+<td>6,342</td>
+<td>11,098</td>
+</tr>
+<tr>
+<td>(-)순차입금</td>
+<td>2,539</td>
+<td>2,539</td>
+</tr>
+<tr>
+<td><strong>Equity Value</strong></td>
+<td><strong>3,803</strong></td>
+<td><strong>8,559</strong></td>
+</tr>
+<tr>
+<td>현재 시총 대비</td>
+<td>UP 10471.4% (중간값 기준)</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<br>
+<h2>5. 주요 가정 & 유의사항</h2>
+<br>
+<ul>
+<li>재무 데이터: DART 공개 재무제표 (LTM(1Q 2026) 기준)</li>
+<li>D&A 누락 시 EBITDA 산출 불가 → EBIT 기준으로만 산출</li>
+<li>비상장사: 시가총액 없음 → EV/EBIT 범위만 참고</li>
+<li>멀티플 기준: 업종 기준값 (주관적)</li>
+</ul>
+<br>
+<blockquote>⚠️ 본 초안은 공개 데이터 기반 자동 산출물입니다.</blockquote>
+<blockquote>공식 보고서 사용 전 재무팀 또는 선임과 수치 검증 필수.</blockquote></div></td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+  <script>
+
+function toggleDetail(idx) {
+    var el = document.getElementById('detail-' + idx);
+    if (!el) return;
+    var isOpen = el.classList.contains('open');
+    // 모두 닫기
+    var all = document.querySelectorAll('.detail-inner');
+    for (var i = 0; i < all.length; i++) {
+        all[i].classList.remove('open');
+    }
+    // 클릭한 것 토글
+    if (!isOpen) {
+        el.classList.add('open');
+    }
+}
+
+  </script>
+</body>
+</html>
