@@ -99,6 +99,16 @@
   .news-title:hover { text-decoration: underline; }
   .news-meta  { font-size: 10px; color: #9ca3af; margin-top: 1px; }
 
+  /* 예산 탭 */
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; border-bottom: 2px solid #e5e7eb; padding-bottom: 0; }
+  .tab-btn { padding: 7px 16px; font-size: 12px; font-weight: 700; border: 2px solid #e5e7eb;
+             border-bottom: none; border-radius: 6px 6px 0 0; background: #f3f4f6;
+             color: #6b7280; cursor: pointer; transition: all 0.15s; margin-bottom: -2px; }
+  .tab-btn:hover { background: #e5e7eb; color: #374151; }
+  .tab-btn.active { background: #1a3c5e; color: #fff; border-color: #1a3c5e; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
   /* 푸터 */
   .footer { text-align: center; font-size: 11px; color: #9ca3af; padding: 16px 0 8px; }
 
@@ -115,7 +125,7 @@
 
   <div class="header">
     <h1>🏠 MS 부동산 Dashboard <span class="badge badge-yellow">관망 (매수 보류)</span></h1>
-    <div class="meta">2026년 05월 22일 (금) &nbsp;·&nbsp; 07:45 KST &nbsp;·&nbsp; 실거래가 기준 · 매수자: 무주택 신혼부부 · 서울/분당</div>
+    <div class="meta">2026년 05월 22일 (금) &nbsp;·&nbsp; 09:10 KST &nbsp;·&nbsp; 실거래가 기준 · 매수자: 무주택 신혼부부 · 서울/분당</div>
   </div>
 
   <!-- 1. 시장 스냅샷 -->
@@ -227,19 +237,29 @@
     </div>
   </div>
 
-  <!-- 4. Top 20 관심 단지 -->
+  <!-- 4. Top 20 관심 단지 (예산 탭) -->
   <div class="card">
-    <div class="card-title">🏆 관심 단지 Top 20 &nbsp;<span style="font-size:10px;color:#9ca3af">매수상한 11.6억 이내 · 실거주 총점 기준 · 데이터: scored_all.csv (2026-05-22 기준)</span></div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
-            <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
-            <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div class="card-title">🏆 관심 단지 Top 20 &nbsp;<span style="font-size:10px;color:#9ca3af">실거주 총점 기준 · 탭별 매수상한 적용 · 데이터: scored_all.csv (2026-05-22 기준)</span></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchReTab(this,0)">11.6억</button>
+      <button class="tab-btn" onclick="switchReTab(this,1)">12.1억</button>
+      <button class="tab-btn" onclick="switchReTab(this,2)">12.6억</button>
+      <button class="tab-btn" onclick="switchReTab(this,3)">13.1억</button>
+      <button class="tab-btn" onclick="switchReTab(this,4)">13.6억</button>
+      
+    </div>
+    
+        <div class="tab-pane active" id="re-tab-0">
+          <div class="tbl-wrap">
+            <table>
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+              <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+              <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+            </tr>
+          </thead>
+              <tbody>
         <tr>
           <td class="td-rank">1</td>
           <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B3%B4%EB%9D%BC%EB%A7%A4%20%EC%8B%A0%EB%8F%99%EC%95%84%20%ED%8C%8C%EB%B0%80%EB%A6%AC%EC%97%90%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">보라매 신동아 파밀리에</a></td>
@@ -540,9 +560,1270 @@
           <td>5</td>
           <td class="score-mid"><b>69.5</b></td>
         </tr>
-        </tbody>
-      </table>
-    </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="re-tab-1">
+          <div class="tbl-wrap">
+            <table>
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+              <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+              <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+            </tr>
+          </thead>
+              <tbody>
+        <tr>
+          <td class="td-rank">1</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B3%B4%EB%9D%BC%EB%A7%A4%20%EC%8B%A0%EB%8F%99%EC%95%84%20%ED%8C%8C%EB%B0%80%EB%A6%AC%EC%97%90%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">보라매 신동아 파밀리에</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>10.3억</b></td>
+          <td class="trend-up">+8.9%</td>
+          <td>47.5%</td>
+          <td>32분</td>
+          <td>4.7억</td>
+          <td>4.7억</td>
+          <td>2016</td>
+          <td>9</td>
+          <td class="score-high"><b>79.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">2</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%84%B1%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남성</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.2억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.6억</td>
+          <td>4.6억</td>
+          <td>1983</td>
+          <td>5</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">3</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C1%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌1차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+15.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>5.5억</td>
+          <td>1997</td>
+          <td>2</td>
+          <td class="score-high"><b>75.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">4</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%AC%B8%ED%99%94%EC%B4%8C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">문화촌현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>8.0억</b></td>
+          <td class="trend-up">+16.3%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>2.6억</td>
+          <td>2.6억</td>
+          <td>2002</td>
+          <td>5</td>
+          <td class="score-high"><b>74.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">5</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%AC%EB%8B%B9%EC%9E%90%EC%9D%B4%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">사당자이</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>11.8억</b></td>
+          <td class="trend-up">+11.7%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>6.1억</td>
+          <td>6.1억</td>
+          <td>1999</td>
+          <td>3</td>
+          <td class="score-high"><b>73.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">6</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EC%89%90%EB%A5%B4%EB%B9%8C%20%EC%84%B1%EB%8F%99%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성쉐르빌</a></td>
+          <td>성동구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+14.3%</td>
+          <td>41.5%</td>
+          <td>40분</td>
+          <td>5.7억</td>
+          <td>6.4억</td>
+          <td>2006</td>
+          <td>2</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">7</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제삼성래미안</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>8.7억</b></td>
+          <td class="trend-up">+12.1%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.0억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">8</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%9A%B0%EC%84%B11%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">우성1</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+4.9%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>1986</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">9</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%AD%EA%B5%AC1%EC%B0%A8%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">청구1차</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+8.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.5억</td>
+          <td>5.5억</td>
+          <td>1994</td>
+          <td>8</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">10</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%95%84%20%EC%A2%85%EB%A1%9C%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동아</a></td>
+          <td>종로구</td>
+          <td>84㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+12.8%</td>
+          <td>57.1%</td>
+          <td>39분</td>
+          <td>-</td>
+          <td>3.2억</td>
+          <td>1995</td>
+          <td>3</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">11</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%9C%EC%97%B0%EB%9C%A8%EB%9E%80%EC%B1%84%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">천연뜨란채</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.6%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>7</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">12</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%9E%91%EC%83%81%EB%96%BC%EB%B9%8C%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동작상떼빌</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.4%</td>
+          <td>47.8%</td>
+          <td>36분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>4</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">13</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.1억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.4억</td>
+          <td>4.4억</td>
+          <td>1999</td>
+          <td>5</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">14</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%ED%98%B8%EA%B7%B8%EB%A6%B0%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼호그린</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>7.8억</b></td>
+          <td class="trend-up">+11.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>2.5억</td>
+          <td>1999</td>
+          <td>2</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">15</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+8.7%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>2004</td>
+          <td>12</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">16</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%8C%8C%ED%81%AC%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악파크푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>10.0억</b></td>
+          <td class="trend-up">+8.3%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>4.2억</td>
+          <td>4.4억</td>
+          <td>2014</td>
+          <td>8</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">17</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%96%91%ED%8F%89%EB%B2%BD%EC%82%B0%EB%B8%94%EB%A3%A8%EB%B0%8D%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">양평벽산블루밍</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+10.5%</td>
+          <td>47.5%</td>
+          <td>37분</td>
+          <td>3.2억</td>
+          <td>3.2억</td>
+          <td>1990</td>
+          <td>4</td>
+          <td class="score-high"><b>70.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">18</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C2%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌2차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.0억</b></td>
+          <td class="trend-up">+5.8%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>4.3억</td>
+          <td>1998</td>
+          <td>2</td>
+          <td class="score-high"><b>70.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">19</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>9.5억</b></td>
+          <td class="trend-up">+14.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.8억</td>
+          <td>1992</td>
+          <td>3</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">20</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%94%BC%EC%96%B4%EB%A6%AC%EC%8A%A4%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">피어리스</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>7.5억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>55.1%</td>
+          <td>36분</td>
+          <td>-</td>
+          <td>2.4억</td>
+          <td>1987</td>
+          <td>2</td>
+          <td class="score-mid"><b>69.5</b></td>
+        </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="re-tab-2">
+          <div class="tbl-wrap">
+            <table>
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+              <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+              <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+            </tr>
+          </thead>
+              <tbody>
+        <tr>
+          <td class="td-rank">1</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B3%B4%EB%9D%BC%EB%A7%A4%20%EC%8B%A0%EB%8F%99%EC%95%84%20%ED%8C%8C%EB%B0%80%EB%A6%AC%EC%97%90%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">보라매 신동아 파밀리에</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>10.3억</b></td>
+          <td class="trend-up">+8.9%</td>
+          <td>47.5%</td>
+          <td>32분</td>
+          <td>4.7억</td>
+          <td>4.7억</td>
+          <td>2016</td>
+          <td>9</td>
+          <td class="score-high"><b>79.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">2</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성래미안</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.3억</b></td>
+          <td class="trend-up">+22.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.7억</td>
+          <td>6.7억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">3</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%84%B1%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남성</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.2억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.6억</td>
+          <td>4.6억</td>
+          <td>1983</td>
+          <td>5</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">4</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C1%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌1차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+15.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>5.5억</td>
+          <td>1997</td>
+          <td>2</td>
+          <td class="score-high"><b>75.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">5</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%AC%B8%ED%99%94%EC%B4%8C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">문화촌현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>8.0억</b></td>
+          <td class="trend-up">+16.3%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>2.6억</td>
+          <td>2.6억</td>
+          <td>2002</td>
+          <td>5</td>
+          <td class="score-high"><b>74.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">6</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%AC%EB%8B%B9%EC%9E%90%EC%9D%B4%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">사당자이</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>11.8억</b></td>
+          <td class="trend-up">+11.7%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>6.1억</td>
+          <td>6.1억</td>
+          <td>1999</td>
+          <td>3</td>
+          <td class="score-high"><b>73.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">7</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EC%89%90%EB%A5%B4%EB%B9%8C%20%EC%84%B1%EB%8F%99%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성쉐르빌</a></td>
+          <td>성동구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+14.3%</td>
+          <td>41.5%</td>
+          <td>40분</td>
+          <td>5.7억</td>
+          <td>6.4억</td>
+          <td>2006</td>
+          <td>2</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">8</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제삼성래미안</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>8.7억</b></td>
+          <td class="trend-up">+12.1%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.0억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">9</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%9A%B0%EC%84%B11%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">우성1</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+4.9%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>1986</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">10</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%ED%95%9C%EA%B0%95%ED%83%80%EC%9A%B4%20%EC%9A%A9%EC%82%B0%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">한강타운</a></td>
+          <td>용산구</td>
+          <td>59㎡</td>
+          <td><b>12.4억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>38.8%</td>
+          <td>37분</td>
+          <td>6.8억</td>
+          <td>6.8억</td>
+          <td>2001</td>
+          <td>5</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">11</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%AD%EA%B5%AC1%EC%B0%A8%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">청구1차</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+8.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.5억</td>
+          <td>5.5억</td>
+          <td>1994</td>
+          <td>8</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">12</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%95%84%20%EC%A2%85%EB%A1%9C%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동아</a></td>
+          <td>종로구</td>
+          <td>84㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+12.8%</td>
+          <td>57.1%</td>
+          <td>39분</td>
+          <td>-</td>
+          <td>3.2억</td>
+          <td>1995</td>
+          <td>3</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">13</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%82%B0%EC%84%BC%ED%8A%B8%EB%9F%B4%EC%9E%90%EC%9D%B4%20%EC%A4%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남산센트럴자이</a></td>
+          <td>중구</td>
+          <td>84㎡</td>
+          <td><b>12.4억</b></td>
+          <td class="trend-up">+3.7%</td>
+          <td>52.5%</td>
+          <td>32분</td>
+          <td>5.5억</td>
+          <td>6.8억</td>
+          <td>2009</td>
+          <td>2</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">14</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%9C%EC%97%B0%EB%9C%A8%EB%9E%80%EC%B1%84%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">천연뜨란채</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.6%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>7</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">15</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%9E%91%EC%83%81%EB%96%BC%EB%B9%8C%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동작상떼빌</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.4%</td>
+          <td>47.8%</td>
+          <td>36분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>4</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">16</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.1억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.4억</td>
+          <td>4.4억</td>
+          <td>1999</td>
+          <td>5</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">17</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%ED%98%B8%EA%B7%B8%EB%A6%B0%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼호그린</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>7.8억</b></td>
+          <td class="trend-up">+11.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>2.5억</td>
+          <td>1999</td>
+          <td>2</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">18</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+8.7%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>2004</td>
+          <td>12</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">19</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%8C%8C%ED%81%AC%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악파크푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>10.0억</b></td>
+          <td class="trend-up">+8.3%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>4.2억</td>
+          <td>4.4억</td>
+          <td>2014</td>
+          <td>8</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">20</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%96%91%ED%8F%89%EB%B2%BD%EC%82%B0%EB%B8%94%EB%A3%A8%EB%B0%8D%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">양평벽산블루밍</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+10.5%</td>
+          <td>47.5%</td>
+          <td>37분</td>
+          <td>3.2억</td>
+          <td>3.2억</td>
+          <td>1990</td>
+          <td>4</td>
+          <td class="score-high"><b>70.5</b></td>
+        </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="re-tab-3">
+          <div class="tbl-wrap">
+            <table>
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+              <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+              <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+            </tr>
+          </thead>
+              <tbody>
+        <tr>
+          <td class="td-rank">1</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B3%B4%EB%9D%BC%EB%A7%A4%20%EC%8B%A0%EB%8F%99%EC%95%84%20%ED%8C%8C%EB%B0%80%EB%A6%AC%EC%97%90%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">보라매 신동아 파밀리에</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>10.3억</b></td>
+          <td class="trend-up">+8.9%</td>
+          <td>47.5%</td>
+          <td>32분</td>
+          <td>4.7억</td>
+          <td>4.7억</td>
+          <td>2016</td>
+          <td>9</td>
+          <td class="score-high"><b>79.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">2</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성래미안</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.3억</b></td>
+          <td class="trend-up">+22.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.7억</td>
+          <td>6.7억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">3</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%84%B1%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남성</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.2억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.6억</td>
+          <td>4.6억</td>
+          <td>1983</td>
+          <td>5</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">4</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C1%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌1차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+15.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>5.5억</td>
+          <td>1997</td>
+          <td>2</td>
+          <td class="score-high"><b>75.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">5</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%AC%B8%ED%99%94%EC%B4%8C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">문화촌현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>8.0억</b></td>
+          <td class="trend-up">+16.3%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>2.6억</td>
+          <td>2.6억</td>
+          <td>2002</td>
+          <td>5</td>
+          <td class="score-high"><b>74.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">6</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%AC%EB%8B%B9%EC%9E%90%EC%9D%B4%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">사당자이</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>11.8억</b></td>
+          <td class="trend-up">+11.7%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>6.1억</td>
+          <td>6.1억</td>
+          <td>1999</td>
+          <td>3</td>
+          <td class="score-high"><b>73.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">7</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EC%89%90%EB%A5%B4%EB%B9%8C%20%EC%84%B1%EB%8F%99%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성쉐르빌</a></td>
+          <td>성동구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+14.3%</td>
+          <td>41.5%</td>
+          <td>40분</td>
+          <td>5.7억</td>
+          <td>6.4억</td>
+          <td>2006</td>
+          <td>2</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">8</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%8B%A0%EB%8F%99%EC%95%84%20%EC%84%B1%EB%8F%99%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">신동아</a></td>
+          <td>성동구</td>
+          <td>59㎡</td>
+          <td><b>13.0억</b></td>
+          <td class="trend-up">+4.6%</td>
+          <td>41.5%</td>
+          <td>35분</td>
+          <td>7.4억</td>
+          <td>7.4억</td>
+          <td>1996</td>
+          <td>6</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">9</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제삼성래미안</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>8.7억</b></td>
+          <td class="trend-up">+12.1%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.0억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">10</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%9A%B0%EC%84%B11%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">우성1</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+4.9%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>1986</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">11</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%ED%95%9C%EA%B0%95%ED%83%80%EC%9A%B4%20%EC%9A%A9%EC%82%B0%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">한강타운</a></td>
+          <td>용산구</td>
+          <td>59㎡</td>
+          <td><b>12.4억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>38.8%</td>
+          <td>37분</td>
+          <td>6.8억</td>
+          <td>6.8억</td>
+          <td>2001</td>
+          <td>5</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">12</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%AD%EA%B5%AC1%EC%B0%A8%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">청구1차</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+8.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.5억</td>
+          <td>5.5억</td>
+          <td>1994</td>
+          <td>8</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">13</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%95%84%20%EC%A2%85%EB%A1%9C%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동아</a></td>
+          <td>종로구</td>
+          <td>84㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+12.8%</td>
+          <td>57.1%</td>
+          <td>39분</td>
+          <td>-</td>
+          <td>3.2억</td>
+          <td>1995</td>
+          <td>3</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">14</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%82%B0%EC%84%BC%ED%8A%B8%EB%9F%B4%EC%9E%90%EC%9D%B4%20%EC%A4%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남산센트럴자이</a></td>
+          <td>중구</td>
+          <td>84㎡</td>
+          <td><b>12.4억</b></td>
+          <td class="trend-up">+3.7%</td>
+          <td>52.5%</td>
+          <td>32분</td>
+          <td>5.5억</td>
+          <td>6.8억</td>
+          <td>2009</td>
+          <td>2</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">15</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%9C%EC%97%B0%EB%9C%A8%EB%9E%80%EC%B1%84%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">천연뜨란채</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.6%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>7</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">16</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%9E%91%EC%83%81%EB%96%BC%EB%B9%8C%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동작상떼빌</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.4%</td>
+          <td>47.8%</td>
+          <td>36분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>4</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">17</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.1억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.4억</td>
+          <td>4.4억</td>
+          <td>1999</td>
+          <td>5</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">18</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%ED%98%B8%EA%B7%B8%EB%A6%B0%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼호그린</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>7.8억</b></td>
+          <td class="trend-up">+11.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>2.5억</td>
+          <td>1999</td>
+          <td>2</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">19</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+8.7%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>2004</td>
+          <td>12</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">20</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B4%80%EC%95%85%ED%8C%8C%ED%81%AC%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4%20%EA%B4%80%EC%95%85%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">관악파크푸르지오</a></td>
+          <td>관악구</td>
+          <td>84㎡</td>
+          <td><b>10.0억</b></td>
+          <td class="trend-up">+8.3%</td>
+          <td>57.2%</td>
+          <td>31분</td>
+          <td>4.2억</td>
+          <td>4.4억</td>
+          <td>2014</td>
+          <td>8</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="re-tab-4">
+          <div class="tbl-wrap">
+            <table>
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+              <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+              <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+            </tr>
+          </thead>
+              <tbody>
+        <tr>
+          <td class="td-rank">1</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%B3%B4%EB%9D%BC%EB%A7%A4%20%EC%8B%A0%EB%8F%99%EC%95%84%20%ED%8C%8C%EB%B0%80%EB%A6%AC%EC%97%90%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">보라매 신동아 파밀리에</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>10.3억</b></td>
+          <td class="trend-up">+8.9%</td>
+          <td>47.5%</td>
+          <td>32분</td>
+          <td>4.7억</td>
+          <td>4.7억</td>
+          <td>2016</td>
+          <td>9</td>
+          <td class="score-high"><b>79.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">2</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%84%9C%EC%84%9C%EC%9A%B8%EC%82%BC%EC%84%B1%20%EB%A7%88%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">서서울삼성</a></td>
+          <td>마포구</td>
+          <td>84㎡</td>
+          <td><b>13.2억</b></td>
+          <td class="trend-up">+22.2%</td>
+          <td>47.4%</td>
+          <td>35분</td>
+          <td>7.6억</td>
+          <td>7.6억</td>
+          <td>1998</td>
+          <td>2</td>
+          <td class="score-high"><b>78.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">3</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성래미안</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.3억</b></td>
+          <td class="trend-up">+22.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.7억</td>
+          <td>6.7억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">4</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%84%B1%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남성</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.2억</b></td>
+          <td class="trend-up">+11.2%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.6억</td>
+          <td>4.6억</td>
+          <td>1983</td>
+          <td>5</td>
+          <td class="score-high"><b>75.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">5</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%EC%95%84%EB%84%88%EC%8A%A4%EB%B9%8C1%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남아너스빌1차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+15.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>5.5억</td>
+          <td>1997</td>
+          <td>2</td>
+          <td class="score-high"><b>75.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">6</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%AC%B8%ED%99%94%EC%B4%8C%ED%98%84%EB%8C%80%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">문화촌현대</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>8.0억</b></td>
+          <td class="trend-up">+16.3%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>2.6억</td>
+          <td>2.6억</td>
+          <td>2002</td>
+          <td>5</td>
+          <td class="score-high"><b>74.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">7</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%AC%EB%8B%B9%EB%A1%AF%EB%8D%B0%EC%BA%90%EC%8A%AC2%EC%B0%A8%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">사당롯데캐슬2차</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>13.6억</b></td>
+          <td class="trend-up">+4.4%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>8.0억</td>
+          <td>8.0억</td>
+          <td>2004</td>
+          <td>4</td>
+          <td class="score-high"><b>73.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">8</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%AC%EB%8B%B9%EC%9E%90%EC%9D%B4%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">사당자이</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>11.8억</b></td>
+          <td class="trend-up">+11.7%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>6.1억</td>
+          <td>6.1억</td>
+          <td>1999</td>
+          <td>3</td>
+          <td class="score-high"><b>73.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">9</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%EC%84%B1%EC%89%90%EB%A5%B4%EB%B9%8C%20%EC%84%B1%EB%8F%99%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼성쉐르빌</a></td>
+          <td>성동구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+14.3%</td>
+          <td>41.5%</td>
+          <td>40분</td>
+          <td>5.7억</td>
+          <td>6.4억</td>
+          <td>2006</td>
+          <td>2</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">10</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%8B%A0%EB%8F%99%EC%95%84%20%EC%84%B1%EB%8F%99%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">신동아</a></td>
+          <td>성동구</td>
+          <td>59㎡</td>
+          <td><b>13.0억</b></td>
+          <td class="trend-up">+4.6%</td>
+          <td>41.5%</td>
+          <td>35분</td>
+          <td>7.4억</td>
+          <td>7.4억</td>
+          <td>1996</td>
+          <td>6</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">11</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%ED%99%8D%EC%A0%9C%EC%82%BC%EC%84%B1%EB%9E%98%EB%AF%B8%EC%95%88%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">홍제삼성래미안</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>8.7억</b></td>
+          <td class="trend-up">+12.1%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>-</td>
+          <td>3.0억</td>
+          <td>2001</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">12</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%EC%9A%B0%EC%84%B11%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">우성1</a></td>
+          <td>영등포구</td>
+          <td>84㎡</td>
+          <td><b>12.0억</b></td>
+          <td class="trend-up">+4.9%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>6.4억</td>
+          <td>6.4억</td>
+          <td>1986</td>
+          <td>4</td>
+          <td class="score-high"><b>72.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">13</td>
+          <td class="td-name"> <a href="https://land.naver.com/search/index.nhn?query=%ED%95%9C%EA%B0%95%ED%83%80%EC%9A%B4%20%EC%9A%A9%EC%82%B0%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">한강타운</a></td>
+          <td>용산구</td>
+          <td>59㎡</td>
+          <td><b>12.4억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>38.8%</td>
+          <td>37분</td>
+          <td>6.8억</td>
+          <td>6.8억</td>
+          <td>2001</td>
+          <td>5</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">14</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%AD%EA%B5%AC1%EC%B0%A8%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">청구1차</a></td>
+          <td>서대문구</td>
+          <td>84㎡</td>
+          <td><b>11.1억</b></td>
+          <td class="trend-up">+8.8%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.5억</td>
+          <td>5.5억</td>
+          <td>1994</td>
+          <td>8</td>
+          <td class="score-high"><b>72.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">15</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%95%84%20%EC%A2%85%EB%A1%9C%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동아</a></td>
+          <td>종로구</td>
+          <td>84㎡</td>
+          <td><b>8.9억</b></td>
+          <td class="trend-up">+12.8%</td>
+          <td>57.1%</td>
+          <td>39분</td>
+          <td>-</td>
+          <td>3.2억</td>
+          <td>1995</td>
+          <td>3</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">16</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%82%A8%EC%82%B0%EC%84%BC%ED%8A%B8%EB%9F%B4%EC%9E%90%EC%9D%B4%20%EC%A4%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">남산센트럴자이</a></td>
+          <td>중구</td>
+          <td>84㎡</td>
+          <td><b>12.4억</b></td>
+          <td class="trend-up">+3.7%</td>
+          <td>52.5%</td>
+          <td>32분</td>
+          <td>5.5억</td>
+          <td>6.8억</td>
+          <td>2009</td>
+          <td>2</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">17</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%B2%9C%EC%97%B0%EB%9C%A8%EB%9E%80%EC%B1%84%20%EC%84%9C%EB%8C%80%EB%AC%B8%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">천연뜨란채</a></td>
+          <td>서대문구</td>
+          <td>59㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.6%</td>
+          <td>55.1%</td>
+          <td>42분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>7</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">18</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EB%8F%99%EC%9E%91%EC%83%81%EB%96%BC%EB%B9%8C%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">동작상떼빌</a></td>
+          <td>동작구</td>
+          <td>84㎡</td>
+          <td><b>10.8억</b></td>
+          <td class="trend-up">+13.4%</td>
+          <td>47.8%</td>
+          <td>36분</td>
+          <td>5.2억</td>
+          <td>5.2억</td>
+          <td>2006</td>
+          <td>4</td>
+          <td class="score-high"><b>71.5</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">19</td>
+          <td class="td-name"><span class="tag tag-gap">갭</span> <a href="https://land.naver.com/search/index.nhn?query=%EA%B2%BD%EB%82%A8%20%EC%98%81%EB%93%B1%ED%8F%AC%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">경남</a></td>
+          <td>영등포구</td>
+          <td>59㎡</td>
+          <td><b>10.1억</b></td>
+          <td class="trend-up">+7.3%</td>
+          <td>47.5%</td>
+          <td>35분</td>
+          <td>4.4억</td>
+          <td>4.4억</td>
+          <td>1999</td>
+          <td>5</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+        <tr>
+          <td class="td-rank">20</td>
+          <td class="td-name"><span class="tag tag-live">실거주</span> <a href="https://land.naver.com/search/index.nhn?query=%EC%82%BC%ED%98%B8%EA%B7%B8%EB%A6%B0%20%EB%8F%99%EC%9E%91%EA%B5%AC" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">삼호그린</a></td>
+          <td>동작구</td>
+          <td>59㎡</td>
+          <td><b>7.8억</b></td>
+          <td class="trend-up">+11.5%</td>
+          <td>47.8%</td>
+          <td>30분</td>
+          <td>-</td>
+          <td>2.5억</td>
+          <td>1999</td>
+          <td>2</td>
+          <td class="score-high"><b>71.0</b></td>
+        </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
     <div style="font-size:11px;color:#9ca3af;margin-top:8px">
       단지명 클릭 → 네이버 부동산 검색 &nbsp;|&nbsp; 갭현금 ≤5.5억: 갭투자 적합 &nbsp;|&nbsp; 실거주현금 ≤6억: 실거주 가능
     </div>
@@ -630,8 +1911,16 @@
   </div>
 
   <div class="footer">
-    MS 부동산 Dashboard &nbsp;·&nbsp; 가격: 국토부 실거래가 API 로우데이터 기반 (추정치 포함 금지) &nbsp;·&nbsp; 생성: 2026-05-22 07:45 KST
+    MS 부동산 Dashboard &nbsp;·&nbsp; 가격: 국토부 실거래가 API 로우데이터 기반 (추정치 포함 금지) &nbsp;·&nbsp; 생성: 2026-05-22 09:10 KST
   </div>
 </div>
+<script>
+function switchReTab(btn, idx) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('re-tab-' + idx).classList.add('active');
+}
+</script>
 </body>
 </html>

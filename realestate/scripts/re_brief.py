@@ -37,16 +37,18 @@ def load_config():
         return json.load(f)
 
 
-def load_top20():
+BUDGET_TABS = [11.6, 12.1, 12.6, 13.1, 13.6]
+
+
+def load_top20(max_price=11.6):
     """scored_all.csv → 총점_실거주 기준 Top 20 (매수상한 이내)"""
     rows = []
     try:
         with open(f'{BASE_DIR}/data/scored_all.csv', encoding='utf-8-sig') as f:
             for r in csv.DictReader(f):
                 try:
-                    # 매수상한(11.6억) 이내 필터
                     price = float(r.get('매매가', 0) or 0)
-                    if price > 11.6:
+                    if price > max_price:
                         continue
                     score = float(r.get('총점_실거주', 0) or 0)
                     rows.append({**r, '_score': score, '_price': price})
@@ -202,6 +204,16 @@ HTML_STYLE = """
   .news-title:hover { text-decoration: underline; }
   .news-meta  { font-size: 10px; color: #9ca3af; margin-top: 1px; }
 
+  /* 예산 탭 */
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; border-bottom: 2px solid #e5e7eb; padding-bottom: 0; }
+  .tab-btn { padding: 7px 16px; font-size: 12px; font-weight: 700; border: 2px solid #e5e7eb;
+             border-bottom: none; border-radius: 6px 6px 0 0; background: #f3f4f6;
+             color: #6b7280; cursor: pointer; transition: all 0.15s; margin-bottom: -2px; }
+  .tab-btn:hover { background: #e5e7eb; color: #374151; }
+  .tab-btn.active { background: #1a3c5e; color: #fff; border-color: #1a3c5e; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
   /* 푸터 */
   .footer { text-align: center; font-size: 11px; color: #9ca3af; padding: 16px 0 8px; }
 
@@ -238,7 +250,56 @@ def _fmt(val, suffix='', dec=1):
         return '-'
 
 
-def build_html(cfg, top20, chungyak, watchlist, news):
+def _build_rows_html(top20):
+    """Top 20 리스트 → <tr> HTML 문자열"""
+    rows_html = ''
+    for i, r in enumerate(top20, 1):
+        name      = r.get('단지명', '')
+        gu        = r.get('구', '')
+        area      = r.get('면적', '')
+        price     = _fmt(r.get('매매가'), '억')
+        jeonse_r  = _fmt(r.get('KB전세가율'), '%', 1)
+        trend     = r.get('추세', '')
+        trend_str = f'{float(trend):+.1f}%' if trend else '-'
+        commute   = _fmt(r.get('통근가중'), '분', 0)
+        score     = r.get('총점_실거주', '')
+        gap_cash  = r.get('갭필요현금', '')
+        live_cash = r.get('실거주필요현금', '')
+        vintage   = r.get('준공', '')
+        trades    = r.get('매매건수', '')
+
+        gap_cash_f  = float(gap_cash)  if gap_cash  else 99
+        live_cash_f = float(live_cash) if live_cash else 99
+        if gap_cash_f <= 5.5:
+            tag = '<span class="tag tag-gap">갭</span>'
+        elif live_cash_f <= 6.0:
+            tag = '<span class="tag tag-live">실거주</span>'
+        else:
+            tag = ''
+
+        t_cls = _trend_cls(trend)
+        s_cls = _score_cls(score)
+
+        rows_html += f"""
+        <tr>
+          <td class="td-rank">{i}</td>
+          <td class="td-name">{tag} <a href="https://land.naver.com/search/index.nhn?query={requests.utils.quote(name+' '+gu)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">{name}</a></td>
+          <td>{gu}</td>
+          <td>{area}</td>
+          <td><b>{price}</b></td>
+          <td class="{t_cls}">{trend_str}</td>
+          <td>{jeonse_r}</td>
+          <td>{commute}</td>
+          <td>{_fmt(gap_cash,'억') if gap_cash else '-'}</td>
+          <td>{_fmt(live_cash,'억') if live_cash else '-'}</td>
+          <td>{vintage}</td>
+          <td>{trades}</td>
+          <td class="{s_cls}"><b>{_fmt(score,'',1)}</b></td>
+        </tr>"""
+    return rows_html
+
+
+def build_html(cfg, top20_scenarios, chungyak, watchlist, news):
     now      = NOW
     _days_ko = ['월','화','수','목','금','토','일']
     date_str = f'{now.strftime("%Y년 %m월 %d일")} ({_days_ko[now.weekday()]})'
@@ -294,52 +355,32 @@ def build_html(cfg, top20, chungyak, watchlist, news):
     if not chungyak_html:
         chungyak_html = '<p style="color:#9ca3af;font-size:13px">등록된 청약 없음</p>'
 
-    # ── Top 20 단지 테이블 ────────────────────────
-    rows_html = ''
-    for i, r in enumerate(top20, 1):
-        name     = r.get('단지명','')
-        gu       = r.get('구','')
-        area     = r.get('면적','')
-        price    = _fmt(r.get('매매가'), '억')
-        jeonse_r = _fmt(r.get('KB전세가율'), '%', 1)
-        trend    = r.get('추세', '')
-        trend_str = f'{float(trend):+.1f}%' if trend else '-'
-        commute  = _fmt(r.get('통근가중'), '분', 0)
-        score    = r.get('총점_실거주','')
-        gap_cash = r.get('갭필요현금','')
-        live_cash = r.get('실거주필요현금','')
-        vintage  = r.get('준공','')
-        trades   = r.get('매매건수','')
+    # ── Top 20 예산 탭 HTML ────────────────────────
+    _thead = """
+          <thead>
+            <tr>
+              <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
+              <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
+              <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
+            </tr>
+          </thead>"""
 
-        # 전략 태그
-        gap_cash_f = float(gap_cash) if gap_cash else 99
-        live_cash_f = float(live_cash) if live_cash else 99
-        if gap_cash_f <= 5.5:
-            tag = '<span class="tag tag-gap">갭</span>'
-        elif live_cash_f <= 6.0:
-            tag = '<span class="tag tag-live">실거주</span>'
-        else:
-            tag = ''
-
-        t_cls = _trend_cls(trend)
-        s_cls = _score_cls(score)
-
-        rows_html += f"""
-        <tr>
-          <td class="td-rank">{i}</td>
-          <td class="td-name">{tag} <a href="https://land.naver.com/search/index.nhn?query={requests.utils.quote(name+' '+gu)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">{name}</a></td>
-          <td>{gu}</td>
-          <td>{area}</td>
-          <td><b>{price}</b></td>
-          <td class="{t_cls}">{trend_str}</td>
-          <td>{jeonse_r}</td>
-          <td>{commute}</td>
-          <td>{_fmt(gap_cash,'억') if gap_cash else '-'}</td>
-          <td>{_fmt(live_cash,'억') if live_cash else '-'}</td>
-          <td>{vintage}</td>
-          <td>{trades}</td>
-          <td class="{s_cls}"><b>{_fmt(score,'',1)}</b></td>
-        </tr>"""
+    tab_btns = ''
+    tab_panes = ''
+    for i, budget in enumerate(BUDGET_TABS):
+        active_cls = ' active' if i == 0 else ''
+        tab_btns += f'<button class="tab-btn{active_cls}" onclick="switchReTab(this,{i})">{budget:.1f}억</button>\n      '
+        rows = top20_scenarios.get(budget, [])
+        rows_html = _build_rows_html(rows)
+        tab_panes += f"""
+        <div class="tab-pane{active_cls}" id="re-tab-{i}">
+          <div class="tbl-wrap">
+            <table>{_thead}
+              <tbody>{rows_html}
+              </tbody>
+            </table>
+          </div>
+        </div>"""
 
     # ── 추천 로직 설명 ────────────────────────────
     LOGIC = [
@@ -425,22 +466,13 @@ def build_html(cfg, top20, chungyak, watchlist, news):
     </div>
   </div>
 
-  <!-- 4. Top 20 관심 단지 -->
+  <!-- 4. Top 20 관심 단지 (예산 탭) -->
   <div class="card">
-    <div class="card-title">🏆 관심 단지 Top 20 &nbsp;<span style="font-size:10px;color:#9ca3af">매수상한 11.6억 이내 · 실거주 총점 기준 · 데이터: scored_all.csv ({NOW.strftime('%Y-%m-%d')} 기준)</span></div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th style="text-align:left">단지명</th><th>구</th><th>면적</th>
-            <th>매매가</th><th>추세</th><th>전세가율</th><th>통근</th>
-            <th>갭현금</th><th>실거주현금</th><th>준공</th><th>거래수</th><th>총점</th>
-          </tr>
-        </thead>
-        <tbody>{rows_html}
-        </tbody>
-      </table>
+    <div class="card-title">🏆 관심 단지 Top 20 &nbsp;<span style="font-size:10px;color:#9ca3af">실거주 총점 기준 · 탭별 매수상한 적용 · 데이터: scored_all.csv ({NOW.strftime('%Y-%m-%d')} 기준)</span></div>
+    <div class="tab-bar">
+      {tab_btns}
     </div>
+    {tab_panes}
     <div style="font-size:11px;color:#9ca3af;margin-top:8px">
       단지명 클릭 → 네이버 부동산 검색 &nbsp;|&nbsp; 갭현금 ≤5.5억: 갭투자 적합 &nbsp;|&nbsp; 실거주현금 ≤6억: 실거주 가능
     </div>
@@ -467,6 +499,14 @@ def build_html(cfg, top20, chungyak, watchlist, news):
     MS 부동산 Dashboard &nbsp;·&nbsp; 가격: 국토부 실거래가 API 로우데이터 기반 (추정치 포함 금지) &nbsp;·&nbsp; 생성: {now.strftime('%Y-%m-%d %H:%M')} KST
   </div>
 </div>
+<script>
+function switchReTab(btn, idx) {{
+  document.querySelectorAll('.tab-btn').forEach(function(b){{ b.classList.remove('active'); }});
+  document.querySelectorAll('.tab-pane').forEach(function(p){{ p.classList.remove('active'); }});
+  btn.classList.add('active');
+  document.getElementById('re-tab-' + idx).classList.add('active');
+}}
+</script>
 </body>
 </html>"""
 
@@ -495,13 +535,15 @@ def send_telegram(text):
 def main():
     print(f'[{NOW}] MS 부동산 Dashboard 생성')
     cfg      = load_config()
-    top20    = load_top20()
+    top20_scenarios = {b: load_top20(b) for b in BUDGET_TABS}
     chungyak = load_chungyak()
     watchlist = load_watchlist()
     news     = fetch_realestate_news(5)
-    print(f'  단지: {len(top20)}개 / 청약: {len(chungyak)}개 / 뉴스: {len(news)}건')
+    for b, rows in top20_scenarios.items():
+        print(f'  단지 ({b:.1f}억): {len(rows)}개')
+    print(f'  청약: {len(chungyak)}개 / 뉴스: {len(news)}건')
 
-    html = build_html(cfg, top20, chungyak, watchlist, news)
+    html = build_html(cfg, top20_scenarios, chungyak, watchlist, news)
 
     os.makedirs(DOCS_DIR, exist_ok=True)
     out = os.path.join(DOCS_DIR, 're.html')
@@ -514,7 +556,7 @@ def main():
     tg = (
         f'<b>🏠 {date_tag} MS 부동산 Dashboard</b>\n\n'
         f'<a href="{PAGES_URL}">{date_tag} | {PAGES_URL}</a>\n\n'
-        f'📊 관심단지 {len(top20)}개 · 청약 {len(chungyak)}개\n'
+        f'📊 관심단지 {len(top20_scenarios[BUDGET_TABS[0]])}개(11.6억 기준) · 청약 {len(chungyak)}개\n'
         f'🎯 전략: {cfg["strategy"]["current_rec"]}'
     )
     send_telegram(tg)
