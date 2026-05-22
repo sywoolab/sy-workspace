@@ -182,6 +182,78 @@ def main():
     # 현재 체력 기반 예상 완주 계산 (페이지 상단 표시용)
     est, cur_vdot = _compute_estimate(log, sched_data)
 
+    # ── 훈련 진단 (최근 14일) ──
+    def _training_diagnosis(log, today_str):
+        from datetime import datetime, timezone, timedelta
+        KST = timezone(timedelta(hours=9))
+        today_dt = datetime.strptime(today_str, '%Y-%m-%d').replace(tzinfo=KST)
+        cutoff = (today_dt - timedelta(days=14)).strftime('%Y-%m-%d')
+
+        swim_cnt = bike_cnt = run_cnt = brick_cnt = 0
+        bike_km_total = run_km_total = 0
+        last_run_date = None
+
+        for dk in sorted(log.keys(), reverse=True):
+            if dk < cutoff: break
+            e = log[dk]
+            types = {m.get('type') for m in e.get('all_metrics', [])}
+            for m in e.get('all_metrics', []):
+                t = m.get('type')
+                if t == 'swim': swim_cnt += 1
+                elif t == 'bike':
+                    bike_cnt += 1
+                    bike_km_total += m.get('distance_km') or (m.get('distance_m') or 0)/1000
+                elif t == 'run':
+                    run_cnt += 1
+                    run_km_total += m.get('distance_km') or m.get('distance_m', 0)/1000
+                    if last_run_date is None: last_run_date = dk
+            if {'bike', 'run'} <= types: brick_cnt += 1
+
+        run_gap_days = (today_dt - datetime.strptime(last_run_date, '%Y-%m-%d').replace(tzinfo=KST)).days if last_run_date else 99
+
+        items = []
+        # 러닝
+        if run_gap_days >= 14:
+            items.append({'sport': '🏃 러닝', 'status': 'bad',   'msg': f'{run_gap_days}일째 런 없음 — VDOT 정체·하락 위험'})
+        elif run_cnt < 2:
+            items.append({'sport': '🏃 러닝', 'status': 'warn',  'msg': f'주 {run_cnt/2:.1f}회 평균 — 목표(주 3회) 미달'})
+        else:
+            items.append({'sport': '🏃 러닝', 'status': 'good',  'msg': f'14일 {run_cnt}회 {run_km_total:.0f}km'})
+        # 자전거
+        if bike_km_total >= 100:
+            items.append({'sport': '🚴 자전거', 'status': 'good', 'msg': f'14일 {bike_km_total:.0f}km — 볼륨 충분'})
+        elif bike_km_total >= 50:
+            items.append({'sport': '🚴 자전거', 'status': 'warn', 'msg': f'14일 {bike_km_total:.0f}km — 장거리 1회 추가 권장'})
+        else:
+            items.append({'sport': '🚴 자전거', 'status': 'bad',  'msg': f'14일 {bike_km_total:.0f}km — 라이딩 부족'})
+        # 수영
+        if swim_cnt >= 4:
+            items.append({'sport': '🏊 수영', 'status': 'good',  'msg': f'14일 {swim_cnt}회 — 빈도 양호'})
+        elif swim_cnt >= 2:
+            items.append({'sport': '🏊 수영', 'status': 'warn',  'msg': f'14일 {swim_cnt}회 — 주 3회 목표 미달'})
+        else:
+            items.append({'sport': '🏊 수영', 'status': 'bad',   'msg': f'14일 {swim_cnt}회 — 빈도 부족'})
+        # 브릭
+        if brick_cnt >= 2:
+            items.append({'sport': '🔗 브릭',  'status': 'good',  'msg': f'14일 {brick_cnt}회 — 전환 감각 유지'})
+        elif brick_cnt == 1:
+            items.append({'sport': '🔗 브릭',  'status': 'warn',  'msg': '14일 1회 — 주 1회 이상 권장'})
+        else:
+            items.append({'sport': '🔗 브릭',  'status': 'bad',   'msg': '14일 0회 — 자전거→런 전환 감각 저하 중'})
+
+        bad_count = sum(1 for i in items if i['status'] == 'bad')
+        warn_count = sum(1 for i in items if i['status'] == 'warn')
+        if bad_count >= 2:
+            verdict = ('red', '개선 필요', '핵심 종목 공백 발생. 이번 주 러닝·브릭 우선 복구 필요.')
+        elif bad_count == 1 or warn_count >= 2:
+            verdict = ('yellow', '부분 보완 필요', '자전거 기반은 좋음. 러닝·브릭 비중 높여야 대가야 목표 달성 가능.')
+        else:
+            verdict = ('green', '순항 중', '전 종목 균형 잡힘. 현재 페이스 유지.')
+
+        return items, verdict
+
+    # diag_items 는 today 문자열 정의 후 계산 (아래)
+
     # ── 목표별 처방 계산 ──
     # race_targets: (대회날짜, 이름, 목표분)
     race_targets = [
@@ -338,6 +410,9 @@ def main():
 
     now_str = now.strftime('%Y-%m-%d %H:%M KST')
 
+    # today 문자열 정의 후 진단 계산
+    diag_items, diag_verdict = _training_diagnosis(log, today)
+
     html = f"""<!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -487,6 +562,25 @@ tr:hover{{background:#15152a}}
   </div>
 </div>
 """
+
+    # ── 훈련 진단 섹션 HTML ──
+    v_color = {'red': '#ff6c6c', 'yellow': '#ffd56c', 'green': '#6affa0'}.get(diag_verdict[0], '#888')
+    v_icon  = {'red': '❌', 'yellow': '⚠️', 'green': '✅'}.get(diag_verdict[0], '📊')
+    s_color = {'good': '#6affa0', 'warn': '#ffd56c', 'bad': '#ff6c6c'}
+    s_icon  = {'good': '✅', 'warn': '⚠️', 'bad': '❌'}
+    html += f'<div class="section">📊 훈련 진단 (최근 14일)</div>\n'
+    html += f'<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px 16px;margin-bottom:16px">\n'
+    html += f'<div style="font-size:14px;font-weight:600;color:{v_color};margin-bottom:8px">{v_icon} {diag_verdict[1]}</div>\n'
+    html += f'<div style="font-size:12px;color:#888;margin-bottom:10px">{diag_verdict[2]}</div>\n'
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px">\n'
+    for item in diag_items:
+        sc = s_color[item['status']]
+        si = s_icon[item['status']]
+        html += (f'<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px">'
+                 f'<div style="font-size:12px;font-weight:600;color:{sc}">{si} {item["sport"]}</div>'
+                 f'<div style="font-size:11px;color:#777;margin-top:2px">{item["msg"]}</div>'
+                 f'</div>\n')
+    html += '</div>\n</div>\n'
 
     # ── 목표 달성 처방 섹션 ──
     for r_date, r_name, r_target_min in race_targets:
