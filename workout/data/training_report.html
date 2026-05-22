@@ -35,7 +35,19 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-05-22 09:22 KST</div>
+<div class="sub">업데이트: 2026-05-22 09:26 KST</div>
+
+<div style="background:#13131f;border:1px solid #ffd56c44;border-radius:12px;padding:14px 16px;margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <span style="font-size:15px;font-weight:700;color:#ffd56c">⚠️ 부분 보완 필요</span>
+    <span style="font-size:11px;color:#555">— 자전거 기반은 좋음. 러닝·브릭 비중 높여야 대가야 목표 달성 가능.</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">
+    <div><span style="color:#555">📅 오늘</span><br><span style="color:#ccc">🏃 런 6~8km Easy (저녁, 일정 확인 후)</span></div>
+    <div><span style="color:#555">🎯 다음 대회</span><br><span style="color:#ccc">D-37 🎯 sub-2:42 — 현재 2:49 예상, <span style="color:#ff6c6c">-7분 필요</span></span></div>
+    <div style="grid-column:1/-1"><span style="color:#555">🔥 핵심 과제</span><br><span style="color:#ffd56c">주 0.5회 평균 — 목표(주 3회) 미달</span></div>
+  </div>
+</div>
 
 <div class="grid">
 <div class="card"><div class="val" style="color:#ffd56c">D-16</div><div class="label">한강 쉬엄쉬엄 (1+20+10)</div><div class="sub-val">T1 연습</div></div>
@@ -125,7 +137,7 @@ const allSwim   = [0, 64, 0, 0, 0, 0, 0, 0, 98, 0, 118, 114, 0, 63, 0, 0, 97, 0,
 const allBike   = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 169, 0, 0, 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 0, 238, 0, 0, 0, 0, 0, 0, 0, 0, 381, 0, 0, 0, 0, 0, 519, 232, 0, 0, 0, 0, 0];
 const allRun    = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 0, 0, 304, 0, 117, 0, 76, 0, 181, 0, 0, 0, 0, 103, 59, 0, 0, 0, 52, 54, 44, 0, 0, 466, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const allOther  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["06-28", "08-27", "06-21", "06-07"];
+const raceDates = ["06-07", "06-28", "06-21", "08-27"];
 
 const slice = isMobile ? 30 : 60;
 const labels   = allLabels.slice(-slice);
@@ -335,5 +347,5 @@ new Chart(document.getElementById('tlChart'), {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-05-22 09:22 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-05-22 09:26 KST</div>
 </body></html>

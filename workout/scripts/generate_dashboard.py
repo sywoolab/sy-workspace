@@ -451,6 +451,61 @@ tr:hover{{background:#15152a}}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
 <div class="sub">업데이트: {now_str}</div>
+"""
+
+    # ── 코치 요약 카드 (최상단) ──
+    vc = {'red': '#ff6c6c', 'yellow': '#ffd56c', 'green': '#6affa0'}.get(diag_verdict[0], '#888')
+    vi = {'red': '❌', 'yellow': '⚠️', 'green': '✅'}.get(diag_verdict[0], '📊')
+
+    # 다음 대회 + 예상 gap
+    next_race_name, next_race_gap_str = '', ''
+    if est:
+        total_m_for_gap = est.get('total', 0)
+        for rdate, rname, rgoal in races:
+            if days_until(rdate) > 0 and 'sub-' in rgoal:
+                th_, tm_ = rgoal.replace('🎯 sub-', '').split(':')
+                target_min = int(th_)*60 + int(tm_)
+                gap_min = round(total_m_for_gap - target_min)
+                next_race_name = rname
+                d_left = days_until(rdate)
+                if gap_min > 0:
+                    next_race_gap_str = f'D-{d_left} {rgoal} — 현재 {int(total_m_for_gap)//60}:{int(total_m_for_gap)%60:02d} 예상, <span style="color:#ff6c6c">-{gap_min}분 필요</span>'
+                else:
+                    next_race_gap_str = f'D-{d_left} {rgoal} — <span style="color:#6affa0">달성 가능 (+{abs(gap_min)}분 여유)</span>'
+                break
+
+    # 오늘 할 일
+    today_plan = (sched_data.get('overrides', {}).get(today) or {}).get('workout', '스케줄 미등록')
+
+    # 핵심 액션 — 러닝 공백 우선, 그 다음 bad/warn 순
+    key_action = ''
+    for item in diag_items:
+        if '러닝' in item['sport'] and item['status'] in ('bad', 'warn'):
+            key_action = item['msg']
+            break
+    if not key_action:
+        for item in diag_items:
+            if item['status'] == 'bad':
+                key_action = item['msg']
+                break
+    if not key_action:
+        for item in diag_items:
+            if item['status'] == 'warn':
+                key_action = item['msg']
+                break
+
+    html += f"""
+<div style="background:#13131f;border:1px solid {vc}44;border-radius:12px;padding:14px 16px;margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <span style="font-size:15px;font-weight:700;color:{vc}">{vi} {diag_verdict[1]}</span>
+    <span style="font-size:11px;color:#555">— {diag_verdict[2]}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">
+    <div><span style="color:#555">📅 오늘</span><br><span style="color:#ccc">{today_plan}</span></div>
+    <div><span style="color:#555">🎯 다음 대회</span><br><span style="color:#ccc">{next_race_gap_str}</span></div>
+    <div style="grid-column:1/-1"><span style="color:#555">🔥 핵심 과제</span><br><span style="color:{vc}">{key_action}</span></div>
+  </div>
+</div>
 
 <div class="grid">
 """
