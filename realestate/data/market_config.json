@@ -1,28 +1,31 @@
 {
   "_meta": {
-    "updated": "2026-05-20",
-    "note": "수동 업데이트 파일. 금리·지수는 변경 시 이 파일만 수정."
+    "updated": "2026-05-23",
+    "active_strategies": ["live", "wait"],
+    "deactivated_strategies": {"gap": "2025-10-15 10.15 대책 / 토허구역 갭투자 금지"},
+    "note": "10.15 대책 + 5/9 양도세 중과 + 5/12 토허 보완책 반영. 출처: 정책브리핑 148950973/148950959/148959488/148964215, BOK, 머니투데이 2026-05-14. ⚠️ active_strategies 필드는 메인 메타정보로 현재 코드 미사용 (코드 패치 차후 작업)"
   },
   "rates": {
-    "base_rate":      { "value": 2.75, "label": "기준금리",     "note": "한국은행 2025.02 인하" },
-    "mortgage_fixed": { "value": 3.40, "label": "주담대(고정)", "note": "5대은행 평균" },
-    "mortgage_var":   { "value": 3.10, "label": "주담대(변동)", "note": "5대은행 평균" },
-    "jeonse_loan":    { "value": 3.80, "label": "전세대출",     "note": "버팀목 제외" }
+    "base_rate":      { "value": 2.50, "label": "기준금리",     "note": "한국은행 2025.05 인하, 8회 연속 동결 (2026.04.10). 다음 5/28 금통위 → 동결 컨센서스" },
+    "mortgage_fixed": { "value": 5.50, "label": "주담대(고정)", "note": "5대은행 5년 고정 4.53~6.45% 중간값 5.49% (2026.05.14)" },
+    "mortgage_var":   { "value": 5.00, "label": "주담대(변동)", "note": "5대은행 6개월 변동 3.77~5.45%. 5.0%는 상단 근접 보수값" },
+    "jeonse_loan":    { "value": 4.20, "label": "전세대출",     "note": "일반 시중 평균. HF 보증서는 3.4~4.5%" }
   },
   "budget": {
     "cash_avail":    600000000,
-    "max_purchase":  1160000000,
-    "note": "현금 6억 기준 취득세 역산 매수상한 11.6억"
+    "max_purchase":  1120000000,
+    "max_total_cost": 1160000000,
+    "note": "매매가 상한 11.2억 (취득세 약 0.35억 포함 총비용 11.6억). 생애최초 LTV 70% + 절대한도 6억 + 6개월 전입의무 + 스트레스 +3% (10.15 대책)"
   },
   "strategy": {
-    "current_rec": "관망 (매수 보류)",
+    "current_rec": "관망 (매수 보류) — 토허구역 갭투자 금지, 실거주 1전략 집중",
     "target_window": "2026 하반기 ~ 2027 상반기",
-    "trigger": "5월 양도세 중과 복원 후 급매물 대기",
+    "trigger": "양도세 중과 복원(5/9) 후 다주택 매도 매물 + 토허 추가 완화 모니터링",
     "color": "yellow"
   },
   "market_index": {
     "seoul_jeonse_rate": 50.9,
-    "updated": "2026-03 (KB부동산)",
-    "note": "서울 평균 전세가율"
+    "updated": "2026-03 (KB부동산) — 미갱신",
+    "note": "차후 KB API 재추출 필요"
   }
 }
