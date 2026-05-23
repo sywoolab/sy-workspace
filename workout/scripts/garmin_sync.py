@@ -270,7 +270,7 @@ def _push_and_update_dashboard(has_new_activity: bool):
             )
             # training-dashboard repo 업데이트
             html_src = Path(BASE_DIR) / 'workout' / 'data' / 'training_report.html'
-            td_path = Path('/tmp/training-dashboard')
+            td_path = dashboard_repo
             if td_path.exists() and html_src.exists():
                 import shutil
                 shutil.copy2(html_src, td_path / 'index.html')
@@ -331,9 +331,77 @@ def _load_sync_state():
 
 
 def _save_sync_state(state):
+    # 머신 식별자 자동 주입 (다중 머신 cron 운영 시 어느 머신이 마지막 sync인지 추적)
+    import platform
+    state['last_synced_by'] = platform.node() or sys.platform
+    state['last_synced_at'] = datetime.now(KST).strftime('%Y-%m-%d %H:%M')
     os.makedirs(os.path.dirname(SYNC_STATE_FILE), exist_ok=True)
     with open(SYNC_STATE_FILE, 'w', encoding='utf-8') as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+
+
+# ============================================================
+# 로컬 cron 운영: git pull/push (CI 환경에서는 no-op — workflow가 처리)
+# ============================================================
+def _is_ci():
+    return bool(os.environ.get('GITHUB_ACTIONS') or os.environ.get('CI'))
+
+
+def _git_pull_safe():
+    """로컬 sync 시작 시 git pull --rebase --autostash. 다른 머신/CI가 먼저 push했으면 흡수."""
+    if _is_ci():
+        return
+    import subprocess
+    repo_root = str(Path(BASE_DIR).parent.resolve())
+    try:
+        r = subprocess.run(['git', 'pull', '--rebase', '--autostash'],
+                           cwd=repo_root, capture_output=True, timeout=60, text=True)
+        if r.returncode == 0:
+            print(f"[git pull] OK")
+        else:
+            print(f"[git pull] 실패 (계속 진행): {r.stderr[:200]}")
+    except Exception as e:
+        print(f"[git pull] 예외 (계속 진행): {e}")
+
+
+def _git_push_safe(commit_message):
+    """로컬 sync 종료 시 변경 파일 commit + push (충돌 시 pull --rebase 후 retry 3회)."""
+    if _is_ci():
+        return
+    import subprocess, time as _time
+    repo_root = str(Path(BASE_DIR).parent.resolve())
+    files = [
+        'workout/workout_log.json',
+        'workout/data/garmin_health.json',
+        'workout/data/sync_state.json',
+        'workout/data/improvement_queue.json',
+        'workout/workout_schedule.json',
+    ]
+    try:
+        subprocess.run(['git', 'add'] + files, cwd=repo_root,
+                       capture_output=True, timeout=15)
+        r = subprocess.run(['git', 'diff', '--staged', '--quiet'],
+                           cwd=repo_root, capture_output=True)
+        if r.returncode == 0:
+            print("[git push] 변경 없음")
+            return
+        subprocess.run(['git', 'commit', '-m', commit_message],
+                       cwd=repo_root, capture_output=True, timeout=15)
+        for attempt in range(3):
+            r = subprocess.run(['git', 'push'], cwd=repo_root,
+                               capture_output=True, timeout=90, text=True)
+            if r.returncode == 0:
+                print(f"[git push] OK (시도 {attempt+1}/3)")
+                return
+            print(f"[git push] 실패 시도 {attempt+1}/3: {r.stderr[:200]}")
+            # 충돌 가능성 → pull --rebase 후 재시도
+            subprocess.run(['git', 'pull', '--rebase', '--autostash'],
+                           cwd=repo_root, capture_output=True, timeout=60)
+            _time.sleep(2 ** attempt)
+        send_telegram("⚠️ git push 3회 실패 — 다음 sync에서 자동 흡수 시도")
+    except Exception as e:
+        print(f"[git push] 예외: {e}")
+        send_telegram(f"⚠️ git push 예외: {str(e)[:200]}")
 
 
 def login_garmin():
@@ -2214,6 +2282,8 @@ def fill_planned():
 
 if __name__ == '__main__':
     mode = sys.argv[1] if len(sys.argv) > 1 else 'sync'
+    # 로컬 cron(Mac/Win) 시작 시 git pull --rebase (CI에서는 no-op)
+    _git_pull_safe()
     try:
         result = None
         if mode == 'resend':
@@ -2222,6 +2292,10 @@ if __name__ == '__main__':
             fill_planned()
         else:
             result = sync()  # None=로그인 실패, True=변경 있음, False=변경 없음
+        # 로컬 cron sync 성공 + 변경 있음 → commit + push retry (CI에서는 no-op, workflow가 처리)
+        if mode == 'sync' and result is True:
+            import platform as _platform
+            _git_push_safe(f"garmin sync ({_platform.node() or sys.platform}): update workout log & health data")
         # 별건 패치 (2026-05-11): sync 로그인 실패 시 workflow도 fail로 표시 (silent success 차단)
         if mode == 'sync' and result is None:
             sys.exit(1)

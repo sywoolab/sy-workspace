@@ -4370,5 +4370,249 @@
         "start_time": "06:17"
       }
     ]
+  },
+  "2026-05-17": {
+    "planned": "🚴 자전거 50km Easy 또는 휴식",
+    "done": true,
+    "actual": "자전거 46.38km 128분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 46.38,
+      "duration_min": 127.8,
+      "avg_speed_kmh": 21.8,
+      "avg_hr": 133,
+      "max_hr": 191,
+      "avg_power": null,
+      "training_load": 232,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 666,
+          "avg_hr": 116,
+          "max_hr": 143,
+          "speed_kmh": 27.0
+        },
+        {
+          "distance": 5000,
+          "duration": 547,
+          "avg_hr": 147,
+          "max_hr": 162,
+          "speed_kmh": 32.9
+        },
+        {
+          "distance": 5000,
+          "duration": 529,
+          "avg_hr": 161,
+          "max_hr": 191,
+          "speed_kmh": 34.1
+        },
+        {
+          "distance": 5000,
+          "duration": 927,
+          "avg_hr": 133,
+          "max_hr": 164,
+          "speed_kmh": 19.4
+        },
+        {
+          "distance": 5000,
+          "duration": 939,
+          "avg_hr": 133,
+          "max_hr": 167,
+          "speed_kmh": 19.2
+        },
+        {
+          "distance": 5000,
+          "duration": 1069,
+          "avg_hr": 139,
+          "max_hr": 185,
+          "speed_kmh": 16.8
+        },
+        {
+          "distance": 5000,
+          "duration": 953,
+          "avg_hr": 148,
+          "max_hr": 186,
+          "speed_kmh": 18.9
+        },
+        {
+          "distance": 5000,
+          "duration": 1114,
+          "avg_hr": 107,
+          "max_hr": 158,
+          "speed_kmh": 16.2
+        },
+        {
+          "distance": 5000,
+          "duration": 712,
+          "avg_hr": 127,
+          "max_hr": 152,
+          "speed_kmh": 25.3
+        },
+        {
+          "distance": 1382,
+          "duration": 213,
+          "avg_hr": 137,
+          "max_hr": 172,
+          "speed_kmh": 23.4
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.5 / 무산소 3.2 | 부하 232",
+    "garmin_id": 22907468981,
+    "start_time": "09:39",
+    "garmin_ids": [
+      22907468981
+    ]
+  },
+  "2026-05-16": {
+    "planned": "TBD — 강습/동호회/자전거 (사용자 결정)",
+    "done": true,
+    "actual": "자전거 85.12km 172분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 85.12,
+      "duration_min": 172.1,
+      "avg_speed_kmh": 29.7,
+      "avg_hr": 145,
+      "max_hr": 195,
+      "avg_power": null,
+      "training_load": 519,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 675,
+          "avg_hr": 137,
+          "max_hr": 166,
+          "speed_kmh": 26.7
+        },
+        {
+          "distance": 5000,
+          "duration": 582,
+          "avg_hr": 154,
+          "max_hr": 180,
+          "speed_kmh": 30.9
+        },
+        {
+          "distance": 5000,
+          "duration": 617,
+          "avg_hr": 147,
+          "max_hr": 181,
+          "speed_kmh": 29.2
+        },
+        {
+          "distance": 5000,
+          "duration": 658,
+          "avg_hr": 133,
+          "max_hr": 157,
+          "speed_kmh": 27.4
+        },
+        {
+          "distance": 5000,
+          "duration": 596,
+          "avg_hr": 140,
+          "max_hr": 178,
+          "speed_kmh": 30.2
+        },
+        {
+          "distance": 5000,
+          "duration": 509,
+          "avg_hr": 173,
+          "max_hr": 190,
+          "speed_kmh": 35.4
+        },
+        {
+          "distance": 5000,
+          "duration": 598,
+          "avg_hr": 147,
+          "max_hr": 187,
+          "speed_kmh": 30.1
+        },
+        {
+          "distance": 5000,
+          "duration": 526,
+          "avg_hr": 156,
+          "max_hr": 177,
+          "speed_kmh": 34.2
+        },
+        {
+          "distance": 5000,
+          "duration": 828,
+          "avg_hr": 122,
+          "max_hr": 160,
+          "speed_kmh": 21.7
+        },
+        {
+          "distance": 5000,
+          "duration": 566,
+          "avg_hr": 152,
+          "max_hr": 195,
+          "speed_kmh": 31.8
+        },
+        {
+          "distance": 5000,
+          "duration": 614,
+          "avg_hr": 134,
+          "max_hr": 156,
+          "speed_kmh": 29.3
+        },
+        {
+          "distance": 5000,
+          "duration": 499,
+          "avg_hr": 160,
+          "max_hr": 195,
+          "speed_kmh": 36.0
+        },
+        {
+          "distance": 5000,
+          "duration": 572,
+          "avg_hr": 156,
+          "max_hr": 169,
+          "speed_kmh": 31.5
+        },
+        {
+          "distance": 5000,
+          "duration": 609,
+          "avg_hr": 141,
+          "max_hr": 181,
+          "speed_kmh": 29.6
+        },
+        {
+          "distance": 5000,
+          "duration": 543,
+          "avg_hr": 163,
+          "max_hr": 193,
+          "speed_kmh": 33.1
+        },
+        {
+          "distance": 5000,
+          "duration": 606,
+          "avg_hr": 143,
+          "max_hr": 167,
+          "speed_kmh": 29.7
+        },
+        {
+          "distance": 5000,
+          "duration": 705,
+          "avg_hr": 131,
+          "max_hr": 159,
+          "speed_kmh": 25.5
+        },
+        {
+          "distance": 125,
+          "duration": 23,
+          "avg_hr": 134,
+          "max_hr": 136,
+          "speed_kmh": 19.7
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 4.7 / 무산소 5.0 | 부하 519",
+    "garmin_id": 22895719936,
+    "start_time": "07:06",
+    "garmin_ids": [
+      22895719936
+    ]
   }
 }
