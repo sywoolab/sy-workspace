@@ -96,6 +96,50 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def _load_with_head_guard(path, rel_path, min_key_loss=10):
+    """누적 데이터 파일 load + HEAD 머지 가드 (2026-05-23 도입).
+
+    working tree 손상(이전 머지 충돌·stash·다른 머신 분기) 시 HEAD 보존분을 흡수해
+    sync save 단계에서의 손실 전파를 차단한다. pre-commit hook은 commit 단계 차단이지만,
+    save 직후 working tree 파일이 손상돼 있으면 사용자가 다음 push 전까지 인지 못 함.
+
+    rel_path: git 저장소 root 기준 상대경로 (예: 'workout/data/garmin_health.json').
+    min_key_loss: HEAD가 working tree보다 이만큼 이상 많으면 손상 의심.
+
+    working tree의 key가 충돌 시 우선 (사용자가 방금 수정한 값이 최신).
+    """
+    import subprocess as _sp
+    working = load_json(path)
+    if not isinstance(working, dict):
+        working = {}
+    try:
+        repo_root = str(Path(BASE_DIR).resolve().parent)
+        r = _sp.run(
+            ['git', 'show', f'HEAD:{rel_path}'],
+            cwd=repo_root, capture_output=True, text=True, timeout=10,
+            encoding='utf-8', errors='replace',
+        )
+        if r.returncode != 0 or not r.stdout:
+            return working
+        head_data = json.loads(r.stdout)
+        if not isinstance(head_data, dict):
+            return working
+        head_n = len(head_data)
+        work_n = len(working)
+        if head_n - work_n >= min_key_loss:
+            merged = {**head_data, **working}  # working tree(TODAY) 우선
+            msg = (
+                f"⚠️ {rel_path} working tree 손상 감지 — HEAD에서 자동 머지\n"
+                f"working: {work_n}개 / HEAD: {head_n}개 → merged: {len(merged)}개"
+            )
+            print(msg)
+            send_telegram(msg)
+            return merged
+    except (json.JSONDecodeError, OSError, _sp.SubprocessError) as e:
+        print(f"[WARN] HEAD 머지 가드 실패 ({rel_path}): {e}")
+    return working
+
+
 def seconds_to_pace(secs):
     if secs is None or secs <= 0:
         return '?'
@@ -1841,8 +1885,8 @@ def sync():
     sync_state['consecutive_failures'] = 0
     _save_sync_state(sync_state)
 
-    # 2. 기존 데이터 로드
-    workout_log = load_json(LOG_FILE)
+    # 2. 기존 데이터 로드 — working tree 손상 시 HEAD에서 자동 머지 (#7 방지)
+    workout_log = _load_with_head_guard(LOG_FILE, 'workout/workout_log.json', min_key_loss=10)
     schedule_data = load_json(SCHEDULE_FILE)
 
     # 기존 garmin_id 목록 (중복 방지) — 단일 garmin_id + garmin_ids 리스트 + all_metrics 모두 체크
@@ -1961,9 +2005,10 @@ def sync():
     print(f"  건강 데이터 수집 완료")
 
     # 건강 데이터 저장 (대시보드 표시를 위해 전체 보관 — 삭제 로직 제거)
-    health_history = load_json(HEALTH_FILE)
-    if not isinstance(health_history, dict):
-        health_history = {}
+    # working tree 손상 시 HEAD에서 자동 머지 (#7 방지)
+    health_history = _load_with_head_guard(
+        HEALTH_FILE, 'workout/data/garmin_health.json', min_key_loss=10,
+    )
     health_history[TODAY] = health
     # 과거 데이터 정리 안 함 (대시보드 전체 기록 보관용)
     save_json(HEALTH_FILE, health_history)
@@ -2260,7 +2305,8 @@ def fill_planned():
 
     사용: python garmin_sync.py fill-planned
     """
-    workout_log = load_json(LOG_FILE) or {}
+    # working tree 손상 시 HEAD에서 자동 머지 (#7 방지, 가드 적용)
+    workout_log = _load_with_head_guard(LOG_FILE, 'workout/workout_log.json', min_key_loss=10)
     schedule_data = load_json(SCHEDULE_FILE) or {}
     count = 0
     for date_key in sorted(workout_log.keys()):
