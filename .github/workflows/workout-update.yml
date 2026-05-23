@@ -6,6 +6,9 @@ on:
       - 'workout/workout_log.json'
   workflow_dispatch:
 
+# HTML 생성·training-dashboard repo 배포는 dashboard-update.yml에서 담당.
+# 본 workflow는 알림 + 분석 + 스케줄 갱신만 책임 (중복 push race 방지).
+
 permissions:
   contents: write
 
@@ -14,12 +17,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # HEAD~1 비교용 (notify_log_change.py)
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - run: pip install requests
+      - run: pip install -r requirements.txt
+
+      - name: Notify manual workout entry
+        if: github.event_name == 'push'
+        env:
+          BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python workout/scripts/notify_log_change.py
 
       - name: Run workout analysis
         env:
