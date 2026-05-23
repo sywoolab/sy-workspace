@@ -51,7 +51,7 @@ def _find_recent_race(log, within_days=120):
         if not ({'swim', 'bike', 'run'} <= types):
             continue
         # 레이스 활동 확인 (수영 OW + 자전거 HR 높음)
-        swim_m_list = [m for m in all_m if m.get('type') == 'swim' and m.get('distance_m', 0) > 500]
+        swim_m_list = [m for m in all_m if m.get('type') == 'swim' and (m.get('distance_m') or 0) > 500]
         bike_m_list = [m for m in all_m if m.get('type') == 'bike']
         run_m_list  = [m for m in all_m if m.get('type') == 'run']
         if not (swim_m_list and bike_m_list and run_m_list):
