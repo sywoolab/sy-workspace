@@ -1,0 +1,11 @@
+#!/bin/sh
+# sy-workspace pre-commit hook (2026-05-23 신설, .githooks 정본 2026-05-23 이관)
+# 누적 데이터 파일 JSON entry 단위 무결성 검증
+# - workout_log.json: 각 날짜별 all_metrics 개수가 HEAD>0 → staged=0 되면 차단
+# - garmin_health.json / watchlist*.json: 날짜·항목 누락 차단
+# 우회: --no-verify (L0 §"권한 일탈 금지" 위반)
+#
+# 다중 머신 동기화: git config core.hooksPath .githooks (레포 클론 후 1회 실행)
+
+REPO=$(git rev-parse --show-toplevel)
+exec python "$REPO/.githooks/pre_commit_check.py" "$@"
