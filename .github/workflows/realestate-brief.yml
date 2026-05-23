@@ -3,6 +3,11 @@ name: realestate-brief
 on:
   schedule:
     - cron: '30 22 * * 0'   # 매주 월요일 07:30 KST (UTC 일요일 22:30)
+  push:
+    paths:
+      - 'realestate/data/market_config.json'
+      - 'realestate/data/watchlist_summary.json'
+      - 'realestate/data/chungyak/registry.json'
   workflow_dispatch:
 
 permissions:
@@ -13,12 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # HEAD~1 비교용 (notify_realestate_change.py)
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - run: pip install requests
+
+      - name: Notify SSOT change (push만)
+        if: github.event_name == 'push'
+        env:
+          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python realestate/scripts/notify_realestate_change.py
 
       - name: MS 부동산 Dashboard HTML 생성
         env:
@@ -38,7 +52,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add docs/re.html realestate/data/market_config.json 2>/dev/null || true
+          # market_config.json은 push 트리거 paths이므로 무한 루프 차단 위해 add 제외
+          git add docs/re.html 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "realestate: MS 부동산 Dashboard update"
             git pull --rebase --autostash
