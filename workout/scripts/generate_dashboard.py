@@ -17,9 +17,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 try:
     from dotenv import load_dotenv
-    for p in [Path(__file__).parents[1], Path(__file__).parents[3]]:
-        if (p / '.env').exists():
-            load_dotenv(p / '.env')
+    _here = Path(__file__).resolve().parent
+    for _p in [_here, *_here.parents]:
+        if (_p / '.env').exists():
+            load_dotenv(_p / '.env')
             break
 except ImportError:
     pass
