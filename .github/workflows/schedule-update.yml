@@ -1,0 +1,34 @@
+name: schedule-update
+
+on:
+  push:
+    paths:
+      - 'workout/workout_schedule.json'
+  workflow_dispatch:
+
+# workout_schedule.json 변경 시 텔레그램 즉시 알림.
+# HTML 갱신은 dashboard-update.yml이 담당 (paths 중복으로 둘 다 trigger됨, race 없음).
+# 2026-05-24 추가 — schedule 변경 즉시 텔레 알림 갭 보완.
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # HEAD~1 비교용
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests python-dotenv
+
+      - name: Notify schedule change
+        env:
+          BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python workout/scripts/notify_schedule_change.py
