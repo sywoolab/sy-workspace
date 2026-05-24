@@ -4395,7 +4395,7 @@
       "avg_hr": 133,
       "max_hr": 186,
       "avg_power": 114.0,
-      "training_load": 225,
+      "training_load": 243,
       "laps": [
         {
           "distance": 5000,
@@ -4548,7 +4548,8 @@
       "raw_garmin": {
         "distance_km": 104.43,
         "duration_min": 226.2,
-        "avg_speed_kmh": 27.7
+        "avg_speed_kmh": 27.7,
+        "training_load": 225
       },
       "lost_segment": {
         "reason": "일시정지 해제 누락으로 미기록",
@@ -4558,11 +4559,13 @@
         "est_duration_min": 13.5,
         "est_avg_speed_kmh": 40.0,
         "source": "manual_user_report",
-        "note": "사용자 보고: 총 라이딩 113~114km → 손실구간 약 9km. 평속 40km/h 자기보고"
+        "note": "사용자 보고: 총 라이딩 113~114km → 손실구간 약 9km. 평속 40km/h 자기보고",
+        "est_training_load": 18,
+        "load_basis": "Zone 3 EPOC ~80/h × 13.5min (HR 추정 150대, 평속 40km/h 평지 항속)"
       }
     },
     "training_zone": "moderate",
-    "note": "유산소 3.9 / 무산소 2.7 | 부하 225 | 손실구간 산입(이촌편의점→성산대교 +9.0km/+13.5분, 40km/h)",
+    "note": "유산소 3.9 / 무산소 2.7 | 부하 243(raw 225+추정 18) | 손실구간 산입(이촌편의점→성산대교 +9.0km/+13.5분, 40km/h)",
     "garmin_id": 22989918598,
     "start_time": "07:16",
     "garmin_ids": [
@@ -4577,7 +4580,7 @@
         "max_hr": 186,
         "avg_pace": null,
         "avg_speed": 7.8869,
-        "training_load": 225,
+        "training_load": 243,
         "garmin_id": 22989918598,
         "laps": [
           {
