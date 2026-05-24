@@ -248,3 +248,52 @@
 ## 가민 데이터
 - 원본: /Users/sywoo/Downloads/Activities.csv
 - 백업: workspace/_data/garmin/
+
+## 운동 데이터 수정 보호 절차 (필수 — 2026-05-24 신설, T4 통과)
+
+> 5/16·5/17 자전거 entry 손실 사고(L0 §"권한·데이터 보호") + 5/24 사이클 손실구간 보정 사례에서 도출. 자동 sync와 수동 보정 흐름을 분리한다. 3-에이전트 + 2-레드팀 + 사용자 명시 승인 완료 (INBOX #18).
+
+### 적용 흐름 분리
+
+| 흐름 | 적용 절차 | 등급 |
+| ------ | ------ | ------ |
+| 자동 sync 풍부화 (garmin_sync.py가 가민 API에서 빈 필드 채우기) | 면제 (pre-commit 무결성 hook은 유지) | T2 |
+| **수동 보정** (사용자 명시 보고로 metrics/all_metrics 수치 수정) | 본 절차 전체 적용 | **T4** |
+| 신규 날짜 entry 추가 | 기존 규칙 | T2 |
+
+### 수동 보정 허용 트리거 (객관 기준 — 메인 추측 금지)
+
+1. **가민 raw 명백 유실** — 사용자 명시 보고 + 외부 증거 (일시정지 시간 갭, GPS 단절 등)
+2. **가민 type 오인** — 가민 API activityType이 명백히 잘못된 경우 (예: bike → swim 분류)
+3. **데이터 손상** — JSON schema 검증 실패 또는 HEAD vs working tree merge 충돌 (guard_data_loss hook 우회 케이스)
+4. **그 외 모든 수정은 금지**. commit message에 `trigger: <1|2|3>` 명시 필수
+
+### T4 의무 절차 (수동 보정 시 — L0 §"권한·데이터 보호" 확장)
+
+1. SSOT(workout_log.json) Read 도구 직접 확인 (메모리 의존 금지)
+2. `metrics.raw_garmin` 백업 영구 보존 (덮어쓰기 금지)
+3. `all_metrics[i].raw_*` 백업 동일 적용
+4. 메타필드 동봉: `metrics.lost_segment` 또는 `metrics.correction` — 필수 키 `{reason, source ∈ [manual_user_report, garmin_api_refetch, data_corruption_restore], est_basis, ts(ISO8601)}`
+5. **atomic 3필드 동기화**: `metrics` + `all_metrics[i]` + `actual` 한 commit (한 필드만 수정한 patch는 invalid)
+6. **Diff Disclosure 3항목 출력** (L0 §"Diff Disclosure 의무" 그대로):
+   - 변경 라인 수 `+N/-M`
+   - 데이터 entry 변경 카운트
+   - 손실 entry 날짜·항목 리스트
+7. commit 의미 단위 분리 (거리/시간/부하/타입 등 별도 commit)
+8. **사용자 명시 ack 후 commit** (L0 §"권한 일탈 금지" 표준)
+
+### 수정 금지 케이스 (위반 시 즉시 revert + 자진 보고)
+
+1. 메인 추정으로 가민 raw in-place 덮어쓰기 (raw_garmin 백업 없이)
+2. 가민 값이 "낮아 보여서/높아 보여서" 임의 보정 — 외부 공식·객관 근거(예: EPOC rate) 있는 경우만 예외
+3. metrics만 또는 all_metrics만 수정 (대시보드/텔레/분석 코드가 다른 우선순위 참조)
+4. `--no-verify`로 pre-commit hook 우회
+
+### 자동 차단 (별도 작업 — pre_commit_check.py 확장 TODO)
+
+- `raw_garmin` 필드 없는 entry 수정 시 차단
+- atomic 3필드 동기화 검증 (셋이 같은 단위로 변경됐는지)
+- 메타필드 schema 검증 (`source` 필드 값 enum 검증)
+- 트리거 명시 commit 메시지 강제 (`trigger: <N>` 포함 여부)
+
+위 hook 구현 전까지는 **사용자 명시 ack로 보완**.
