@@ -4571,12 +4571,12 @@
     "all_metrics": [
       {
         "type": "bike",
-        "distance_m": 104430.0,
-        "duration_sec": 13572.0,
+        "distance_m": 113430.0,
+        "duration_sec": 14382.0,
         "avg_hr": 133,
         "max_hr": 186,
         "avg_pace": null,
-        "avg_speed": 7.694444444444444,
+        "avg_speed": 7.8869,
         "training_load": 225,
         "garmin_id": 22989918598,
         "laps": [
@@ -4729,7 +4729,11 @@
           }
         ],
         "open_water": false,
-        "start_time": "07:16"
+        "start_time": "07:16",
+        "raw_distance_m": 104430.0,
+        "raw_duration_sec": 13572.0,
+        "raw_avg_speed": 7.694444444444444,
+        "lost_segment_included": true
       }
     ]
   }
