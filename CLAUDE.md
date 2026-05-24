@@ -195,3 +195,25 @@ hook 자동 첨부(workout_schedule, workout_log)로 이미 제공되지만, gar
 4. UserPromptSubmit hook이 `workout_schedule.json` 자동 첨부하므로 컨텍스트에 있는 그것을 1차로 사용한다. 단, 컨텍스트 첨부분이 잘렸거나 의심되면 Read로 재확인.
 
 **근거**: 코드의 default 상수와 사용자가 manual override한 실제 일정이 다를 수 있다. 2026-05-05 사례에서 default가 "수=자전거 30분"이었지만 실제 override는 "5/6 러닝 4km Easy"였고, 코드 상수만 보고 답변해 사용자 지적을 받았다 (L0 §"전수 확인 원칙" 위반).
+
+## 데이터 변경 = "반영"의 정의 (필수 — 2026-05-24 도입)
+
+SSOT 보호 파일(`workout_schedule.json`, `workout_log.json`, `ib/watchlist*`, `real-estate/*`, `_claude_memory/*`)을 변경할 때 사용자가 "반영", "수정", "변경", "적용" 등 표현을 쓰면 **기본값은 로컬 Edit + git commit + git push까지**다.
+
+로컬 Edit만으로는 텔레그램·HTML(training-dashboard)·다른 머신·GitHub Actions 어디에도 도달 못 함 → "반영" 아님.
+
+### 예외 (사용자 명시 시에만)
+- "commit 하지 마", "push는 나중에", "로컬에서만" → 그 단계 생략
+- 모호한 발화 ("그냥 X만 반영해") → commit/push 빼라는 의미로 해석 금지. "X에만 집중하고 부수작업 빼라"의 자연 해석 우선. commit/push는 반영의 핵심 절차이지 부수작업이 아님
+
+### 위반 시 보고
+- Edit만 한 상태로 turn 종료할 때 응답에 **"⚠️ 로컬 Edit만 됨 — 텔레/HTML 미반영. push 필요 시 알려주세요"** 1줄 명시 의무
+- 사후 발견 시 L0 §"오류 보고 프로토콜" 적용. 사용자 발화·표현 탓 표현 금지 ("오역", "요청대로" 등) → 메인 행동의 구조적 원인 분석
+
+### 인프라 (2026-05-24 도입)
+- `workout/scripts/notify_schedule_change.py` — schedule 변경 시 텔레 즉시 알림 (HEAD~1 vs HEAD 비교)
+- `.github/workflows/schedule-update.yml` — push trigger
+- 메인이 push 정상 수행 시 텔레·HTML·cron alert 3자 자동 동기화
+
+### 배경
+2026-05-24 메인이 workout_schedule.json Edit 후 commit/push 누락 → 텔레/HTML 미반영 사고. 사용자가 발견 후 "사용자 발화 오역" 표현으로 메인이 책임 전가 → 이중 과실. 상세: 메모리 `feedback_data_change_reflection.md`.
