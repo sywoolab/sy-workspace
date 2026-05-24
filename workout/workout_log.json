@@ -4386,12 +4386,12 @@
   "2026-05-24": {
     "planned": "🚴 장거리 라이딩 100km",
     "done": true,
-    "actual": "자전거 111.43km 236분 (가민 raw 104.43km + 손실구간 추정 7.0km @ 40.0km/h)",
+    "actual": "자전거 113.43km 239분 (가민 raw 104.43km + 손실구간 추정 9.0km @ 40.0km/h)",
     "metrics": {
       "type": "bike",
-      "distance_km": 111.43,
-      "duration_min": 236.7,
-      "avg_speed_kmh": 28.25,
+      "distance_km": 113.43,
+      "duration_min": 239.7,
+      "avg_speed_kmh": 28.39,
       "avg_hr": 133,
       "max_hr": 186,
       "avg_power": 114.0,
@@ -4554,15 +4554,15 @@
         "reason": "일시정지 해제 누락으로 미기록",
         "start": "이촌 편의점",
         "end": "성산대교 아래",
-        "est_distance_km": 7.0,
-        "est_duration_min": 10.5,
+        "est_distance_km": 9.0,
+        "est_duration_min": 13.5,
         "est_avg_speed_kmh": 40.0,
         "source": "manual_user_report",
-        "note": "한강자전거길 km 표지목 기준 약 7km 추정 + 사용자 자기보고 평속 40km/h"
+        "note": "사용자 보고: 총 라이딩 113~114km → 손실구간 약 9km. 평속 40km/h 자기보고"
       }
     },
     "training_zone": "moderate",
-    "note": "유산소 3.9 / 무산소 2.7 | 부하 225 | 손실구간 산입(이촌편의점→성산대교 +7.0km/+10.5분, 40km/h)",
+    "note": "유산소 3.9 / 무산소 2.7 | 부하 225 | 손실구간 산입(이촌편의점→성산대교 +9.0km/+13.5분, 40km/h)",
     "garmin_id": 22989918598,
     "start_time": "07:16",
     "garmin_ids": [
