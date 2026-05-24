@@ -4382,5 +4382,355 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-05-24": {
+    "planned": "🚴 장거리 라이딩 100km",
+    "done": true,
+    "actual": "자전거 111.43km 236분 (가민 raw 104.43km + 손실구간 추정 7.0km @ 40.0km/h)",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 111.43,
+      "duration_min": 236.7,
+      "avg_speed_kmh": 28.25,
+      "avg_hr": 133,
+      "max_hr": 186,
+      "avg_power": 114.0,
+      "training_load": 225,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 614,
+          "avg_hr": 129,
+          "max_hr": 161,
+          "speed_kmh": 29.3
+        },
+        {
+          "distance": 5000,
+          "duration": 565,
+          "avg_hr": 142,
+          "max_hr": 154,
+          "speed_kmh": 31.9
+        },
+        {
+          "distance": 5000,
+          "duration": 590,
+          "avg_hr": 146,
+          "max_hr": 162,
+          "speed_kmh": 30.5
+        },
+        {
+          "distance": 5000,
+          "duration": 599,
+          "avg_hr": 140,
+          "max_hr": 155,
+          "speed_kmh": 30.1
+        },
+        {
+          "distance": 5000,
+          "duration": 611,
+          "avg_hr": 129,
+          "max_hr": 156,
+          "speed_kmh": 29.4
+        },
+        {
+          "distance": 5000,
+          "duration": 615,
+          "avg_hr": 128,
+          "max_hr": 162,
+          "speed_kmh": 29.3
+        },
+        {
+          "distance": 5000,
+          "duration": 598,
+          "avg_hr": 129,
+          "max_hr": 157,
+          "speed_kmh": 30.1
+        },
+        {
+          "distance": 5000,
+          "duration": 716,
+          "avg_hr": 130,
+          "max_hr": 154,
+          "speed_kmh": 25.1
+        },
+        {
+          "distance": 5000,
+          "duration": 619,
+          "avg_hr": 122,
+          "max_hr": 138,
+          "speed_kmh": 29.1
+        },
+        {
+          "distance": 5000,
+          "duration": 693,
+          "avg_hr": 130,
+          "max_hr": 150,
+          "speed_kmh": 26.0
+        },
+        {
+          "distance": 5000,
+          "duration": 608,
+          "avg_hr": 126,
+          "max_hr": 149,
+          "speed_kmh": 29.6
+        },
+        {
+          "distance": 5000,
+          "duration": 737,
+          "avg_hr": 124,
+          "max_hr": 151,
+          "speed_kmh": 24.4
+        },
+        {
+          "distance": 5000,
+          "duration": 938,
+          "avg_hr": 151,
+          "max_hr": 175,
+          "speed_kmh": 19.2
+        },
+        {
+          "distance": 5000,
+          "duration": 540,
+          "avg_hr": 114,
+          "max_hr": 151,
+          "speed_kmh": 33.4
+        },
+        {
+          "distance": 5000,
+          "duration": 739,
+          "avg_hr": 120,
+          "max_hr": 148,
+          "speed_kmh": 24.4
+        },
+        {
+          "distance": 5000,
+          "duration": 740,
+          "avg_hr": 137,
+          "max_hr": 186,
+          "speed_kmh": 24.3
+        },
+        {
+          "distance": 5000,
+          "duration": 564,
+          "avg_hr": 147,
+          "max_hr": 177,
+          "speed_kmh": 31.9
+        },
+        {
+          "distance": 5000,
+          "duration": 610,
+          "avg_hr": 142,
+          "max_hr": 177,
+          "speed_kmh": 29.5
+        },
+        {
+          "distance": 5000,
+          "duration": 604,
+          "avg_hr": 131,
+          "max_hr": 155,
+          "speed_kmh": 29.8
+        },
+        {
+          "distance": 5000,
+          "duration": 635,
+          "avg_hr": 135,
+          "max_hr": 156,
+          "speed_kmh": 28.3
+        },
+        {
+          "distance": 4425,
+          "duration": 635,
+          "avg_hr": 138,
+          "max_hr": 153,
+          "speed_kmh": 25.1
+        }
+      ],
+      "raw_garmin": {
+        "distance_km": 104.43,
+        "duration_min": 226.2,
+        "avg_speed_kmh": 27.7
+      },
+      "lost_segment": {
+        "reason": "일시정지 해제 누락으로 미기록",
+        "start": "이촌 편의점",
+        "end": "성산대교 아래",
+        "est_distance_km": 7.0,
+        "est_duration_min": 10.5,
+        "est_avg_speed_kmh": 40.0,
+        "source": "manual_user_report",
+        "note": "한강자전거길 km 표지목 기준 약 7km 추정 + 사용자 자기보고 평속 40km/h"
+      }
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.9 / 무산소 2.7 | 부하 225 | 손실구간 산입(이촌편의점→성산대교 +7.0km/+10.5분, 40km/h)",
+    "garmin_id": 22989918598,
+    "start_time": "07:16",
+    "garmin_ids": [
+      22989918598
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": 104430.0,
+        "duration_sec": 13572.0,
+        "avg_hr": 133,
+        "max_hr": 186,
+        "avg_pace": null,
+        "avg_speed": 7.694444444444444,
+        "training_load": 225,
+        "garmin_id": 22989918598,
+        "laps": [
+          {
+            "distance": 5000,
+            "duration": 614,
+            "avg_hr": 129,
+            "max_hr": 161,
+            "speed_kmh": 29.3
+          },
+          {
+            "distance": 5000,
+            "duration": 565,
+            "avg_hr": 142,
+            "max_hr": 154,
+            "speed_kmh": 31.9
+          },
+          {
+            "distance": 5000,
+            "duration": 590,
+            "avg_hr": 146,
+            "max_hr": 162,
+            "speed_kmh": 30.5
+          },
+          {
+            "distance": 5000,
+            "duration": 599,
+            "avg_hr": 140,
+            "max_hr": 155,
+            "speed_kmh": 30.1
+          },
+          {
+            "distance": 5000,
+            "duration": 611,
+            "avg_hr": 129,
+            "max_hr": 156,
+            "speed_kmh": 29.4
+          },
+          {
+            "distance": 5000,
+            "duration": 615,
+            "avg_hr": 128,
+            "max_hr": 162,
+            "speed_kmh": 29.3
+          },
+          {
+            "distance": 5000,
+            "duration": 598,
+            "avg_hr": 129,
+            "max_hr": 157,
+            "speed_kmh": 30.1
+          },
+          {
+            "distance": 5000,
+            "duration": 716,
+            "avg_hr": 130,
+            "max_hr": 154,
+            "speed_kmh": 25.1
+          },
+          {
+            "distance": 5000,
+            "duration": 619,
+            "avg_hr": 122,
+            "max_hr": 138,
+            "speed_kmh": 29.1
+          },
+          {
+            "distance": 5000,
+            "duration": 693,
+            "avg_hr": 130,
+            "max_hr": 150,
+            "speed_kmh": 26.0
+          },
+          {
+            "distance": 5000,
+            "duration": 608,
+            "avg_hr": 126,
+            "max_hr": 149,
+            "speed_kmh": 29.6
+          },
+          {
+            "distance": 5000,
+            "duration": 737,
+            "avg_hr": 124,
+            "max_hr": 151,
+            "speed_kmh": 24.4
+          },
+          {
+            "distance": 5000,
+            "duration": 938,
+            "avg_hr": 151,
+            "max_hr": 175,
+            "speed_kmh": 19.2
+          },
+          {
+            "distance": 5000,
+            "duration": 540,
+            "avg_hr": 114,
+            "max_hr": 151,
+            "speed_kmh": 33.4
+          },
+          {
+            "distance": 5000,
+            "duration": 739,
+            "avg_hr": 120,
+            "max_hr": 148,
+            "speed_kmh": 24.4
+          },
+          {
+            "distance": 5000,
+            "duration": 740,
+            "avg_hr": 137,
+            "max_hr": 186,
+            "speed_kmh": 24.3
+          },
+          {
+            "distance": 5000,
+            "duration": 564,
+            "avg_hr": 147,
+            "max_hr": 177,
+            "speed_kmh": 31.9
+          },
+          {
+            "distance": 5000,
+            "duration": 610,
+            "avg_hr": 142,
+            "max_hr": 177,
+            "speed_kmh": 29.5
+          },
+          {
+            "distance": 5000,
+            "duration": 604,
+            "avg_hr": 131,
+            "max_hr": 155,
+            "speed_kmh": 29.8
+          },
+          {
+            "distance": 5000,
+            "duration": 635,
+            "avg_hr": 135,
+            "max_hr": 156,
+            "speed_kmh": 28.3
+          },
+          {
+            "distance": 4425,
+            "duration": 635,
+            "avg_hr": 138,
+            "max_hr": 153,
+            "speed_kmh": 25.1
+          }
+        ],
+        "open_water": false,
+        "start_time": "07:16"
+      }
+    ]
   }
 }
