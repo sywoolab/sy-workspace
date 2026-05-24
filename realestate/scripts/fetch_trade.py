@@ -14,6 +14,13 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# 크로스플랫폼 한글 출력 (INBOX #21, 2026-05-24 추가) — Windows cp949 콘솔에서 이모지 출력 시 UnicodeEncodeError 차단
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except (AttributeError, ValueError):
+    pass
+
 import requests
 
 # L0 §"환경변수 부트스트랩": 부모 경로 거슬러 올라가며 .env 탐색
