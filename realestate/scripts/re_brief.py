@@ -24,7 +24,11 @@ BASE_DIR = str(Path(__file__).resolve().parent.parent)
 DOCS_DIR = str(Path(__file__).resolve().parent.parent.parent / 'docs')
 HEADERS  = {'User-Agent': 'Mozilla/5.0'}
 
-BOT_TOKEN = os.environ.get('REALESTATE_BOT_TOKEN') or os.environ.get('BOT_TOKEN', '')
+BOT_TOKEN = (
+    os.environ.get('BOT_TOKEN')
+    or os.environ.get('REALESTATE_BOT_TOKEN')
+    or os.environ.get('TELEGRAM_BOT_TOKEN', '')
+)
 CHAT_ID   = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
 PAGES_URL = 'https://sywoolab.github.io/sy-workspace/re.html'
 

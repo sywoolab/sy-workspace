@@ -70,6 +70,45 @@
 - 스크립트 수정 시 로컬 실행으로 사전 검증 (환경변수 세팅 필요)
 - `workout/workout_log.json`, `workout/workout_schedule.json`은 다른 에이전트가 동시 수정할 수 있음 → git pull 후 작업
 
+## 에러 알림 필수 — SystemExit 패턴 (필수 — 2026-05-24 도입)
+
+> 2026-05-08 INBOX #4 후속. cron 스크립트가 exit code 1+ 로 종료해도 텔레그램에 도달 못 하면 사용자는 묵음 실패를 인지 못 함. 모든 신규/기존 운영 스크립트에 아래 try/except 패턴 의무 적용.
+
+### 표준 패턴
+
+`if __name__ == '__main__':` 블록을 다음과 같이 작성한다 (운동·IB·부동산 모든 cron-driven 스크립트):
+
+```python
+import sys
+import traceback
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except SystemExit as e:
+        if e.code not in (0, None):
+            try:
+                send_telegram(f"❌ {SCRIPT_NAME} 오류 (exit {e.code})")
+            except Exception:
+                pass
+        raise
+    except Exception:
+        try:
+            send_telegram(f"❌ {SCRIPT_NAME} 예외\n{traceback.format_exc()[:1500]}")
+        except Exception:
+            pass
+        sys.exit(1)
+```
+
+### 적용 대상
+- `workout/scripts/*.py` (garmin_sync, workout_alert, notify_log_change, notify_schedule_change)
+- `ib/scripts/*.py`, `realestate/scripts/*.py` 등 모든 cron-driven 스크립트
+- 신규 스크립트 작성 시 본 패턴 의무 (PR 검토 시 누락 확인)
+
+### 검증
+- 스크립트 수정 후 인위적 실패(존재하지 않는 BOT_TOKEN 등) 1회 dry-run으로 텔레 알림 도달 확인
+- 알림 누락 시 즉시 패턴 추가 + 재배포
+
 ## 자동화 산출물 검증 (필수 — 2026-05-10 도입)
 
 > 가민 sync 6회 실패 사례에서 도출. 자동화 스크립트가 "성공" 메시지를 출력하면서도 실제 산출물에는 누락이 있는 silent fail 패턴을 차단한다.

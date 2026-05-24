@@ -28,14 +28,27 @@ jobs:
       - run: pip install requests
 
       - name: Notify SSOT change (push만)
+        id: notify
         if: github.event_name == 'push'
+        continue-on-error: true
         env:
+          BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python realestate/scripts/notify_realestate_change.py
 
+      - name: Notify failure of SSOT notify step
+        if: github.event_name == 'push' && steps.notify.outcome == 'failure'
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.REALESTATE_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="⚠️ realestate notify_realestate_change.py 실패 — SSOT 변경 텔레 알림 미발송 ($(date '+%Y-%m-%d %H:%M KST'))" || true
+          echo "::warning::notify_realestate_change.py failed — SSOT change not propagated to telegram"
+
       - name: MS 부동산 Dashboard HTML 생성
+        id: brief
         env:
+          BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python realestate/scripts/re_brief.py

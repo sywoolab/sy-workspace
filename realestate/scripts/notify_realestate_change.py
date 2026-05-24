@@ -71,8 +71,19 @@ def _git_show(ref, rel_path):
 
 
 def _diff_market_config(prev, head):
-    """rates/budget/strategy/market_index 키 단위 변경분."""
+    """rates/budget/strategy/market_index 키 단위 변경분 + _meta 변경 감지 (INBOX #17)."""
     lines = []
+
+    # _meta.active_strategies / deactivated_strategies 변경 감지 (전략 신호등 메타정보)
+    pm = (prev or {}).get('_meta') or {}
+    hm = (head or {}).get('_meta') or {}
+    for meta_key in ('active_strategies', 'deactivated_strategies'):
+        pv = pm.get(meta_key)
+        hv = hm.get(meta_key)
+        if json.dumps(pv, sort_keys=True, ensure_ascii=False) != json.dumps(hv, sort_keys=True, ensure_ascii=False):
+            lines.append(f'  [_meta.{meta_key}]')
+            lines.append(f'    {pv} → {hv}')
+
     sections = ['rates', 'budget', 'strategy', 'market_index']
     for sec in sections:
         p = (prev or {}).get(sec) or {}
