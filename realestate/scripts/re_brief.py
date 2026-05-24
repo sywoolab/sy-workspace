@@ -315,6 +315,16 @@ def build_html(cfg, top20_scenarios, chungyak, watchlist, news):
     sig_emoji = {'yellow': '🟡', 'green': '🟢', 'red': '🔴'}.get(sig_color, '🟡')
     badge_cls = {'yellow': 'badge-yellow', 'green': 'badge-green', 'red': 'badge-red'}.get(sig_color, 'badge-yellow')
 
+    # 활성/비활성 전략 (_meta.active_strategies / deactivated_strategies) — INBOX #17
+    _meta_strat = cfg.get('_meta', {}) or {}
+    _active = _meta_strat.get('active_strategies', []) or []
+    _deact  = _meta_strat.get('deactivated_strategies', {}) or {}
+    _strat_label = {'live': '실거주', 'gap': '갭투자', 'wait': '전월세→추후매입'}
+    active_html = ' · '.join(f'✅ {_strat_label.get(s, s)}' for s in _active)
+    deactivated_html = '<br>'.join(
+        f'🚫 {_strat_label.get(k, k)} 비활성 — {v}' for k, v in _deact.items()
+    )
+
     # ── 시장 스냅샷 ──────────────────────────────
     rates = cfg['rates']
     budget = cfg['budget']
@@ -459,6 +469,8 @@ def build_html(cfg, top20_scenarios, chungyak, watchlist, news):
         <h3>{cfg['strategy']['current_rec']}</h3>
         <p>목표 창: {cfg['strategy']['target_window']}</p>
         <p style="margin-top:2px">{cfg['strategy']['trigger']}</p>
+        {f'<p style="margin-top:8px;font-size:12px;color:#374151"><b>활성</b>: {active_html}</p>' if active_html else ''}
+        {f'<p style="margin-top:4px;font-size:12px;color:#dc2626"><b>비활성</b>: {deactivated_html}</p>' if deactivated_html else ''}
       </div>
     </div>
   </div>

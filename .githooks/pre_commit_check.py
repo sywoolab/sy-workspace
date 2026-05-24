@@ -42,17 +42,55 @@ def check_workout_log():
             if not isinstance(entry, dict):
                 continue
             h_metrics = entry.get('all_metrics', []) or []
+            h_actual = (entry.get('actual') or '').strip()
+            h_done = entry.get('done')
             if date not in stagd:
-                if h_metrics:
-                    violations.append(f"  - {p}: {date} entry 통째 삭제 (HEAD metrics={len(h_metrics)})")
+                if h_metrics or h_actual:
+                    violations.append(f"  - {p}: {date} entry 통째 삭제 (HEAD metrics={len(h_metrics)} actual={h_actual!r})")
                 continue
             s_entry = stagd[date]
             if not isinstance(s_entry, dict):
                 continue
             s_metrics = s_entry.get('all_metrics', []) or []
+            s_actual = (s_entry.get('actual') or '').strip()
+            s_done = s_entry.get('done')
+            # 1) all_metrics N → 0 손실
             if len(h_metrics) > 0 and len(s_metrics) == 0:
                 types = [m.get('type') for m in h_metrics]
                 violations.append(f"  - {p}: {date} metrics {len(h_metrics)}개 → 0 (손실 type: {types})")
+            # 2) actual 비공백 → 빈 문자열 (사용자 수동 메모 또는 실제 기록 손실 — INBOX #18)
+            if h_actual and not s_actual:
+                violations.append(f"  - {p}: {date} actual 손실 (HEAD: {h_actual[:60]!r} → staged 빈 문자열)")
+            # 3) done=True → False/None (완료 표시 회귀)
+            if h_done is True and s_done is not True:
+                violations.append(f"  - {p}: {date} done True → {s_done!r} (완료 표시 회귀)")
+    return violations
+
+
+def check_workout_schedule():
+    """workout_schedule.json overrides entry의 workout 필드 손실 감지 (INBOX #18)."""
+    violations = []
+    p = 'workout/workout_schedule.json'
+    head = show(p, 'HEAD')
+    stagd = show(p, '')
+    if not (isinstance(head, dict) and isinstance(stagd, dict)):
+        return violations
+    h_over = head.get('overrides', {}) or {}
+    s_over = stagd.get('overrides', {}) or {}
+    for date, entry in h_over.items():
+        if not isinstance(entry, dict):
+            continue
+        h_workout = (entry.get('workout') or '').strip()
+        if date not in s_over:
+            if h_workout:
+                violations.append(f"  - {p}: override {date} 통째 삭제 (HEAD workout: {h_workout[:50]!r})")
+            continue
+        s_entry = s_over[date]
+        if not isinstance(s_entry, dict):
+            continue
+        s_workout = (s_entry.get('workout') or '').strip()
+        if h_workout and not s_workout:
+            violations.append(f"  - {p}: override {date} workout 손실 (HEAD: {h_workout[:60]!r} → staged 빈 문자열)")
     return violations
 
 
@@ -79,7 +117,7 @@ def check_keyed_files():
 
 
 def main():
-    violations = check_workout_log() + check_keyed_files()
+    violations = check_workout_log() + check_workout_schedule() + check_keyed_files()
     if violations:
         print("[pre-commit 차단] 누적 데이터 파일 entry 손실 감지:", file=sys.stderr)
         for v in violations:
