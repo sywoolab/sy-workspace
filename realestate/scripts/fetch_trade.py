@@ -910,6 +910,74 @@ def save_results(data, top1, top2, top3, ext_top=None):
         json.dump(summary, f, ensure_ascii=False, indent=2)
     print(f"TOP10 저장: {path}")
 
+    # WATCHLIST_SUMMARY 자동 생성 (INBOX #14 근본 원인 진단 후속, 2026-05-24)
+    # 기존: 메인 에이전트 수기 작성 → 오기·임의 산출 위험 (v2 정합성 0/10 사고)
+    # 신규: strategy2_live(top2)에서 자동 산출 → 수기 작성 경로 폐기
+    save_watchlist_summary(top2, data)
+
+
+def save_watchlist_summary(top2_live, scored_data):
+    """strategy2_live(실거주 TOP) → watchlist_summary.json 자동 변환.
+
+    INBOX #14 근본 원인 진단 (2026-05-24) 후속:
+    - 메인 수기 작성 SSOT 구조 결함 차단
+    - 모든 단지는 scored_data에 실존하는 항목만 사용 (검증 step 포함)
+    - data_source 필드로 자동 산출 명시
+    """
+    # 검증: top2_live의 모든 단지가 scored_data에 있는지 확인 (식별자 (구, 법정동, 단지명, 면적))
+    scored_set = {(d.get("구"), d.get("법정동"), d.get("단지명"), d.get("면적")) for d in scored_data}
+    violations = []
+    for e in top2_live:
+        key = (e.get("구"), e.get("법정동"), e.get("단지명"), e.get("면적"))
+        if key not in scored_set:
+            violations.append(key)
+    if violations:
+        print(f"[WARN watchlist] {len(violations)}건이 scored_data 부재 → 산출 중단")
+        for v in violations:
+            print(f"  - {v}")
+        return  # 산출 중단 (이전 watchlist 유지)
+
+    complexes = []
+    for e in top2_live[:10]:
+        complexes.append({
+            "name": e.get("단지명"),
+            "area": e.get("면적"),
+            "district": f'{e.get("구")} {e.get("법정동")}'.strip(),
+            "price_2m_ago": e.get("2개월전"),
+            "price_2m_avg": e.get("2개월평균") or e.get("매매가"),
+            "price_latest": e.get("최근거래") or e.get("매매가"),
+            "latest_date": e.get("최근일자"),
+            "gap_pct": e.get("괴리율"),
+            "jeonse_rate_pct": e.get("KB전세가율"),
+            "jeonse_rate_pct_source": "구 평균 (KB_RATIO 상수) — 단지별 매핑은 INBOX 별도",
+            "commute_weighted_min": e.get("통근가중"),
+            "trade_count": e.get("매매건수"),
+            "vintage": e.get("준공"),
+            "score_live": e.get("총점_실거주"),
+        })
+
+    summary = {
+        "updated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "version": "v3-auto",
+        "selection_basis": (
+            "자동 산출 — strategy_top10.json의 strategy2_live 상위 10건. "
+            "fetch_trade.py save_watchlist_summary() 함수가 생성. "
+            "단지명/가격/면적 모두 scored_all.csv에 실존 검증 통과. "
+            "메인 수기 편집 금지 (INBOX #14 근본 원인 진단 2026-05-24 후속)."
+        ),
+        "data_source": f"scored_all.csv ({datetime.now().strftime('%Y-%m-%d')})",
+        "notes": [
+            "jeonse_rate_pct는 구 평균 (단지별 KB API 호출은 INBOX 별도 작업)",
+            "매수상한 11.2억 cutoff는 strategy2_live 자체에서 적용됨",
+            "단지명 정규화 (괄호 안 번지·차수표기 통일)는 INBOX 별도",
+        ],
+        "complexes": complexes,
+    }
+    path = BASE_DIR / "watchlist_summary.json"
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(summary, f, ensure_ascii=False, indent=2)
+    print(f"WATCHLIST 저장: {path} ({len(complexes)}건, 자동 산출)")
+
 
 # ── 메인 ──────────────────────────────────────────────────
 
