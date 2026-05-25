@@ -264,33 +264,30 @@ def _push_and_update_dashboard(has_new_activity: bool):
     import subprocess
     from pathlib import Path
 
+    repo_root = str(Path(BASE_DIR).parent.resolve())  # sy-workspace/ (레포 루트)
+
     # 변경된 파일 있어야 push
     unstaged = subprocess.run(
         ['git', 'status', '--porcelain'],
-        capture_output=True, text=True, cwd=BASE_DIR
+        capture_output=True, text=True, cwd=repo_root
     ).stdout.strip()
 
     if not unstaged:
         print('  [git] 변경 없음 — push 생략')
     else:
-        # 1) origin과 먼저 동기화 (working tree 변경은 --autostash로 보존)
-        subprocess.run(
-            ['git', 'pull', '--rebase', '--autostash'],
-            capture_output=True, text=True, cwd=BASE_DIR
-        )
-        # 2) 데이터 파일 스테이징
+        # 1) 데이터 파일 스테이징 (레포 루트 기준 경로)
         subprocess.run(
             ['git', 'add',
              'workout/workout_log.json',
              'workout/data/garmin_health.json',
              'workout/data/sync_state.json'],
-            cwd=BASE_DIR, capture_output=True
+            cwd=repo_root, capture_output=True
         )
         # 3) 실제 스테이징된 변경이 있을 때만 commit
         #    (--allow-empty 금지: git add 실패/레이스 시 빈 커밋이 데이터 누락을 숨김 — 2026-05-25 사고 root cause)
         staged = subprocess.run(
             ['git', 'diff', '--cached', '--name-only'],
-            capture_output=True, text=True, cwd=BASE_DIR
+            capture_output=True, text=True, cwd=repo_root
         ).stdout.strip()
         if not staged:
             # 새 활동이 있다는데 스테이징할 게 없음 = silent fail (L0 §자동화 산출물 검증)
@@ -304,11 +301,11 @@ def _push_and_update_dashboard(has_new_activity: bool):
             label = '새 활동' if has_new_activity else '헬스 데이터'
             subprocess.run(
                 ['git', 'commit', '-m', f'garmin sync: {label} ({TODAY} local)'],
-                cwd=BASE_DIR, capture_output=True
+                cwd=repo_root, capture_output=True
             )
             result2 = subprocess.run(
                 ['git', 'push'],
-                capture_output=True, text=True, cwd=BASE_DIR
+                capture_output=True, text=True, cwd=repo_root
             )
             if result2.returncode == 0:
                 print('  [git] push 완료')
@@ -316,7 +313,7 @@ def _push_and_update_dashboard(has_new_activity: bool):
                 if has_new_activity:
                     head_log = subprocess.run(
                         ['git', 'show', 'HEAD:workout/workout_log.json'],
-                        capture_output=True, text=True, cwd=BASE_DIR
+                        capture_output=True, text=True, cwd=repo_root
                     ).stdout
                     if TODAY not in head_log:
                         try:
@@ -336,11 +333,13 @@ def _push_and_update_dashboard(has_new_activity: bool):
         dashboard_script = Path(BASE_DIR) / 'workout' / 'scripts' / 'generate_dashboard.py'
         dashboard_repo   = Path.home() / 'tmp' / 'training-dashboard'
         if dashboard_script.exists():
-            subprocess.run(
+            r_dash = subprocess.run(
                 [sys.executable, str(dashboard_script)],
-                cwd=str(Path(BASE_DIR) / 'workout'),
-                capture_output=True
+                cwd=repo_root,
+                capture_output=True, text=True
             )
+            if r_dash.returncode != 0:
+                print(f'  [dashboard] generate 실패: {r_dash.stderr[:200]}')
             # training-dashboard repo 업데이트
             html_src = Path(BASE_DIR) / 'workout' / 'data' / 'training_report.html'
             td_path = dashboard_repo
