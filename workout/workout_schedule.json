@@ -206,8 +206,8 @@
     },
     "2026-05-28": {
       "date": "2026-05-28",
-      "workout": "🏃 인터벌 또는 템포 6km",
-      "detail": "",
+      "workout": "🏃 러닝 8km Easy",
+      "detail": "훈련준비도 POOR 4일 연속 — 인터벌 취소. Easy 거리 빌드 우선 (HR 145 이하, 빌드업 3km 후 점진). 인터벌은 컨디션 회복 후 6월로 이월.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -247,8 +247,8 @@
     },
     "2026-06-02": {
       "date": "2026-06-02",
-      "workout": "🏃 러닝 5km Easy",
-      "detail": "",
+      "workout": "🏃 러닝 8km Easy",
+      "detail": "Easy 거리 빌드 2단계. HR 145 이하. 6/7 한강3종 D-5 — 강도 올리지 않음.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -343,8 +343,8 @@
     },
     "2026-06-14": {
       "date": "2026-06-14",
-      "workout": "🏃 러닝 18km (장거리 능력 점검)",
-      "detail": "",
+      "workout": "🏃 러닝 12km Easy (장거리 빌드)",
+      "detail": "6/11 10km 다음 단계. 18km는 현재 longest 8km 대비 점프 과대 — 12km로 현실화. HR 145 이하 Easy 유지. 대가야(6/28) 전 핵심 장거리 세션.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -375,8 +375,8 @@
     },
     "2026-06-18": {
       "date": "2026-06-18",
-      "workout": "🏃 러닝 6km Easy",
-      "detail": "",
+      "workout": "🏃 러닝 10km Easy",
+      "detail": "6/14 12km 다음 단계. 대가야(6/28) D-10 — 마지막 중장거리. 이후는 테이퍼.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
