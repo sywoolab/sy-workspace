@@ -134,9 +134,9 @@ RENT_TAG_MAP = {
 def _canonical_name(name: str) -> str:
     """단지명 정규화: 지번 괄호 제거 + 공백 정리.
     예) '홍제원현대(459-0)' → '홍제원현대'
-    API가 같은 단지를 번지 표기 차이로 분리하는 경우를 병합한다.
+    하이픈 포함 번지 패턴만 제거 — '래미안(1)', '래미안(2)' 같은 단지번호는 보존.
     """
-    name = re.sub(r'\s*\(\d[\d\-]*\)\s*', '', name)
+    name = re.sub(r'\s*\(\d+\-\d+\)\s*', '', name)
     return ' '.join(name.split())
 
 
@@ -1065,4 +1065,19 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import traceback as _tb
+    try:
+        sys.exit(main())
+    except SystemExit as e:
+        if e.code not in (0, None):
+            try:
+                send_telegram(f"❌ fetch_trade.py 오류 (exit {e.code})")
+            except Exception:
+                pass
+        raise
+    except Exception:
+        try:
+            send_telegram(f"❌ fetch_trade.py 예외\n{_tb.format_exc()[:1500]}")
+        except Exception:
+            pass
+        sys.exit(1)

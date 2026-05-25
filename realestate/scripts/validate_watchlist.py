@@ -92,6 +92,9 @@ def main():
     updated = watchlist.get("updated", "unknown")
     issues = []
 
+    if not scored_set:
+        issues.append("⚠️ scored_all.csv 없음 — 단지 실존 검증 SKIP (가격·stale만 검증)")
+
     for c in complexes:
         name = c.get("name", "")
         area = c.get("area", "")
