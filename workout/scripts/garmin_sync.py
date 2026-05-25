@@ -265,18 +265,20 @@ def _push_and_update_dashboard(has_new_activity: bool):
     from pathlib import Path
 
     # 변경된 파일 있어야 push
-    staged = subprocess.run(
-        ['git', 'diff', '--name-only', 'HEAD'],
-        capture_output=True, text=True, cwd=BASE_DIR
-    ).stdout.strip()
     unstaged = subprocess.run(
         ['git', 'status', '--porcelain'],
         capture_output=True, text=True, cwd=BASE_DIR
     ).stdout.strip()
 
-    if not unstaged and not staged:
+    if not unstaged:
         print('  [git] 변경 없음 — push 생략')
     else:
+        # 1) origin과 먼저 동기화 (working tree 변경은 --autostash로 보존)
+        subprocess.run(
+            ['git', 'pull', '--rebase', '--autostash'],
+            capture_output=True, text=True, cwd=BASE_DIR
+        )
+        # 2) 데이터 파일 스테이징
         subprocess.run(
             ['git', 'add',
              'workout/workout_log.json',
@@ -284,23 +286,50 @@ def _push_and_update_dashboard(has_new_activity: bool):
              'workout/data/sync_state.json'],
             cwd=BASE_DIR, capture_output=True
         )
-        label = '새 활동' if has_new_activity else '헬스 데이터'
-        subprocess.run(
-            ['git', 'commit', '--allow-empty', '-m', f'garmin sync: {label} ({TODAY} local)'],
-            cwd=BASE_DIR, capture_output=True
-        )
-        result = subprocess.run(
-            ['git', 'pull', '--rebase', '--autostash'],
+        # 3) 실제 스테이징된 변경이 있을 때만 commit
+        #    (--allow-empty 금지: git add 실패/레이스 시 빈 커밋이 데이터 누락을 숨김 — 2026-05-25 사고 root cause)
+        staged = subprocess.run(
+            ['git', 'diff', '--cached', '--name-only'],
             capture_output=True, text=True, cwd=BASE_DIR
-        )
-        result2 = subprocess.run(
-            ['git', 'push'],
-            capture_output=True, text=True, cwd=BASE_DIR
-        )
-        if result2.returncode == 0:
-            print('  [git] push 완료')
+        ).stdout.strip()
+        if not staged:
+            # 새 활동이 있다는데 스테이징할 게 없음 = silent fail (L0 §자동화 산출물 검증)
+            if has_new_activity:
+                try:
+                    send_telegram(f"⚠️ gsync: 새 활동 fetch했으나 commit할 데이터 0건 — 누락 의심 ({TODAY}). 수동 확인 필요")
+                except Exception:
+                    pass
+            print('  [git] 스테이징 변경 없음 — commit 생략')
         else:
-            print(f'  [git] push 실패: {result2.stderr[:100]}')
+            label = '새 활동' if has_new_activity else '헬스 데이터'
+            subprocess.run(
+                ['git', 'commit', '-m', f'garmin sync: {label} ({TODAY} local)'],
+                cwd=BASE_DIR, capture_output=True
+            )
+            result2 = subprocess.run(
+                ['git', 'push'],
+                capture_output=True, text=True, cwd=BASE_DIR
+            )
+            if result2.returncode == 0:
+                print('  [git] push 완료')
+                # 4) 산출물 검증: 새 활동이면 push된 HEAD에 오늘 entry 실존 확인 (L0 §자동화 산출물 검증)
+                if has_new_activity:
+                    head_log = subprocess.run(
+                        ['git', 'show', 'HEAD:workout/workout_log.json'],
+                        capture_output=True, text=True, cwd=BASE_DIR
+                    ).stdout
+                    if TODAY not in head_log:
+                        try:
+                            send_telegram(f"⚠️ gsync: push 완료했으나 HEAD에 {TODAY} entry 없음 — 데이터 누락 의심")
+                        except Exception:
+                            pass
+                        print(f'  [git] ⚠️ HEAD에 {TODAY} entry 누락 — 알림 발송')
+            else:
+                print(f'  [git] push 실패: {result2.stderr[:100]}')
+                try:
+                    send_telegram(f"❌ gsync push 실패 ({TODAY}): {result2.stderr[:200]}")
+                except Exception:
+                    pass
 
     # 대시보드 HTML 재생성 + training-dashboard repo push
     try:
