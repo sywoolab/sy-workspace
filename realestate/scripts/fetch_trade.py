@@ -8,6 +8,7 @@
 import csv
 import json
 import os
+import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
@@ -128,6 +129,15 @@ RENT_TAG_MAP = {
     "preDeposit": "종전보증금", "preMonthlyRent": "종전월세",
     "jibun": "지번",
 }
+
+
+def _canonical_name(name: str) -> str:
+    """단지명 정규화: 지번 괄호 제거 + 공백 정리.
+    예) '홍제원현대(459-0)' → '홍제원현대'
+    API가 같은 단지를 번지 표기 차이로 분리하는 경우를 병합한다.
+    """
+    name = re.sub(r'\s*\(\d[\d\-]*\)\s*', '', name)
+    return ' '.join(name.split())
 
 
 def _calc_acq_tax(price):
@@ -291,7 +301,7 @@ def aggregate_and_score(all_trade, all_rent):
             except (ValueError, KeyError):
                 continue
             dong = r.get("법정동", "").strip()
-            trade_map[(gu, dong, r["단지명"], at)].append({"date": dt, "amount": amt, "build_year": by})
+            trade_map[(gu, dong, _canonical_name(r["단지명"]), at)].append({"date": dt, "amount": amt, "build_year": by})
 
     for code, rows in all_rent.items():
         gu = DISTRICTS[code]
@@ -304,7 +314,7 @@ def aggregate_and_score(all_trade, all_rent):
             except (ValueError, KeyError):
                 continue
             dong = r.get("법정동", "").strip()
-            rent_map[(gu, dong, r["단지명"], at)].append(dep)
+            rent_map[(gu, dong, _canonical_name(r["단지명"]), at)].append(dep)
 
     # 구+면적별 평균가격 (할인율 계산용)
     gu_area_prices = defaultdict(list)
@@ -393,7 +403,11 @@ def aggregate_and_score(all_trade, all_rent):
         else:
             s6 = 5
         s7 = 10 if discount >= 15 else (8 if discount >= 5 else (6 if discount >= 0 else 4))
-        kb_ratio = KB_RATIO.get(gu, 50)
+        # 전세가율: 단지별 실계약(jeonse_avg/price) 우선, 전세 2건 미만 시 구 KB 평균 fallback
+        if jeonse_avg is not None and price > 0:
+            kb_ratio = round(jeonse_avg / price * 100, 1)
+        else:
+            kb_ratio = KB_RATIO.get(gu, 50)
         s8 = 10 if kb_ratio >= 60 else (8 if kb_ratio >= 55 else (6 if kb_ratio >= 50 else 4))
 
         scores = {'S1': s1, 'S2': s2, 'S3': s3, 'S4': s4, 'S5': s5, 'S6': s6, 'S7': s7, 'S8': s8}
@@ -949,7 +963,7 @@ def save_watchlist_summary(top2_live, scored_data):
             "latest_date": e.get("최근일자"),
             "gap_pct": e.get("괴리율"),
             "jeonse_rate_pct": e.get("KB전세가율"),
-            "jeonse_rate_pct_source": "구 평균 (KB_RATIO 상수) — 단지별 매핑은 INBOX 별도",
+            "jeonse_rate_pct_source": "단지별 실계약 (jeonse_avg/price) — 전세 2건 미만 시 구 KB 평균 fallback",
             "commute_weighted_min": e.get("통근가중"),
             "trade_count": e.get("매매건수"),
             "vintage": e.get("준공"),
@@ -967,9 +981,9 @@ def save_watchlist_summary(top2_live, scored_data):
         ),
         "data_source": f"scored_all.csv ({datetime.now().strftime('%Y-%m-%d')})",
         "notes": [
-            "jeonse_rate_pct는 구 평균 (단지별 KB API 호출은 INBOX 별도 작업)",
+            "jeonse_rate_pct는 단지별 실계약 비율 (전세 2건 미만 시 구 KB 평균 fallback)",
             "매수상한 11.2억 cutoff는 strategy2_live 자체에서 적용됨",
-            "단지명 정규화 (괄호 안 번지·차수표기 통일)는 INBOX 별도",
+            "단지명 정규화 (_canonical_name): 지번 괄호 제거 + 공백 정리 적용됨",
         ],
         "complexes": complexes,
     }

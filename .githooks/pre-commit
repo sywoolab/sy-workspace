@@ -8,4 +8,5 @@
 # 다중 머신 동기화: git config core.hooksPath .githooks (레포 클론 후 1회 실행)
 
 REPO=$(git rev-parse --show-toplevel)
-exec python "$REPO/.githooks/pre_commit_check.py" "$@"
+PY=$(command -v python3 || command -v python)
+exec "$PY" "$REPO/.githooks/pre_commit_check.py" "$@"

@@ -25,6 +25,14 @@ jobs:
           CHAT_ID: ${{ secrets.REALESTATE_CHAT_ID }}
         run: python realestate/scripts/fetch_trade.py
 
+      - name: 워치리스트 정합성 검증
+        continue-on-error: true
+        env:
+          BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.REALESTATE_CHAT_ID }}
+        run: python realestate/scripts/validate_watchlist.py
+
       - name: Save collected data
         run: |
           git config user.name "github-actions"

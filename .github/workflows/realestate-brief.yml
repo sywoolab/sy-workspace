@@ -45,6 +45,14 @@ jobs:
             -d text="⚠️ realestate notify_realestate_change.py 실패 — SSOT 변경 텔레 알림 미발송 ($(date '+%Y-%m-%d %H:%M KST'))" || true
           echo "::warning::notify_realestate_change.py failed — SSOT change not propagated to telegram"
 
+      - name: 워치리스트 정합성 검증
+        continue-on-error: true
+        env:
+          BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python realestate/scripts/validate_watchlist.py
+
       - name: MS 부동산 Dashboard HTML 생성
         id: brief
         env:
