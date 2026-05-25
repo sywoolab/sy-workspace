@@ -4739,5 +4739,46 @@
         "lost_segment_included": true
       }
     ]
+  },
+  "2026-05-25": {
+    "planned": "🏊 수영 1km Easy 완료 (사이팅 포함) / 러닝 스킵 → 5/26 이전",
+    "done": true,
+    "actual": "수영 1525m 40분 @1:54/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1525,
+      "duration_min": 39.9,
+      "moving_min": 29.0,
+      "pace_per_100m": "1:54",
+      "avg_hr": 121,
+      "max_hr": 157,
+      "swolf": 39,
+      "strokes": 646,
+      "avg_spm": null,
+      "training_load": 43
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.1 / 무산소 0.7 | 부하 43",
+    "garmin_id": 23003038921,
+    "start_time": "09:32",
+    "garmin_ids": [
+      23003038921
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 2394.0,
+        "avg_hr": 121,
+        "max_hr": 157,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 43,
+        "garmin_id": 23003038921,
+        "laps": null,
+        "open_water": false,
+        "start_time": "09:32"
+      }
+    ]
   }
 }
