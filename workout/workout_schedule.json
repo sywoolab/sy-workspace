@@ -271,24 +271,24 @@
     },
     "2026-06-05": {
       "date": "2026-06-05",
-      "workout": "🏊 수영 강습 06시 (Easy) + OW 짧게 (옵션)",
-      "detail": "",
+      "workout": "🏊 수영 강습 06시 + 러닝 Easy 6km",
+      "detail": "쉬엄쉬엄 D-2. 비경쟁 펀런이므로 테이퍼 불필요. 평소 훈련 유지.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-06": {
       "date": "2026-06-06",
-      "workout": "짧은 워밍업 (자전거 30분 + 러닝 2km)",
-      "detail": "",
+      "workout": "가벼운 이동 준비 (자전거 30분 스핀 + 러닝 2~3km))",
+      "detail": "쉬엄쉬엄 D-1. 다리 풀어주기만. 경쟁 아니므로 피로 관리 최소한.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-07": {
       "date": "2026-06-07",
-      "workout": "🏁 한강쉬엄쉬엄 (수영 1km + 자전거 20km + 러닝 10km). T1 수트 탈의 첫 실전 연습",
-      "detail": "",
+      "workout": "🎉 쉬엄쉬엄 한강 3종 (수영 1km + 자전거 20km + 러닝 10km)",
+      "detail": "비경쟁 펀런 대회. 기록 욕심 없이 즐기기. T1·T2 전환 연습 + 웻수트 탈의 실전 경험 목적. HR 존3 이하로 여유있게.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
