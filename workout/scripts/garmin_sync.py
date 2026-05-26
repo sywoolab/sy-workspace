@@ -264,7 +264,7 @@ def _push_and_update_dashboard(has_new_activity: bool):
     import subprocess
     from pathlib import Path
 
-    repo_root = str(Path(BASE_DIR).parent.resolve())  # sy-workspace/ (레포 루트)
+    repo_root = str(Path(BASE_DIR).resolve().parent)  # sy-workspace/ (레포 루트)
 
     # 변경된 파일 있어야 push
     unstaged = subprocess.run(
@@ -424,7 +424,7 @@ def _git_pull_safe():
     if _is_ci():
         return
     import subprocess
-    repo_root = str(Path(BASE_DIR).parent.resolve())
+    repo_root = str(Path(BASE_DIR).resolve().parent)
     try:
         r = subprocess.run(['git', 'pull', '--rebase', '--autostash'],
                            cwd=repo_root, capture_output=True, timeout=60, text=True)
@@ -441,7 +441,7 @@ def _git_push_safe(commit_message):
     if _is_ci():
         return
     import subprocess, time as _time
-    repo_root = str(Path(BASE_DIR).parent.resolve())
+    repo_root = str(Path(BASE_DIR).resolve().parent)
     files = [
         'workout/workout_log.json',
         'workout/data/garmin_health.json',
