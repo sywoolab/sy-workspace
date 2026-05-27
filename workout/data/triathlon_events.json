@@ -76,7 +76,7 @@
     "reg_period": "2026-01-16 14:00 ~ 2026-06-12 23:59"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "2026 고령군수배 대가야 전국 철인3종 대회",
     "location": "경북 고령군 다산 은행나무숲 (경북 고령군 다산면 좌학리 969)",
     "course": "생활체육(스탠다드)",
@@ -88,7 +88,7 @@
     "status": "접수중",
     "name": "제26회 문화체육관광부장관배 전국 트라이애슬론 선수권 대회",
     "location": "전북 익산시 익산국제철인3종경기장 일원",
-    "course": "전문체육(엘리트/U23: 스탠다드), 고등부 (스프린트), 중등부 (슈퍼스프린트), 초등부 (아쿠아슬론, 생활체육(스탠다드)",
+    "course": "전문체육(엘리트/U23: 스프린트), 고등부 (스프린트), 중등부 (슈퍼스프린트), 초등부 (아쿠아슬론, 생활체육(스탠다드)",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2052&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.06.26 ~ 28",
     "reg_period": "2026-04-01 14:00 ~ 2026-05-28 23:59"
@@ -112,7 +112,7 @@
   },
   {
     "status": "접수예정",
-    "name": "2026 아이치·나고야 아시안게임 국가대표 선발전(3차)_심판모집용",
+    "name": "2026 아이치·나고야 아시안게임 국가대표 선발전(3차)",
     "location": "경상남도 양산시",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2080&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.30 ~ 31",
@@ -120,7 +120,7 @@
   },
   {
     "status": "접수예정",
-    "name": "2026 아이치·나고야 아시안게임 국가대표 선발전(2차)_심판모집용",
+    "name": "2026 아이치·나고야 아시안게임 국가대표 선발전(2차)",
     "location": "경상남도 양산시",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2078&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.29 ~ 31",
