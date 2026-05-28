@@ -231,8 +231,8 @@
     },
     "2026-05-31": {
       "date": "2026-05-31",
-      "workout": "🚴 자전거 80km — 단일 능력 유지 라이드 (5/16 85km 달성 후 두 번째)",
-      "detail": "80km 단일 능력 기준 이미 달성(5/16 85km). 이번은 능력 유지 + 페이스 연습 (33~35km/h 목표).",
+      "workout": "🛌 완전 휴식",
+      "detail": "일. 토 운동 후 회복. D-7(한강3종)",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -335,16 +335,16 @@
     },
     "2026-06-13": {
       "date": "2026-06-13",
-      "workout": "TBD + 🏊 OW 2km 도전 (사전 시뮬)",
-      "detail": "",
+      "workout": "🏊 수영 개인강습 + 🏃 Easy 롱런 11~12km",
+      "detail": "토. 수영 개인강습 후 롱런. 첫 10km+ 도전. HR 145 이하, 6:00+/km",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-14": {
       "date": "2026-06-14",
-      "workout": "🏃 Easy 롱런 11~12km",
-      "detail": "일. 14~15km는 현재 기반(8.7km)에서 너무 급격. 11~12km로 첫 점프. HR 145 이하, 6:00+ 유지",
+      "workout": "🛌 완전 휴식",
+      "detail": "일. 롱런은 토 6/13으로 이동",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -487,8 +487,8 @@
     },
     "2026-07-05": {
       "date": "2026-07-05",
-      "workout": "🚴 롱바이크 100km",
-      "detail": "일. 첫 100km 롱라이드. Easy~Moderate. 완주 목적, 페이스 무시",
+      "workout": "🛌 완전 휴식",
+      "detail": "일. 롱바이크는 토 7/4으로 이동",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -535,8 +535,8 @@
     },
     "2026-07-19": {
       "date": "2026-07-19",
-      "workout": "🚴 롱바이크 100~120km",
-      "detail": "일. 2회차 롱라이드. 지난주 100km 무리 없었으면 120km 도전",
+      "workout": "🛌 완전 휴식",
+      "detail": "일. 롱바이크는 토 7/18으로 이동",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -559,8 +559,32 @@
     },
     "2026-07-26": {
       "date": "2026-07-26",
-      "workout": "🏃 10km 테스트런 (서브50 시도)",
-      "detail": "일. 격주 런/바이크 8주 후 첫 서브50 시도. 목표 49:30~50:00",
+      "workout": "🛌 완전 휴식",
+      "detail": "일. 테스트런은 토 7/25으로 이동",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-07-04": {
+      "date": "2026-07-04",
+      "workout": "🏊 수영 개인강습 + 🚴 롱바이크 100km",
+      "detail": "토. 수영 개인강습 후 롱라이드. 오전 수영 → 오후 바이크 100km",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-07-18": {
+      "date": "2026-07-18",
+      "workout": "🏊 수영 개인강습 + 🚴 롱바이크 100~120km",
+      "detail": "토. 2회차 롱라이드. 100km 무리 없었으면 120km",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-07-25": {
+      "date": "2026-07-25",
+      "workout": "🏊 수영 개인강습 + 🏃 10km 테스트런 (서브50 시도)",
+      "detail": "토. 8주 빌드 후 서브50 테스트. WU 2km + 10km 목표 페이스 + CD 1km",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
