@@ -222,12 +222,11 @@
     },
     "2026-05-30": {
       "date": "2026-05-30",
-      "workout": "TBD + 🏊 OW 1회 (사이팅 + 직진성)",
-      "detail": "확정 미정 — 사용자 보고 2026-05-24: 그때 할 수 있을지 없을지 모름. 5/29 전후 컨디션·일정 따라 결정. 미실행 시 대안: 6/7 한강3종 D-13 직전이라 직진성 연습 빠지면 한강리버크로스(6/21) 대비 부담 증가 — 가능하면 OW 진행 권장.",
+      "workout": "🏊 수영 개인강습 + 🚴→🏃 미니 브릭",
+      "detail": "토. 5/23처럼 수영 개인강습 후 자전거→러닝. 브릭 감각 유지.",
       "source": "manual",
       "auto": false,
-      "rule": "tentative-pending-decision",
-      "decision_pending": "user-availability-and-condition"
+      "rule": "user-confirmed"
     },
     "2026-05-31": {
       "date": "2026-05-31",
