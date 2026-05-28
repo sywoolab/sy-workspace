@@ -126,23 +126,10 @@ def _find_recent_race(log, within_days=120):
 
 def _compute_estimate(log, sched):
     """현재 체력 기반 예상 완주 분할 계산.
-    우선순위: 최근 레이스 데이터(실측 보정) > workout_analysis > last_analysis 폴백
+    우선순위: workout_analysis 동적 알고리즘 > last_analysis 폴백
+    (레이스 실측값은 과거 고정값이므로 1순위에서 제외 — 훈련에 따라 동적으로 업데이트됨)
     """
-    # 1순위: 최근 레이스 실측 보정
-    race_est = _find_recent_race(log)
-    if race_est:
-        # VDOT은 알고리즘에서 보완
-        if _ANALYSIS_AVAILABLE:
-            try:
-                vdot = update_vdot(log)
-                race_est['vdot'] = vdot
-            except Exception:
-                pass
-        if not race_est.get('vdot'):
-            race_est['vdot'] = sched.get('current_vdot', 36)
-        return race_est, race_est['vdot']
-
-    # 2순위: workout_analysis 알고리즘
+    # 1순위: workout_analysis 동적 알고리즘 (VDOT + 최근 수영/바이크 데이터)
     if _ANALYSIS_AVAILABLE:
         try:
             est = estimate_finish_time(log)

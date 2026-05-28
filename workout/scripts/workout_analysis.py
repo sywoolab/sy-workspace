@@ -508,6 +508,9 @@ def estimate_finish_time(log):
         # 너무 낮은 평속(20 미만) 제외 (브릭 등 특수 상황)
         speeds = [s for s in speeds if s >= 20]
         avg_speed = sum(speeds) / len(speeds) if speeds else 32
+        # 남북/경사 훈련 코스 보정: 훈련 평속이 32 미만이면 평지 대회 코스 환산 (+10%)
+        if avg_speed < 32:
+            avg_speed = min(avg_speed / 0.90, 36)
         est_bike = (40 / avg_speed) * 60
     else:
         est_bike = 75  # 사이클 선수 기본값
