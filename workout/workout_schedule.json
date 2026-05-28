@@ -263,8 +263,8 @@
     },
     "2026-06-04": {
       "date": "2026-06-04",
-      "workout": "휴식",
-      "detail": "",
+      "workout": "🏃 러닝 5~6km Easy",
+      "detail": "목 D-3. 쉬엄쉬엄한강은 펀런이라 테이퍼 불필요. 짧게 다리 깨우기.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
