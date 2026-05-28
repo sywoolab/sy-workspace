@@ -359,8 +359,8 @@
     },
     "2026-06-16": {
       "date": "2026-06-16",
-      "workout": "🏃 Easy 10~11km",
-      "detail": "화. 바이크 주 원래 계획이었으나 6/20 회사+6/21 OW로 100km 롱라이드 불가. 런 볼륨 유지",
+      "workout": "🚴 바이크 60~80km",
+      "detail": "화. 바이크 주. 토 6/20 회사로 토 라이딩 불가 → 화요일에 롱라이드. 100km는 다음 바이크 주 토요일로",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -375,8 +375,8 @@
     },
     "2026-06-18": {
       "date": "2026-06-18",
-      "workout": "🏃 템포런 (WU 3km + 템포 4km @5:20~5:25 + CD 2km)",
-      "detail": "목. 2회차 템포. 4km로 1km 추가. OW 대회 3일 전이지만 수영이라 다리 회복 가능",
+      "workout": "🏃 Easy 5km",
+      "detail": "목. 바이크 주 런 볼륨 최소화. 바이크 피로 회복 + 다리 깨우기만",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
