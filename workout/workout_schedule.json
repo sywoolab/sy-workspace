@@ -271,8 +271,8 @@
     },
     "2026-06-05": {
       "date": "2026-06-05",
-      "workout": "🏊 수영 강습 06시 + 러닝 Easy 6km",
-      "detail": "쉬엄쉬엄 D-2. 비경쟁 펀런이므로 테이퍼 불필요. 평소 훈련 유지.",
+      "workout": "🏊 수영 강습 06시",
+      "detail": "금 D-2. 수영만. 평일 운동 하나 원칙.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -415,8 +415,8 @@
     },
     "2026-06-23": {
       "date": "2026-06-23",
-      "workout": "🏊 수영 강습 06시 + 🏃 Easy 8km",
-      "detail": "화 D-5. 수영 강습 후 Easy 런. 마지막 자극. 페이스 6:00+, HR 145 이하 엄수",
+      "workout": "🏃 Easy 8km",
+      "detail": "화. 화요일은 수영 강습 없음. 런만.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
