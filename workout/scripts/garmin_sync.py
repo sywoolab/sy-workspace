@@ -254,10 +254,13 @@ _ONEDRIVE_BACKUP = os.path.expanduser(
 
 
 def _push_and_update_dashboard(has_new_activity: bool):
-    """Mac 로컬 sync 후 git push + 대시보드 자동 업데이트 (2026-05-20 추가).
+    """로컬 sync 후 git push + 대시보드 자동 업데이트 (Mac/Win 공통, 2026-05-20 추가, 2026-05-30 OS 무관 + HTML 동봉 fix).
 
     GH Actions에선 별도 workflow가 처리하므로 skip.
     새 활동 있을 때만 push → 변경 없는 날 불필요한 commit 방지.
+
+    순서: (1) HTML 재생성 먼저 → (2) 데이터+HTML 한 commit으로 push → (3) training-dashboard repo 별도 동기화.
+    HTML을 push 이전에 만들고 staging에 포함시켜야 sy-workspace tracked 사본이 고아(stale)가 되지 않음.
     """
     if os.environ.get('GITHUB_ACTIONS'):
         return
@@ -266,28 +269,53 @@ def _push_and_update_dashboard(has_new_activity: bool):
 
     repo_root = str(Path(BASE_DIR).resolve().parent)  # sy-workspace/ (레포 루트)
 
-    # 변경된 파일 있어야 push
+    # (1) 데이터 변경 여부 우선 확인
     unstaged = subprocess.run(
         ['git', 'status', '--porcelain'],
-        capture_output=True, text=True, cwd=repo_root
+        capture_output=True, text=True, cwd=repo_root, timeout=30
     ).stdout.strip()
 
+    # (2) HTML 신선본 재생성 — git add 이전. sy-workspace tracked 사본도 같이 commit해야 고아화 차단.
+    dashboard_script = Path(BASE_DIR) / 'workout' / 'scripts' / 'generate_dashboard.py'
+    html_src = Path(BASE_DIR) / 'workout' / 'data' / 'training_report.html'
+    if dashboard_script.exists() and unstaged:
+        try:
+            r_dash = subprocess.run(
+                [sys.executable, str(dashboard_script)],
+                cwd=repo_root, capture_output=True, text=True, timeout=120
+            )
+            if r_dash.returncode == 0:
+                print('  [dashboard] HTML 재생성 완료')
+            else:
+                print(f'  [dashboard] generate 실패: {r_dash.stderr[:200]}')
+        except Exception as e:
+            print(f'  [dashboard] generate 예외: {e}')
+
     if not unstaged:
-        print('  [git] 변경 없음 — push 생략')
+        # silent fail 차단: 새 활동 있다는데 working tree 변화 0 — L1 §자동화 산출물 변화량 비교 의무
+        if has_new_activity:
+            try:
+                send_telegram(f"⚠️ gsync: 새 활동 fetch했으나 working tree 변화 0건 — 누락 의심 ({TODAY}). 수동 확인 필요")
+            except Exception:
+                pass
+            print(f'  [git] ⚠️ 새 활동 fetch했으나 unstaged 0 — 알림 발송')
+        else:
+            print('  [git] 변경 없음 — push 생략')
     else:
-        # 1) 데이터 파일 스테이징 (레포 루트 기준 경로)
+        # (3) 데이터 파일 + HTML 일괄 스테이징 (sy-workspace tracked HTML 사본 동봉 — 고아화 차단)
         subprocess.run(
             ['git', 'add',
              'workout/workout_log.json',
              'workout/data/garmin_health.json',
-             'workout/data/sync_state.json'],
-            cwd=repo_root, capture_output=True
+             'workout/data/sync_state.json',
+             'workout/data/training_report.html'],
+            cwd=repo_root, capture_output=True, timeout=30
         )
-        # 3) 실제 스테이징된 변경이 있을 때만 commit
+        # (4) 실제 스테이징된 변경이 있을 때만 commit
         #    (--allow-empty 금지: git add 실패/레이스 시 빈 커밋이 데이터 누락을 숨김 — 2026-05-25 사고 root cause)
         staged = subprocess.run(
             ['git', 'diff', '--cached', '--name-only'],
-            capture_output=True, text=True, cwd=repo_root
+            capture_output=True, text=True, cwd=repo_root, timeout=30
         ).stdout.strip()
         if not staged:
             # 새 활동이 있다는데 스테이징할 게 없음 = silent fail (L0 §자동화 산출물 검증)
@@ -301,19 +329,28 @@ def _push_and_update_dashboard(has_new_activity: bool):
             label = '새 활동' if has_new_activity else '헬스 데이터'
             subprocess.run(
                 ['git', 'commit', '-m', f'garmin sync: {label} ({TODAY} local)'],
-                cwd=repo_root, capture_output=True
+                cwd=repo_root, capture_output=True, timeout=60
             )
-            result2 = subprocess.run(
-                ['git', 'push'],
-                capture_output=True, text=True, cwd=repo_root
-            )
+            try:
+                result2 = subprocess.run(
+                    ['git', 'push'],
+                    capture_output=True, text=True, cwd=repo_root, timeout=60
+                )
+            except subprocess.TimeoutExpired:
+                # Windows에서 git push hang (credential prompt 등) — 5/30 root cause 후보. 차단 알림 + 명시 종료.
+                print('  [git] push 60초 timeout — credential/네트워크 hang 의심')
+                try:
+                    send_telegram(f"❌ gsync push 60초 timeout ({TODAY}) — git credential/네트워크 hang 의심. 수동 확인 필요")
+                except Exception:
+                    pass
+                return
             if result2.returncode == 0:
                 print('  [git] push 완료')
-                # 4) 산출물 검증: 새 활동이면 push된 HEAD에 오늘 entry 실존 확인 (L0 §자동화 산출물 검증)
+                # (5) 산출물 검증: 새 활동이면 push된 HEAD에 오늘 entry 실존 확인 (L0 §자동화 산출물 검증)
                 if has_new_activity:
                     head_log = subprocess.run(
                         ['git', 'show', 'HEAD:workout/workout_log.json'],
-                        capture_output=True, text=True, cwd=repo_root
+                        capture_output=True, text=True, cwd=repo_root, timeout=30
                     ).stdout
                     if TODAY not in head_log:
                         try:
@@ -322,40 +359,30 @@ def _push_and_update_dashboard(has_new_activity: bool):
                             pass
                         print(f'  [git] ⚠️ HEAD에 {TODAY} entry 누락 — 알림 발송')
             else:
-                print(f'  [git] push 실패: {result2.stderr[:100]}')
+                # stderr 빈 케이스도 차단 — 5/30 root cause 후보 (실제 실패했는데 stderr 0길이로 silent)
+                err_detail = result2.stderr.strip() or f'returncode={result2.returncode} (stderr 비어있음)'
+                print(f'  [git] push 실패: {err_detail[:200]}')
                 try:
-                    send_telegram(f"❌ gsync push 실패 ({TODAY}): {result2.stderr[:200]}")
+                    send_telegram(f"❌ gsync push 실패 ({TODAY}): {err_detail[:200]}")
                 except Exception:
                     pass
 
-    # 대시보드 HTML 재생성 + training-dashboard repo push
+    # (6) training-dashboard repo도 동기화 (해당 클론이 있는 머신만 — 보통 Mac)
     try:
-        dashboard_script = Path(BASE_DIR) / 'workout' / 'scripts' / 'generate_dashboard.py'
-        dashboard_repo   = Path.home() / 'tmp' / 'training-dashboard'
-        if dashboard_script.exists():
-            r_dash = subprocess.run(
-                [sys.executable, str(dashboard_script)],
-                cwd=repo_root,
-                capture_output=True, text=True
+        dashboard_repo = Path.home() / 'tmp' / 'training-dashboard'
+        if dashboard_repo.exists() and html_src.exists():
+            import shutil
+            shutil.copy2(html_src, dashboard_repo / 'index.html')
+            subprocess.run(['git', 'add', 'index.html'], cwd=str(dashboard_repo), capture_output=True)
+            subprocess.run(
+                ['git', 'commit', '-m', f'update: {TODAY} sync'],
+                cwd=str(dashboard_repo), capture_output=True
             )
-            if r_dash.returncode != 0:
-                print(f'  [dashboard] generate 실패: {r_dash.stderr[:200]}')
-            # training-dashboard repo 업데이트
-            html_src = Path(BASE_DIR) / 'workout' / 'data' / 'training_report.html'
-            td_path = dashboard_repo
-            if td_path.exists() and html_src.exists():
-                import shutil
-                shutil.copy2(html_src, td_path / 'index.html')
-                subprocess.run(['git', 'add', 'index.html'], cwd=str(td_path), capture_output=True)
-                subprocess.run(
-                    ['git', 'commit', '-m', f'update: {TODAY} sync'],
-                    cwd=str(td_path), capture_output=True
-                )
-                r = subprocess.run(['git', 'push'], cwd=str(td_path), capture_output=True, text=True)
-                if r.returncode == 0:
-                    print('  [dashboard] 업데이트 완료')
+            r = subprocess.run(['git', 'push'], cwd=str(dashboard_repo), capture_output=True, text=True)
+            if r.returncode == 0:
+                print('  [dashboard] training-dashboard repo push 완료')
     except Exception as e:
-        print(f'  [dashboard] 업데이트 실패: {e}')
+        print(f'  [dashboard] training-dashboard repo 동기화 실패: {e}')
 
 
 def _backup_to_onedrive():
