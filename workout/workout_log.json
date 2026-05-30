@@ -5231,5 +5231,62 @@
         "start_time": "06:19"
       }
     ]
+  },
+  "2026-05-30": {
+    "planned": "🏊 수영 개인강습 완료 + 🏃 저녁 러닝 4km Easy",
+    "done": true,
+    "actual": "수영 225m 8분 @1:31/100m + 수영 1525m 29분 @1:53/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1525,
+      "duration_min": 28.9,
+      "moving_min": 28.9,
+      "pace_per_100m": "1:53",
+      "avg_hr": 116,
+      "max_hr": 142,
+      "swolf": 39,
+      "strokes": 664,
+      "avg_spm": null,
+      "training_load": 20
+    },
+    "training_zone": "easy",
+    "note": "유산소 0.8 | 부하 11 | 장비 추정 | 유산소 1.3 / 무산소 0.2 | 부하 20",
+    "garmin_id": 23062931935,
+    "start_time": "14:13",
+    "garmin_ids": [
+      23062932381,
+      23062931935
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 486.0,
+        "avg_hr": 121,
+        "max_hr": 138,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 11,
+        "garmin_id": 23062932381,
+        "laps": null,
+        "open_water": false,
+        "start_time": "14:50"
+      },
+      {
+        "type": "swim",
+        "distance_m": 1525,
+        "duration_min": 28.9,
+        "moving_min": 28.9,
+        "pace_per_100m": "1:53",
+        "avg_hr": 116,
+        "max_hr": 142,
+        "swolf": 39,
+        "strokes": 664,
+        "avg_spm": null,
+        "training_load": 20,
+        "garmin_id": 23062931935,
+        "start_time": "14:13"
+      }
+    ]
   }
 }
