@@ -2396,6 +2396,13 @@ if __name__ == '__main__':
         # 로컬 cron sync 성공 + 변경 있음 → commit + push retry (CI에서는 no-op, workflow가 처리)
         if mode == 'sync' and result is True:
             import platform as _platform
+            # 대시보드 자동 재생성 (새 활동 있을 때만)
+            try:
+                import subprocess as _sp
+                _dash = Path(__file__).resolve().parent / 'generate_dashboard.py'
+                _sp.run([sys.executable, str(_dash)], cwd=str(Path(__file__).resolve().parent.parent), timeout=60)
+            except Exception as _e:
+                print(f"[WARN] 대시보드 재생성 실패: {_e}")
             _git_push_safe(f"garmin sync ({_platform.node() or sys.platform}): update workout log & health data")
         # 별건 패치 (2026-05-11): sync 로그인 실패 시 workflow도 fail로 표시 (silent success 차단)
         if mode == 'sync' and result is None:
