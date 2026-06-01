@@ -59,6 +59,14 @@
     "reg_period": "2026-06-02 14:00 ~ 2025-07-16 18:00"
   },
   {
+    "status": "접수예정",
+    "name": "2026 Level 1 승급 세미나",
+    "location": "서울 미정",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2050&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.08.15 ~ 16",
+    "reg_period": "2026-06-01 14:00 ~ 2026-06-12 18:00"
+  },
+  {
     "status": "접수마감",
     "name": "2026 LOTTE AQUATHLON 롯데 아쿠아슬론 대회(접수마감)",
     "location": "서울특별시 석촌호수 및 롯데월드타워",
@@ -135,20 +143,20 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수예정",
-    "name": "제55회 전국소년체육대회",
-    "location": "부산 기장군 장안읍 임랑해수욕장",
-    "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.05.23 ~ 24"
-  },
-  {
     "status": "접수마감",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅱ(5.23 토요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2066&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.05.23",
     "reg_period": "접수마감"
+  },
+  {
+    "status": "접수예정",
+    "name": "제55회 전국소년체육대회",
+    "location": "부산 기장군 장안읍 임랑해수욕장",
+    "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.23 ~ 24"
   },
   {
     "status": "접수마감",
@@ -169,20 +177,20 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수마감",
-    "name": "2026 철인3종 3차 대회 규정 정기 교육",
-    "location": "온라인 ZOOM",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2091&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.05.13",
-    "reg_period": "2026-04-17  ~ 2026-05-11"
-  },
-  {
     "status": "접수중",
     "name": "2026 철인3종 4차 대회 규정 정기 교육",
     "location": "온라인 ZOOM",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2100&page=1&sYear=2026&sStat=&sPost=&field=tour_title&keyword=4차",
     "date": "2026.06.10",
     "reg_period": "2026-05-20 09:00 ~ 2026-06-09 18:00"
+  },
+  {
+    "status": "접수마감",
+    "name": "2026 철인3종 3차 대회 규정 정기 교육",
+    "location": "온라인 ZOOM",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2091&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.13",
+    "reg_period": "2026-04-17  ~ 2026-05-11"
   },
   {
     "status": "접수마감",
@@ -246,14 +254,6 @@
   },
   {
     "status": "접수마감",
-    "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅰ(4.25 토요일)",
-    "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2069&page=2&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.04.25",
-    "reg_period": "접수마감"
-  },
-  {
-    "status": "접수마감",
     "name": "2026년 1차 수영 테스트 프로그램",
     "location": "통영 트라이애슬론 광장",
     "course": "수영테스트(수영 300m)",
@@ -268,6 +268,14 @@
     "course": "스탠다드",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2039&page=2&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.04.25 ~ 26"
+  },
+  {
+    "status": "접수마감",
+    "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅰ(4.25 토요일)",
+    "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2069&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.04.25",
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
