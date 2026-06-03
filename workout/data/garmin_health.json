@@ -3158,5 +3158,45 @@
       "load": null,
       "vo2max_run": null
     }
+  },
+  "2026-06-03": {
+    "date": "2026-06-03",
+    "steps": 1824,
+    "stress": {
+      "avg": 48,
+      "max": 93,
+      "rest": 15.13,
+      "low": 27.35,
+      "medium": 32.99,
+      "high": 4.14
+    },
+    "body_battery": {
+      "max": 7,
+      "min": 5,
+      "start": 5
+    },
+    "resting_hr": 51,
+    "sleep": {
+      "duration_min": 144,
+      "score": 18,
+      "deep_min": 35,
+      "light_min": 109,
+      "rem_min": 0,
+      "awake_min": 61
+    },
+    "hrv": {
+      "weekly_avg": 45,
+      "last_night": 23,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 1,
+      "level": "POOR"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
   }
 }

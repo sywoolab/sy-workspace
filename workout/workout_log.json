@@ -5513,5 +5513,172 @@
         "start_time": "06:15"
       }
     ]
+  },
+  "2026-06-03": {
+    "planned": "🚴 남북 자전거 왕복 + 🏊 수영 1.5km",
+    "done": true,
+    "actual": "자전거 43.52km 109분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 43.52,
+      "duration_min": 109.5,
+      "avg_speed_kmh": 23.8,
+      "avg_hr": 148,
+      "max_hr": 181,
+      "avg_power": 156.0,
+      "training_load": 179,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 605,
+          "avg_hr": 135,
+          "max_hr": 153,
+          "speed_kmh": 29.8
+        },
+        {
+          "distance": 5000,
+          "duration": 500,
+          "avg_hr": 157,
+          "max_hr": 166,
+          "speed_kmh": 36.0
+        },
+        {
+          "distance": 5000,
+          "duration": 506,
+          "avg_hr": 158,
+          "max_hr": 162,
+          "speed_kmh": 35.6
+        },
+        {
+          "distance": 5000,
+          "duration": 969,
+          "avg_hr": 157,
+          "max_hr": 168,
+          "speed_kmh": 18.6
+        },
+        {
+          "distance": 5000,
+          "duration": 873,
+          "avg_hr": 148,
+          "max_hr": 171,
+          "speed_kmh": 20.6
+        },
+        {
+          "distance": 5000,
+          "duration": 970,
+          "avg_hr": 137,
+          "max_hr": 159,
+          "speed_kmh": 18.5
+        },
+        {
+          "distance": 5000,
+          "duration": 1023,
+          "avg_hr": 157,
+          "max_hr": 181,
+          "speed_kmh": 17.6
+        },
+        {
+          "distance": 5000,
+          "duration": 605,
+          "avg_hr": 135,
+          "max_hr": 162,
+          "speed_kmh": 29.7
+        },
+        {
+          "distance": 3517,
+          "duration": 517,
+          "avg_hr": 145,
+          "max_hr": 160,
+          "speed_kmh": 24.5
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.9 / 무산소 1.0 | 부하 179",
+    "garmin_id": 23112858823,
+    "start_time": "15:03",
+    "garmin_ids": [
+      23112858823
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": 43520.0,
+        "duration_sec": 6570.0,
+        "avg_hr": 148,
+        "max_hr": 181,
+        "avg_pace": null,
+        "avg_speed": 6.611111111111111,
+        "training_load": 179,
+        "garmin_id": 23112858823,
+        "laps": [
+          {
+            "distance": 5000,
+            "duration": 605,
+            "avg_hr": 135,
+            "max_hr": 153,
+            "speed_kmh": 29.8
+          },
+          {
+            "distance": 5000,
+            "duration": 500,
+            "avg_hr": 157,
+            "max_hr": 166,
+            "speed_kmh": 36.0
+          },
+          {
+            "distance": 5000,
+            "duration": 506,
+            "avg_hr": 158,
+            "max_hr": 162,
+            "speed_kmh": 35.6
+          },
+          {
+            "distance": 5000,
+            "duration": 969,
+            "avg_hr": 157,
+            "max_hr": 168,
+            "speed_kmh": 18.6
+          },
+          {
+            "distance": 5000,
+            "duration": 873,
+            "avg_hr": 148,
+            "max_hr": 171,
+            "speed_kmh": 20.6
+          },
+          {
+            "distance": 5000,
+            "duration": 970,
+            "avg_hr": 137,
+            "max_hr": 159,
+            "speed_kmh": 18.5
+          },
+          {
+            "distance": 5000,
+            "duration": 1023,
+            "avg_hr": 157,
+            "max_hr": 181,
+            "speed_kmh": 17.6
+          },
+          {
+            "distance": 5000,
+            "duration": 605,
+            "avg_hr": 135,
+            "max_hr": 162,
+            "speed_kmh": 29.7
+          },
+          {
+            "distance": 3517,
+            "duration": 517,
+            "avg_hr": 145,
+            "max_hr": 160,
+            "speed_kmh": 24.5
+          }
+        ],
+        "open_water": false,
+        "start_time": "15:03"
+      }
+    ]
   }
 }
