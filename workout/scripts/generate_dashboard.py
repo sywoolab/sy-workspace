@@ -363,10 +363,10 @@ def main():
         window = [tl_by_date.get(all_dates[j], 0) for j in range(max(0, i-6), i+1)]
         e['tl_7d'] = int(sum(window))
 
-    # 이번주 실적 (이번주 월요일부터)
+    # 최근 7일 실적 (롤링 7일)
     from datetime import date as _date
     _today = _date.today()
-    _week_start = str(_today - timedelta(days=_today.weekday()))
+    _week_start = str(_today - timedelta(days=6))
     week_entries = [e for e in entries if e['date'] >= _week_start]
     week_swim = sum(m.get('distance_m',0) or 0 for e in week_entries for m in e['metrics'] if m.get('type')=='swim')
     week_bike = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='bike')
@@ -505,10 +505,10 @@ tr:hover{{background:#15152a}}
         col = '#ff6c6c' if d<7 else '#ffd56c' if d<21 else '#7c6fff'
         html += f'<div class="card"><div class="val" style="color:{col}">D-{d}</div><div class="label">{rname}</div><div class="sub-val">{goal}</div></div>\n'
 
-    html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_swim//100/10:.1f}km</div><div class="label">이번주 수영</div></div>
-<div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">이번주 자전거</div></div>
-<div class="card"><div class="val" style="color:#6ab4ff">{week_run:.0f}km</div><div class="label">이번주 러닝</div></div>
-<div class="card"><div class="val" style="color:#ff6aff">{int(week_tl)}</div><div class="label">이번주 누적부하</div></div>
+    html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_swim//100/10:.1f}km</div><div class="label">7일 수영</div></div>
+<div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">7일 자전거</div></div>
+<div class="card"><div class="val" style="color:#6ab4ff">{week_run:.0f}km</div><div class="label">7일 러닝</div></div>
+<div class="card"><div class="val" style="color:#ff6aff">{int(week_tl)}</div><div class="label">7일 누적부하</div></div>
 </div>
 """
 
