@@ -363,8 +363,11 @@ def main():
         window = [tl_by_date.get(all_dates[j], 0) for j in range(max(0, i-6), i+1)]
         e['tl_7d'] = int(sum(window))
 
-    # 이번주 실적
-    week_entries = [e for e in entries if e['date'] >= '2026-05-18']
+    # 이번주 실적 (이번주 월요일부터)
+    from datetime import date as _date
+    _today = _date.today()
+    _week_start = str(_today - timedelta(days=_today.weekday()))
+    week_entries = [e for e in entries if e['date'] >= _week_start]
     week_swim = sum(m.get('distance_m',0) or 0 for e in week_entries for m in e['metrics'] if m.get('type')=='swim')
     week_bike = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='bike')
     week_run  = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='run')
