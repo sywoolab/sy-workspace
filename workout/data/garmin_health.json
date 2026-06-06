@@ -3241,19 +3241,19 @@
   },
   "2026-06-06": {
     "date": "2026-06-06",
-    "steps": 533,
+    "steps": 2103,
     "stress": {
-      "avg": 18,
-      "max": 96,
-      "rest": 59.31,
-      "low": 10.6,
-      "medium": 1.48,
-      "high": 0.86
+      "avg": 20,
+      "max": 98,
+      "rest": 49.03,
+      "low": 8.97,
+      "medium": 2.34,
+      "high": 1.73
     },
     "body_battery": {
       "max": 76,
       "min": 5,
-      "start": 47
+      "start": 37
     },
     "resting_hr": 47,
     "sleep": {
@@ -3270,7 +3270,7 @@
       "status": "BALANCED"
     },
     "training_readiness": {
-      "score": 45,
+      "score": 39,
       "level": "LOW"
     },
     "training_status": {
