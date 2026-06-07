@@ -992,37 +992,77 @@ new Chart(document.getElementById('tlChart'), {{
 }});
 </script>
 
-<div class="section">📅 훈련 계획 (오늘~14일)</div>
+<div class="section">📅 훈련 계획 (주차별 — 제목 클릭으로 펼치기/접기)</div>
 """
 
-    # 다음 14일 스케줄 표 생성
+    # 주차별 접이식 스케줄 (오늘 ~ 마지막 계획일, 엑셀 그룹 스타일 — 2026-06-07 사용자 요청)
     sched_data = json.loads(SCHED_FILE.read_text(encoding='utf-8')) if SCHED_FILE.exists() else {}
     overrides = sched_data.get('overrides', {})
+    weekly_goals = sched_data.get('weekly_goals', {})
     race_dates_set = {r[0] for r in races}
 
-    html += '<table><thead><tr><th>날짜</th><th>계획</th></tr></thead><tbody>\n'
-    for i in range(15):
-        d = datetime.now(KST) + timedelta(days=i)
-        dk = d.strftime('%Y-%m-%d')
-        dow = ['월','화','수','목','금','토','일'][d.weekday()]
-        date_s = f"{dk[5:]} ({dow})"
-        plan = (overrides.get(dk) or {}).get('workout', '')
-        if not plan and dk in race_dates_set:
-            plan = '🏁 대회'
-        if not plan:
-            # 고정 강습일 (월/수/금)
-            if d.weekday() in (0,2,4):
-                plan = '🏊 수영 강습 06시'
-        if not plan:
-            plan = '—'
+    _now = datetime.now(KST)
+    _today_key = _now.strftime('%Y-%m-%d')
+    _future = [k for k in overrides if k >= _today_key]
+    _last_day = max(_future) if _future else (_now + timedelta(days=14)).strftime('%Y-%m-%d')
 
-        is_today_r = dk == today
-        is_race_r = dk in race_dates_set
-        plan_color = '#ffd56c' if is_race_r else ('#6affa0' if is_today_r else '#ccc')
-        bg = ' style="background:#1a1a2e"' if is_race_r else (' style="background:#0d2a0d"' if is_today_r else '')
-        date_color = '#ffd56c' if is_race_r else ('#fff' if is_today_r else '#888')
-        html += f'<tr{bg}><td style="color:{date_color};font-weight:{"600" if is_today_r or is_race_r else "400"};white-space:nowrap">{date_s}</td><td style="color:{plan_color}">{plan}</td></tr>\n'
-    html += '</tbody></table>'
+    def _week_start_str(d):
+        return (d - timedelta(days=d.weekday())).strftime('%Y-%m-%d')
+
+    _plan_days = []
+    _cur = _now
+    while _cur.strftime('%Y-%m-%d') <= _last_day:
+        _plan_days.append(_cur)
+        _cur += timedelta(days=1)
+
+    _cur_ws = _week_start_str(_now)
+    _next_ws = _week_start_str(_now + timedelta(days=7))
+
+    from itertools import groupby as _groupby
+    for _ws, _grp in _groupby(_plan_days, key=_week_start_str):
+        _grp = list(_grp)
+        _we_dt = datetime.strptime(_ws, '%Y-%m-%d') + timedelta(days=6)
+        _wg = weekly_goals.get(_ws, {})
+        _label = f"{_ws[5:].replace('-', '/')} ~ {_we_dt.strftime('%m/%d')}"
+        _wtag = _wg.get('week', '')
+        _title = _wg.get('title', '주간 계획')
+        _open = ' open' if _ws in (_cur_ws, _next_ws) else ''
+        _race_in_week = any(d.strftime('%Y-%m-%d') in race_dates_set for d in _grp)
+        _hl = '#ffd56c' if _race_in_week else '#7c6fff'
+
+        html += (f'<details{_open} style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
+                 f'padding:0;margin-bottom:8px">\n')
+        html += (f'<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:{_hl};'
+                 f'list-style-position:inside">'
+                 f'{_wtag} <span style="color:#888;font-weight:400;font-size:11px">{_label}</span> — {_title}'
+                 + (f' <span style="font-size:10px;color:#555">· 목표부하 {_wg["target_load"]}</span>' if _wg.get('target_load') else '')
+                 + '</summary>\n')
+        if _wg.get('goal'):
+            html += f'<div style="font-size:11.5px;color:#aaa;padding:0 14px 6px;line-height:1.5">🎯 {_wg["goal"]}</div>\n'
+        if _wg.get('sessions'):
+            html += f'<div style="font-size:10.5px;color:#777;padding:0 14px 8px">{_wg["sessions"]}</div>\n'
+
+        html += '<table style="margin:0 8px 10px;width:calc(100% - 16px)"><tbody>\n'
+        for d in _grp:
+            dk = d.strftime('%Y-%m-%d')
+            dow = ['월', '화', '수', '목', '금', '토', '일'][d.weekday()]
+            date_s = f"{dk[5:]} ({dow})"
+            plan = (overrides.get(dk) or {}).get('workout', '')
+            if not plan and dk in race_dates_set:
+                plan = '🏁 대회'
+            if not plan and d.weekday() in (0, 2, 4):
+                plan = '🏊 수영 강습 06시'
+            if not plan:
+                plan = '—'
+
+            is_today_r = dk == today
+            is_race_r = dk in race_dates_set
+            plan_color = '#ffd56c' if is_race_r else ('#6affa0' if is_today_r else '#ccc')
+            bg = ' style="background:#1a1a2e"' if is_race_r else (' style="background:#0d2a0d"' if is_today_r else '')
+            date_color = '#ffd56c' if is_race_r else ('#fff' if is_today_r else '#888')
+            html += (f'<tr{bg}><td style="color:{date_color};font-weight:{"600" if is_today_r or is_race_r else "400"};'
+                     f'white-space:nowrap">{date_s}</td><td style="color:{plan_color}">{plan}</td></tr>\n')
+        html += '</tbody></table>\n</details>\n'
 
     # ── 종목별 주차 트렌드 계산 ──
     sched_full = json.loads(SCHED_FILE.read_text(encoding='utf-8')) if SCHED_FILE.exists() else {}
