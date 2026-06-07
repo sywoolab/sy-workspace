@@ -6222,11 +6222,11 @@
       "max_hr": 159,
       "swolf": 48,
       "strokes": 317,
-      "avg_spm": null,
+      "avg_spm": 18,
       "training_load": 36
     },
     "training_zone": "easy",
-    "note": "유산소 2.0 / 무산소 0.6 | 부하 36",
+    "note": "유산소 2.0 / 무산소 0.6 | 부하 36 | 컨디션 저조(피로 높음, TR Poor 23, BB 45)",
     "garmin_id": 23169213991,
     "start_time": "06:15",
     "garmin_ids": [
@@ -6235,7 +6235,7 @@
     "all_metrics": [
       {
         "type": "swim",
-        "distance_m": null,
+        "distance_m": 725,
         "duration_sec": 2418.0,
         "avg_hr": 110,
         "max_hr": 159,
