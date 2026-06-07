@@ -588,12 +588,12 @@ tr:hover{{background:#15152a}}
             return f"{s:.0f}초" if s < 60 else f"{abs(d_min):.1f}분"
 
         def _trend_tag(d_min, label):
-            """±5초 이내는 보합 처리"""
+            """±5초 이내는 보합. 화살표 = 성과 방향 (빨라짐 ▲ 초록 / 느려짐 ▼ 빨강 — 성적 비교 섹션과 통일)"""
             if abs(d_min) * 60 < 5:
                 return f'<span style="color:#888">→ 보합 <span style="color:#555">({label})</span></span>'
             if d_min < 0:
-                return f'<span style="color:#6affa0">▼ {_fmt_delta(d_min)} 단축 <span style="color:#555">({label})</span></span>'
-            return f'<span style="color:#ff6c6c">▲ {_fmt_delta(d_min)} 증가 <span style="color:#555">({label})</span></span>'
+                return f'<span style="color:#6affa0">▲ {_fmt_delta(d_min)} 빨라짐 <span style="color:#555">({label})</span></span>'
+            return f'<span style="color:#ff6c6c">▼ {_fmt_delta(d_min)} 느려짐 <span style="color:#555">({label})</span></span>'
 
         trend_html = ''
         swim_trend_s = bike_trend_s = run_trend_s = ''
@@ -602,10 +602,11 @@ tr:hover{{background:#15152a}}
             last_h = est_hist[-1]
             prev_h = est_hist[-2]
             last_d = _dt.strptime(last_h['date'], '%Y-%m-%d')
-            # 7일 전 기준점: 마지막 훈련일에서 7일 이상 떨어진 가장 최근 스냅샷 (없으면 최초)
+            # 2주 전 기준점: 마지막 훈련일에서 14일 이상 떨어진 가장 최근 스냅샷 (없으면 최초)
+            # (1주 기준은 단일 세션 노이즈에 너무 민감 — 사용자 피드백 2026-06-07)
             ref7 = est_hist[0]
             for h in reversed(est_hist[:-1]):
-                if (last_d - _dt.strptime(h['date'], '%Y-%m-%d')).days >= 7:
+                if (last_d - _dt.strptime(h['date'], '%Y-%m-%d')).days >= 14:
                     ref7 = h
                     break
 
@@ -614,14 +615,14 @@ tr:hover{{background:#15152a}}
             ref7_label = f"{ref7['date'][5:].replace('-', '/')} 대비"
             prev_label = f"직전 훈련 {prev_h['date'][5:].replace('-', '/')} 대비"
 
-            # 종목별 7일 추세 (타일 하단 표시)
+            # 종목별 2주 추세 (타일 하단 표시) — 빨라짐 ▲ 초록 / 느려짐 ▼ 빨강
             def _tile_trend(key):
                 d = last_h[key] - ref7[key]
                 if abs(d) * 60 < 5:
                     return '<span style="color:#666">→ 보합</span>'
                 if d < 0:
-                    return f'<span style="color:#6affa0">▼{_fmt_delta(d)}</span>'
-                return f'<span style="color:#ff6c6c">▲{_fmt_delta(d)}</span>'
+                    return f'<span style="color:#6affa0">▲{_fmt_delta(d)}</span>'
+                return f'<span style="color:#ff6c6c">▼{_fmt_delta(d)}</span>'
 
             swim_trend_s = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("swim")} <span style="color:#555">/ {ref7_label}</span></div>'
             bike_trend_s = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("bike")} <span style="color:#555">/ {ref7_label}</span></div>'
@@ -654,17 +655,18 @@ tr:hover{{background:#15152a}}
                     lines.append('예상시간 변화 없음 (±5초 이내)')
                     est_drivers.append(lines)
                     continue
+                # 화살표 = 성과 방향: 빨라짐 ▲ / 느려짐 ▼ (성적 비교 섹션과 통일)
                 if abs(h['swim'] - p['swim']) * 60 >= 5:
-                    seg = (f"🏊 {'▼' if h['swim'] < p['swim'] else '▲'}{abs(h['swim'] - p['swim']) * 60:.0f}초"
+                    seg = (f"🏊 {'▲' if h['swim'] < p['swim'] else '▼'}{abs(h['swim'] - p['swim']) * 60:.0f}초"
                            f" — 수영페이스 평균 {_mmss_sec(p['avg_swim_pace_sec'])}→{_mmss_sec(h['avg_swim_pace_sec'])}/100m")
                     if h['ow_correction'] != p['ow_correction']:
                         seg += f", OW보정 +{p['ow_correction']}→+{h['ow_correction']}초(경험↑)"
                     lines.append(seg)
                 if abs(h['bike'] - p['bike']) * 60 >= 5 and h['avg_bike_speed_kmh'] and p['avg_bike_speed_kmh']:
-                    lines.append(f"🚴 {'▼' if h['bike'] < p['bike'] else '▲'}{abs(h['bike'] - p['bike']) * 60:.0f}초"
+                    lines.append(f"🚴 {'▲' if h['bike'] < p['bike'] else '▼'}{abs(h['bike'] - p['bike']) * 60:.0f}초"
                                  f" — 평속추정 {p['avg_bike_speed_kmh']:.1f}→{h['avg_bike_speed_kmh']:.1f}km/h")
                 if abs(h['run'] - p['run']) * 60 >= 5:
-                    seg = f"🏃 {'▼' if h['run'] < p['run'] else '▲'}{abs(h['run'] - p['run']) * 60:.0f}초"
+                    seg = f"🏃 {'▲' if h['run'] < p['run'] else '▼'}{abs(h['run'] - p['run']) * 60:.0f}초"
                     parts = []
                     if h['vdot'] != p['vdot']:
                         parts.append(f"VDOT {p['vdot']}→{h['vdot']}")
@@ -678,7 +680,7 @@ tr:hover{{background:#15152a}}
             trend_html = (
                 f'<div style="margin-top:14px;border-top:1px solid #1f1f33;padding-top:10px">'
                 f'<div style="font-size:12px;color:#aaa;margin-bottom:4px">📈 예상 완주 추세'
-                f'<span style="font-size:10px;color:#555;margin-left:8px">동일 알고리즘으로 시점별 재계산 · 아래로 갈수록 빠름 · '
+                f'<span style="font-size:10px;color:#555;margin-left:8px">동일 알고리즘으로 시점별 재계산 · 아래로 갈수록 빠름 · ▲빨라짐 ▼느려짐 · '
                 f'보수적 알고리즘 VDOT 기준이라 상단 헤드라인과 1~2분 차이 가능 · 점에 마우스/탭 = 종목별 분해 + 변화 요인</span></div>'
                 f'<div style="font-size:12px;margin-bottom:8px">{_trend_tag(d_week, ref7_label)}'
                 f'<span style="margin-left:14px">{_trend_tag(d_prev, prev_label)}</span></div>'
@@ -1158,7 +1160,7 @@ new Chart(document.getElementById('tlChart'), {{
             pm_h, pm_m = divmod(int(pm or 0), 60)
             pm_s = f'{pm_h}:{pm_m:02d}' if pm else '—'
 
-            # 개선 화살표 vs 전주
+            # 개선 화살표 vs 전주 — 화살표 = 성과 방향 (좋아짐 ▲ 초록 / 나빠짐 ▼ 빨강, 추세 섹션과 통일)
             sp_trend = bs_trend = rm_trend = pm_trend = ''
             if i > 0:
                 prev_sp = trend_rows[i-1][1]
@@ -1166,13 +1168,13 @@ new Chart(document.getElementById('tlChart'), {{
                 prev_rm = trend_rows[i-1][3]
                 prev_pm = trend_rows[i-1][4]
                 if sp and prev_sp and abs(sp - prev_sp) >= 2:
-                    sp_trend = f' <span style="color:{"#6affa0" if sp < prev_sp else "#ff6c6c"}">{"▼" if sp < prev_sp else "▲"}</span>'
+                    sp_trend = f' <span style="color:{"#6affa0" if sp < prev_sp else "#ff6c6c"}">{"▲" if sp < prev_sp else "▼"}</span>'
                 if bs and prev_bs and abs(bs - prev_bs) >= 0.5:
                     bs_trend = f' <span style="color:{"#6affa0" if bs > prev_bs else "#ff6c6c"}">{"▲" if bs > prev_bs else "▼"}</span>'
                 if rm and prev_rm and abs(rm - prev_rm) >= 0.5:
-                    rm_trend = f' <span style="color:{"#6affa0" if rm < prev_rm else "#ff6c6c"}">{"▼" if rm < prev_rm else "▲"}</span>'
+                    rm_trend = f' <span style="color:{"#6affa0" if rm < prev_rm else "#ff6c6c"}">{"▲" if rm < prev_rm else "▼"}</span>'
                 if pm and prev_pm and abs(pm - prev_pm) >= 0.5:
-                    pm_trend = f' <span style="color:{"#6affa0" if pm < prev_pm else "#ff6c6c"}">{"▼" if pm < prev_pm else "▲"}</span>'
+                    pm_trend = f' <span style="color:{"#6affa0" if pm < prev_pm else "#ff6c6c"}">{"▲" if pm < prev_pm else "▼"}</span>'
 
             is_current = (i == len(trend_rows) - 1)
             row_style = ' style="background:#0d2a0d"' if is_current else ''
