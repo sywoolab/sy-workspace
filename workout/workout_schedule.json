@@ -294,11 +294,12 @@
     },
     "2026-06-08": {
       "date": "2026-06-08",
-      "workout": "🏊 수영 강습 06시 (회복)",
-      "detail": "",
+      "workout": "🛌 휴식 우선 (수영 강습 기본 스킵 — 기상 컨디션 좋으면 회복 수영만)",
+      "detail": "월. 6/6~6/7 이틀 부하 470 + 대회 + 사용자 \"엄청 피곤\" 보고(6/7 저녁) → 마스터 §6 월요일 휴식 대체 적용. 기본값 스킵·수면 우선. 기상 시 RHR 47 이하 + 몸 가벼우면 초저강도 회복 수영만 옵션. 6/9 템포가 우선순위.",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed"
+      "rule": "user-confirmed",
+      "decision_pending": "morning-condition-check"
     },
     "2026-06-09": {
       "date": "2026-06-09",
