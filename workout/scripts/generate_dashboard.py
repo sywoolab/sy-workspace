@@ -510,7 +510,15 @@ tr:hover{{background:#15152a}}
     for rdate, rname, goal in races:
         d = days_until(rdate)
         col = '#ff6c6c' if d<7 else '#ffd56c' if d<21 else '#7c6fff'
-        html += f'<div class="card"><div class="val" style="color:{col}">D-{d}</div><div class="label">{rname}</div><div class="sub-val">{goal}</div></div>\n'
+        _rdt = datetime.strptime(rdate, '%Y-%m-%d')
+        _dow = ['월','화','수','목','금','토','일'][_rdt.weekday()]
+        _date_label = f"{_rdt.month}/{_rdt.day}({_dow})"
+        html += (f'<div class="card">'
+                 f'<div class="val" style="color:{col}">D-{d}</div>'
+                 f'<div class="label">{rname}</div>'
+                 f'<div class="sub-val" style="color:#666">{_date_label}</div>'
+                 f'<div class="sub-val">{goal}</div>'
+                 f'</div>\n')
 
     html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_swim//100/10:.1f}km</div><div class="label">7일 수영</div></div>
 <div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">7일 자전거</div></div>
