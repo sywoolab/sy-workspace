@@ -6207,5 +6207,46 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-06-08": {
+    "planned": "🛌 휴식 우선 (수영 강습 기본 스킵 — 기상 컨디션 좋으면 회복 수영만)",
+    "done": true,
+    "actual": "수영 725m 40분 @2:28/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 725,
+      "duration_min": 40.3,
+      "moving_min": 18.0,
+      "pace_per_100m": "2:28",
+      "avg_hr": 110,
+      "max_hr": 159,
+      "swolf": 48,
+      "strokes": 317,
+      "avg_spm": null,
+      "training_load": 36
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.0 / 무산소 0.6 | 부하 36",
+    "garmin_id": 23169213991,
+    "start_time": "06:15",
+    "garmin_ids": [
+      23169213991
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 2418.0,
+        "avg_hr": 110,
+        "max_hr": 159,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 36,
+        "garmin_id": 23169213991,
+        "laps": null,
+        "open_water": false,
+        "start_time": "06:15"
+      }
+    ]
   }
 }
