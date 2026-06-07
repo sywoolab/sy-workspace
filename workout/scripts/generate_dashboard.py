@@ -1127,14 +1127,12 @@ new Chart(document.getElementById('tlChart'), {{
         else:
             compliance_map[dk] = 'partial'
 
-    html += f"""
-<div class="section">훈련 기록 (3/16~, 전체 {len(all_dates)}일)</div>
-<table><thead><tr>
-<th>날짜</th><th>계획</th><th>운동 (준수)</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>
-</tr></thead><tbody>
-"""
+    # ── 최근 2주 / 이전 기록 분리 ──
+    cutoff_dt = (datetime.now(KST) - timedelta(days=13)).strftime('%Y-%m-%d')
+    recent_ents = [e for e in reversed(entries) if e['date'] >= cutoff_dt]
+    old_ents    = [e for e in reversed(entries) if e['date'] < cutoff_dt]
 
-    for e in reversed(entries):
+    def _row_html(e):
         dk = e['date']
         actual = e['actual']
         tl = e['total_tl']
@@ -1149,7 +1147,6 @@ new Chart(document.getElementById('tlChart'), {{
         dow = ['월','화','수','목','금','토','일'][dt.weekday()]
         date_s = f"{dk[5:]} ({dow})"
 
-        # 뱃지
         if is_rest:
             badges = '<span class="rest-badge">—</span>'
         else:
@@ -1181,11 +1178,9 @@ new Chart(document.getElementById('tlChart'), {{
             if not badges:
                 badges = f'<span class="rest-badge">{actual[:60]}</span>'
 
-        # 부하 + 7일 누적
         if tl:
             tl_pct = min(100, tl/600*100)
             tc = '#ff6c6c' if tl>400 else '#ffd56c' if tl>200 else '#7c6fff'
-            # 7일 누적 색상
             t7c = '#ff6c6c' if tl7>900 else '#ffd56c' if tl7>500 else '#6affa0'
             tl_s = (f'<div class="tl-bar-wrap">'
                     f'<span style="color:{tc}">{int(tl)}</span>'
@@ -1196,14 +1191,12 @@ new Chart(document.getElementById('tlChart'), {{
             t7c = '#ff6c6c' if tl7>900 else '#ffd56c' if tl7>500 else '#6affa0'
             tl_s = f'<div class="tl7" style="color:{t7c}">∑7d {tl7}</div>' if tl7 else '-'
 
-        # 체감 RPE (가민 자가평가) — 부하(EPOC)와 체감의 괴리 추적 (2026-06-07 도입)
         _rpes = [m.get('rpe') for m in (e.get('metrics') or []) if m.get('rpe')]
         if _rpes:
             _rmax = max(_rpes)
             _rc = '#ff6c6c' if _rmax >= 8 else '#ffd56c' if _rmax >= 6 else '#6affa0'
             tl_s += f'<div style="font-size:10px;color:{_rc};margin-top:1px">체감 {_rmax}/10</div>'
 
-        # 수면
         if sleep_min:
             sh,sm = sleep_min//60, sleep_min%60
             sc = 'g' if sleep_min>=420 else 'y' if sleep_min>=360 else 'r'
@@ -1215,14 +1208,12 @@ new Chart(document.getElementById('tlChart'), {{
         def hc(v): return 'g' if (v or 0)>=60 else 'y' if (v or 0)>=45 else 'r' if v else 'dim'
         hrv_s = f'<span class="{hc(hrv_l)}">{hrv_l}</span>/<span class="{hc(hrv_w)}">{hrv_w}</span>' if (hrv_l and hrv_w) else (f'<span class="{hc(hrv_l)}">{hrv_l}</span>' if hrv_l else '-')
 
-        # 계획 컬럼
         entry_log = log.get(dk) or {}
         planned_text = entry_log.get('planned') or (overrides.get(dk) or {}).get('workout', '')
         planned_short = (planned_text or '').replace('🏊 ','').replace('🏃 ','').replace('🚴 ','').replace('🏁 ','')
         planned_short = planned_short[:28] + ('…' if len(planned_short) > 28 else '')
         planned_s = f'<span style="color:#666;font-size:10.5px">{planned_short}</span>' if planned_short else '-'
 
-        # 준수 마크
         comp = compliance_map.get(dk, 'none')
         comp_icon = {'ok': '✅', 'miss': '❌', 'partial': '⚠️', 'extra': '💪', 'rest': '😴', 'future': '', 'none': ''}.get(comp, '')
         badges_with_comp = f'{badges} {comp_icon}' if comp_icon else badges
@@ -1230,9 +1221,29 @@ new Chart(document.getElementById('tlChart'), {{
         is_race_day = any(dk==r[0] for r in races)
         is_today_day = dk==today
         rc = ' class="race-row"' if is_race_day else (' class="today-row"' if is_today_day else (' class="rest-row"' if is_rest else ''))
-        html += f'<tr{rc}><td>{date_s}</td><td>{planned_s}</td><td>{badges_with_comp}</td><td style="white-space:nowrap">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
+        return f'<tr{rc}><td>{date_s}</td><td>{planned_s}</td><td>{badges_with_comp}</td><td style="white-space:nowrap">{tl_s}</td><td>{sleep_s}</td><td>{rhr_s}</td><td>{hrv_s}</td></tr>\n'
 
+    _thead = ('<table><thead><tr>'
+              '<th>날짜</th><th>계획</th><th>운동 (준수)</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th>'
+              '</tr></thead><tbody>\n')
+
+    html += f'\n<div class="section">📋 훈련 기록 — 최근 2주 <span style="font-size:11px;color:#555;font-weight:400">({len(recent_ents)}일)</span></div>\n'
+    html += _thead
+    for e in recent_ents:
+        html += _row_html(e)
     html += "</tbody></table>"
+
+    if old_ents:
+        old_start = old_ents[-1]['date'][5:]
+        old_end   = old_ents[0]['date'][5:]
+        html += (f'<details style="margin-top:6px">'
+                 f'<summary style="cursor:pointer;padding:9px 14px;font-size:12px;color:#555;'
+                 f'background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
+                 f'list-style-position:inside">📂 이전 기록 ({len(old_ents)}일 · {old_start} ~ {old_end}) — 클릭하여 펼치기</summary>'
+                 f'<div style="margin-top:4px">{_thead}')
+        for e in old_ents:
+            html += _row_html(e)
+        html += "</tbody></table></div></details>"
 
     # ── 종목별 실력 트렌드 섹션 ──
     if trend_rows:
