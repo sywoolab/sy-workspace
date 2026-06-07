@@ -1746,8 +1746,117 @@ def format_on_track(workout_log, schedule_data, plan_adjustments):
 # ============================================================
 # 텔레그램 메시지 포매팅
 # ============================================================
+def _format_entry_activities(entry, date_str, workout_log, schedule_data, lines):
+    """workout_log entry의 all_metrics를 start_time 시간순으로 순회하며 운동별 라인 출력.
+
+    P1 (2026-06-07): new_activities(원시 파싱 객체) 순회 대신 entry의 all_metrics 기준으로
+    대시보드와 동일한 데이터 소스·순서 사용. [HH:MM] 시각 표기 포함.
+    all_metrics가 없으면 기존 metrics 단일 활동 fallback.
+    """
+    type_emoji = {'run': '🏃', 'swim': '🏊', 'bike': '🚴', 'brick': '🔥', 'strength': '💪'}
+    type_name_kr = {'run': '러닝', 'swim': '수영', 'bike': '자전거', 'brick': '브릭', 'strength': '근력'}
+
+    # 날짜 라벨
+    if date_str == TODAY:
+        date_label = '오늘'
+    elif date_str == YESTERDAY:
+        date_label = '어제'
+    elif date_str:
+        date_label = f"{date_str[5:7].lstrip('0')}/{date_str[8:10].lstrip('0')}"
+    else:
+        date_label = ''
+
+    all_m = entry.get('all_metrics', [])
+    if all_m:
+        sorted_m = sorted(all_m, key=lambda m: m.get('start_time') or '99:99')
+        for m in sorted_m:
+            wtype = m.get('type', 'other')
+            emoji = type_emoji.get(wtype, '🏋️')
+            name = type_name_kr.get(wtype, wtype)
+            st = m.get('start_time', '')
+            time_tag = f"[{st}] " if st else ''
+            when_label = f"{date_label} {st}".strip() if st else date_label
+            suffix = f" ({when_label})" if when_label else ''
+            lines.append(f"{time_tag}{emoji} {name}{suffix}")
+
+            if wtype == 'run':
+                dist = m.get('distance_km') or (m.get('distance_m', 0) / 1000)
+                pace = m.get('pace_per_km') or m.get('avg_pace') or '?'
+                dur_sec = m.get('duration_sec') or int((m.get('duration_min') or 0) * 60)
+                # all_metrics run의 duration_sec이 null인 경우 pace×distance 역산
+                if not dur_sec and pace and pace != '?' and dist:
+                    try:
+                        pp = pace.split(':')
+                        pace_s = int(pp[0]) * 60 + int(pp[1])
+                        dur_sec = int(pace_s * dist)
+                    except (ValueError, IndexError):
+                        pass
+                dur_str = seconds_to_hhmm(dur_sec) if dur_sec else '?'
+                lines.append(f"  {round(dist, 2)}km | {pace}/km | {dur_str}")
+                if m.get('avg_hr'):
+                    lines.append(f"  HR {m['avg_hr']}/{m.get('max_hr', '?')}")
+                if m.get('cadence'):
+                    lines.append(f"  케이던스 {m['cadence']}spm")
+            elif wtype == 'swim':
+                dist_m = m.get('distance_m', 0)
+                pace = m.get('pace_per_100m', '?')
+                dur_sec = int((m.get('duration_min') or 0) * 60)
+                lines.append(f"  {round(dist_m)}m | {pace}/100m | {seconds_to_hhmm(dur_sec)}")
+                if m.get('avg_hr'):
+                    lines.append(f"  HR {m['avg_hr']}/{m.get('max_hr', '?')}")
+                if m.get('swolf'):
+                    lines.append(f"  Swolf {m['swolf']} | 스트로크 {m.get('strokes', m.get('total_strokes', '?'))}")
+            elif wtype == 'bike':
+                # PATH A(all_metrics 초기화: distance_m/duration_sec/avg_speed m/s)와
+                # PATH B(merge: distance_km/duration_min/avg_speed_kmh) 양쪽 호환 (레드팀 BUG-1)
+                dist = m.get('distance_km') or round((m.get('distance_m') or 0) / 1000, 2)
+                speed = m.get('avg_speed_kmh') or (round(m['avg_speed'] * 3.6, 1) if m.get('avg_speed') else '?')
+                dur_sec = m.get('duration_sec') or int((m.get('duration_min') or 0) * 60)
+                if dist:
+                    lines.append(f"  {dist}km | {speed}km/h | {seconds_to_hhmm(dur_sec)}")
+                else:
+                    lines.append(f"  {seconds_to_hhmm(dur_sec)}")
+                if m.get('avg_hr'):
+                    lines.append(f"  HR {m['avg_hr']}/{m.get('max_hr', '?')}")
+                if m.get('avg_power'):
+                    lines.append(f"  파워 {m['avg_power']}W")
+
+            if m.get('training_load'):
+                lines.append(f"  부하 {m['training_load']}")
+            lines.append("")
+    else:
+        # all_metrics 없음 → metrics 단일 활동 fallback
+        m = entry.get('metrics', {})
+        wtype = m.get('type', 'other')
+        emoji = type_emoji.get(wtype, '🏋️')
+        name = type_name_kr.get(wtype, wtype)
+        st = entry.get('start_time', '')
+        time_tag = f"[{st}] " if st else ''
+        when_label = f"{date_label} {st}".strip() if st else date_label
+        suffix = f" ({when_label})" if when_label else ''
+        lines.append(f"{time_tag}{emoji} {name}{suffix}")
+        if wtype == 'run':
+            lines.append(f"  {m.get('distance_km', '?')}km | {m.get('pace_per_km', '?')}/km")
+            if m.get('avg_hr'):
+                lines.append(f"  HR {m['avg_hr']}/{m.get('max_hr', '?')}")
+        elif wtype == 'swim':
+            lines.append(f"  {m.get('distance_m', '?')}m | {m.get('pace_per_100m', '?')}/100m")
+            if m.get('avg_hr'):
+                lines.append(f"  HR {m['avg_hr']}/{m.get('max_hr', '?')}")
+        elif wtype == 'bike':
+            lines.append(f"  {m.get('distance_km', '?')}km | {m.get('avg_speed_kmh', '?')}km/h")
+            if m.get('avg_hr'):
+                lines.append(f"  HR {m['avg_hr']}/{m.get('max_hr', '?')}")
+        lines.append("")
+
+
 def format_workout_message(parsed_activities, health, plan_adjustments, schedule_data, workout_log):
-    """새 운동 감지 시 텔레그램 메시지"""
+    """새 운동 감지 시 텔레그램 메시지.
+
+    P1 (2026-06-07): 운동별 표시 블록을 new_activities 순회 대신
+    workout_log entry의 all_metrics 시간순 순회로 전환.
+    new_activities는 "어느 날짜가 갱신됐나" 판별용으로만 사용.
+    """
     lines = []
     # 헤더에 sync 시각 명시 — 며칠치 활동을 한 알림에 묶어 보낼 때 사용자 혼동 방지
     sync_label = f"{NOW.month}/{NOW.day} {NOW.strftime('%H:%M')}"
@@ -1758,70 +1867,40 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
         lines.append(f"  ⚠️ {len(parsed_activities)}건 / {activity_dates[0]} ~ {activity_dates[-1]} (소급 동기화)")
     lines.append("")
 
-    type_emoji = {'run': '🏃', 'swim': '🏊', 'bike': '🚴', 'brick': '🔥', 'strength': '💪'}
-    type_name = {'run': '러닝', 'swim': '수영', 'bike': '자전거', 'brick': '브릭', 'strength': '근력'}
+    # affected dates: new_activities가 갱신한 날짜 목록 (시간순)
+    affected_dates = sorted(activity_dates)
 
-    for p in parsed_activities:
-        wtype = p['type']
-        emoji = type_emoji.get(wtype, '🏋️')
-        name = type_name.get(wtype, p.get('activity_name', '운동'))
+    # 날짜별로 묶어서 entry의 all_metrics 시간순 표시 (P1 핵심)
+    for date_str in affected_dates:
+        entry = workout_log.get(date_str)
+        if not entry:
+            # entry 없는 경우 (아직 save 전 드문 케이스) → parsed_activities fallback
+            day_acts = [p for p in parsed_activities if p.get('date') == date_str]
+            for p in day_acts:
+                wtype = p['type']
+                type_emoji = {'run': '🏃', 'swim': '🏊', 'bike': '🚴', 'brick': '🔥', 'strength': '💪'}
+                type_name = {'run': '러닝', 'swim': '수영', 'bike': '자전거', 'brick': '브릭', 'strength': '근력'}
+                emoji = type_emoji.get(wtype, '🏋️')
+                name = type_name.get(wtype, wtype)
+                st = p.get('start_time', '') or ''
+                time_tag = f"[{st}] " if st else ''
+                lines.append(f"{time_tag}{emoji} {name}")
+                lines.append("")
+            continue
 
-        # 활동 날짜·시각 라벨 — "오늘 07:46" / "어제 11:57" / "5/1 12:47"
-        d = p.get('date', '')
-        t = p.get('start_time', '') or ''
-        if d == TODAY:
-            when = f"오늘 {t}".strip()
-        elif d == YESTERDAY:
-            when = f"어제 {t}".strip()
-        elif d:
-            when = f"{d[5:7].lstrip('0')}/{d[8:10].lstrip('0')} {t}".strip()
-        else:
-            when = ''
-        suffix = f" ({when})" if when else ''
-        lines.append(f"{emoji} {name}{suffix}")
+        # entry → all_metrics 시간순 출력 (P1 핵심 경로)
+        _format_entry_activities(entry, date_str, workout_log, schedule_data, lines)
 
-        if wtype == 'run':
-            lines.append(f"  {p['distance_km']}km | {p['pace_per_km']}/km | {seconds_to_hhmm(p['duration_sec'])}")
-            if p['avg_hr']:
-                lines.append(f"  HR {p['avg_hr']}/{p['max_hr']}")
-            if p.get('cadence'):
-                lines.append(f"  케이던스 {p['cadence']}spm | 보폭 {p.get('stride_m', '?')}m")
-
-        elif wtype == 'swim':
-            dur_str = seconds_to_hhmm(p['duration_sec'])
-            lines.append(f"  {p['distance_m']}m | {p['pace_per_100m']}/100m | {dur_str}")
-            if p['avg_hr']:
-                lines.append(f"  HR {p['avg_hr']}/{p['max_hr']}")
-            if p.get('swolf'):
-                lines.append(f"  Swolf {p['swolf']} | 스트로크 {p.get('total_strokes', '?')}")
-
-        elif wtype == 'bike':
-            dur_str = seconds_to_hhmm(p['duration_sec'])
-            if p.get('distance_km'):
-                lines.append(f"  {p['distance_km']}km | {p.get('avg_speed_kmh', '?')}km/h | {dur_str}")
-            else:
-                lines.append(f"  {dur_str}")
-            if p['avg_hr']:
-                lines.append(f"  HR {p['avg_hr']}/{p['max_hr']}")
-            if p.get('avg_power'):
-                lines.append(f"  파워 {p['avg_power']}W (NP {p.get('norm_power', '?')}W)")
-
-        # 훈련 효과
-        te_parts = []
-        if p.get('aerobic_te'):
-            te_parts.append(f"유산소 {round(p['aerobic_te'], 1)}")
-        if p.get('anaerobic_te'):
-            te_parts.append(f"무산소 {round(p['anaerobic_te'], 1)}")
-        if te_parts:
-            lines.append(f"  TE: {' / '.join(te_parts)}")
-
-        # 운동 종합 판정
-        feedback = generate_workout_feedback(p, schedule_data, workout_log)
-        if feedback:
-            lines.append("")
-            for fb in feedback:
-                lines.append(f"  {fb}")
-        lines.append("")
+        # 운동 종합 판정: parsed_activities 중 해당 날짜 첫 번째 parsed 사용
+        day_acts = [p for p in parsed_activities if p.get('date') == date_str]
+        if day_acts:
+            # 주 운동(러닝 우선, 없으면 첫번째) 기반으로 판정 생성
+            primary = next((p for p in day_acts if p['type'] == 'run'), day_acts[0])
+            feedback = generate_workout_feedback(primary, schedule_data, workout_log)
+            if feedback:
+                for fb in feedback:
+                    lines.append(f"  {fb}")
+                lines.append("")
 
     # 주간 경과 피드백
     try:

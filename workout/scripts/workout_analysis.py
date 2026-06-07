@@ -894,8 +894,9 @@ def format_single_activity(metrics):
         if hr:
             lines.append(f"    HR {hr}/{maxhr} | Swolf {swolf}")
     elif wtype == 'run':
-        dist = metrics.get('distance_km', 0)
-        pace = metrics.get('pace_per_km', '')
+        # all_metrics 항목은 distance_m/avg_pace 필드를 쓰므로 fallback (2026-06-07 단일화 수정)
+        dist = metrics.get('distance_km') or round((metrics.get('distance_m') or 0) / 1000, 2)
+        pace = metrics.get('pace_per_km') or metrics.get('avg_pace') or ''
         hr = metrics.get('avg_hr', '')
         maxhr = metrics.get('max_hr', '')
         lines.append(f"    {dist}km | {pace}/km")
@@ -908,9 +909,10 @@ def format_single_activity(metrics):
             if lap_strs:
                 lines.append(f"    스플릿: {' → '.join(lap_strs)}")
     elif wtype == 'bike':
-        dur = metrics.get('duration_min', 0)
-        dist = metrics.get('distance_km', 0)
-        speed = metrics.get('avg_speed_kmh', 0)
+        # all_metrics 항목은 distance_m/duration_sec/avg_speed(m/s) 필드 사용 — fallback (레드팀 BUG-1)
+        dur = metrics.get('duration_min') or round((metrics.get('duration_sec') or 0) / 60, 1)
+        dist = metrics.get('distance_km') or round((metrics.get('distance_m') or 0) / 1000, 2)
+        speed = metrics.get('avg_speed_kmh') or (round(metrics['avg_speed'] * 3.6, 1) if metrics.get('avg_speed') else 0)
         hr = metrics.get('avg_hr', '')
         maxhr = metrics.get('max_hr', '')
         if dist:

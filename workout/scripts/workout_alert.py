@@ -448,11 +448,14 @@ def _calc_week_compliance():
                         compliant += 1
 
             # 러닝 페이스 수집 (전주 대비용)
+            # P4: pace_per_km 우선, avg_pace fallback (KeyError 방지 + 실필드 대응)
             actual_types = _actual_sport_types(entry)
             if 'run' in actual_types:
                 for m in entry.get('all_metrics', []):
-                    if m.get('type') == 'run' and m.get('avg_pace'):
-                        p = m['avg_pace']
+                    if m.get('type') == 'run':
+                        p = m.get('pace_per_km') or m.get('avg_pace')
+                        if not p:
+                            continue
                         try:
                             parts = p.split(':')
                             sec = int(parts[0]) * 60 + int(parts[1])
@@ -723,10 +726,24 @@ def format_morning():
     workout, detail = get_today_workout()
     today_done = is_done(TODAY)
     if today_done:
-        actual = get_actual(TODAY)
         lines.append(f"[오늘] ✅ {workout} 완료!")
-        if actual:
-            lines.append(f"  → {actual}")
+        # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
+        try:
+            import sys as _sys
+            _scripts_dir = os.path.dirname(os.path.abspath(__file__))
+            if _scripts_dir not in _sys.path:
+                _sys.path.insert(0, _scripts_dir)
+            from workout_analysis import format_today_workout as _fmt_today
+            today_entry = WORKOUT_LOG.get(TODAY)
+            detail_str = _fmt_today(today_entry) if today_entry else None
+            if detail_str:
+                for _line in detail_str.split('\n'):
+                    lines.append(f"  {_line}" if _line and not _line.startswith('  ') else _line)
+        except Exception as _e:
+            # fallback: actual 1줄
+            actual = get_actual(TODAY)
+            if actual:
+                lines.append(f"  → {actual}")
     else:
         lines.append(f"[오늘] {get_emoji(workout)} {workout}")
         if detail:
@@ -831,7 +848,7 @@ def format_recovery_scenario(missed_workout):
     days_passed = today.weekday() + 1
     remaining = 7 - days_passed
 
-    # 이번 주 실적
+    # 이번 주 실적 — P3: all_metrics 기반 카운트 (_count_types_from_entry 패턴)
     run_count = 0
     swim_count = 0
     bike_count = 0
@@ -842,14 +859,30 @@ def format_recovery_scenario(missed_workout):
         key = dt.strftime('%Y-%m-%d')
         entry = WORKOUT_LOG.get(key)
         if entry and entry.get('done'):
-            wtype = entry.get('metrics', {}).get('type', '')
-            if wtype == 'run':
-                run_count += 1
-                run_km += entry.get('metrics', {}).get('distance_km', 0)
-            elif wtype == 'swim':
-                swim_count += 1
-            elif wtype == 'bike':
-                bike_count += 1
+            all_m = entry.get('all_metrics', [])
+            if all_m:
+                seen_types = set()
+                for m in all_m:
+                    t = m.get('type', '')
+                    if t in ('run', 'swim', 'bike') and t not in seen_types:
+                        if t == 'run':
+                            run_count += 1
+                            run_km += m.get('distance_km') or m.get('distance_m', 0) / 1000
+                        elif t == 'swim':
+                            swim_count += 1
+                        elif t == 'bike':
+                            bike_count += 1
+                        seen_types.add(t)
+            else:
+                # all_metrics 없으면 metrics.type 단일 카운트 (fallback)
+                wtype = entry.get('metrics', {}).get('type', '')
+                if wtype == 'run':
+                    run_count += 1
+                    run_km += entry.get('metrics', {}).get('distance_km', 0)
+                elif wtype == 'swim':
+                    swim_count += 1
+                elif wtype == 'bike':
+                    bike_count += 1
 
     run_need = max(0, 3 - run_count)
 
@@ -909,12 +942,26 @@ def format_evening():
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
-        actual = get_actual(TODAY)
         lines.append(f"🏁 D-{DAYS_LEFT} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
-        if actual:
-            lines.append(f"  → {actual}")
+        # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
+        try:
+            import sys as _sys
+            _scripts_dir = os.path.dirname(os.path.abspath(__file__))
+            if _scripts_dir not in _sys.path:
+                _sys.path.insert(0, _scripts_dir)
+            from workout_analysis import format_today_workout as _fmt_today
+            today_entry = WORKOUT_LOG.get(TODAY)
+            detail_str = _fmt_today(today_entry) if today_entry else None
+            if detail_str:
+                for _line in detail_str.split('\n'):
+                    lines.append(f"  {_line}" if _line and not _line.startswith('  ') else _line)
+        except Exception as _e:
+            # fallback: actual 1줄
+            actual = get_actual(TODAY)
+            if actual:
+                lines.append(f"  → {actual}")
     else:
         # 미완료 → 리마인드 + 복구 시나리오
         lines.append(f"🏁 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")

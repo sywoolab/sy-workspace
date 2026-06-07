@@ -63,7 +63,40 @@ def _git_show(ref):
 
 
 def _summarize_entry(entry):
-    """entry에서 actual 요약 1줄."""
+    """entry에서 운동 요약 1줄.
+
+    P5 (2026-06-07): all_metrics가 있으면 start_time 정렬 후
+    '[HH:MM] 종목 거리@페이스' 형태로 ' + ' 연결. 없으면 actual fallback.
+    """
+    all_m = entry.get('all_metrics', [])
+    if all_m:
+        sorted_m = sorted(all_m, key=lambda m: m.get('start_time') or '99:99')
+        parts = []
+        type_name = {'run': '러닝', 'swim': '수영', 'bike': '자전거'}
+        for m in sorted_m:
+            wtype = m.get('type', '?')
+            name = type_name.get(wtype, wtype)
+            st = m.get('start_time', '')
+            prefix = f"[{st}] " if st else ''
+            if wtype == 'run':
+                dist = m.get('distance_km') or round(m.get('distance_m', 0) / 1000, 2)
+                pace = m.get('pace_per_km') or m.get('avg_pace') or '?'
+                parts.append(f"{prefix}{name} {dist}km@{pace}")
+            elif wtype == 'swim':
+                dist = m.get('distance_m', '?')
+                pace = m.get('pace_per_100m', '?')
+                parts.append(f"{prefix}{name} {dist}m@{pace}/100m")
+            elif wtype == 'bike':
+                # PATH A/B 필드 호환 (레드팀 BUG-2)
+                dist = m.get('distance_km') or (round(m['distance_m'] / 1000, 2) if m.get('distance_m') else '?')
+                speed = m.get('avg_speed_kmh') or (round(m['avg_speed'] * 3.6, 1) if m.get('avg_speed') else '?')
+                parts.append(f"{prefix}{name} {dist}km@{speed}km/h")
+            else:
+                parts.append(f"{prefix}{name}")
+        if parts:
+            return ' + '.join(parts)
+
+    # fallback: actual 1줄 또는 metrics 단일 요약
     actual = entry.get('actual', '').strip()
     if actual:
         return actual
