@@ -456,10 +456,16 @@ def count_ow(log):
     return count
 
 
-def estimate_finish_time(log):
-    """개선된 예상 완주시간 (VDOT + 브릭감속 + 테이퍼 반영)"""
-    schedule = load_json(SCHEDULE_FILE)
-    current_vdot = schedule.get('current_vdot', 35)
+def estimate_finish_time(log, vdot_override=None):
+    """개선된 예상 완주시간 (VDOT + 브릭감속 + 테이퍼 반영)
+
+    vdot_override: 지정 시 schedule 파일 대신 해당 VDOT 사용 (추세 replay용)
+    """
+    if vdot_override is not None:
+        current_vdot = vdot_override
+    else:
+        schedule = load_json(SCHEDULE_FILE)
+        current_vdot = schedule.get('current_vdot', 35)
     brick_count = count_bricks(log)
     ow_count = count_ow(log)
 
@@ -555,8 +561,12 @@ def estimate_finish_time(log):
     }
 
 
-def update_vdot(log):
-    """최근 러닝 데이터로 VDOT 재추정 (훈련 공백 감쇠 + 거리 보정 반영)"""
+def update_vdot(log, as_of=None):
+    """최근 러닝 데이터로 VDOT 재추정 (훈련 공백 감쇠 + 거리 보정 반영)
+
+    as_of: 'YYYY-MM-DD' 기준일 (None=오늘). 추세 replay 시 과거 시점 기준으로
+    기록 신선도(7일/14일 컷)를 판정하기 위해 사용.
+    """
     run_entries = get_latest_metrics(log, 'run', 5)
     if not run_entries:
         return 35  # 기본값
@@ -581,7 +591,8 @@ def update_vdot(log):
         # 2주 이상 된 기록은 현재 체력을 반영하지 않으므로 제외
         try:
             from datetime import datetime as _dt
-            days_ago = (NOW.date() - _dt.strptime(date_key, '%Y-%m-%d').date()).days
+            ref_date = _dt.strptime(as_of, '%Y-%m-%d').date() if as_of else NOW.date()
+            days_ago = (ref_date - _dt.strptime(date_key, '%Y-%m-%d').date()).days
             if days_ago > 14:
                 continue  # 오래된 기록 제외
             elif days_ago > 7:
@@ -595,6 +606,35 @@ def update_vdot(log):
         return 35
     # 최근 기록 기반 평균
     return round(sum(vdots) / len(vdots))
+
+
+def estimate_history(log):
+    """예상 완주시간 추세 시계열 (replay 방식 — 별도 상태 파일 없음)
+
+    각 훈련일에 대해 '그날까지의 로그'만으로 update_vdot + estimate_finish_time을
+    재계산한다. 항상 현행 알고리즘으로 전 구간을 같은 기준으로 재계산하므로,
+    알고리즘이 개선돼도 추세 비교 기준이 어긋나지 않는다 (스냅샷 저장 방식의 단점 회피).
+
+    반환: [{date, swim, bike, run, total, vdot}, ...] (날짜 오름차순)
+    """
+    history = []
+    done_dates = [d for d in sorted(log.keys()) if log[d].get('done')]
+    for d in done_dates:
+        sub_log = {k: v for k, v in log.items() if k <= d}
+        try:
+            vdot = update_vdot(sub_log, as_of=d)
+            est = estimate_finish_time(sub_log, vdot_override=vdot)
+        except Exception:
+            continue  # 단일 시점 실패가 전체 추세를 막지 않도록
+        history.append({
+            'date': d,
+            'swim': est['swim'],
+            'bike': est['bike'],
+            'run': est['run_brick'],
+            'total': est['total'],
+            'vdot': vdot,
+        })
+    return history
 
 
 def check_adjustments(log, week_stats, phase, vdot):

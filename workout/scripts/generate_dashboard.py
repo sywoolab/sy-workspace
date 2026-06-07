@@ -26,7 +26,7 @@ except ImportError:
     pass
 
 try:
-    from workout_analysis import estimate_finish_time, update_vdot
+    from workout_analysis import estimate_finish_time, update_vdot, estimate_history
     _ANALYSIS_AVAILABLE = True
 except Exception:
     _ANALYSIS_AVAILABLE = False
@@ -169,6 +169,14 @@ def main():
 
     # 현재 체력 기반 예상 완주 계산 (페이지 상단 표시용)
     est, cur_vdot = _compute_estimate(log, sched_data)
+
+    # ── 예상 완주 추세 (replay — 시점별 재계산 시계열) ──
+    est_hist = []
+    if _ANALYSIS_AVAILABLE:
+        try:
+            est_hist = estimate_history(log)
+        except Exception:
+            est_hist = []
 
     # ── 훈련 진단 (최근 14일) ──
     def _training_diagnosis(log, today_str):
@@ -573,9 +581,90 @@ tr:hover{{background:#15152a}}
         bike_spd_s  = f'{bike_spd:.1f}km/h' if bike_spd else '—'
         run_pace_s  = _run_pace_from_min(run_m)
 
-        race_info = est.get('race_actual') if est else None
-    race_date_label = f'대구 {est["date"][5:]} 실적 기반' if race_info else '알고리즘 추정'
-    html += f"""
+        # ── 추세 계산: 직전 훈련일 대비(보조) + 7일 전 대비(주 기준) ──
+        def _fmt_delta(d_min):
+            """분 단위 차이 → 사람이 읽는 단위 (60초 미만은 초)"""
+            s = abs(d_min) * 60
+            return f"{s:.0f}초" if s < 60 else f"{abs(d_min):.1f}분"
+
+        def _trend_tag(d_min, label):
+            """±5초 이내는 보합 처리"""
+            if abs(d_min) * 60 < 5:
+                return f'<span style="color:#888">→ 보합 <span style="color:#555">({label})</span></span>'
+            if d_min < 0:
+                return f'<span style="color:#6affa0">▼ {_fmt_delta(d_min)} 단축 <span style="color:#555">({label})</span></span>'
+            return f'<span style="color:#ff6c6c">▲ {_fmt_delta(d_min)} 증가 <span style="color:#555">({label})</span></span>'
+
+        trend_html = ''
+        swim_trend_s = bike_trend_s = run_trend_s = ''
+        if len(est_hist) >= 2:
+            from datetime import datetime as _dt
+            last_h = est_hist[-1]
+            prev_h = est_hist[-2]
+            last_d = _dt.strptime(last_h['date'], '%Y-%m-%d')
+            # 7일 전 기준점: 마지막 훈련일에서 7일 이상 떨어진 가장 최근 스냅샷 (없으면 최초)
+            ref7 = est_hist[0]
+            for h in reversed(est_hist[:-1]):
+                if (last_d - _dt.strptime(h['date'], '%Y-%m-%d')).days >= 7:
+                    ref7 = h
+                    break
+
+            d_prev = last_h['total'] - prev_h['total']
+            d_week = last_h['total'] - ref7['total']
+            ref7_label = f"{ref7['date'][5:].replace('-', '/')} 대비"
+            prev_label = f"직전 훈련 {prev_h['date'][5:].replace('-', '/')} 대비"
+
+            # 종목별 7일 추세 (타일 하단 표시)
+            def _tile_trend(key):
+                d = last_h[key] - ref7[key]
+                if abs(d) * 60 < 5:
+                    return '<span style="color:#666">→ 보합</span>'
+                if d < 0:
+                    return f'<span style="color:#6affa0">▼{_fmt_delta(d)}</span>'
+                return f'<span style="color:#ff6c6c">▲{_fmt_delta(d)}</span>'
+
+            swim_trend_s = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("swim")} <span style="color:#555">/ {ref7_label}</span></div>'
+            bike_trend_s = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("bike")} <span style="color:#555">/ {ref7_label}</span></div>'
+            run_trend_s  = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("run")} <span style="color:#555">/ {ref7_label}</span></div>'
+
+            # 스파크라인 (전체 추세, 3/16~현재) — 아래로 갈수록 빠름
+            pts = [h['total'] for h in est_hist]
+            w, hgt = 600, 64
+            mn, mx = min(pts), max(pts)
+            rng = (mx - mn) or 1.0
+            n = len(pts)
+            coords = []
+            for i, p in enumerate(pts):
+                x = 4 + i * (w - 8) / max(n - 1, 1)
+                y = 8 + (mx - p) * (hgt - 16) / rng
+                coords.append(f'{x:.1f},{y:.1f}')
+            last_x, last_y = coords[-1].split(',')
+            spark = (
+                f'<svg viewBox="0 0 {w} {hgt}" style="width:100%;height:{hgt}px;display:block" preserveAspectRatio="none">'
+                f'<polyline points="{" ".join(coords)}" fill="none" stroke="#7c6fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+                f'<circle cx="{last_x}" cy="{last_y}" r="3.5" fill="#7c6fff"/>'
+                f'</svg>'
+            )
+            first_h = est_hist[0]
+            trend_html = (
+                f'<div style="margin-top:14px;border-top:1px solid #1f1f33;padding-top:10px">'
+                f'<div style="font-size:12px;color:#aaa;margin-bottom:4px">📈 예상 완주 추세'
+                f'<span style="font-size:10px;color:#555;margin-left:8px">동일 알고리즘으로 시점별 재계산 · 아래로 갈수록 빠름 · '
+                f'보수적 알고리즘 VDOT 기준이라 상단 헤드라인과 1~2분 차이 가능</span></div>'
+                f'<div style="font-size:12px;margin-bottom:8px">{_trend_tag(d_week, ref7_label)}'
+                f'<span style="margin-left:14px">{_trend_tag(d_prev, prev_label)}</span></div>'
+                f'{spark}'
+                f'<div style="display:flex;justify-content:space-between;font-size:10px;color:#555;margin-top:2px">'
+                f'<span>{first_h["date"][5:].replace("-", "/")} · {_fmt_min(first_h["total"])}</span>'
+                f'<span style="color:#7c6fff">{last_h["date"][5:].replace("-", "/")} · {_fmt_min(last_h["total"])}</span>'
+                f'</div></div>'
+            )
+
+        # est=None이면 이 섹션의 모든 변수가 미정의이므로 섹션 전체를 if est: 내부에서 렌더링
+        # (기존: race_date_label/html이 블록 밖에 있어 est=None 시 NameError — 레드팀 B-1 수정)
+        race_info = est.get('race_actual')
+        race_date_label = f'대구 {est["date"][5:]} 실적 기반' if race_info else '알고리즘 추정'
+        html += f"""
 <div class="section">🏁 현재 체력 기반 예상 완주 <span style="font-size:11px;color:#555;font-weight:400">({race_date_label})</span></div>
 <div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
@@ -590,22 +679,26 @@ tr:hover{{background:#15152a}}
       <div style="font-size:20px;font-weight:700;color:#6ab4ff">{_fmt_mmss(swim_m)}</div>
       <div style="font-size:11px;color:#777;margin-top:2px">🏊 수영 1.5km</div>
       <div style="font-size:11px;color:#6ab4ff;margin-top:1px">{swim_pace_s}</div>
+      {swim_trend_s}
     </div>
     <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
       <div style="font-size:20px;font-weight:700;color:#ffa06a">{_fmt_mmss(bike_m)}</div>
       <div style="font-size:11px;color:#777;margin-top:2px">🚴 자전거 40km</div>
       <div style="font-size:11px;color:#ffa06a;margin-top:1px">{bike_spd_s}</div>
+      {bike_trend_s}
     </div>
     <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px">
       <div style="font-size:20px;font-weight:700;color:#6affa0">{_fmt_mmss(run_m)}</div>
       <div style="font-size:11px;color:#777;margin-top:2px">🏃 러닝 10km</div>
       <div style="font-size:11px;color:#6affa0;margin-top:1px">{run_pace_s}</div>
+      {run_trend_s}
     </div>
     <div style="background:#1a1a2e;border-radius:8px;padding:8px 12px;opacity:0.5">
       <div style="font-size:14px;font-weight:500;color:#666">T1 {_fmt_mmss(t1_m)} / T2 {_fmt_mmss(t2_m)}</div>
       <div style="font-size:11px;color:#444;margin-top:2px">바꿈터 (별도)</div>
     </div>
   </div>
+  {trend_html}
 </div>
 """
 
