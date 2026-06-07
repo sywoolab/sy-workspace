@@ -627,37 +627,108 @@ tr:hover{{background:#15152a}}
             bike_trend_s = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("bike")} <span style="color:#555">/ {ref7_label}</span></div>'
             run_trend_s  = f'<div style="font-size:10px;margin-top:2px">{_tile_trend("run")} <span style="color:#555">/ {ref7_label}</span></div>'
 
-            # 스파크라인 (전체 추세, 3/16~현재) — 아래로 갈수록 빠름
-            pts = [h['total'] for h in est_hist]
-            w, hgt = 600, 64
-            mn, mx = min(pts), max(pts)
-            rng = (mx - mn) or 1.0
-            n = len(pts)
-            coords = []
-            for i, p in enumerate(pts):
-                x = 4 + i * (w - 8) / max(n - 1, 1)
-                y = 8 + (mx - p) * (hgt - 16) / rng
-                coords.append(f'{x:.1f},{y:.1f}')
-            last_x, last_y = coords[-1].split(',')
-            spark = (
-                f'<svg viewBox="0 0 {w} {hgt}" style="width:100%;height:{hgt}px;display:block" preserveAspectRatio="none">'
-                f'<polyline points="{" ".join(coords)}" fill="none" stroke="#7c6fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
-                f'<circle cx="{last_x}" cy="{last_y}" r="3.5" fill="#7c6fff"/>'
-                f'</svg>'
-            )
-            first_h = est_hist[0]
+            # 추세 차트 데이터 (Chart.js — 부하 트렌드와 동일 패턴, 마우스오버 시 종목별 분해 + 변화 요인)
+            def _mmss_sec(sec):
+                return f'{int(sec)//60}:{int(sec)%60:02d}'
+
+            est_labels = [h['date'][5:].replace('-', '/') for h in est_hist]
+            est_totals = [round(h['total'], 1) for h in est_hist]
+            est_splits = [
+                {'s': _fmt_mmss(h['swim']), 'b': _fmt_mmss(h['bike']), 'r': _fmt_mmss(h['run']),
+                 't': _fmt_min(h['total']), 'v': h['vdot']}
+                for h in est_hist
+            ]
+            # 변화 요인 분해: 직전 스냅샷 대비 어떤 구성요소가 움직였는지
+            est_drivers = []
+            for i, h in enumerate(est_hist):
+                if i == 0:
+                    est_drivers.append(['시즌 시작점 (3/16 복귀)'])
+                    continue
+                p = est_hist[i - 1]
+                lines = []
+                act = (log.get(h['date'], {}).get('actual') or '').strip()
+                if act:
+                    lines.append('당일: ' + (act[:46] + '…' if len(act) > 46 else act))
+                d_tot = h['total'] - p['total']
+                if abs(d_tot) * 60 < 5:
+                    lines.append('예상시간 변화 없음 (±5초 이내)')
+                    est_drivers.append(lines)
+                    continue
+                if abs(h['swim'] - p['swim']) * 60 >= 5:
+                    seg = (f"🏊 {'▼' if h['swim'] < p['swim'] else '▲'}{abs(h['swim'] - p['swim']) * 60:.0f}초"
+                           f" — 수영페이스 평균 {_mmss_sec(p['avg_swim_pace_sec'])}→{_mmss_sec(h['avg_swim_pace_sec'])}/100m")
+                    if h['ow_correction'] != p['ow_correction']:
+                        seg += f", OW보정 +{p['ow_correction']}→+{h['ow_correction']}초(경험↑)"
+                    lines.append(seg)
+                if abs(h['bike'] - p['bike']) * 60 >= 5 and h['avg_bike_speed_kmh'] and p['avg_bike_speed_kmh']:
+                    lines.append(f"🚴 {'▼' if h['bike'] < p['bike'] else '▲'}{abs(h['bike'] - p['bike']) * 60:.0f}초"
+                                 f" — 평속추정 {p['avg_bike_speed_kmh']:.1f}→{h['avg_bike_speed_kmh']:.1f}km/h")
+                if abs(h['run'] - p['run']) * 60 >= 5:
+                    seg = f"🏃 {'▼' if h['run'] < p['run'] else '▲'}{abs(h['run'] - p['run']) * 60:.0f}초"
+                    parts = []
+                    if h['vdot'] != p['vdot']:
+                        parts.append(f"VDOT {p['vdot']}→{h['vdot']}")
+                    if h.get('brick_slowdown_pct') != p.get('brick_slowdown_pct'):
+                        parts.append(f"브릭감속 {p['brick_slowdown_pct']}%→{h['brick_slowdown_pct']}%(브릭경험↑)")
+                    if parts:
+                        seg += ' — ' + ', '.join(parts)
+                    lines.append(seg)
+                est_drivers.append(lines)
+
             trend_html = (
                 f'<div style="margin-top:14px;border-top:1px solid #1f1f33;padding-top:10px">'
                 f'<div style="font-size:12px;color:#aaa;margin-bottom:4px">📈 예상 완주 추세'
                 f'<span style="font-size:10px;color:#555;margin-left:8px">동일 알고리즘으로 시점별 재계산 · 아래로 갈수록 빠름 · '
-                f'보수적 알고리즘 VDOT 기준이라 상단 헤드라인과 1~2분 차이 가능</span></div>'
+                f'보수적 알고리즘 VDOT 기준이라 상단 헤드라인과 1~2분 차이 가능 · 점에 마우스/탭 = 종목별 분해 + 변화 요인</span></div>'
                 f'<div style="font-size:12px;margin-bottom:8px">{_trend_tag(d_week, ref7_label)}'
                 f'<span style="margin-left:14px">{_trend_tag(d_prev, prev_label)}</span></div>'
-                f'{spark}'
-                f'<div style="display:flex;justify-content:space-between;font-size:10px;color:#555;margin-top:2px">'
-                f'<span>{first_h["date"][5:].replace("-", "/")} · {_fmt_min(first_h["total"])}</span>'
-                f'<span style="color:#7c6fff">{last_h["date"][5:].replace("-", "/")} · {_fmt_min(last_h["total"])}</span>'
-                f'</div></div>'
+                '<div style="height:150px"><canvas id="estChart"></canvas></div>'
+                '<script>\n'
+                f'const estLabels = {json.dumps(est_labels, ensure_ascii=False)};\n'
+                f'const estTotals = {json.dumps(est_totals)};\n'
+                f'const estSplits = {json.dumps(est_splits, ensure_ascii=False)};\n'
+                f'const estDrivers = {json.dumps(est_drivers, ensure_ascii=False)};\n'
+                '''
+new Chart(document.getElementById('estChart'), {
+  type: 'line',
+  data: { labels: estLabels, datasets: [{
+    data: estTotals, borderColor: '#7c6fff', backgroundColor: '#7c6fff22',
+    borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, pointBackgroundColor: '#7c6fff',
+    fill: true, tension: 0.25,
+  }]},
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        displayColors: false,
+        callbacks: {
+          title: (items) => items[0] ? items[0].label + ' 시점 예상' : '',
+          label: (item) => {
+            const s = estSplits[item.dataIndex];
+            return ['전체 ' + s.t + ' (VDOT ' + s.v + ')',
+                    '\\uD83C\\uDFCA ' + s.s + '  \\uD83D\\uDEB4 ' + s.b + '  \\uD83C\\uDFC3 ' + s.r];
+          },
+          afterBody: (items) => {
+            if (!items.length) return [];
+            const d = estDrivers[items[0].dataIndex] || [];
+            return d.length ? [''].concat(d) : [];
+          },
+        }
+      },
+    },
+    scales: {
+      x: { ticks: { color: '#666', maxTicksLimit: 10, font: { size: 10 } }, grid: { color: '#1a1a2a' } },
+      y: { reverse: true,
+           ticks: { color: '#666', font: { size: 10 },
+                    callback: (v) => Math.floor(v/60) + ':' + String(Math.round(v%60)).padStart(2,'0') },
+           grid: { color: '#1a1a2a' } },
+    },
+  }
+});
+</script>'''
+                '</div>'
             )
 
         # est=None이면 이 섹션의 모든 변수가 미정의이므로 섹션 전체를 if est: 내부에서 렌더링

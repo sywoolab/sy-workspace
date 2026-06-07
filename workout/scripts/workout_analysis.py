@@ -633,6 +633,11 @@ def estimate_history(log):
             'run': est['run_brick'],
             'total': est['total'],
             'vdot': vdot,
+            # 변화 요인 분해용 구성요소 (툴팁 표시)
+            'avg_swim_pace_sec': est['avg_swim_pace_sec'],
+            'avg_bike_speed_kmh': est['avg_bike_speed_kmh'],
+            'ow_correction': est['ow_correction'],
+            'brick_slowdown_pct': est['brick_slowdown_pct'],
         })
     return history
 
