@@ -35,7 +35,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-06-07 22:05 KST</div>
+<div class="sub">업데이트: 2026-06-07 22:09 KST</div>
 
 <div style="background:#13131f;border:1px solid #6affa044;border-radius:12px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -192,7 +192,7 @@ const allSwim   = [97, 0, 0, 0, 97, 0, 78, 0, 53, 101, 46, 0, 0, 45, 0, 0, 0, 62
 const allBike   = [0, 0, 0, 0, 0, 0, 0, 169, 0, 0, 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 0, 238, 0, 0, 0, 0, 0, 0, 0, 0, 381, 0, 0, 0, 0, 0, 518, 232, 0, 0, 0, 0, 0, 146, 243, 0, 0, 0, 0, 0, 0, 0, 0, 0, 179, 0, 0, 164, 88];
 const allRun    = [0, 0, 0, 0, 0, 78, 0, 0, 0, 0, 304, 0, 117, 0, 76, 0, 181, 0, 0, 0, 0, 103, 59, 0, 0, 0, 52, 54, 44, 0, 0, 466, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 104, 0, 0, 98, 0, 85, 0, 0, 0, 0, 96, 0, 76, 0, 0, 140];
 const allOther  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["06-28", "08-27", "06-07", "06-21"];
+const raceDates = ["08-27", "06-21", "06-07", "06-28"];
 
 const slice = isMobile ? 30 : 60;
 const labels   = allLabels.slice(-slice);
@@ -488,11 +488,11 @@ new Chart(document.getElementById('tlChart'), {
   <span style="font-size:11px;color:#555">(표준거리 환산 2:49)</span>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6ab4ff">32:12</div><div style="font-size:10px;color:#666;margin-top:1px">🏊 수영</div><div style="font-size:10px;color:#444">1398m · 2:14/100m</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">4:48</div><div style="font-size:10px;color:#666;margin-top:1px">T1</div><div style="font-size:10px;color:#444">바꿈터</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#ffa06a">70:18</div><div style="font-size:10px;color:#666;margin-top:1px">🚴 자전거</div><div style="font-size:10px;color:#444">39.31km · 33.6km/h</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">2:42</div><div style="font-size:10px;color:#666;margin-top:1px">T2</div><div style="font-size:10px;color:#444">바꿈터</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6affa0">53:44</div><div style="font-size:10px;color:#666;margin-top:1px">🏃 러닝</div><div style="font-size:10px;color:#444">9.46km · 5:40/km</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6ab4ff">32:12</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">2:14/100m</div><div style="font-size:10.5px;color:#888;margin-top:2px">🏊 수영 · 1398m</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">4:48</div><div style="font-size:10.5px;color:#888;margin-top:2px">T1 · 바꿈터</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#ffa06a">70:18</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">33.6km/h</div><div style="font-size:10.5px;color:#888;margin-top:2px">🚴 자전거 · 39.31km</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">2:42</div><div style="font-size:10.5px;color:#888;margin-top:2px">T2 · 바꿈터</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6affa0">53:44</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">5:40/km</div><div style="font-size:10.5px;color:#888;margin-top:2px">🏃 러닝 · 9.46km</div></div>
 </div>
 <div style="border-top:1px solid #1a1a2e;padding-top:8px">
 <div style="font-size:11px;color:#666;margin-bottom:5px">📝 시사점</div>
@@ -512,11 +512,11 @@ new Chart(document.getElementById('tlChart'), {
   <span style="font-size:22px;font-weight:700;color:#7c6fff;margin-left:auto">1:57:34*</span>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6ab4ff">21:12</div><div style="font-size:10px;color:#666;margin-top:1px">🏊 수영</div><div style="font-size:10px;color:#444">885m · 2:18/100m</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">≈25분†</div><div style="font-size:10px;color:#666;margin-top:1px">T1</div><div style="font-size:10px;color:#444">바꿈터</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#ffa06a">48:06</div><div style="font-size:10px;color:#666;margin-top:1px">🚴 자전거</div><div style="font-size:10px;color:#444">23.39km · 29.2km/h</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">9:00</div><div style="font-size:10px;color:#666;margin-top:1px">T2</div><div style="font-size:10px;color:#444">바꿈터</div></div>
-<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6affa0">48:16</div><div style="font-size:10px;color:#666;margin-top:1px">🏃 러닝</div><div style="font-size:10px;color:#444">8.75km · 5:31/km</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6ab4ff">21:12</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">2:18/100m</div><div style="font-size:10.5px;color:#888;margin-top:2px">🏊 수영 · 885m</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">≈25분†</div><div style="font-size:10.5px;color:#888;margin-top:2px">T1 · 바꿈터</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#ffa06a">48:06</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">29.2km/h</div><div style="font-size:10.5px;color:#888;margin-top:2px">🚴 자전거 · 23.39km</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:0.4"><div style="font-size:16px;font-weight:600;color:#555">9:00</div><div style="font-size:10.5px;color:#888;margin-top:2px">T2 · 바꿈터</div></div>
+<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:1"><div style="font-size:16px;font-weight:600;color:#6affa0">48:16</div><div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">5:31/km</div><div style="font-size:10.5px;color:#888;margin-top:2px">🏃 러닝 · 8.75km</div></div>
 </div>
 <div style="border-top:1px solid #1a1a2e;padding-top:8px">
 <div style="font-size:11px;color:#666;margin-bottom:5px">📝 시사점</div>
@@ -530,5 +530,5 @@ new Chart(document.getElementById('tlChart'), {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-06-07 22:05 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-06-07 22:09 KST</div>
 </body></html>

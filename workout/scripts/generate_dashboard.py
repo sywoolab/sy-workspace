@@ -1325,24 +1325,30 @@ new Chart(document.getElementById('tlChart'), {{
 
                 # 분할 기록
                 html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">\n'
-                for label, color, val, sub in [
+                # 페이스를 별도 줄로 크게 표시 (2026-06-07 사용자 피드백: 페이스 가독성)
+                for label, color, val, pace, sub in [
                     ('🏊 수영', '#6ab4ff',
                      swim_s.get('time','—'),
-                     f"{swim_s.get('distance_m','')}m · {swim_s.get('pace_per_100m','')}/100m"),
-                    ('T1', '#555', t1, '바꿈터'),
+                     f"{swim_s.get('pace_per_100m','—')}/100m",
+                     f"{swim_s.get('distance_m','')}m"),
+                    ('T1', '#555', t1, '', '바꿈터'),
                     ('🚴 자전거', '#ffa06a',
                      bike_s.get('time','—'),
-                     f"{bike_s.get('distance_km','')}km · {bike_s.get('speed_kmh','')}km/h"),
-                    ('T2', '#555', t2, '바꿈터'),
+                     f"{bike_s.get('speed_kmh','—')}km/h",
+                     f"{bike_s.get('distance_km','')}km"),
+                    ('T2', '#555', t2, '', '바꿈터'),
                     ('🏃 러닝', '#6affa0',
                      run_s.get('time','—'),
-                     f"{run_s.get('distance_km','')}km · {run_s.get('pace_per_km','')}/km"),
+                     f"{run_s.get('pace_per_km','—')}/km",
+                     f"{run_s.get('distance_km','')}km"),
                 ]:
                     opacity = '0.4' if label in ('T1','T2') else '1'
-                    html += (f'<div style="background:#1a1a2e;border-radius:7px;padding:7px 10px;opacity:{opacity}">'
+                    pace_html = (f'<div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">{pace}</div>'
+                                 if pace else '')
+                    html += (f'<div style="background:#1a1a2e;border-radius:7px;padding:8px 10px;opacity:{opacity}">'
                              f'<div style="font-size:16px;font-weight:600;color:{color}">{val}</div>'
-                             f'<div style="font-size:10px;color:#666;margin-top:1px">{label}</div>'
-                             f'<div style="font-size:10px;color:#444">{sub}</div>'
+                             f'{pace_html}'
+                             f'<div style="font-size:10.5px;color:#888;margin-top:2px">{label} · {sub}</div>'
                              f'</div>\n')
                 html += '</div>\n'
 
