@@ -6,6 +6,9 @@ on:
       - 'workout/workout_log.json'
       - 'workout/data/garmin_health.json'
       - 'workout/workout_schedule.json'
+      - 'workout/data/race_records.json'
+      - 'workout/scripts/generate_dashboard.py'
+      - 'workout/scripts/workout_analysis.py'
   workflow_dispatch:
 
 jobs:
