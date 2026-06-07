@@ -587,15 +587,23 @@ def format_training_progress(analysis):
         "🟡" if isinstance(vdot, (int, float)) and vdot >= 37 else "🔴")
     lines.append(f"  VDOT: {vdot} → 목표 39 {vdot_icon}")
 
-    # workout_schedule.json에서 브릭/OW 카운트
+    # 브릭/OW 카운트 — 로그에서 동적 계산 (schedule 정적 필드는 stale 가능, 2026-06-07 근본 수정)
     try:
-        with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
-            schedule = json.load(f)
-        brick_count = schedule.get('brick_count', 0)
-        ow_count = schedule.get('ow_count', 0)
-    except (FileNotFoundError, json.JSONDecodeError):
-        brick_count = 0
-        ow_count = 0
+        from workout_analysis import count_bricks, count_ow
+        brick_count = count_bricks(WORKOUT_LOG)
+        ow_count = count_ow(WORKOUT_LOG)
+    except Exception as e:
+        if not isinstance(e, ImportError):
+            # L0 §자동화 산출물 검증 — fallback 발동 사유 노출 (무음 회귀 금지)
+            print(f"[WARN] 브릭/OW 동적 계산 실패: {e} → schedule 정적 필드 fallback")
+        try:
+            with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
+                schedule = json.load(f)
+            brick_count = schedule.get('brick_count', 0)
+            ow_count = schedule.get('ow_count', 0)
+        except (FileNotFoundError, json.JSONDecodeError):
+            brick_count = 0
+            ow_count = 0
 
     brick_icon = "🟢" if brick_count >= 6 else ("🟡" if brick_count >= 3 else "🔴")
     ow_icon = "🟢" if ow_count >= 3 else ("🟡" if ow_count >= 1 else "🔴")

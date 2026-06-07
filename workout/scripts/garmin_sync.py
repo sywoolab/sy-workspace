@@ -1646,8 +1646,20 @@ def format_on_track(workout_log, schedule_data, plan_adjustments):
     est = last_analysis.get('estimated_finish', '?')
     status = last_analysis.get('status', '')
     vdot = schedule_data.get('current_vdot', 37)
-    brick_count = schedule_data.get('brick_count', 0)
-    ow_count = schedule_data.get('ow_count', 0)
+    # 브릭/OW는 로그에서 동적 계산 (schedule 정적 필드는 analysis 실행 전까지 stale —
+    # 2026-06-07 "오늘 브릭이 카운트 안 됨" 사고 근본 수정. 실패 시에만 정적 필드 fallback)
+    try:
+        from workout_analysis import count_bricks, count_ow
+        brick_count = count_bricks(workout_log)
+        ow_count = count_ow(workout_log)
+    except ImportError:
+        brick_count = schedule_data.get('brick_count', 0)
+        ow_count = schedule_data.get('ow_count', 0)
+    except Exception as e:
+        # L0 §자동화 산출물 검증 — fallback 발동 사유 노출 (무음 회귀 금지)
+        print(f"[WARN] 브릭/OW 동적 계산 실패: {e} → schedule 정적 필드 fallback")
+        brick_count = schedule_data.get('brick_count', 0)
+        ow_count = schedule_data.get('ow_count', 0)
 
     # 이번 주 러닝 현황
     today = NOW.date()
