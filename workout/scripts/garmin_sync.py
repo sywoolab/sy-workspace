@@ -601,6 +601,25 @@ def fetch_laps(api, activity_id):
         return []
 
 
+def fetch_self_eval(api, activity_id):
+    """활동 자가평가 수집 — 상세 endpoint summaryDTO (2026-06-07 도입)
+
+    directWorkoutRpe: 10~100 (가민 앱 RPE 1~10 입력값 ×10)
+    directWorkoutFeel: 0~100 (25 단위, 0=매우 나쁨 ~ 100=매우 좋음)
+    체감 강도와 가민 부하(EPOC)의 괴리 추적용 (사용자 요청 2026-06-07).
+    """
+    try:
+        det = api.connectapi(f'/activity-service/activity/{activity_id}')
+        sm = (det or {}).get('summaryDTO') or {}
+        rpe_raw = sm.get('directWorkoutRpe')
+        feel_raw = sm.get('directWorkoutFeel')
+        rpe = round(rpe_raw / 10) if rpe_raw else None
+        feel = round(feel_raw) if feel_raw is not None else None
+        return rpe, feel
+    except Exception:
+        return None, None
+
+
 def parse_activity(activity):
     """가민 활동 데이터 → workout_log.json 형식으로 변환"""
     # 활동 종류 판별
@@ -2037,9 +2056,19 @@ def sync():
             if parsed['type'] in ('run', 'bike'):
                 laps = fetch_laps(api, act_id)
                 parsed['laps'] = parse_laps(laps, parsed['type'])
+            # 자가평가 (RPE 1~10 / Feel 0~100) — 입력 안 한 활동은 None → 필드 생략
+            rpe, feel = fetch_self_eval(api, act_id)
+            if rpe is not None:
+                parsed['rpe'] = rpe
+            if feel is not None:
+                parsed['feel'] = feel
             new_activities.append(parsed)
         else:
             skip_reasons['unsupported_type'] += 1
+
+    # 활동 시간순 정렬 — 가민 API는 최신순(역순) 반환이라 그대로 merge하면
+    # actual/all_metrics/텔레 알림이 실제 운동 순서와 반대가 됨 (2026-06-07 사용자 보고로 수정)
+    new_activities.sort(key=lambda p: (p.get('date') or '', p.get('start_time') or '99:99'))
 
     new_count = len(new_activities)
     total_skipped = sum(skip_reasons.values())
@@ -2121,6 +2150,11 @@ def sync():
                 new_m['garmin_id'] = new_gid
                 if entry.get('start_time'):
                     new_m['start_time'] = entry['start_time']
+                # 자가평가 전달 (레드팀 BUG-1: parsed→all_metrics 경로 누락 수정)
+                if parsed.get('rpe') is not None:
+                    new_m['rpe'] = parsed['rpe']
+                if parsed.get('feel') is not None:
+                    new_m['feel'] = parsed['feel']
                 existing['all_metrics'].append(new_m)
 
                 # 주 운동(러닝 우선) 기준으로 단일 metrics 유지 (호환성)
@@ -2160,6 +2194,11 @@ def sync():
                         'open_water': m.get('open_water', False),
                         'start_time': entry.get('start_time'),
                     }
+                    # 자가평가 전달 (레드팀 BUG-1 수정 — 필드 생략 패턴 유지)
+                    if parsed.get('rpe') is not None:
+                        first_am['rpe'] = parsed['rpe']
+                    if parsed.get('feel') is not None:
+                        first_am['feel'] = parsed['feel']
                     entry['all_metrics'] = [first_am]
                 workout_log[date_key] = entry
 

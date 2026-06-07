@@ -1156,6 +1156,13 @@ new Chart(document.getElementById('tlChart'), {{
             t7c = '#ff6c6c' if tl7>900 else '#ffd56c' if tl7>500 else '#6affa0'
             tl_s = f'<div class="tl7" style="color:{t7c}">∑7d {tl7}</div>' if tl7 else '-'
 
+        # 체감 RPE (가민 자가평가) — 부하(EPOC)와 체감의 괴리 추적 (2026-06-07 도입)
+        _rpes = [m.get('rpe') for m in (e.get('metrics') or []) if m.get('rpe')]
+        if _rpes:
+            _rmax = max(_rpes)
+            _rc = '#ff6c6c' if _rmax >= 8 else '#ffd56c' if _rmax >= 6 else '#6affa0'
+            tl_s += f'<div style="font-size:10px;color:{_rc};margin-top:1px">체감 {_rmax}/10</div>'
+
         # 수면
         if sleep_min:
             sh,sm = sleep_min//60, sleep_min%60
