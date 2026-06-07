@@ -587,20 +587,11 @@ tr:hover{{background:#15152a}}
             s = abs(d_min) * 60
             return f"{s:.0f}초" if s < 60 else f"{abs(d_min):.1f}분"
 
-        def _trend_tag(d_min, label):
-            """±5초 이내는 보합. 화살표 = 성과 방향 (빨라짐 ▲ 초록 / 느려짐 ▼ 빨강 — 성적 비교 섹션과 통일)"""
-            if abs(d_min) * 60 < 5:
-                return f'<span style="color:#888">→ 보합 <span style="color:#555">({label})</span></span>'
-            if d_min < 0:
-                return f'<span style="color:#6affa0">▲ {_fmt_delta(d_min)} 빨라짐 <span style="color:#555">({label})</span></span>'
-            return f'<span style="color:#ff6c6c">▼ {_fmt_delta(d_min)} 느려짐 <span style="color:#555">({label})</span></span>'
-
         trend_html = ''
         swim_trend_s = bike_trend_s = run_trend_s = ''
         if len(est_hist) >= 2:
             from datetime import datetime as _dt
             last_h = est_hist[-1]
-            prev_h = est_hist[-2]
             last_d = _dt.strptime(last_h['date'], '%Y-%m-%d')
             # 2주 전 기준점: 마지막 훈련일에서 14일 이상 떨어진 가장 최근 스냅샷 (없으면 최초)
             # (1주 기준은 단일 세션 노이즈에 너무 민감 — 사용자 피드백 2026-06-07)
@@ -610,10 +601,7 @@ tr:hover{{background:#15152a}}
                     ref7 = h
                     break
 
-            d_prev = last_h['total'] - prev_h['total']
-            d_week = last_h['total'] - ref7['total']
             ref7_label = f"{ref7['date'][5:].replace('-', '/')} 대비"
-            prev_label = f"직전 훈련 {prev_h['date'][5:].replace('-', '/')} 대비"
 
             # 종목별 2주 추세 (타일 하단 표시) — 빨라짐 ▲ 초록 / 느려짐 ▼ 빨강
             def _tile_trend(key):
@@ -633,12 +621,6 @@ tr:hover{{background:#15152a}}
                 return f'{int(sec)//60}:{int(sec)%60:02d}'
 
             est_labels = [h['date'][5:].replace('-', '/') for h in est_hist]
-            est_totals = [round(h['total'], 1) for h in est_hist]
-            est_splits = [
-                {'s': _fmt_mmss(h['swim']), 'b': _fmt_mmss(h['bike']), 'r': _fmt_mmss(h['run']),
-                 't': _fmt_min(h['total']), 'v': h['vdot']}
-                for h in est_hist
-            ]
             # 변화 요인 분해: 직전 스냅샷 대비 어떤 구성요소가 움직였는지
             est_drivers = []
             for i, h in enumerate(est_hist):
@@ -677,58 +659,120 @@ tr:hover{{background:#15152a}}
                     lines.append(seg)
                 est_drivers.append(lines)
 
+            # ── 종목별 추세 차트 3개 (T1/T2 제외 순수 종목 시간 — 상단 카드의 전체시간엔 T1/T2 유지) ──
+            def _disc_drivers(emoji):
+                """툴팁용: 해당 종목 라인 + 당일 운동 라인만 추출"""
+                out = []
+                for lines in est_drivers:
+                    out.append([l for l in lines if l.startswith('당일') or l.startswith(emoji) or l.startswith('시즌')])
+                return out
+
+            def _disc_reason(key):
+                """추세 사유 한 줄 자동 작성 (2주 전 기준점 대비 구성요소 변화)"""
+                d = last_h[key] - ref7[key]
+                if key == 'swim':
+                    _sp_p, _sp_c = ref7['avg_swim_pace_sec'], last_h['avg_swim_pace_sec']
+                    if _mmss_sec(_sp_p) == _mmss_sec(_sp_c):
+                        base = f"수영페이스 평균 거의 동일 ({_mmss_sec(_sp_c)}/100m 수준)"
+                    else:
+                        base = f"수영페이스 평균 {_mmss_sec(_sp_p)}→{_mmss_sec(_sp_c)}/100m"
+                    if last_h['ow_correction'] != ref7['ow_correction']:
+                        base += f" · OW보정 {ref7['ow_correction']}→{last_h['ow_correction']}초(경험↑)"
+                elif key == 'bike':
+                    if ref7['avg_bike_speed_kmh'] and last_h['avg_bike_speed_kmh']:
+                        base = f"평속 추정 {ref7['avg_bike_speed_kmh']:.1f}→{last_h['avg_bike_speed_kmh']:.1f}km/h"
+                    else:
+                        base = "자전거 데이터 부족"
+                else:
+                    base = f"VDOT {ref7['vdot']}→{last_h['vdot']}"
+                    if last_h['vdot'] < ref7['vdot']:
+                        base += " — 최근 2주 Easy 위주(빠른 샘플 부족), 템포 재개 시 회복 전망"
+                    elif last_h['vdot'] > ref7['vdot']:
+                        base += " — 템포·대회 페이스 샘플 반영"
+                if abs(d) * 60 < 5:
+                    arrow = '<span style="color:#888">→ 보합</span>'
+                elif d < 0:
+                    arrow = f'<span style="color:#6affa0">▲ {_fmt_delta(d)} 빨라짐</span>'
+                else:
+                    arrow = f'<span style="color:#ff6c6c">▼ {_fmt_delta(d)} 느려짐</span>'
+                return arrow, base
+
+            _disc_defs = [
+                ('swim', '🏊', '수영 추세 (1.5km)', '#6ab4ff', 'estChartSwim'),
+                ('bike', '🚴', '자전거 추세 (40km)', '#ffa06a', 'estChartBike'),
+                ('run',  '🏃', '러닝 추세 (10km)',  '#6affa0', 'estChartRun'),
+            ]
+            _charts_html = ''
+            for _key, _emoji, _name, _color, _cid in _disc_defs:
+                _arrow, _reason = _disc_reason(_key)
+                _cur = _fmt_mmss(last_h[_key])
+                _charts_html += (
+                    f'<div style="margin-top:10px">'
+                    f'<div style="font-size:12px;color:#ccc">{_emoji} {_name} '
+                    f'<b style="color:{_color}">{_cur}</b> {_arrow} '
+                    f'<span style="font-size:10px;color:#555">({ref7_label})</span></div>'
+                    f'<div style="font-size:10.5px;color:#777;margin:2px 0 4px">{_reason}</div>'
+                    f'<div style="height:100px"><canvas id="{_cid}"></canvas></div>'
+                    f'</div>'
+                )
+
             trend_html = (
                 f'<div style="margin-top:14px;border-top:1px solid #1f1f33;padding-top:10px">'
-                f'<div style="font-size:12px;color:#aaa;margin-bottom:4px">📈 예상 완주 추세'
-                f'<span style="font-size:10px;color:#555;margin-left:8px">동일 알고리즘으로 시점별 재계산 · 아래로 갈수록 빠름 · ▲빨라짐 ▼느려짐 · '
-                f'보수적 알고리즘 VDOT 기준이라 상단 헤드라인과 1~2분 차이 가능 · 점에 마우스/탭 = 종목별 분해 + 변화 요인</span></div>'
-                f'<div style="font-size:12px;margin-bottom:8px">{_trend_tag(d_week, ref7_label)}'
-                f'<span style="margin-left:14px">{_trend_tag(d_prev, prev_label)}</span></div>'
-                '<div style="height:150px"><canvas id="estChart"></canvas></div>'
+                f'<div style="font-size:12px;color:#aaa;margin-bottom:2px">📈 종목별 예상 추세'
+                f'<span style="font-size:10px;color:#555;margin-left:8px">T1/T2 제외 순수 종목 시간 · 동일 알고리즘 시점별 재계산 · '
+                f'아래로 갈수록 빠름 · ▲빨라짐 ▼느려짐 · 점에 마우스/탭 = 변화 요인</span></div>'
+                f'{_charts_html}'
                 '<script>\n'
                 f'const estLabels = {json.dumps(est_labels, ensure_ascii=False)};\n'
-                f'const estTotals = {json.dumps(est_totals)};\n'
-                f'const estSplits = {json.dumps(est_splits, ensure_ascii=False)};\n'
-                f'const estDrivers = {json.dumps(est_drivers, ensure_ascii=False)};\n'
+                f'const estS = {json.dumps([round(h["swim"], 2) for h in est_hist])};\n'
+                f'const estB = {json.dumps([round(h["bike"], 2) for h in est_hist])};\n'
+                f'const estR = {json.dumps([round(h["run"], 2) for h in est_hist])};\n'
+                f'const estDrvS = {json.dumps(_disc_drivers("🏊"), ensure_ascii=False)};\n'
+                f'const estDrvB = {json.dumps(_disc_drivers("🚴"), ensure_ascii=False)};\n'
+                f'const estDrvR = {json.dumps(_disc_drivers("🏃"), ensure_ascii=False)};\n'
                 '''
-new Chart(document.getElementById('estChart'), {
-  type: 'line',
-  data: { labels: estLabels, datasets: [{
-    data: estTotals, borderColor: '#7c6fff', backgroundColor: '#7c6fff22',
-    borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, pointBackgroundColor: '#7c6fff',
-    fill: true, tension: 0.25,
-  }]},
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    interaction: { mode: 'nearest', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        displayColors: false,
-        callbacks: {
-          title: (items) => items[0] ? items[0].label + ' 시점 예상' : '',
-          label: (item) => {
-            const s = estSplits[item.dataIndex];
-            return ['전체 ' + s.t + ' (VDOT ' + s.v + ')',
-                    '\\uD83C\\uDFCA ' + s.s + '  \\uD83D\\uDEB4 ' + s.b + '  \\uD83C\\uDFC3 ' + s.r];
-          },
-          afterBody: (items) => {
-            if (!items.length) return [];
-            const d = estDrivers[items[0].dataIndex] || [];
-            return d.length ? [''].concat(d) : [];
-          },
-        }
+function estMMSS(v) {
+  const t = Math.round(v * 60);
+  return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+}
+function mkTrend(id, data, color, drv) {
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { labels: estLabels, datasets: [{
+      data: data, borderColor: color, backgroundColor: color + '22',
+      borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 5, pointBackgroundColor: color,
+      fill: true, tension: 0.25,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          displayColors: false,
+          callbacks: {
+            title: (items) => items[0] ? items[0].label + ' 시점' : '',
+            label: (item) => '예상 ' + estMMSS(item.parsed.y),
+            afterBody: (items) => {
+              if (!items.length) return [];
+              const d = drv[items[0].dataIndex] || [];
+              return d.length ? [''].concat(d) : [];
+            },
+          }
+        },
       },
-    },
-    scales: {
-      x: { ticks: { color: '#666', maxTicksLimit: 10, font: { size: 10 } }, grid: { color: '#1a1a2a' } },
-      y: { reverse: true,
-           ticks: { color: '#666', font: { size: 10 },
-                    callback: (v) => Math.floor(v/60) + ':' + String(Math.round(v%60)).padStart(2,'0') },
-           grid: { color: '#1a1a2a' } },
-    },
-  }
-});
+      scales: {
+        x: { ticks: { color: '#666', maxTicksLimit: 8, font: { size: 9 } }, grid: { color: '#1a1a2a' } },
+        y: { reverse: true,
+             ticks: { color: '#666', font: { size: 9 }, callback: (v) => estMMSS(v) },
+             grid: { color: '#1a1a2a' } },
+      },
+    }
+  });
+}
+mkTrend('estChartSwim', estS, '#6ab4ff', estDrvS);
+mkTrend('estChartBike', estB, '#ffa06a', estDrvB);
+mkTrend('estChartRun',  estR, '#6affa0', estDrvR);
 </script>'''
                 '</div>'
             )
