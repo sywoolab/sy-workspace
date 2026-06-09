@@ -6250,10 +6250,10 @@
     ]
   },
   "2026-06-09": {
-    "planned": "🏊 수영 강습 (월요일 06시)",
+    "planned": "🏃 빌드업 템포 (WU 3km → 1km @5:15 → 1km @5:10 → CD 2km) [Plan B: 과음 시 휴식]",
     "done": false,
-    "actual": "휴식 (과음 회복)",
-    "note": "전날 과음으로 수영 강습 불참. 충분한 휴식.",
+    "actual": "휴식 (과음 회복 — Plan B 3병+ 적용)",
+    "note": "전날 과음. 스케줄 Plan B(3병+) 적용 → 오늘 휴식, 템포는 수요일 저녁으로 이동.",
     "metrics": {
       "type": "rest",
       "training_load": 0
