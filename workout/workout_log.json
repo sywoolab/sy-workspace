@@ -6301,5 +6301,14 @@
         "feel": 50
       }
     ]
+  },
+  "2026-06-10": {
+    "planned": "🏃 빌드업 템포 (WU 3km → 1km @5:15 → 1km @5:10 → CD 2km)",
+    "done": false,
+    "actual": "휴식 (고객 저녁)",
+    "metrics": {
+      "type": "rest",
+      "training_load": 0
+    }
   }
 }

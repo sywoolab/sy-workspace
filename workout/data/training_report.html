@@ -35,7 +35,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-06-11 14:57 KST</div>
+<div class="sub">업데이트: 2026-06-11 15:07 KST</div>
 
 <div style="background:#13131f;border:1px solid #6affa044;border-radius:12px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -191,7 +191,7 @@ const allSwim   = [97, 0, 78, 0, 53, 101, 46, 0, 0, 45, 0, 0, 0, 62, 0, 0, 93, 0
 const allBike   = [0, 0, 0, 169, 0, 0, 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 0, 238, 0, 0, 0, 0, 0, 0, 0, 0, 381, 0, 0, 0, 0, 0, 518, 232, 0, 0, 0, 0, 0, 146, 243, 0, 0, 0, 0, 0, 0, 0, 0, 0, 179, 0, 0, 164, 88, 0, 0, 0, 0];
 const allRun    = [0, 78, 0, 0, 0, 0, 304, 0, 117, 0, 76, 0, 181, 0, 0, 0, 0, 103, 59, 0, 0, 0, 52, 54, 44, 0, 0, 466, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 104, 0, 0, 98, 0, 85, 0, 0, 0, 0, 96, 0, 76, 0, 0, 140, 0, 0, 0, 0];
 const allOther  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["06-21", "06-28", "08-27"];
+const raceDates = ["06-28", "08-27", "06-21"];
 
 const slice = isMobile ? 30 : 60;
 const labels   = allLabels.slice(-slice);
@@ -380,7 +380,7 @@ new Chart(document.getElementById('tlChart'), {
 <div class="section">📋 훈련 기록 — 최근 2주 <span style="font-size:11px;color:#555;font-weight:400">(14일)</span></div>
 <table><thead><tr><th>날짜</th><th>계획</th><th>운동 (준수)</th><th>부하 / 7일누적</th><th>수면</th><th>RHR</th><th>HRV</th></tr></thead><tbody>
 <tr class="today-row"><td>06-11 (목)</td><td><span style="color:#666;font-size:10.5px">Easy 롱런 11~12km</span></td><td><span class="badge swim">🏊 1400m</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">96</span><div class="tl-bar"><div class="tl-fill" style="width:16%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 602</div><div style="font-size:10px;color:#ffd56c;margin-top:1px">체감 6/10</div></td><td><span class="r">4h56m</span></td><td><span class="r">53</span></td><td><span class="r">43</span>/<span class="r">42</span></td></tr>
-<tr class="rest-row"><td>06-10 (수)</td><td><span style="color:#666;font-size:10.5px">수영 강습 06시</span></td><td><span class="rest-badge">—</span> ❌</td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 582</div></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>06-10 (수)</td><td><span style="color:#666;font-size:10.5px">빌드업 템포 (WU 3km → 1km @5:15 →…</span></td><td><span class="rest-badge">휴식 (고객 저녁)</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 582</div></td><td>-</td><td>-</td><td>-</td></tr>
 <tr><td>06-09 (화)</td><td><span style="color:#666;font-size:10.5px">빌드업 템포 (WU 3km → 1km @5:15 →…</span></td><td><span class="rest-badge">휴식 (과음 회복 — Plan B 3병+ 적용)</span> 😴</td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 761</div></td><td>-</td><td>-</td><td>-</td></tr>
 <tr><td>06-08 (월)</td><td><span style="color:#666;font-size:10.5px">🛌 휴식 우선 (수영 강습 기본 스킵 — 기상 컨디…</span></td><td><span class="badge swim">🏊 725m</span> 💪</td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">36</span><div class="tl-bar"><div class="tl-fill" style="width:6%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 857</div></td><td><span class="y">6h24m</span></td><td><span class="r">51</span></td><td><span class="y">49</span>/<span class="r">43</span></td></tr>
 <tr><td>06-07 (일)</td><td><span style="color:#666;font-size:10.5px">🎉 쉬엄쉬엄 한강 3종 (자전거 20km → 러닝 …</span></td><td><span class="badge swim">🏊 885m</span><span class="badge bike">🚴 23km</span><span class="badge run">🏃 8.8km 5:31</span> ✅</td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">239</span><div class="tl-bar"><div class="tl-fill" style="width:40%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 866</div><div style="font-size:10px;color:#ff6c6c;margin-top:1px">체감 8/10</div></td><td><span class="y">6h51m</span></td><td><span class="y">49</span></td><td><span class="y">51</span>/<span class="y">45</span></td></tr>
@@ -523,5 +523,5 @@ new Chart(document.getElementById('tlChart'), {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-06-11 14:57 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-06-11 15:07 KST</div>
 </body></html>
