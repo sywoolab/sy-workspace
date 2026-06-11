@@ -3398,5 +3398,49 @@
       "load": null,
       "vo2max_run": null
     }
+  },
+  "2026-06-09": {
+    "date": "2026-06-09",
+    "resting_hr": 51,
+    "hrv": {
+      "weekly_avg": 38,
+      "last_night": 26,
+      "status": "UNBALANCED"
+    },
+    "body_battery": {
+      "max": 42,
+      "min": 20
+    },
+    "sleep": {
+      "duration_min": 336,
+      "score": 45,
+      "deep_min": 69,
+      "light_min": 226,
+      "rem_min": 41,
+      "awake_min": 30
+    },
+    "steps": 12535
+  },
+  "2026-06-10": {
+    "date": "2026-06-10",
+    "resting_hr": 46,
+    "hrv": {
+      "weekly_avg": 44,
+      "last_night": 65,
+      "status": "BALANCED"
+    },
+    "body_battery": {
+      "max": 60,
+      "min": 67
+    },
+    "sleep": {
+      "duration_min": 531,
+      "score": 82,
+      "deep_min": 61,
+      "light_min": 384,
+      "rem_min": 86,
+      "awake_min": 1
+    },
+    "steps": 14951
   }
 }
