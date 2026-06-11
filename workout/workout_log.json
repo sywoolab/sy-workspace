@@ -6258,5 +6258,48 @@
       "type": "rest",
       "training_load": 0
     }
+  },
+  "2026-06-11": {
+    "planned": "🏃 Easy 롱런 11~12km",
+    "done": true,
+    "actual": "수영 1400m 28분 @2:01/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1400,
+      "duration_min": 28.2,
+      "moving_min": 28.2,
+      "pace_per_100m": "2:01",
+      "avg_hr": 146,
+      "max_hr": 165,
+      "swolf": 42,
+      "strokes": 665,
+      "avg_spm": null,
+      "training_load": 96
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.1 / 무산소 0.1 | 부하 96",
+    "garmin_id": 23207042060,
+    "start_time": "11:31",
+    "garmin_ids": [
+      23207042060
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 1692.0,
+        "avg_hr": 146,
+        "max_hr": 165,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 96,
+        "garmin_id": 23207042060,
+        "laps": null,
+        "open_water": false,
+        "start_time": "11:31",
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }

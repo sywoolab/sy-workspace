@@ -1798,7 +1798,7 @@ def _format_entry_activities(entry, date_str, workout_log, schedule_data, lines)
                 if m.get('cadence'):
                     lines.append(f"  케이던스 {m['cadence']}spm")
             elif wtype == 'swim':
-                dist_m = m.get('distance_m', 0)
+                dist_m = m.get('distance_m') or 0
                 pace = m.get('pace_per_100m', '?')
                 dur_sec = int((m.get('duration_min') or 0) * 60)
                 lines.append(f"  {round(dist_m)}m | {pace}/100m | {seconds_to_hhmm(dur_sec)}")
