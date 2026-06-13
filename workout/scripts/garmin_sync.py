@@ -231,6 +231,7 @@ def _update_tokens_secret():
              '-R', os.environ.get('GITHUB_REPOSITORY', 'sywoolab/sy-workspace'),
              '--body', b64],
             capture_output=True, text=True, timeout=30,
+            encoding='utf-8', errors='replace',
             env={**os.environ, 'GH_TOKEN': gh_token},
         )
         if result.returncode == 0:
@@ -272,7 +273,8 @@ def _push_and_update_dashboard(has_new_activity: bool):
     # (1) 데이터 변경 여부 우선 확인
     unstaged = subprocess.run(
         ['git', 'status', '--porcelain'],
-        capture_output=True, text=True, cwd=repo_root, timeout=30
+        capture_output=True, text=True, cwd=repo_root, timeout=30,
+        encoding='utf-8', errors='replace',
     ).stdout.strip()
 
     # (2) HTML 신선본 재생성 — git add 이전. sy-workspace tracked 사본도 같이 commit해야 고아화 차단.
@@ -282,7 +284,8 @@ def _push_and_update_dashboard(has_new_activity: bool):
         try:
             r_dash = subprocess.run(
                 [sys.executable, str(dashboard_script)],
-                cwd=repo_root, capture_output=True, text=True, timeout=120
+                cwd=repo_root, capture_output=True, text=True, timeout=120,
+                encoding='utf-8', errors='replace',
             )
             if r_dash.returncode == 0:
                 print('  [dashboard] HTML 재생성 완료')
@@ -315,7 +318,8 @@ def _push_and_update_dashboard(has_new_activity: bool):
         #    (--allow-empty 금지: git add 실패/레이스 시 빈 커밋이 데이터 누락을 숨김 — 2026-05-25 사고 root cause)
         staged = subprocess.run(
             ['git', 'diff', '--cached', '--name-only'],
-            capture_output=True, text=True, cwd=repo_root, timeout=30
+            capture_output=True, text=True, cwd=repo_root, timeout=30,
+            encoding='utf-8', errors='replace',
         ).stdout.strip()
         if not staged:
             # 새 활동이 있다는데 스테이징할 게 없음 = silent fail (L0 §자동화 산출물 검증)
@@ -334,7 +338,8 @@ def _push_and_update_dashboard(has_new_activity: bool):
             try:
                 result2 = subprocess.run(
                     ['git', 'push'],
-                    capture_output=True, text=True, cwd=repo_root, timeout=60
+                    capture_output=True, text=True, cwd=repo_root, timeout=60,
+                    encoding='utf-8', errors='replace',
                 )
             except subprocess.TimeoutExpired:
                 # Windows에서 git push hang (credential prompt 등) — 5/30 root cause 후보. 차단 알림 + 명시 종료.
@@ -350,8 +355,9 @@ def _push_and_update_dashboard(has_new_activity: bool):
                 if has_new_activity:
                     head_log = subprocess.run(
                         ['git', 'show', 'HEAD:workout/workout_log.json'],
-                        capture_output=True, text=True, cwd=repo_root, timeout=30
-                    ).stdout
+                        capture_output=True, text=True, cwd=repo_root, timeout=30,
+                        encoding='utf-8', errors='replace',
+                    ).stdout or ''
                     if TODAY not in head_log:
                         try:
                             send_telegram(f"⚠️ gsync: push 완료했으나 HEAD에 {TODAY} entry 없음 — 데이터 누락 의심")
@@ -378,7 +384,8 @@ def _push_and_update_dashboard(has_new_activity: bool):
                 ['git', 'commit', '-m', f'update: {TODAY} sync'],
                 cwd=str(dashboard_repo), capture_output=True
             )
-            r = subprocess.run(['git', 'push'], cwd=str(dashboard_repo), capture_output=True, text=True)
+            r = subprocess.run(['git', 'push'], cwd=str(dashboard_repo), capture_output=True, text=True,
+                               encoding='utf-8', errors='replace')
             if r.returncode == 0:
                 print('  [dashboard] training-dashboard repo push 완료')
     except Exception as e:
@@ -454,7 +461,8 @@ def _git_pull_safe():
     repo_root = str(Path(BASE_DIR).resolve().parent)
     try:
         r = subprocess.run(['git', 'pull', '--rebase', '--autostash'],
-                           cwd=repo_root, capture_output=True, timeout=60, text=True)
+                           cwd=repo_root, capture_output=True, timeout=60, text=True,
+                           encoding='utf-8', errors='replace')
         if r.returncode == 0:
             print(f"[git pull] OK")
         else:
@@ -488,7 +496,8 @@ def _git_push_safe(commit_message):
                        cwd=repo_root, capture_output=True, timeout=15)
         for attempt in range(3):
             r = subprocess.run(['git', 'push'], cwd=repo_root,
-                               capture_output=True, timeout=90, text=True)
+                               capture_output=True, timeout=90, text=True,
+                               encoding='utf-8', errors='replace')
             if r.returncode == 0:
                 print(f"[git push] OK (시도 {attempt+1}/3)")
                 return
