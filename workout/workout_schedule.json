@@ -343,11 +343,12 @@
     },
     "2026-06-14": {
       "date": "2026-06-14",
-      "workout": "🛌 완전 휴식",
-      "detail": "일. 롱런은 토 6/13으로 이동",
+      "workout": "🚴 Z2 지구력 사이클 55~60km (남북코스 + 평지 15km 추가, 업다운)",
+      "detail": "일. 사이클 단독. 평소 남북코스에 평지 15km 추가 ≈55~60km. Z2(HR 145 이하, 대화 가능) 유지 — 업다운은 스피닝, 힐 스프린트 금지. 6/28 대가야 올림픽(D-14) 바이크 지구력 빌드. 아침 게이트: 기상 시 RHR 50+ / HRV 무너짐 / Body Battery 낮음이면 30~40km Easy 단축 또는 휴식. 6/13 부하 243(러닝 충격) 다음날이라 저충격 자전거로 배치. 탄수+수분 보급 필수(전일 BB 17 방전).",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed"
+      "rule": "user-confirmed",
+      "decision_pending": "morning-condition-check"
     },
     "2026-06-15": {
       "date": "2026-06-15",
