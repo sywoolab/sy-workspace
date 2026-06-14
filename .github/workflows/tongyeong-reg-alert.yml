@@ -1,0 +1,78 @@
+name: tongyeong-reg-alert
+
+on:
+  schedule:
+    # D-7  | 2026-07-21 09:00 KST = 00:00 UTC
+    - cron: '0 0 21 7 *'
+    # D-1  | 2026-07-27 09:00 KST = 00:00 UTC
+    - cron: '0 0 27 7 *'
+    # D-day 아침 | 2026-07-28 07:00 KST = 2026-07-27 22:00 UTC
+    - cron: '0 22 27 7 *'
+    # D-day 13:30 KST (오픈 30분 전) | 2026-07-28 04:30 UTC
+    - cron: '30 4 28 7 *'
+  workflow_dispatch:
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram alert
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 - <<'EOF'
+          import os, requests
+          from datetime import datetime, timezone, timedelta
+
+          KST = timezone(timedelta(hours=9))
+          now = datetime.now(KST)
+          md = (now.month, now.day, now.hour)
+
+          BOT_TOKEN = os.environ['BOT_TOKEN']
+          CHAT_ID   = os.environ['CHAT_ID']
+          URL = "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2042&page=1&sYear=2026&vType=list&field=&keyword="
+
+          if md == (7, 21, 9):
+              msg = (
+                  "📅 통영 철인3종 접수 D-7\n\n"
+                  "2026 통영 월드 트라이애슬론 컵\n"
+                  "📍 경남 통영시 트라이애슬론광장\n"
+                  "🏁 대회일: 2026.10.24~25\n"
+                  f"🔗 접수 링크: {URL}\n\n"
+                  "일주일 후 2026-07-28 14:00 오픈런 대비하세요!"
+              )
+          elif md == (7, 27, 9):
+              msg = (
+                  "⚡ 통영 철인3종 접수 내일!\n\n"
+                  "내일 2026-07-28(화) 14:00 오픈런\n"
+                  f"🔗 {URL}\n\n"
+                  "접수 사이트 미리 로그인해두세요 🏊‍♂️🚴‍♂️🏃‍♂️"
+              )
+          elif md == (7, 27, 7):
+              # D-day 아침 (UTC 22시 = KST 07시이므로 날짜는 7/28)
+              msg = (
+                  "🔔 오늘 14:00 통영 철인3종 접수!\n\n"
+                  "2026 통영 월드 트라이애슬론 컵\n"
+                  "⏰ 오늘 14:00 접수 오픈\n"
+                  f"🔗 {URL}\n\n"
+                  "오전 중 로그인 세션 확인해두세요!"
+              )
+          else:
+              # 13:30 KST 알림 (오픈 30분 전)
+              msg = (
+                  "🚨 30분 후 통영 접수 오픈!\n\n"
+                  "2026 통영 월드 트라이애슬론 컵\n"
+                  "⏰ 14:00 접수 시작 (지금 14:30까지 대기)\n"
+                  f"👉 {URL}\n\n"
+                  "지금 사이트 열고 대기하세요! 오픈런 🔥"
+              )
+
+          resp = requests.post(
+              f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+              json={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"},
+              timeout=10
+          )
+          print(f"[{now.strftime('%Y-%m-%d %H:%M KST')}] status={resp.status_code}")
+          resp.raise_for_status()
+          EOF
