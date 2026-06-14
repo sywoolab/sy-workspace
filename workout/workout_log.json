@@ -6719,5 +6719,174 @@
         "feel": 50
       }
     ]
+  },
+  "2026-06-14": {
+    "planned": "🚴 Z2 지구력 사이클 55~60km (남북코스 + 평지 15km 추가, 업다운)",
+    "done": true,
+    "actual": "자전거 41.6km 104분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 41.6,
+      "duration_min": 103.8,
+      "avg_speed_kmh": 24.0,
+      "avg_hr": 139,
+      "max_hr": 168,
+      "avg_power": 164.0,
+      "training_load": 146,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 620,
+          "avg_hr": 127,
+          "max_hr": 144,
+          "speed_kmh": 29.1
+        },
+        {
+          "distance": 5000,
+          "duration": 541,
+          "avg_hr": 148,
+          "max_hr": 154,
+          "speed_kmh": 33.3
+        },
+        {
+          "distance": 5000,
+          "duration": 605,
+          "avg_hr": 142,
+          "max_hr": 155,
+          "speed_kmh": 29.7
+        },
+        {
+          "distance": 5000,
+          "duration": 934,
+          "avg_hr": 146,
+          "max_hr": 168,
+          "speed_kmh": 19.3
+        },
+        {
+          "distance": 5000,
+          "duration": 855,
+          "avg_hr": 140,
+          "max_hr": 161,
+          "speed_kmh": 21.0
+        },
+        {
+          "distance": 5000,
+          "duration": 1171,
+          "avg_hr": 141,
+          "max_hr": 162,
+          "speed_kmh": 15.4
+        },
+        {
+          "distance": 5000,
+          "duration": 711,
+          "avg_hr": 133,
+          "max_hr": 166,
+          "speed_kmh": 25.3
+        },
+        {
+          "distance": 5000,
+          "duration": 602,
+          "avg_hr": 132,
+          "max_hr": 151,
+          "speed_kmh": 29.9
+        },
+        {
+          "distance": 1599,
+          "duration": 193,
+          "avg_hr": 147,
+          "max_hr": 157,
+          "speed_kmh": 29.9
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.5 / 무산소 1.0 | 부하 146",
+    "garmin_id": 23240862491,
+    "start_time": "10:08",
+    "garmin_ids": [
+      23240862491
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": 41600.0,
+        "duration_sec": 6228.0,
+        "avg_hr": 139,
+        "max_hr": 168,
+        "avg_pace": null,
+        "avg_speed": 6.666666666666666,
+        "training_load": 146,
+        "garmin_id": 23240862491,
+        "laps": [
+          {
+            "distance": 5000,
+            "duration": 620,
+            "avg_hr": 127,
+            "max_hr": 144,
+            "speed_kmh": 29.1
+          },
+          {
+            "distance": 5000,
+            "duration": 541,
+            "avg_hr": 148,
+            "max_hr": 154,
+            "speed_kmh": 33.3
+          },
+          {
+            "distance": 5000,
+            "duration": 605,
+            "avg_hr": 142,
+            "max_hr": 155,
+            "speed_kmh": 29.7
+          },
+          {
+            "distance": 5000,
+            "duration": 934,
+            "avg_hr": 146,
+            "max_hr": 168,
+            "speed_kmh": 19.3
+          },
+          {
+            "distance": 5000,
+            "duration": 855,
+            "avg_hr": 140,
+            "max_hr": 161,
+            "speed_kmh": 21.0
+          },
+          {
+            "distance": 5000,
+            "duration": 1171,
+            "avg_hr": 141,
+            "max_hr": 162,
+            "speed_kmh": 15.4
+          },
+          {
+            "distance": 5000,
+            "duration": 711,
+            "avg_hr": 133,
+            "max_hr": 166,
+            "speed_kmh": 25.3
+          },
+          {
+            "distance": 5000,
+            "duration": 602,
+            "avg_hr": 132,
+            "max_hr": 151,
+            "speed_kmh": 29.9
+          },
+          {
+            "distance": 1599,
+            "duration": 193,
+            "avg_hr": 147,
+            "max_hr": 157,
+            "speed_kmh": 29.9
+          }
+        ],
+        "open_water": false,
+        "start_time": "10:08",
+        "rpe": 7,
+        "feel": 50
+      }
+    ]
   }
 }
