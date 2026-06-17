@@ -7218,5 +7218,143 @@
     "done": false,
     "actual": "휴식 (만취 회복)",
     "note": "전날 만취. 수영 강습 스킵. §13 음주 3병+ 적용."
+  },
+  "2026-06-18": {
+    "planned": "🏃 8~10km 빌드업 러닝 (앞 6~8km Easy → 마지막 1~2km 점진 가속)",
+    "done": true,
+    "actual": "러닝 7.63km @5:55 + 러닝 0.34km @6:27",
+    "metrics": {
+      "type": "run",
+      "distance_km": 0.34,
+      "pace_per_km": "6:27",
+      "avg_hr": 145,
+      "max_hr": 156,
+      "cadence": 172,
+      "training_load": 7,
+      "laps": [
+        {
+          "distance": 338,
+          "duration": 131,
+          "avg_hr": 145,
+          "max_hr": 156,
+          "pace_sec": 388,
+          "pace_str": "6:27"
+        }
+      ]
+    },
+    "training_zone": "easy",
+    "note": "유산소 3.1 / 무산소 0.2 | 부하 94 | 유산소 0.5 | 부하 7",
+    "garmin_id": 23288216252,
+    "start_time": "06:28",
+    "garmin_ids": [
+      23288194390,
+      23288216252
+    ],
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_m": 7630.0,
+        "duration_sec": null,
+        "avg_hr": 141,
+        "max_hr": 163,
+        "avg_pace": "5:55",
+        "avg_speed": null,
+        "training_load": 94,
+        "garmin_id": 23288194390,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 402,
+            "avg_hr": 123,
+            "max_hr": 134,
+            "pace_sec": 402,
+            "pace_str": "6:41"
+          },
+          {
+            "distance": 1000,
+            "duration": 368,
+            "avg_hr": 133,
+            "max_hr": 139,
+            "pace_sec": 368,
+            "pace_str": "6:07"
+          },
+          {
+            "distance": 1000,
+            "duration": 361,
+            "avg_hr": 139,
+            "max_hr": 146,
+            "pace_sec": 361,
+            "pace_str": "6:01"
+          },
+          {
+            "distance": 1000,
+            "duration": 365,
+            "avg_hr": 141,
+            "max_hr": 145,
+            "pace_sec": 365,
+            "pace_str": "6:04"
+          },
+          {
+            "distance": 1000,
+            "duration": 355,
+            "avg_hr": 142,
+            "max_hr": 146,
+            "pace_sec": 355,
+            "pace_str": "5:55"
+          },
+          {
+            "distance": 1000,
+            "duration": 340,
+            "avg_hr": 147,
+            "max_hr": 152,
+            "pace_sec": 340,
+            "pace_str": "5:40"
+          },
+          {
+            "distance": 1000,
+            "duration": 326,
+            "avg_hr": 155,
+            "max_hr": 163,
+            "pace_sec": 326,
+            "pace_str": "5:25"
+          },
+          {
+            "distance": 627,
+            "duration": 197,
+            "avg_hr": 160,
+            "max_hr": 163,
+            "pace_sec": 314,
+            "pace_str": "5:13"
+          }
+        ],
+        "open_water": false,
+        "start_time": "06:28",
+        "rpe": 6,
+        "feel": 50
+      },
+      {
+        "type": "run",
+        "distance_km": 0.34,
+        "pace_per_km": "6:27",
+        "avg_hr": 145,
+        "max_hr": 156,
+        "cadence": 172,
+        "training_load": 7,
+        "laps": [
+          {
+            "distance": 338,
+            "duration": 131,
+            "avg_hr": 145,
+            "max_hr": 156,
+            "pace_sec": 388,
+            "pace_str": "6:27"
+          }
+        ],
+        "garmin_id": 23288216252,
+        "start_time": "07:14",
+        "rpe": 3,
+        "feel": 50
+      }
+    ]
   }
 }
