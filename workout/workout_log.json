@@ -7356,5 +7356,48 @@
         "feel": 50
       }
     ]
+  },
+  "2026-06-19": {
+    "planned": "🏊 수영 강습 06시 (Easy 테이퍼)",
+    "done": true,
+    "actual": "수영 1250m 31분 @2:10/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1250,
+      "duration_min": 31.3,
+      "moving_min": 27.2,
+      "pace_per_100m": "2:10",
+      "avg_hr": 121,
+      "max_hr": 151,
+      "swolf": 45,
+      "strokes": 599,
+      "avg_spm": null,
+      "training_load": 33
+    },
+    "training_zone": "easy",
+    "note": "유산소 1.9 / 무산소 0.6 | 부하 33",
+    "garmin_id": 23302270015,
+    "start_time": "14:31",
+    "garmin_ids": [
+      23302270015
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 1878.0,
+        "avg_hr": 121,
+        "max_hr": 151,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 33,
+        "garmin_id": 23302270015,
+        "laps": null,
+        "open_water": false,
+        "start_time": "14:31",
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
   }
 }
