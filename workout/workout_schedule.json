@@ -408,8 +408,8 @@
     },
     "2026-06-22": {
       "date": "2026-06-22",
-      "workout": "휴식",
-      "detail": "",
+      "workout": "🏊 수영 강습 06시 (완료) + 🏃 저녁 Easy 러닝 6km",
+      "detail": "월 D-6. 오전 수영 1000m 완료(부하29). 저녁 Easy 러닝 6km (HR 150 이하, 페이스 6:00~6:30). 워크샵+대회취소 3일 공백 후 재가동. 빡세게 금지 — 테이퍼 기조 유지.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
