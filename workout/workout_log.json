@@ -7399,5 +7399,48 @@
         "feel": 50
       }
     ]
+  },
+  "2026-06-22": {
+    "planned": "휴식",
+    "done": true,
+    "actual": "수영 1000m 38분 @1:53/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1000,
+      "duration_min": 38.4,
+      "moving_min": 18.9,
+      "pace_per_100m": "1:53",
+      "avg_hr": 116,
+      "max_hr": 146,
+      "swolf": 36,
+      "strokes": 315,
+      "avg_spm": null,
+      "training_load": 29
+    },
+    "training_zone": "easy",
+    "note": "유산소 1.7 / 무산소 0.6 | 부하 29",
+    "garmin_id": 23333706966,
+    "start_time": "06:15",
+    "garmin_ids": [
+      23333706966
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 2304.0,
+        "avg_hr": 116,
+        "max_hr": 146,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 29,
+        "garmin_id": 23333706966,
+        "laps": null,
+        "open_water": false,
+        "start_time": "06:15",
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
   }
 }
