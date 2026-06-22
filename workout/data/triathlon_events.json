@@ -43,6 +43,15 @@
   },
   {
     "status": "접수예정",
+    "name": "제7회 충청북도지사배 충주탄금호 전국 철인3종 경기대회(7월 7일 14시 접수예정)",
+    "location": "충주시 탄금호 국제조정경기장 일원",
+    "course": "스탠다드",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2044&page=1&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.09.19 ~ 20",
+    "reg_period": "2026-07-07 14:00 ~ 2026-08-21 18:00"
+  },
+  {
+    "status": "접수예정",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅲ (9.19 토요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2065&page=1&sYear=2026&vType=list&field=&keyword=",
@@ -69,7 +78,7 @@
   {
     "status": "접수예정",
     "name": "2026 2차 Level C 심판 강습회(신규 심판 과정)",
-    "location": "경기도 예정",
+    "location": "경기도 광주 G스타디움",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2102&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.08.01 ~ 02",
     "reg_period": "2026-06-24 10:00 ~ 2026-07-17 23:59"
@@ -167,20 +176,20 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수예정",
-    "name": "제55회 전국소년체육대회",
-    "location": "부산 기장군 장안읍 임랑해수욕장",
-    "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.05.23 ~ 24"
-  },
-  {
     "status": "접수중",
     "name": "2026 철인3종 5차 대회규정 정기교육",
     "location": "온라인 ZOOM",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2101&page=1&sYear=2026&sStat=&sPost=&field=tour_title&keyword=규정",
     "date": "2026.06.24",
     "reg_period": "2026-06-18 09:00 ~ 2026-06-23 23:59"
+  },
+  {
+    "status": "접수예정",
+    "name": "제55회 전국소년체육대회",
+    "location": "부산 기장군 장안읍 임랑해수욕장",
+    "course": "중등부(개인전: 슈퍼스프린트, 단체전: 아쿠아슬론)",
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2040&page=2&sYear=2026&vType=list&field=&keyword=",
+    "date": "2026.05.23 ~ 24"
   },
   {
     "status": "접수마감",
