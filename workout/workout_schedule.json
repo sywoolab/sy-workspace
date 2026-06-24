@@ -433,23 +433,23 @@
     "2026-06-25": {
       "date": "2026-06-25",
       "workout": "🚴 야외 자전거 30km (HR 155 이하)",
-      "detail": "토. 전날 음주로 HR 165→155 이하로 낮춤. 집 앞 30km 스테디. 테이퍼 해제 첫 자전거.",
+      "detail": "목. 전날 음주로 HR 155 이하로 낮춤. 집 앞 30km 스테디. 테이퍼 해제 첫 자전거.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-26": {
       "date": "2026-06-26",
-      "workout": "🛌 휴식",
-      "detail": "일. 자전거 다음날 회복.",
+      "workout": "🏊 수영 강습 06시",
+      "detail": "금. 고정 강습 일정. 6/25 자전거 다음날 — 수영으로 액티브 회복.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-27": {
       "date": "2026-06-27",
-      "workout": "🏊 수영 강습 06시",
-      "detail": "월. 원래 대가야 이동일이었으나 훈련 전환. 강습 복귀.",
+      "workout": "🏊 수영 개인강습",
+      "detail": "토. 고정 개인강습. 원래 대가야 이동일이었으나 훈련 전환.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -457,7 +457,7 @@
     "2026-06-28": {
       "date": "2026-06-28",
       "workout": "🏃 러닝 10km Easy~Moderate",
-      "detail": "화. 대가야 취소일 → 훈련 전환. 볼륨 복귀 첫 런. HR 155 이하 steady.",
+      "detail": "일. 대가야 취소일 → 훈련 전환. 볼륨 복귀 첫 런. HR 155 이하 steady.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -465,15 +465,15 @@
     "2026-06-29": {
       "date": "2026-06-29",
       "workout": "🏊 수영 강습 06시",
-      "detail": "수. 정규 강습.",
+      "detail": "월. 정규 강습.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-30": {
       "date": "2026-06-30",
-      "workout": "🚴 자전거 40~50km 스테디 + 🏃 전환 런 3km (브릭)",
-      "detail": "목. 거제 대비 브릭 재도입. 자전거 HR 160 이하 → 내려서 런 3km Easy.",
+      "workout": "🛌 휴식",
+      "detail": "화. 평일 회복. 브릭은 Phase2(7/7~)에서 재도입.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -481,23 +481,23 @@
     "2026-07-02": {
       "date": "2026-07-02",
       "workout": "🏃 빌드업 런 10~12km",
-      "detail": "토. WU 3km + 중간 5km @5:20~5:30 + CD 2~4km. 볼륨 빌드업.",
+      "detail": "목. WU 3km + 중간 5km @5:20~5:30 + CD 2~4km. 볼륨 빌드업.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-05": {
       "date": "2026-07-05",
-      "workout": "🏊 수영 강습 06시",
-      "detail": "화.",
+      "workout": "🛌 휴식",
+      "detail": "일. 완전 휴식.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-07": {
       "date": "2026-07-07",
-      "workout": "🏃 Easy 12~13km",
-      "detail": "화. 롱런 빌드 3단계. HR 145 이하 유지",
+      "workout": "🚴 자전거 60km 장거리",
+      "detail": "화. 거제 40km 대비 초과 라이딩. HR 160 이하 스테디. Phase1 마무리.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -568,8 +568,8 @@
     },
     "2026-07-04": {
       "date": "2026-07-04",
-      "workout": "🛌 휴식",
-      "detail": "월.",
+      "workout": "🏊 수영 개인강습 / OW",
+      "detail": "토. 고정 개인강습 또는 OW 훈련.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -592,24 +592,24 @@
     },
     "2026-07-01": {
       "date": "2026-07-01",
-      "workout": "🛌 휴식",
-      "detail": "금. 브릭 다음날 회복.",
+      "workout": "🏊 수영 강습 06시",
+      "detail": "수. 고정 강습 일정.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-03": {
       "date": "2026-07-03",
-      "workout": "🏊 OW 또는 수영 강습",
-      "detail": "일. 가능하면 한강 OW. 불가시 강습.",
+      "workout": "🏊 수영 강습 06시 (OW 가능 시 대체)",
+      "detail": "금. 고정 강습. 한강 OW 가능하면 대체.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-06": {
       "date": "2026-07-06",
-      "workout": "🚴 자전거 60km 장거리",
-      "detail": "수. 거제 40km 대비 초과 라이딩. HR 160 이하 스테디. Phase1 마무리.",
+      "workout": "🏊 수영 강습 06시",
+      "detail": "월. 고정 강습 일정.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
