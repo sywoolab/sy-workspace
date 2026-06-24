@@ -488,16 +488,16 @@
     },
     "2026-07-05": {
       "date": "2026-07-05",
-      "workout": "🛌 휴식",
-      "detail": "일. 완전 휴식.",
+      "workout": "🏃 러닝 Easy 8~10km",
+      "detail": "일. 전날 자전거 후 러닝. HR 150 이하 Easy. 다리 무거우면 6km로 단축.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-07": {
       "date": "2026-07-07",
-      "workout": "🚴 자전거 60km 장거리",
-      "detail": "화. 거제 40km 대비 초과 라이딩. HR 160 이하 스테디. Phase1 마무리.",
+      "workout": "🛌 휴식",
+      "detail": "화. 주말 세션(수영+자전거+런) 회복.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -568,8 +568,8 @@
     },
     "2026-07-04": {
       "date": "2026-07-04",
-      "workout": "🏊 수영 개인강습 / OW",
-      "detail": "토. 고정 개인강습 또는 OW 훈련.",
+      "workout": "🏊 수영 개인강습 + 🚴 자전거 60km 장거리",
+      "detail": "토. 아침 개인강습 후 자전거 60km. Phase1 피크 토요일 집중 세션. HR 160 이하 스테디.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
