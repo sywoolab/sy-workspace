@@ -568,11 +568,12 @@
     },
     "2026-07-04": {
       "date": "2026-07-04",
-      "workout": "🏊 수영 개인강습 + 🚴 자전거 ~67km 언덕 코스",
-      "detail": "토. 아침 개인강습 후 자전거 6/28 수준(~67km 언덕). 강도 같은 코스로. TSS 170~180 목표.",
+      "workout": "🏊 수영 개인강습 (+ 자전거 30km 또는 수영 추가볼륨 당일 결정)",
+      "detail": "토. 개인강습 기본. 당일 컨디션 따라 ①강습 전 자전거 30km 미니브릭 또는 ②강습 전 수영 1000m 추가 중 선택.",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed"
+      "rule": "user-confirmed",
+      "decision_pending": "day-of-condition"
     },
     "2026-07-18": {
       "date": "2026-07-18",
