@@ -488,8 +488,8 @@
     },
     "2026-07-05": {
       "date": "2026-07-05",
-      "workout": "🏃 러닝 Easy 8~10km",
-      "detail": "일. 전날 자전거 후 러닝. HR 150 이하 Easy. 다리 무거우면 6km로 단축.",
+      "workout": "🚴 자전거 60km 장거리 (+ 런 5km 옵션)",
+      "detail": "일. 토 결혼식으로 못 탄 자전거 이동. HR 160 이하 스테디. 여유 있으면 직후 전환 런 5km.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -568,12 +568,11 @@
     },
     "2026-07-04": {
       "date": "2026-07-04",
-      "workout": "🏊 수영 개인강습 (+ 자전거 30km 또는 수영 추가볼륨 당일 결정)",
-      "detail": "토. 개인강습 기본. 당일 컨디션 따라 ①강습 전 자전거 30km 미니브릭 또는 ②강습 전 수영 1000m 추가 중 선택.",
+      "workout": "🏊 수영 개인강습 + 수영 ~1km",
+      "detail": "토. 결혼식으로 자전거 불가. 수영 개인강습 후 추가 1km 정도로 마무리.",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed",
-      "decision_pending": "day-of-condition"
+      "rule": "user-confirmed"
     },
     "2026-07-18": {
       "date": "2026-07-18",
