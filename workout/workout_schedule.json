@@ -473,7 +473,7 @@
     "2026-06-30": {
       "date": "2026-06-30",
       "workout": "🏃 Easy 런 8km",
-      "detail": "화. 대가야 취소로 회복주 불필요 → 빌드업 전환. HR 145 이하 Easy. 다리 무거우면 6km로 단축.",
+      "detail": "화. 저녁 Easy 런 8km. HR 150 이하. 6/28 자전거 여파 회복 완료 후 볼륨 복귀.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
