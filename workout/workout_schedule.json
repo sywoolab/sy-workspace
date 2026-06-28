@@ -472,8 +472,8 @@
     },
     "2026-06-30": {
       "date": "2026-06-30",
-      "workout": "🛌 휴식",
-      "detail": "화. 평일 회복. 브릭은 Phase2(7/7~)에서 재도입.",
+      "workout": "🏃 Easy 런 8km",
+      "detail": "화. 대가야 취소로 회복주 불필요 → 빌드업 전환. HR 145 이하 Easy. 다리 무거우면 6km로 단축.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -568,8 +568,8 @@
     },
     "2026-07-04": {
       "date": "2026-07-04",
-      "workout": "🏊 수영 개인강습 + 🚴 자전거 60km 장거리",
-      "detail": "토. 아침 개인강습 후 자전거 60km. Phase1 피크 토요일 집중 세션. HR 160 이하 스테디.",
+      "workout": "🏊 수영 개인강습 + 🚴 자전거 ~67km 언덕 코스",
+      "detail": "토. 아침 개인강습 후 자전거 6/28 수준(~67km 언덕). 강도 같은 코스로. TSS 170~180 목표.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
