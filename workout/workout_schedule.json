@@ -464,8 +464,8 @@
     },
     "2026-06-29": {
       "date": "2026-06-29",
-      "workout": "🏊 수영 강습 06시",
-      "detail": "월. 정규 강습.",
+      "workout": "🏊 자유수영 1500m (오후, 액티브 리커버리)",
+      "detail": "월. 6/28 자전거 여파 회복일. 오후 자유수영 1500m Easy — 저충격 액티브 리커버리. 내일 아침 런 8km 대비.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -473,7 +473,7 @@
     "2026-06-30": {
       "date": "2026-06-30",
       "workout": "🏃 Easy 런 8km",
-      "detail": "화. 저녁 Easy 런 8km. HR 150 이하. 6/28 자전거 여파 회복 완료 후 볼륨 복귀.",
+      "detail": "화. 아침 Easy 런 8km. HR 150 이하. 출근 전 공복 런.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
