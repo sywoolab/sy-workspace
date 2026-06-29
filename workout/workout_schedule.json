@@ -480,16 +480,16 @@
     },
     "2026-07-02": {
       "date": "2026-07-02",
-      "workout": "🛌 휴식 (사랑니 발치 D+3)",
-      "detail": "목. 발치 D+3. 치과 금지 마지막 날. 빌드업 런 취소.",
+      "workout": "🚴 남북 자전거 (~80km, 2시간30분)",
+      "detail": "목 새벽. 발치 D+3, 항생제 완료. 남북 라이딩. 구강 호흡 최소화. HR 160 이하 스테디.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-05": {
       "date": "2026-07-05",
-      "workout": "🚴 자전거 60~70km 롱라이딩",
-      "detail": "일. 6/28처럼 롱라이딩. HR 160 이하 스테디. 컨디션 좋으면 70km까지.",
+      "workout": "🏃 런 8~10km Easy~Moderate",
+      "detail": "일. 목 자전거 후 일요일 런. HR 155 이하.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
