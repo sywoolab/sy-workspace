@@ -464,24 +464,24 @@
     },
     "2026-06-29": {
       "date": "2026-06-29",
-      "workout": "🏊 자유수영 1500m (오후, 액티브 리커버리)",
-      "detail": "월. 6/28 자전거 여파 회복일. 오후 자유수영 1500m Easy — 저충격 액티브 리커버리. 내일 아침 런 8km 대비.",
+      "workout": "🛌 휴식 (사랑니 발치 당일 D+0)",
+      "detail": "월. 사랑니 발치 당일. 수영 포함 모든 운동 금지.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-06-30": {
       "date": "2026-06-30",
-      "workout": "🏃 Easy 런 8km",
-      "detail": "화. 아침 Easy 런 8km. HR 150 이하. 출근 전 공복 런.",
+      "workout": "🛌 휴식 (사랑니 발치 D+1)",
+      "detail": "화. 사랑니 발치 다음날. 치과 지시 3일 운동 금지.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-02": {
       "date": "2026-07-02",
-      "workout": "🏃 빌드업 런 10~12km",
-      "detail": "목. WU 3km + 중간 5km @5:20~5:30 + CD 2~4km. 볼륨 빌드업.",
+      "workout": "🛌 휴식 (사랑니 발치 D+3)",
+      "detail": "목. 발치 D+3. 치과 금지 마지막 날. 빌드업 런 취소.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -568,8 +568,8 @@
     },
     "2026-07-04": {
       "date": "2026-07-04",
-      "workout": "🏃 러닝 8~10km + 🏊 수영 1:4 레슨",
-      "detail": "토. 결혼식 14시. 오전 러닝 8~10km Easy~Moderate (HR 155 이하) 후 수영 레슨. 11:30 전 귀가 목표.",
+      "workout": "🏃 런 8~10km + 🏊 수영 1:4 레슨 (상처 확인 후)",
+      "detail": "토. 발치 D+5. 결혼식 14시. 런은 무조건 가능. 수영 레슨은 상처 닫혔으면 진행.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
@@ -592,16 +592,16 @@
     },
     "2026-07-01": {
       "date": "2026-07-01",
-      "workout": "🏊 수영 강습 06시",
-      "detail": "수. 고정 강습 일정.",
+      "workout": "🛌 휴식 (사랑니 발치 D+2)",
+      "detail": "수. 발치 D+2. 운동 금지. 수영 강습도 취소.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
     },
     "2026-07-03": {
       "date": "2026-07-03",
-      "workout": "🏊 수영 강습 06시 (OW 가능 시 대체)",
-      "detail": "금. 고정 강습. 한강 OW 가능하면 대체.",
+      "workout": "🏃 Easy 런 6~8km (수영 강습은 상처 보고 판단)",
+      "detail": "금. 발치 D+4. 러닝 복귀. 수영 강습은 상처 닫힘 여부 보고 결정 — 불안하면 패스.",
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
