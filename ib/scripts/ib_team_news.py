@@ -43,6 +43,7 @@ REPO_ROOT      = str(Path(__file__).resolve().parent.parent.parent)  # repo root
 WATCHLIST_FILE = os.path.join(BASE_DIR, 'watchlist_team.json')
 SENT_FILE      = os.path.join(BASE_DIR, 'data', 'team_news_sent.json')
 DOCS_DIR       = os.path.join(REPO_ROOT, 'docs')
+LIVE_JSON_FILE = os.path.join(DOCS_DIR, 'ib_live.json')
 
 PAGES_BASE     = 'https://sywoolab.github.io/sy-workspace'
 HEADERS        = {'User-Agent': 'Mozilla/5.0'}
@@ -99,6 +100,10 @@ def _rate_html(rate):
     cls = 'up' if rate > 0 else ('dn' if rate < 0 else 'nt')
     sign = '+' if rate > 0 else ''
     return f'<span class="{cls}">{sign}{rate:.2f}%</span>'
+
+
+def _safe_text(text):
+    return (text or '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
 # ─────────────────────────────────────────
@@ -817,9 +822,9 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     top_section = ''
     if top_news_html:
         top_section = f"""
-    <div class="card">
+    <div class="card" id="top-news-card">
       <div class="card-title">📌 오늘의 주요 뉴스</div>
-      {top_news_html}
+      <div id="top-news-list">{top_news_html}</div>
     </div>"""
 
     # ── 신한증권 IB 뉴스 ─────────────────────────────
@@ -837,9 +842,9 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     shinhan_section = ''
     if shinhan_html:
         shinhan_section = f"""
-    <div class="card">
+    <div class="card" id="shinhan-news-card">
       <div class="card-title">🏦 신한증권 IB 뉴스</div>
-      {shinhan_html}
+      <div id="shinhan-news-list">{shinhan_html}</div>
     </div>"""
 
     # ── DART 공시 섹션 ───────────────────────────────
@@ -855,11 +860,11 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     dart_section = ''
     if dart_rows:
         dart_section = f"""
-    <div class="card">
+    <div class="card" id="dart-card">
       <div class="card-title">📢 워치리스트 공시 <span style="font-size:10px;color:#9ca3af">(최근 3일 · DART)</span></div>
       <table class="dart-table">
         <thead><tr><th>기업</th><th>일자</th><th>공시명</th></tr></thead>
-        <tbody>{dart_rows}</tbody>
+        <tbody id="dart-list">{dart_rows}</tbody>
       </table>
     </div>"""
 
@@ -867,9 +872,9 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
     rates_section = build_rates_section(us_rates or {}, rates_cfg or {})
 
     news_section = f"""
-    <div class="card">
-      <div class="card-title">📰 뉴스 — {total}건 · {len(sections)}개사</div>
-      {news_html}
+    <div class="card" id="company-news-card">
+      <div class="card-title" id="company-news-title">📰 뉴스 — {total}건 · {len(sections)}개사</div>
+      <div id="company-news-list">{news_html}</div>
     </div>"""
 
     # ── 워치리스트 기업 목록 ──────────────────────────
@@ -1064,7 +1069,120 @@ async function drawAllSparks() {{
   }} catch(e) {{ console.log('spark load err', e); }}
 }}
 
-document.addEventListener('DOMContentLoaded', updateAll);
+function _esc(s) {{
+  return String(s || '').replace(/[&<>"']/g, ch => ({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}}[ch]));
+}}
+function _newsMeta(a) {{
+  const src = _esc(a.source || '');
+  const pub = _esc(a.pub || '');
+  if (src && pub) return `${{src}} <span style="color:#d1d5db">|</span> ${{pub}}`;
+  return src || pub;
+}}
+function _topNewsHtml(items) {{
+  return (items || []).map((a, i) => `
+    <div class="top-news-item">
+      <div class="top-news-num">${{i + 1}}</div>
+      <div class="top-news-body">
+        <a class="top-news-title" href="${{_esc(a.link)}}" target="_blank" rel="noopener">${{_esc(a.title)}}</a>
+        <div class="top-news-meta">${{_newsMeta(a)}}</div>
+      </div>
+    </div>`).join('');
+}}
+function _dartHtml(items) {{
+  return (items || []).map(d => `
+    <tr>
+      <td class="dart-corp">${{_esc(d.corp)}}</td>
+      <td class="dart-date">${{_esc(d.date)}}</td>
+      <td class="dart-title"><a href="${{_esc(d.url)}}" target="_blank" rel="noopener">${{_esc(d.title)}}</a></td>
+    </tr>`).join('');
+}}
+function _companyNewsHtml(items) {{
+  let html = '';
+  let lastGroup = null;
+  for (const item of (items || [])) {{
+    if (item.group && item.group !== lastGroup) {{
+      const groupItems = items.filter(x => x.group === item.group);
+      const nArticles = groupItems.reduce((acc, x) => acc + (x.articles || []).length, 0);
+      html += `
+        <div class="group-header">
+          <span class="group-name">📂 ${{_esc(item.group)}}</span>
+          <span class="group-badge">${{groupItems.length}}개사 · ${{nArticles}}건</span>
+        </div>`;
+      lastGroup = item.group;
+    }}
+    const code = item.code ? `<span class="company-code">${{_esc(item.code)}}</span>` : '';
+    const market = item.market ? `<span class="company-code">${{_esc(item.market)}}</span>` : '';
+    html += `
+      <div class="company-header">
+        <span class="company-name">${{_esc(item.company)}}</span>${{code}}${{market}}
+      </div>`;
+    for (const a of (item.articles || [])) {{
+      const cls = Number(a.score || 0) >= 5 ? 'news-title high' : 'news-title';
+      html += `
+        <div class="news-item">
+          <a class="${{cls}}" href="${{_esc(a.link)}}" target="_blank" rel="noopener">${{_esc(a.title)}}</a>
+          <div class="news-meta">${{_newsMeta(a)}}</div>
+        </div>`;
+    }}
+  }}
+  return html || '<p style="color:#9ca3af;font-size:14px;padding:8px 0">신규 뉴스 없음</p>';
+}}
+
+async function hydrateLiveSnapshot() {{
+  try {{
+    const r = await fetch(`ib_live.json?ts=${{Date.now()}}`, {{cache: 'no-store'}});
+    if (!r.ok) return false;
+    const data = await r.json();
+
+    for (const m of (data.market || [])) {{
+      const pEl = document.getElementById(m.id + '-p');
+      const cEl = document.getElementById(m.id + '-c');
+      if (!pEl || !cEl) continue;
+      pEl.textContent = m.price;
+      cEl.innerHTML = _arrow(Number(m.change || 0)) + ' ' + Math.abs(Number(m.change || 0)).toLocaleString('ko-KR') + ' &nbsp; ' + _rateSpan(Number(m.rate || 0));
+    }}
+
+    for (const s of (data.stocks || [])) {{
+      const pEl = document.getElementById('s-' + s.code + '-p');
+      const cEl = document.getElementById('s-' + s.code + '-c');
+      if (!pEl || !cEl) continue;
+      const chg = Number(s.change || 0);
+      pEl.textContent = Number(s.price || 0).toLocaleString('ko-KR');
+      pEl.style.color = chg > 0 ? '#dc2626' : chg < 0 ? '#1d4ed8' : '';
+      cEl.innerHTML = _arrow(chg) + ' ' + _rateSpan(Number(s.rate || 0));
+    }}
+
+    const topEl = document.getElementById('top-news-list');
+    if (topEl && data.top_news) topEl.innerHTML = _topNewsHtml(data.top_news);
+    const shEl = document.getElementById('shinhan-news-list');
+    if (shEl && data.shinhan_news) shEl.innerHTML = _topNewsHtml(data.shinhan_news);
+    const dartEl = document.getElementById('dart-list');
+    if (dartEl && data.dart_disclosures) dartEl.innerHTML = _dartHtml(data.dart_disclosures);
+
+    const cnEl = document.getElementById('company-news-list');
+    const cnTitle = document.getElementById('company-news-title');
+    if (cnEl && data.company_news) {{
+      cnEl.innerHTML = _companyNewsHtml(data.company_news);
+      const nArticles = data.company_news.reduce((acc, x) => acc + (x.articles || []).length, 0);
+      if (cnTitle) cnTitle.textContent = `📰 뉴스 — ${{nArticles}}건 · ${{data.company_news.length}}개사`;
+    }}
+
+    const ts = document.getElementById('stock-timestamp');
+    if (ts) {{
+      ts.innerHTML = '🔄 최신 스냅샷&nbsp;&nbsp;' + _esc(data.updated_at || '');
+      ts.style.color = '#16a34a';
+    }}
+    return true;
+  }} catch(e) {{
+    console.log('live snapshot err', e);
+    return false;
+  }}
+}}
+
+document.addEventListener('DOMContentLoaded', async () => {{
+  await hydrateLiveSnapshot();
+  updateAll();
+}});
 </script>
 </body>
 </html>"""
@@ -1127,6 +1245,91 @@ def save_prices3m(stock_data, market_data):
     print(f'  prices3m.json 저장 (마켓 {n_mkt}개 / 종목 {n_stk}개)')
 
 
+def save_live_json(market_data, stock_data, top_news, shinhan_news, dart_disclosures, sections, now):
+    """페이지 로드 시 갱신할 최신 스냅샷 JSON.
+
+    GitHub Pages는 서버 실행이 불가능하므로 Actions가 이 파일을 주기적으로 갱신하고,
+    index.html은 cache-busting fetch로 접속 시 최신 값을 읽는다.
+    """
+    os.makedirs(DOCS_DIR, exist_ok=True)
+
+    payload = {
+        'updated_at': now.strftime('%Y-%m-%d %H:%M:%S KST'),
+        'market': [
+            {
+                'id': m.get('html_id', ''),
+                'label': m.get('label', ''),
+                'price': m.get('price_str', ''),
+                'change': m.get('change', 0),
+                'rate': m.get('rate', 0),
+            }
+            for m in market_data
+            if m.get('html_id')
+        ],
+        'stocks': [
+            {
+                'code': s.get('code', ''),
+                'name': s.get('name', ''),
+                'price': s.get('price', 0),
+                'change': s.get('change', 0),
+                'rate': s.get('rate', 0),
+                'mktcap': fmt_mktcap(s.get('mktcap', 0)),
+            }
+            for s in stock_data
+        ],
+        'top_news': [
+            {
+                'title': a.get('title', ''),
+                'link': a.get('link', ''),
+                'source': a.get('source', ''),
+                'pub': a.get('pub', ''),
+            }
+            for a in (top_news or [])
+        ],
+        'shinhan_news': [
+            {
+                'title': a.get('title', ''),
+                'link': a.get('link', ''),
+                'source': a.get('source', ''),
+                'pub': a.get('pub', ''),
+            }
+            for a in (shinhan_news or [])
+        ],
+        'dart_disclosures': [
+            {
+                'corp': d.get('corp', ''),
+                'date': d.get('date', ''),
+                'title': d.get('title', ''),
+                'url': d.get('url', ''),
+            }
+            for d in (dart_disclosures or [])
+        ],
+        'company_news': [
+            {
+                'company': comp.get('name', ''),
+                'code': comp.get('stock_code', ''),
+                'market': comp.get('market', ''),
+                'group': comp.get('group', ''),
+                'articles': [
+                    {
+                        'title': a.get('title', ''),
+                        'link': a.get('link', ''),
+                        'source': a.get('source', ''),
+                        'pub': a.get('pub', ''),
+                        'score': a.get('score', 0),
+                    }
+                    for a in picks[:3]
+                ],
+            }
+            for comp, picks in sections
+        ],
+    }
+
+    with open(LIVE_JSON_FILE, 'w', encoding='utf-8') as f:
+        json.dump(payload, f, ensure_ascii=False)
+    print(f'  ib_live.json 저장: {payload["updated_at"]}')
+
+
 # ─────────────────────────────────────────
 # 텔레그램
 # ─────────────────────────────────────────
@@ -1150,16 +1353,19 @@ def send_telegram(text, silent=False):
 def main():
     now     = datetime.now(KST)
     session = '오전' if now.hour < 12 else '오후'
+    live_only = os.environ.get('IB_LIVE_ONLY', '').strip() == '1'
+    render_only = os.environ.get('IB_RENDER_ONLY', '').strip() == '1'
     _days_ko = ['월', '화', '수', '목', '금', '토', '일']
     date_str = f'{now.strftime("%Y-%m-%d")} ({_days_ko[now.weekday()]})'
-    print(f'[{now}] IB 뉴스브리프 ({session})')
+    mode = 'live-json' if live_only else ('render-only' if render_only else session)
+    print(f'[{now}] IB 뉴스브리프 ({mode})')
 
-    if not BOT_TOKEN or not CHAT_ID:
+    if not (live_only or render_only) and (not BOT_TOKEN or not CHAT_ID):
         print('  IB_TEAM_BOT_TOKEN / CHAT_ID 누락')
         return
 
     companies = load_watchlist()
-    sent      = load_sent()
+    sent      = set() if (live_only or render_only) else load_sent()
 
     # ── 1. 시장 데이터 & 주가 & 금리 ────────────────
     print('  마켓 데이터 수집...')
@@ -1210,9 +1416,18 @@ def main():
                                   us_rates=us_rates, rates_cfg=rates_cfg,
                                   top_news=top_news, shinhan_news=shinhan_news,
                                   dart_disclosures=dart_disclosures)
+    save_live_json(market_data, stock_data, top_news, shinhan_news, dart_disclosures, sections, now)
+    if live_only:
+        print('  live-only 모드: HTML/텔레그램/sent 업데이트 생략')
+        return
+
     page_url = save_html_report(html, session)
     print('  3M 스파크라인 데이터 수집...')
     save_prices3m(stock_data, market_data)
+
+    if render_only:
+        print('  render-only 모드: 텔레그램/sent 업데이트 생략')
+        return
 
     # ── 4. 텔레그램: 링크 + 요약만 ───────────────
     # 마켓 스냅샷 1줄 요약
