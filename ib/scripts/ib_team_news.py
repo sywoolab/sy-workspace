@@ -1421,7 +1421,7 @@ def main():
         print('  live-only 모드: HTML/텔레그램/sent 업데이트 생략')
         return
 
-    page_url = save_html_report(html, session)
+    save_html_report(html, session)
     print('  3M 스파크라인 데이터 수집...')
     save_prices3m(stock_data, market_data)
 
@@ -1444,12 +1444,14 @@ def main():
     if total_fetched > 0 and total_news == 0:
         skip_info = f'\n⚠️ 전체 SKIP — fetch {total_fetched}건'
 
-    date_tag = now.strftime('%y%m%d')  # 260520 형식
+    # Telegram in-app browsers can keep an older /index.html resource.
+    # A fixed query keeps the user-facing page stable while bypassing that cache path.
+    telegram_page_url = f'{PAGES_BASE}/index.html?live=1'
     tg_msg = (
         f'<b>📋 신한증권 IB종합금융부 Daily Brief</b>  {date_str}\n'
         f'\n'
         f'<b>🔗 리포트 보기</b>\n'
-        f'<a href="{page_url}">{page_url}</a>\n'
+        f'<a href="{telegram_page_url}">{telegram_page_url}</a>\n'
         f'\n'
         f'{mkt_summary.strip()}\n'
         f'\n'
@@ -1458,7 +1460,7 @@ def main():
     )
 
     send_telegram(tg_msg)
-    print(f'  텔레그램 전송 완료 — {page_url}')
+    print(f'  텔레그램 전송 완료 — {telegram_page_url}')
 
     # ── 5. sent 업데이트 ──────────────────────────
     for _, picks in sections:
