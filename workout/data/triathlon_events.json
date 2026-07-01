@@ -1,11 +1,11 @@
 [
   {
     "status": "접수중",
-    "name": "2026 철인3종 6차 대회 규정 정기 교육",
+    "name": "2026 철인3종 7차 대회규정 정기교육",
     "location": "온라인 ZOOM",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2108&page=1&sYear=2026&sStat=&sPost=&field=&keyword=",
-    "date": "2026.07.01",
-    "reg_period": "2026-06-24  ~ 2026-06-30"
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2109&page=1&sYear=2026&sStat=&sPost=&field=&keyword=",
+    "date": "2026.07.08",
+    "reg_period": "2026-06-24  ~ 2026-07-07"
   },
   {
     "status": "접수예정",
@@ -26,12 +26,12 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "2026 구례 아이언맨대회",
     "location": "전남 구례군 지리산호수공원오토캠핑장 및 구례공설운동장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2037&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.10.04",
-    "reg_period": "2026-01-28 14:00 ~ 2026-06-30 18:00"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수예정",
@@ -59,7 +59,7 @@
     "reg_period": "2026-07-07 14:00 ~ 2026-08-21 18:00"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "제1회 제주 삼다 철인3종경기 대회",
     "location": "제주도 제주시 김녕해수욕장 인근",
     "course": "김녕해수욕장 인근",
@@ -178,11 +178,11 @@
   },
   {
     "status": "접수중",
-    "name": "2026 철인3종 6차 대회 규정 정기 교육",
+    "name": "2026 철인3종 7차 대회규정 정기교육",
     "location": "온라인 ZOOM",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2108&page=1&sYear=2026&sStat=&sPost=&field=&keyword=",
-    "date": "2026.07.01",
-    "reg_period": "2026-06-24  ~ 2026-06-30"
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2109&page=1&sYear=2026&sStat=&sPost=&field=&keyword=",
+    "date": "2026.07.08",
+    "reg_period": "2026-06-24  ~ 2026-07-07"
   },
   {
     "status": "접수마감",
@@ -353,10 +353,10 @@
   },
   {
     "status": "접수중",
-    "name": "2026 철인3종 6차 대회 규정 정기 교육",
+    "name": "2026 철인3종 7차 대회규정 정기교육",
     "location": "온라인 ZOOM",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2108&page=1&sYear=2026&sStat=&sPost=&field=&keyword=",
-    "date": "2026.07.01",
-    "reg_period": "2026-06-24  ~ 2026-06-30"
+    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2109&page=1&sYear=2026&sStat=&sPost=&field=&keyword=",
+    "date": "2026.07.08",
+    "reg_period": "2026-06-24  ~ 2026-07-07"
   }
 ]
