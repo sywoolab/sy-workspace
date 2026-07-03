@@ -924,7 +924,7 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 <div class="container">
   <div class="header">
     <h1>신한증권 IB종합금융부 Daily Brief <span class="session-badge">{session}</span></h1>
-    <div class="meta">{date_str} &nbsp;·&nbsp; {time_str} &nbsp;·&nbsp; {price_label} 기준</div>
+    <div class="meta">{date_str} &nbsp;·&nbsp; 마지막 업데이트: <span id="last-updated-at">{now.strftime("%Y-%m-%d %H:%M")} KST</span> &nbsp;·&nbsp; {price_label} 기준</div>
   </div>
 
   <div class="card">
@@ -1171,6 +1171,10 @@ async function hydrateLiveSnapshot() {{
     if (ts) {{
       ts.innerHTML = '🔄 최신 스냅샷&nbsp;&nbsp;' + _esc(data.updated_at || '');
       ts.style.color = '#16a34a';
+    }}
+    const lastUpdated = document.getElementById('last-updated-at');
+    if (lastUpdated && data.updated_at) {{
+      lastUpdated.textContent = data.updated_at;
     }}
     return true;
   }} catch(e) {{
