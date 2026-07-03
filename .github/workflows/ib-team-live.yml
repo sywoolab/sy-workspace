@@ -2,8 +2,8 @@ name: ib-team-live
 
 on:
   schedule:
-    - cron: '3,13,23,33,43,53 23 * * 0-4'  # 08:03~08:53 KST 월~금
-    - cron: '3,13,23,33,43,53 0-8 * * 1-5'  # 09:03~17:53 KST 월~금
+    - cron: '*/5 23 * * 0-4'  # 08:00~08:55 KST 월~금
+    - cron: '*/5 0-8 * * 1-5'  # 09:00~17:55 KST 월~금
   workflow_dispatch:
 
 permissions:
@@ -25,13 +25,47 @@ jobs:
 
       - run: pip install requests
 
+      - name: Check live snapshot freshness
+        id: live_due
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+
+          if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+              print("due=true")
+              raise SystemExit
+
+          path = Path("docs/ib_live.json")
+          if not path.exists():
+              print("due=true")
+              raise SystemExit
+
+          try:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              stamp = str(data.get("updated_at", "")).replace(" KST", "")
+              updated = datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S")
+          except Exception:
+              print("due=true")
+              raise SystemExit
+
+          now = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
+          age_seconds = (now - updated).total_seconds()
+          print(f"due={'true' if age_seconds >= 540 else 'false'}")
+          print(f"age_seconds={max(0, int(age_seconds))}")
+          PY
+
       - name: Generate live IB brief snapshot
+        if: steps.live_due.outputs.due == 'true'
         env:
           IB_LIVE_ONLY: '1'
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: python ib/scripts/ib_team_news.py
 
       - name: Commit live snapshot
+        if: steps.live_due.outputs.due == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
