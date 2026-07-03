@@ -902,7 +902,10 @@ function _companyNewsHtml(items) {
 
 async function hydrateLiveSnapshot() {
   try {
-    const r = await fetch(`ib_live.json?ts=${Date.now()}`, {cache: 'no-store'});
+    const qs = `ts=${Date.now()}`;
+    const rawUrl = `https://raw.githubusercontent.com/sywoolab/sy-workspace/main/docs/ib_live.json?${qs}`;
+    let r = await fetch(rawUrl, {cache: 'no-store'});
+    if (!r.ok) r = await fetch(`ib_live.json?${qs}`, {cache: 'no-store'});
     if (!r.ok) return false;
     const data = await r.json();
 
