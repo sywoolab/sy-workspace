@@ -3,7 +3,7 @@ name: ib-team-live
 on:
   schedule:
     - cron: '*/5 23 * * 0-4'  # 08:00~08:55 KST 월~금
-    - cron: '*/5 0-8 * * 1-5'  # 09:00~17:55 KST 월~금
+    - cron: '*/5 0-7 * * 1-5'  # 09:00~16:55 KST 월~금
   workflow_dispatch:
 
 permissions:
