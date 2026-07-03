@@ -947,7 +947,7 @@ def build_html_report(market_data, stock_data, sections, now, session, us_rates=
 
   {watchlist_section}
 
-  <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: {now.strftime("%Y-%m-%d %H:%M")} KST &nbsp;·&nbsp; 주가: 페이지 로드 기준</div>
+  <div class="footer">신한증권 IB종합금융부 &nbsp;·&nbsp; 뉴스 생성: {now.strftime("%Y-%m-%d %H:%M")} KST &nbsp;·&nbsp; 주가: live snapshot 기준</div>
 </div>
 
 <script>
@@ -1181,7 +1181,7 @@ async function hydrateLiveSnapshot() {{
 
 document.addEventListener('DOMContentLoaded', async () => {{
   await hydrateLiveSnapshot();
-  updateAll();
+  drawAllSparks();
 }});
 </script>
 </body>
