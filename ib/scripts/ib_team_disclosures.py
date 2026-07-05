@@ -1,15 +1,15 @@
 """
 IB 팀 채널 — DART 공시 즉시 알림
 - watchlist_team.json 기준
-- 신규 공시 발견 즉시 1건 = 1메시지 발송
 - 중요 공시: 🔴 prefix + sound on
-- 일반 공시: 📋 prefix + silent push (disable_notification)
+- 일반 공시: 📋 polling 1회 = 요약 1메시지, silent push
 - 15분 폴링 (24시간)
 """
 
 import os
 import json
 import hashlib
+import html
 import requests
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
@@ -34,6 +34,8 @@ CHAT_ID = os.environ.get('IB_TEAM_CHAT_ID', '')
 BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 WATCHLIST_FILE = os.path.join(BASE_DIR, 'watchlist_team.json')
 SENT_FILE = os.path.join(BASE_DIR, 'data', 'team_disclosures_sent.json')
+PAGES_URL = 'https://sywoolab.github.io/sy-workspace/index.html?live=1#dart'
+NORMAL_DIGEST_LIMIT = 12
 
 # 중요 공시 키워드 (포함 시 🔴 + sound on)
 URGENT_KEYWORDS = [
@@ -101,6 +103,45 @@ def format_market_label(comp):
     return ''
 
 
+def escape_html(text):
+    return html.escape(str(text or ''), quote=False)
+
+
+def disclosure_link(rcept_no):
+    return f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={rcept_no}"
+
+
+def format_single_alert(item):
+    prefix = '🔴'
+    return (
+        f"{prefix} [공시·중요] {escape_html(item['name'])}{item['label']}\n"
+        f"{escape_html(item['report'])}\n"
+        f'🔗 <a href="{item["link"]}">DART 원문</a>'
+    )
+
+
+def format_normal_digest(items, now):
+    shown = items[:NORMAL_DIGEST_LIMIT]
+    hidden_count = max(0, len(items) - len(shown))
+    lines = [
+        f"📋 [공시 요약] IB Team",
+        f"{now.strftime('%Y-%m-%d %H:%M')} 기준 · 일반 {len(items)}건",
+        "",
+    ]
+
+    for item in shown:
+        lines.append(
+            f"• {escape_html(item['name'])}{item['label']} — "
+            f'<a href="{item["link"]}">{escape_html(item["report"])}</a>'
+        )
+
+    if hidden_count:
+        lines.append(f"• 외 {hidden_count}건")
+
+    lines.extend(["", f'🔗 <a href="{PAGES_URL}">전체 리포트 보기</a>'])
+    return '\n'.join(lines)
+
+
 def send_telegram(text, silent=True):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     resp = requests.post(url, data={
@@ -128,6 +169,7 @@ def main():
     sent = load_sent()
     new_count = 0
     urgent_count = 0
+    normal_items = []
 
     for comp in companies:
         name = comp['name']
@@ -142,26 +184,31 @@ def main():
                 continue
 
             report = d.get('report_nm', '').strip()
-            link = f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={rcept_no}"
             urgent = is_urgent(report)
 
-            label = format_market_label(comp)
-            prefix = '🔴' if urgent else '📋'
-            tag = '공시·중요' if urgent else '공시'
-            report_safe = report.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            item = {
+                'rcept_no': rcept_no,
+                'name': name,
+                'label': format_market_label(comp),
+                'report': report,
+                'link': disclosure_link(rcept_no),
+            }
 
-            msg = (
-                f"{prefix} [{tag}] {name}{label}\n"
-                f"{report_safe}\n"
-                f'🔗 <a href="{link}">DART 원문</a>'
-            )
-
-            if send_telegram(msg, silent=not urgent):
+            if urgent and send_telegram(format_single_alert(item), silent=False):
                 sent.add(rcept_no)
                 new_count += 1
-                if urgent:
-                    urgent_count += 1
-                print(f"  → {prefix} {name}: {report[:40]}")
+                urgent_count += 1
+                print(f"  → 🔴 {name}: {report[:40]}")
+            elif not urgent:
+                normal_items.append(item)
+
+    if normal_items:
+        msg = format_normal_digest(normal_items, now)
+        if send_telegram(msg, silent=True):
+            for item in normal_items:
+                sent.add(item['rcept_no'])
+            new_count += len(normal_items)
+            print(f"  → 📋 일반 공시 요약 {len(normal_items)}건")
 
     print(f"  신규 {new_count}건 (긴급 {urgent_count})")
     if new_count:
