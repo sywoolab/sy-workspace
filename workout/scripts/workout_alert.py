@@ -40,9 +40,14 @@ LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
 # 대회일 & 훈련 시작일
-RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
-TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)  # 복귀일 (월요일)
-DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
+RACE_CHUNGJOO  = datetime(2026, 9, 20, tzinfo=KST)   # 충주 탄금호 (튠업)
+RACE_TONGYEONG = datetime(2026, 10, 25, tzinfo=KST)  # 통영 월드컵 (A레이스)
+RACE_DAY = RACE_TONGYEONG  # 하위 호환 (format_week 캡용)
+TRAIN_START  = datetime(2026, 3, 16, tzinfo=KST)  # 시즌 시작 (기록 기준)
+RESTART_DATE = datetime(2026, 7, 7, tzinfo=KST)   # 발치 후 복귀 재시작
+DAYS_LEFT_CHUNGJOO  = (RACE_CHUNGJOO.date()  - NOW.date()).days
+DAYS_LEFT_TONGYEONG = (RACE_TONGYEONG.date() - NOW.date()).days
+DAYS_LEFT = DAYS_LEFT_TONGYEONG  # 하위 호환
 
 # 주차 계산 (훈련 시작일 기준, 월요일 시작)
 def get_week_number(dt):
@@ -51,63 +56,106 @@ def get_week_number(dt):
 
 CURRENT_WEEK = get_week_number(NOW)
 
-# Phase 판별 (날짜 기반, 주 단위 경계 = 일요일)
-PHASE1_END = datetime(2026, 4, 5, tzinfo=KST).date()   # 일요일 (Week 2 끝)
-PHASE2_END = datetime(2026, 4, 26, tzinfo=KST).date()  # 일요일 (Week 5 끝)
-PHASE3_END = datetime(2026, 5, 10, tzinfo=KST).date()  # 일요일 (대회일)
+# Phase 판별 (날짜 기반)
+PHASE1_END    = datetime(2026, 7, 26, tzinfo=KST).date()   # 베이스 복귀 종료
+PHASE2_END    = datetime(2026, 9, 13, tzinfo=KST).date()   # 빌드업 종료
+PHASE3_END    = datetime(2026, 9, 20, tzinfo=KST).date()   # 충주 대회 주
+RECOVERY_END  = datetime(2026, 10, 11, tzinfo=KST).date()  # 충주 후 회복+통영빌드
+TAPER_END     = datetime(2026, 10, 25, tzinfo=KST).date()  # 통영 테이퍼/대회
 
 def get_phase(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
-    if d <= PHASE1_END:
-        return 1, "Phase 1: 베이스"
+    if d < RESTART_DATE.date():
+        return 0, "시즌 전반기 완료"
+    elif d <= PHASE1_END:
+        return 1, "Phase 1: 베이스 복귀"
     elif d <= PHASE2_END:
-        return 2, "Phase 2: 빌드"
+        return 2, "Phase 2: 빌드업"
     elif d <= PHASE3_END:
-        return 3, "Phase 3: 테이퍼"
-    return 0, "대회 완료"
+        return 3, "Phase 3: 충주 샤프닝"
+    elif d <= RECOVERY_END:
+        return 4, "Phase 4: 회복+통영 빌드"
+    elif d <= TAPER_END:
+        return 5, "Phase 5: 통영 테이퍼"
+    return 6, "시즌 완료"
 
 phase, phase_name = get_phase(NOW)
 
-# 주차별 이름
+# 주차별 이름 (3/16 기준 주차 번호)
 WEEK_NAMES = {
-    0: "Week 0: 복귀 주",
-    1: "Week 1: 베이스 ①",
-    2: "Week 2: 베이스 ②",
-    3: "Week 3: 빌드 ①",
-    4: "Week 4: 빌드 ② (아쿠아슬론)",
-    5: "Week 5: 빌드 ③",
-    6: "Week 6: 테이퍼",
-    7: "Week 7: 대회 주",
+    0:  "Week 0: 복귀 주",
+    1:  "Week 1: 베이스 ①",
+    2:  "Week 2: 베이스 ②",
+    3:  "Week 3: 빌드 ①",
+    4:  "Week 4: 빌드 ② (아쿠아슬론)",
+    5:  "Week 5: 빌드 ③",
+    6:  "Week 6: 테이퍼",
+    7:  "Week 7: 대구 대회 주",
+    # 7/7~ 재시작 (주차 16~)
+    16: "W1: 베이스 복귀 ①",
+    17: "W2: 베이스 복귀 ②",
+    18: "W3: 베이스 복귀 ③",
+    19: "W4: 빌드업 ①",
+    20: "W5: 빌드업 ②",
+    21: "W6: 빌드업 ③",
+    22: "W7: 빌드업 ④",
+    23: "W8: 빌드업 ⑤",
+    24: "W9: 빌드업 ⑥",
+    25: "W10: 충주 샤프닝",
+    26: "W11: 충주 대회 주",
+    27: "W12: 충주 후 회복",
+    28: "W13: 통영 빌드 ①",
+    29: "W14: 통영 빌드 ②",
+    30: "W15: 통영 테이퍼 ①",
+    31: "W16: 통영 테이퍼 ② (대회 주)",
 }
 
-# 요일별 운동 스케줄
+# 요일별 운동 스케줄 (Phase별)
 SCHEDULE = {
-    1: {  # Phase 1
+    1: {  # Phase 1: 베이스 복귀 (7/7~7/26)
         0: ("수영 수업", ""),
-        1: ("러닝", "5~6km Easy (6:16+/km)"),
+        1: ("러닝", "4~6km Easy (6:00+ 유지, 강도 X)"),
         2: ("수영 수업", ""),
-        3: ("러닝 + 코어", "6~7km + 코어 15분"),
+        3: ("러닝", "4~6km Easy"),
         4: ("수영 수업", ""),
-        5: ("브릭 → 수영", "자전거 60분 → 러닝 5km Easy → 개인교습"),
+        5: ("수영 개인강습", "자전거는 2주차부터"),
         6: ("완전 휴식", ""),
     },
-    2: {  # Phase 2
+    2: {  # Phase 2: 빌드업 (7/27~9/13)
         0: ("수영 수업", ""),
-        1: ("러닝 템포", "7km (2up→3@5:10→2dn)"),
+        1: ("러닝 템포", "7~8km (2up→3~4@5:10~5:20→2dn)"),
         2: ("수영 수업", ""),
-        3: ("러닝 + 코어", "7~8km Easy"),
+        3: ("러닝 볼륨", "8~10km Easy"),
         4: ("수영 수업", ""),
-        5: ("브릭 → 수영", "자전거 75~90분 → 러닝 5km → 개인교습"),
+        5: ("브릭 → 수영", "자전거 90분 → 러닝 7~8km → 개인강습"),
         6: ("완전 휴식", ""),
     },
-    3: {  # Phase 3 (테이퍼)
-        0: ("수영 수업", ""),
-        1: ("러닝", "6km @5:00~5:10"),
-        2: ("수영 수업", ""),
-        3: ("러닝", "4km Easy + 스트라이드"),
+    3: {  # Phase 3: 충주 샤프닝 (9/14~9/20)
+        0: ("수영 가볍게", "1km"),
+        1: ("러닝", "3km 조깅"),
+        2: ("자전거 가볍게", "30분"),
+        3: ("완전 휴식", ""),
         4: ("수영 가볍게", "1km"),
-        5: ("수영 개인교습", "가볍게 (사이팅 연습)"),
+        5: ("충주 이동+검수", ""),
+        6: ("대회", "충주 스탠다드 — 수영 1.5km + 자전거 40km + 러닝 10km"),
+    },
+    4: {  # Phase 4: 충주 후 회복+통영 빌드 (9/21~10/11)
+        0: ("수영 수업", ""),
+        1: ("러닝 Easy", "6~8km (회복 페이스)"),
+        2: ("수영 수업", ""),
+        3: ("러닝 볼륨", "8~10km Easy"),
+        4: ("수영 수업", ""),
+        5: ("브릭 → 수영", "자전거 75분 → 러닝 6km → 개인강습"),
         6: ("완전 휴식", ""),
+    },
+    5: {  # Phase 5: 통영 테이퍼 (10/12~10/25)
+        0: ("수영 수업", ""),
+        1: ("러닝", "5km @5:10~5:20"),
+        2: ("수영 수업", ""),
+        3: ("러닝", "3km Easy + 스트라이드"),
+        4: ("수영 가볍게", "1km"),
+        5: ("수영 개인강습 or 통영 이동", ""),
+        6: ("완전 휴식 or 통영 대회", ""),
     },
 }
 
@@ -148,19 +196,29 @@ WEEK7_SCHEDULE = {
 # Phase별 주간 목표 & 최소 기준
 PHASE_GOALS = {
     1: {
-        "goal": "러닝 빈도 확보 + 자전거 감각 회복",
-        "volume": "수영 4 / 러닝 3(20~23km) / 자전거 1(60분)",
-        "min": "러닝 최소 3회, 페이스 무관",
+        "goal": "발치 후 복귀 — 빈도 확보, 강도 X",
+        "volume": "수영 4회 / 러닝 2회(8~12km) / 자전거 2주차~",
+        "min": "러닝 최소 2회, 통증 시 즉시 중단",
     },
     2: {
-        "goal": "페이스 5:10→5:00 + 브릭 적응",
-        "volume": "수영 3~4 / 러닝 3(21~25km) / 자전거 2(150분)",
-        "min": "러닝 최소 3회 + 일요일 브릭 필수",
+        "goal": "충주 대비 핵심 빌드 — 8월 중 자전거 80km + 러닝 18km 단독 목표",
+        "volume": "수영 4회 / 러닝 2회(15~20km) / 자전거+브릭 주1",
+        "min": "화 템포 + 토 브릭 필수",
     },
     3: {
-        "goal": "볼륨 줄이고 컨디션 피킹",
-        "volume": "수영 2~3 / 러닝 2(10km) / 자전거 1(30분)",
+        "goal": "충주 샤프닝 — 볼륨↓ 컨디션↑",
+        "volume": "수영 2회 / 러닝 1회(3km) / 자전거 1회(30분)",
         "min": "과훈련 금지, 감각 유지만",
+    },
+    4: {
+        "goal": "충주 회복 + 통영 재빌드",
+        "volume": "수영 4회 / 러닝 2회(14~18km) / 브릭 1회",
+        "min": "첫 주 Easy only, 2~3주차 강도 회복",
+    },
+    5: {
+        "goal": "통영 테이퍼 — A레이스 컨디션 조성",
+        "volume": "수영 2~3회 / 러닝 2회(8km) / 자전거 1회(30분)",
+        "min": "볼륨 50~70% 감소, 강도 낮춤",
     },
 }
 
@@ -254,12 +312,14 @@ def get_schedule_for_date(dt):
 
     wk = get_week_number(dt)
     dow = dt.weekday()
+    # 과거 플랜 (3/16~7/6) — 구 스케줄 상수 fallback
     if wk == 0:
         return WEEK0_SCHEDULE.get(dow, ("휴식", ""))
     if wk == 4:
         return WEEK4_SCHEDULE.get(dow, ("휴식", ""))
-    if wk >= 7:
+    if 7 <= wk <= 15:
         return WEEK7_SCHEDULE.get(dow, ("완전 휴식", ""))
+    # 현재 플랜 (7/7~)
     p, _ = get_phase(dt)
     if p == 0 or p not in SCHEDULE:
         return ("완전 휴식", "")
@@ -696,7 +756,7 @@ def format_morning():
     est = analysis.get('estimated_finish', '?')
     status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
     vdot = analysis.get('vdot', '?')
-    lines.append(f"🏁 대구 철인3종 D-{DAYS_LEFT} | 예상 {est} {status_icon} | VDOT {vdot}")
+    lines.append(f"🏁 충주 D-{DAYS_LEFT_CHUNGJOO} | 통영 D-{DAYS_LEFT_TONGYEONG} | 예상 {est} {status_icon} | VDOT {vdot}")
     lines.append("")
 
     # 훈련 진척도
@@ -931,7 +991,7 @@ def format_evening():
         # 휴식일이어도 내일 코칭은 보내기
         coaching = format_tomorrow_coaching()
         if coaching:
-            lines = [f"🏁 D-{DAYS_LEFT} | 😴 오늘은 휴식"]
+            lines = [f"🏁 충주 D-{DAYS_LEFT_CHUNGJOO} | 통영 D-{DAYS_LEFT_TONGYEONG} | 😴 오늘은 휴식"]
             lines.append("")
             lines.append(coaching)
             return "\n".join(lines)
@@ -942,7 +1002,7 @@ def format_evening():
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
-        lines.append(f"🏁 D-{DAYS_LEFT} | ✅ 오늘 운동 완료!")
+        lines.append(f"🏁 충주 D-{DAYS_LEFT_CHUNGJOO} | 통영 D-{DAYS_LEFT_TONGYEONG} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
@@ -964,7 +1024,7 @@ def format_evening():
                 lines.append(f"  → {actual}")
     else:
         # 미완료 → 리마인드 + 복구 시나리오
-        lines.append(f"🏁 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")
+        lines.append(f"🏁 충주 D-{DAYS_LEFT_CHUNGJOO} | 통영 D-{DAYS_LEFT_TONGYEONG} | ⚠️ 오늘 운동 기록이 없습니다!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if detail:

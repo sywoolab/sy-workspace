@@ -242,7 +242,7 @@ def main():
         if bad_count >= 2:
             verdict = ('red', '개선 필요', '핵심 종목 공백 발생. 이번 주 러닝·브릭 우선 복구 필요.')
         elif bad_count == 1 or warn_count >= 2:
-            verdict = ('yellow', '부분 보완 필요', '자전거 기반은 좋음. 러닝·브릭 비중 높여야 대가야 목표 달성 가능.')
+            verdict = ('yellow', '부분 보완 필요', '자전거 기반은 좋음. 러닝·브릭 비중 높여야 충주/통영 목표 달성 가능.')
         else:
             verdict = ('green', '순항 중', '전 종목 균형 잡힘. 현재 페이스 유지.')
 
@@ -253,8 +253,8 @@ def main():
     # ── 목표별 처방 계산 ──
     # race_targets: (대회날짜, 이름, 목표분)
     race_targets = [
-        ("2026-06-28", "대가야", 162),   # sub-2:42
-        ("2026-08-27", "거제",  155),    # sub-2:35
+        ("2026-09-20", "충주",  155),    # sub-2:35 (튠업)
+        ("2026-10-25", "통영",  155),    # sub-2:35 (A레이스)
     ]
 
     def _prescription(est, target_total_min):
@@ -326,8 +326,8 @@ def main():
         }
 
     races = [
-        ("2026-06-28", "대가야 스탠다드", "🎯 sub-2:42"),
-        ("2026-08-27", "거제 스탠다드", "🎯 sub-2:35"),
+        ("2026-09-20", "충주 탄금호 스탠다드", "🎯 sub-2:35"),
+        ("2026-10-25", "통영 월드컵 스탠다드", "🎯 sub-2:35"),
     ]
 
     now = datetime.now(KST)
@@ -560,7 +560,7 @@ tr:hover{{background:#15152a}}
             return f"{int(pace_sec)//60}:{int(pace_sec)%60:02d}/km"
 
         # 가장 가까운 목표 대회 gap 계산
-        # 대가야 목표: 2:42 = 162분, 거제 목표: 2:35 = 155분
+        # 충주 목표: 2:35 = 155분, 통영 목표: 2:35 = 155분
         next_target_race = None
         next_target_min = None
         next_target_label = None
@@ -1292,8 +1292,8 @@ new Chart(document.getElementById('tlChart'), {{
     # 대회 일정 섹션
     all_races_ext = [
         ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
-        ("2026-06-28", "고령 대가야 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:42 (5/10 -8:39)"),
-        ("2026-08-27", "거제 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:35 (가을 시즌)"),
+        ("2026-09-20", "충주 탄금호 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:35 (튠업)"),
+        ("2026-10-25", "통영 월드컵 스탠다드", "수영 1.5+자전거 40+러닝 10km", "🎯 목표 sub-2:35 (A레이스)"),
     ]
     html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
     for rdate, rname, rdist, rgoal in all_races_ext:
