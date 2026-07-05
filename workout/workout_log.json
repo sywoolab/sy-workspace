@@ -530,6 +530,38 @@
     "training_zone": "tempo",
     "note": "swim TE 3.2 | bike TE 3.9 | run TE 3.1 | 브릭 자동 판정 | 러닝 네거티브 스플릿 6:01→5:01"
   },
+  "2026-03-22": {
+    "planned": "완전 휴식",
+    "done": true,
+    "actual": "근력 훈련 8분",
+    "metrics": {
+      "type": "strength",
+      "training_load": 1
+    },
+    "training_zone": "easy",
+    "note": " | 부하 1",
+    "garmin_id": 22255298354,
+    "start_time": "12:37",
+    "garmin_ids": [
+      22255298354
+    ],
+    "all_metrics": [
+      {
+        "type": "strength",
+        "distance_m": null,
+        "duration_sec": 473,
+        "avg_hr": 82,
+        "max_hr": 109,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 1,
+        "garmin_id": 22255298354,
+        "laps": null,
+        "open_water": false,
+        "start_time": "12:37"
+      }
+    ]
+  },
   "2026-03-23": {
     "planned": "수영 수업",
     "done": true,
@@ -1601,158 +1633,6 @@
       }
     ]
   },
-  "2026-04-21": {
-    "planned": "러닝 Easy (감량)",
-    "done": true,
-    "actual": "러닝 6.41km @5:45",
-    "metrics": {
-      "type": "run",
-      "distance_km": 6.41,
-      "pace_per_km": "5:45",
-      "avg_hr": 158,
-      "max_hr": 174,
-      "cadence": 174,
-      "training_load": 117,
-      "laps": [
-        {
-          "distance": 1000,
-          "duration": 372,
-          "avg_hr": 149,
-          "max_hr": 161,
-          "pace_sec": 372,
-          "pace_str": "6:12"
-        },
-        {
-          "distance": 1000,
-          "duration": 347,
-          "avg_hr": 157,
-          "max_hr": 162,
-          "pace_sec": 347,
-          "pace_str": "5:46"
-        },
-        {
-          "distance": 1000,
-          "duration": 350,
-          "avg_hr": 154,
-          "max_hr": 160,
-          "pace_sec": 350,
-          "pace_str": "5:49"
-        },
-        {
-          "distance": 1000,
-          "duration": 341,
-          "avg_hr": 159,
-          "max_hr": 163,
-          "pace_sec": 341,
-          "pace_str": "5:41"
-        },
-        {
-          "distance": 1000,
-          "duration": 339,
-          "avg_hr": 159,
-          "max_hr": 172,
-          "pace_sec": 339,
-          "pace_str": "5:39"
-        },
-        {
-          "distance": 1000,
-          "duration": 338,
-          "avg_hr": 169,
-          "max_hr": 174,
-          "pace_sec": 338,
-          "pace_str": "5:37"
-        },
-        {
-          "distance": 411,
-          "duration": 129,
-          "avg_hr": 163,
-          "max_hr": 173,
-          "pace_sec": 315,
-          "pace_str": "5:14"
-        }
-      ]
-    },
-    "training_zone": "tempo",
-    "note": "유산소 3.5 | 부하 117",
-    "garmin_id": 22599063228,
-    "start_time": "06:31",
-    "garmin_ids": [
-      22599063228
-    ],
-    "all_metrics": [
-      {
-        "type": "run",
-        "distance_m": null,
-        "duration_sec": 2217,
-        "avg_hr": 158,
-        "max_hr": 174,
-        "avg_pace": null,
-        "avg_speed": null,
-        "training_load": 117,
-        "garmin_id": 22599063228,
-        "laps": [
-          {
-            "distance": 1000,
-            "duration": 372,
-            "avg_hr": 149,
-            "max_hr": 161,
-            "pace_sec": 372,
-            "pace_str": "6:12"
-          },
-          {
-            "distance": 1000,
-            "duration": 347,
-            "avg_hr": 157,
-            "max_hr": 162,
-            "pace_sec": 347,
-            "pace_str": "5:46"
-          },
-          {
-            "distance": 1000,
-            "duration": 350,
-            "avg_hr": 154,
-            "max_hr": 160,
-            "pace_sec": 350,
-            "pace_str": "5:49"
-          },
-          {
-            "distance": 1000,
-            "duration": 341,
-            "avg_hr": 159,
-            "max_hr": 163,
-            "pace_sec": 341,
-            "pace_str": "5:41"
-          },
-          {
-            "distance": 1000,
-            "duration": 339,
-            "avg_hr": 159,
-            "max_hr": 172,
-            "pace_sec": 339,
-            "pace_str": "5:39"
-          },
-          {
-            "distance": 1000,
-            "duration": 338,
-            "avg_hr": 169,
-            "max_hr": 174,
-            "pace_sec": 338,
-            "pace_str": "5:37"
-          },
-          {
-            "distance": 411,
-            "duration": 129,
-            "avg_hr": 163,
-            "max_hr": 173,
-            "pace_sec": 315,
-            "pace_str": "5:14"
-          }
-        ],
-        "open_water": false,
-        "start_time": "06:31"
-      }
-    ]
-  },
   "2026-04-19": {
     "planned": "아쿠아슬론 대회",
     "done": true,
@@ -1928,6 +1808,158 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-04-21": {
+    "planned": "러닝 Easy (감량)",
+    "done": true,
+    "actual": "러닝 6.41km @5:45",
+    "metrics": {
+      "type": "run",
+      "distance_km": 6.41,
+      "pace_per_km": "5:45",
+      "avg_hr": 158,
+      "max_hr": 174,
+      "cadence": 174,
+      "training_load": 117,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 372,
+          "avg_hr": 149,
+          "max_hr": 161,
+          "pace_sec": 372,
+          "pace_str": "6:12"
+        },
+        {
+          "distance": 1000,
+          "duration": 347,
+          "avg_hr": 157,
+          "max_hr": 162,
+          "pace_sec": 347,
+          "pace_str": "5:46"
+        },
+        {
+          "distance": 1000,
+          "duration": 350,
+          "avg_hr": 154,
+          "max_hr": 160,
+          "pace_sec": 350,
+          "pace_str": "5:49"
+        },
+        {
+          "distance": 1000,
+          "duration": 341,
+          "avg_hr": 159,
+          "max_hr": 163,
+          "pace_sec": 341,
+          "pace_str": "5:41"
+        },
+        {
+          "distance": 1000,
+          "duration": 339,
+          "avg_hr": 159,
+          "max_hr": 172,
+          "pace_sec": 339,
+          "pace_str": "5:39"
+        },
+        {
+          "distance": 1000,
+          "duration": 338,
+          "avg_hr": 169,
+          "max_hr": 174,
+          "pace_sec": 338,
+          "pace_str": "5:37"
+        },
+        {
+          "distance": 411,
+          "duration": 129,
+          "avg_hr": 163,
+          "max_hr": 173,
+          "pace_sec": 315,
+          "pace_str": "5:14"
+        }
+      ]
+    },
+    "training_zone": "tempo",
+    "note": "유산소 3.5 | 부하 117",
+    "garmin_id": 22599063228,
+    "start_time": "06:31",
+    "garmin_ids": [
+      22599063228
+    ],
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_m": null,
+        "duration_sec": 2217,
+        "avg_hr": 158,
+        "max_hr": 174,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 117,
+        "garmin_id": 22599063228,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 372,
+            "avg_hr": 149,
+            "max_hr": 161,
+            "pace_sec": 372,
+            "pace_str": "6:12"
+          },
+          {
+            "distance": 1000,
+            "duration": 347,
+            "avg_hr": 157,
+            "max_hr": 162,
+            "pace_sec": 347,
+            "pace_str": "5:46"
+          },
+          {
+            "distance": 1000,
+            "duration": 350,
+            "avg_hr": 154,
+            "max_hr": 160,
+            "pace_sec": 350,
+            "pace_str": "5:49"
+          },
+          {
+            "distance": 1000,
+            "duration": 341,
+            "avg_hr": 159,
+            "max_hr": 163,
+            "pace_sec": 341,
+            "pace_str": "5:41"
+          },
+          {
+            "distance": 1000,
+            "duration": 339,
+            "avg_hr": 159,
+            "max_hr": 172,
+            "pace_sec": 339,
+            "pace_str": "5:39"
+          },
+          {
+            "distance": 1000,
+            "duration": 338,
+            "avg_hr": 169,
+            "max_hr": 174,
+            "pace_sec": 338,
+            "pace_str": "5:37"
+          },
+          {
+            "distance": 411,
+            "duration": 129,
+            "avg_hr": 163,
+            "max_hr": 173,
+            "pace_sec": 315,
+            "pace_str": "5:14"
+          }
+        ],
+        "open_water": false,
+        "start_time": "06:31"
+      }
+    ]
   },
   "2026-04-22": {
     "planned": "수영 수업",
@@ -2650,89 +2682,6 @@
       }
     ]
   },
-  "2026-05-03": {
-    "planned": "한강 OW 클래스",
-    "done": true,
-    "actual": "OW 1107m 52분 @2:18/100m",
-    "metrics": {
-      "type": "swim",
-      "is_open_water": true,
-      "distance_m": 1107,
-      "duration_min": 51.9,
-      "moving_min": 25.5,
-      "pace_per_100m": "2:18",
-      "avg_hr": 111,
-      "max_hr": 166,
-      "swolf": 78,
-      "strokes": 357,
-      "avg_spm": null,
-      "training_load": 44
-    },
-    "training_zone": "easy",
-    "note": "OW 첫 경험 | 유산소 2.1 / 무산소 0.9 | 부하 44",
-    "garmin_id": 22743428925,
-    "start_time": "07:46",
-    "garmin_ids": [
-      22743428925
-    ],
-    "all_metrics": [
-      {
-        "type": "swim",
-        "distance_m": 1107,
-        "duration_sec": 3113,
-        "avg_hr": 111,
-        "max_hr": 166,
-        "avg_pace": null,
-        "avg_speed": null,
-        "training_load": 44,
-        "garmin_id": 22743428925,
-        "laps": null,
-        "open_water": false,
-        "start_time": "07:46"
-      }
-    ]
-  },
-  "2026-05-02": {
-    "planned": "",
-    "done": true,
-    "actual": "수영 1325m 72분 @1:45/100m",
-    "metrics": {
-      "type": "swim",
-      "distance_m": 1325,
-      "duration_min": 72.4,
-      "moving_min": 23.3,
-      "pace_per_100m": "1:45",
-      "avg_hr": 120,
-      "max_hr": 191,
-      "swolf": 36,
-      "strokes": 512,
-      "avg_spm": null,
-      "training_load": 66
-    },
-    "training_zone": "easy",
-    "note": "유산소 2.3 / 무산소 1.7 | 부하 66",
-    "garmin_id": 22732716056,
-    "start_time": "11:57",
-    "garmin_ids": [
-      22732716056
-    ],
-    "all_metrics": [
-      {
-        "type": "swim",
-        "distance_m": 1325,
-        "duration_sec": 4345,
-        "avg_hr": 120,
-        "max_hr": 191,
-        "avg_pace": null,
-        "avg_speed": null,
-        "training_load": 66,
-        "garmin_id": 22732716056,
-        "laps": null,
-        "open_water": false,
-        "start_time": "11:57"
-      }
-    ]
-  },
   "2026-05-01": {
     "planned": "",
     "done": true,
@@ -2903,6 +2852,89 @@
         ],
         "garmin_id": 22721020009,
         "start_time": "15:03"
+      }
+    ]
+  },
+  "2026-05-02": {
+    "planned": "",
+    "done": true,
+    "actual": "수영 1325m 72분 @1:45/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1325,
+      "duration_min": 72.4,
+      "moving_min": 23.3,
+      "pace_per_100m": "1:45",
+      "avg_hr": 120,
+      "max_hr": 191,
+      "swolf": 36,
+      "strokes": 512,
+      "avg_spm": null,
+      "training_load": 66
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.3 / 무산소 1.7 | 부하 66",
+    "garmin_id": 22732716056,
+    "start_time": "11:57",
+    "garmin_ids": [
+      22732716056
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1325,
+        "duration_sec": 4345,
+        "avg_hr": 120,
+        "max_hr": 191,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 66,
+        "garmin_id": 22732716056,
+        "laps": null,
+        "open_water": false,
+        "start_time": "11:57"
+      }
+    ]
+  },
+  "2026-05-03": {
+    "planned": "한강 OW 클래스",
+    "done": true,
+    "actual": "OW 1107m 52분 @2:18/100m",
+    "metrics": {
+      "type": "swim",
+      "is_open_water": true,
+      "distance_m": 1107,
+      "duration_min": 51.9,
+      "moving_min": 25.5,
+      "pace_per_100m": "2:18",
+      "avg_hr": 111,
+      "max_hr": 166,
+      "swolf": 78,
+      "strokes": 357,
+      "avg_spm": null,
+      "training_load": 44
+    },
+    "training_zone": "easy",
+    "note": "OW 첫 경험 | 유산소 2.1 / 무산소 0.9 | 부하 44",
+    "garmin_id": 22743428925,
+    "start_time": "07:46",
+    "garmin_ids": [
+      22743428925
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1107,
+        "duration_sec": 3113,
+        "avg_hr": 111,
+        "max_hr": 166,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 44,
+        "garmin_id": 22743428925,
+        "laps": null,
+        "open_water": false,
+        "start_time": "07:46"
       }
     ]
   },
@@ -3741,115 +3773,6 @@
       }
     ]
   },
-  "2026-05-17": {
-    "planned": "🚴 자전거 50km Easy 또는 휴식",
-    "done": true,
-    "actual": "자전거 46km 127분",
-    "metrics": {
-      "type": "bike",
-      "distance_km": 46.38,
-      "duration_min": 127.8,
-      "avg_speed_kmh": 21.8,
-      "avg_hr": 133,
-      "max_hr": 191,
-      "avg_power": null,
-      "training_load": 232,
-      "laps": [
-        {
-          "distance": 5000,
-          "duration": 666,
-          "avg_hr": 116,
-          "max_hr": 143,
-          "speed_kmh": 27.0
-        },
-        {
-          "distance": 5000,
-          "duration": 547,
-          "avg_hr": 147,
-          "max_hr": 162,
-          "speed_kmh": 32.9
-        },
-        {
-          "distance": 5000,
-          "duration": 529,
-          "avg_hr": 161,
-          "max_hr": 191,
-          "speed_kmh": 34.1
-        },
-        {
-          "distance": 5000,
-          "duration": 927,
-          "avg_hr": 133,
-          "max_hr": 164,
-          "speed_kmh": 19.4
-        },
-        {
-          "distance": 5000,
-          "duration": 939,
-          "avg_hr": 133,
-          "max_hr": 167,
-          "speed_kmh": 19.2
-        },
-        {
-          "distance": 5000,
-          "duration": 1069,
-          "avg_hr": 139,
-          "max_hr": 185,
-          "speed_kmh": 16.8
-        },
-        {
-          "distance": 5000,
-          "duration": 953,
-          "avg_hr": 148,
-          "max_hr": 186,
-          "speed_kmh": 18.9
-        },
-        {
-          "distance": 5000,
-          "duration": 1114,
-          "avg_hr": 107,
-          "max_hr": 158,
-          "speed_kmh": 16.2
-        },
-        {
-          "distance": 5000,
-          "duration": 712,
-          "avg_hr": 127,
-          "max_hr": 152,
-          "speed_kmh": 25.3
-        },
-        {
-          "distance": 1382,
-          "duration": 213,
-          "avg_hr": 137,
-          "max_hr": 172,
-          "speed_kmh": 23.4
-        }
-      ]
-    },
-    "training_zone": "moderate",
-    "note": "유산소 3.5 / 무산소 3.2 | 부하 232",
-    "garmin_id": 22907468981,
-    "start_time": "09:39",
-    "garmin_ids": [
-      22907468981
-    ],
-    "all_metrics": [
-      {
-        "type": "bike",
-        "distance_m": 46381.890625,
-        "distance_km": 46.38,
-        "duration_sec": 7668,
-        "duration_min": 127.8,
-        "avg_hr": 133,
-        "max_hr": 191,
-        "avg_speed_kmh": 21.8,
-        "training_load": 232,
-        "garmin_id": 22907468981,
-        "start_time": "09:39"
-      }
-    ]
-  },
   "2026-05-16": {
     "planned": "TBD — 강습/동호회/자전거 (사용자 결정)",
     "done": true,
@@ -4015,6 +3938,115 @@
       }
     ]
   },
+  "2026-05-17": {
+    "planned": "🚴 자전거 50km Easy 또는 휴식",
+    "done": true,
+    "actual": "자전거 46km 127분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 46.38,
+      "duration_min": 127.8,
+      "avg_speed_kmh": 21.8,
+      "avg_hr": 133,
+      "max_hr": 191,
+      "avg_power": null,
+      "training_load": 232,
+      "laps": [
+        {
+          "distance": 5000,
+          "duration": 666,
+          "avg_hr": 116,
+          "max_hr": 143,
+          "speed_kmh": 27.0
+        },
+        {
+          "distance": 5000,
+          "duration": 547,
+          "avg_hr": 147,
+          "max_hr": 162,
+          "speed_kmh": 32.9
+        },
+        {
+          "distance": 5000,
+          "duration": 529,
+          "avg_hr": 161,
+          "max_hr": 191,
+          "speed_kmh": 34.1
+        },
+        {
+          "distance": 5000,
+          "duration": 927,
+          "avg_hr": 133,
+          "max_hr": 164,
+          "speed_kmh": 19.4
+        },
+        {
+          "distance": 5000,
+          "duration": 939,
+          "avg_hr": 133,
+          "max_hr": 167,
+          "speed_kmh": 19.2
+        },
+        {
+          "distance": 5000,
+          "duration": 1069,
+          "avg_hr": 139,
+          "max_hr": 185,
+          "speed_kmh": 16.8
+        },
+        {
+          "distance": 5000,
+          "duration": 953,
+          "avg_hr": 148,
+          "max_hr": 186,
+          "speed_kmh": 18.9
+        },
+        {
+          "distance": 5000,
+          "duration": 1114,
+          "avg_hr": 107,
+          "max_hr": 158,
+          "speed_kmh": 16.2
+        },
+        {
+          "distance": 5000,
+          "duration": 712,
+          "avg_hr": 127,
+          "max_hr": 152,
+          "speed_kmh": 25.3
+        },
+        {
+          "distance": 1382,
+          "duration": 213,
+          "avg_hr": 137,
+          "max_hr": 172,
+          "speed_kmh": 23.4
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.5 / 무산소 3.2 | 부하 232",
+    "garmin_id": 22907468981,
+    "start_time": "09:39",
+    "garmin_ids": [
+      22907468981
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": 46381.890625,
+        "distance_km": 46.38,
+        "duration_sec": 7668,
+        "duration_min": 127.8,
+        "avg_hr": 133,
+        "max_hr": 191,
+        "avg_speed_kmh": 21.8,
+        "training_load": 232,
+        "garmin_id": 22907468981,
+        "start_time": "09:39"
+      }
+    ]
+  },
   "2026-05-19": {
     "planned": "🏃 러닝 8km Easy",
     "done": true,
@@ -4053,38 +4085,6 @@
         "laps": null,
         "open_water": false,
         "start_time": "06:26"
-      }
-    ]
-  },
-  "2026-03-22": {
-    "planned": "완전 휴식",
-    "done": true,
-    "actual": "근력 훈련 8분",
-    "metrics": {
-      "type": "strength",
-      "training_load": 1
-    },
-    "training_zone": "easy",
-    "note": " | 부하 1",
-    "garmin_id": 22255298354,
-    "start_time": "12:37",
-    "garmin_ids": [
-      22255298354
-    ],
-    "all_metrics": [
-      {
-        "type": "strength",
-        "distance_m": null,
-        "duration_sec": 473,
-        "avg_hr": 82,
-        "max_hr": 109,
-        "avg_pace": null,
-        "avg_speed": null,
-        "training_load": 1,
-        "garmin_id": 22255298354,
-        "laps": null,
-        "open_water": false,
-        "start_time": "12:37"
       }
     ]
   },
@@ -6259,6 +6259,15 @@
       "training_load": 0
     }
   },
+  "2026-06-10": {
+    "planned": "🏃 빌드업 템포 (WU 3km → 1km @5:15 → 1km @5:10 → CD 2km)",
+    "done": false,
+    "actual": "휴식 (고객 저녁)",
+    "metrics": {
+      "type": "rest",
+      "training_load": 0
+    }
+  },
   "2026-06-11": {
     "planned": "🏃 Easy 롱런 11~12km",
     "done": true,
@@ -6301,15 +6310,6 @@
         "feel": 50
       }
     ]
-  },
-  "2026-06-10": {
-    "planned": "🏃 빌드업 템포 (WU 3km → 1km @5:15 → 1km @5:10 → CD 2km)",
-    "done": false,
-    "actual": "휴식 (고객 저녁)",
-    "metrics": {
-      "type": "rest",
-      "training_load": 0
-    }
   },
   "2026-06-12": {
     "planned": "🏊 수영 강습 06시",
@@ -7524,6 +7524,18 @@
       }
     ]
   },
+  "2026-06-20": {
+    "planned": "🏊 수영 강습 06시 (테이퍼)",
+    "done": false,
+    "actual": "휴식 (회사 워크샵 1박2일)",
+    "note": "워크샵으로 훈련 불가. 계획 외 휴식."
+  },
+  "2026-06-21": {
+    "planned": "🏁 한강리버크로스 2km OW",
+    "done": false,
+    "actual": "대회 취소 (비)",
+    "note": "폭우로 대회 취소. 비자발적 휴식. OW 카운트 미증가."
+  },
   "2026-06-22": {
     "planned": "휴식",
     "done": true,
@@ -7566,18 +7578,6 @@
         "feel": 50
       }
     ]
-  },
-  "2026-06-20": {
-    "planned": "🏊 수영 강습 06시 (테이퍼)",
-    "done": false,
-    "actual": "휴식 (회사 워크샵 1박2일)",
-    "note": "워크샵으로 훈련 불가. 계획 외 휴식."
-  },
-  "2026-06-21": {
-    "planned": "🏁 한강리버크로스 2km OW",
-    "done": false,
-    "actual": "대회 취소 (비)",
-    "note": "폭우로 대회 취소. 비자발적 휴식. OW 카운트 미증가."
   },
   "2026-06-23": {
     "planned": "🏃 테이퍼 강도 터치 (WU 3km + 3×1km @5:15~5:20 R2분 + CD 2km)",
@@ -8271,6 +8271,27 @@
     "training_zone": "rest",
     "note": "6/28 자전거 66km 누적 피로. 컨디션 회복 우선."
   },
+  "2026-07-01": {
+    "planned": "🛌 휴식 (사랑니 발치 D+2)",
+    "done": true,
+    "actual": "휴식 (사랑니 D+2, 안정)",
+    "training_zone": "rest",
+    "note": "사랑니 발치 이틀째. 계획대로 완전 휴식."
+  },
+  "2026-07-02": {
+    "planned": "🚴 남북 자전거 (~45km, 1시간30분)",
+    "done": false,
+    "actual": "휴식 (사랑니 회복 — 혈병 형성 중)",
+    "training_zone": "rest",
+    "note": "사랑니 회복 우선. 자전거 취소."
+  },
+  "2026-07-03": {
+    "planned": "🏃 Easy 런 6~8km (수영 강습은 상처 보고 판단)",
+    "done": false,
+    "actual": "휴식 (사랑니 회복)",
+    "training_zone": "rest",
+    "note": "사랑니 회복 중. 러닝·수영 모두 취소."
+  },
   "2026-07-04": {
     "planned": "🏃 런 8~10km + 🏊 수영 1:4 레슨 (상처 확인 후)",
     "done": true,
@@ -8488,6 +8509,13 @@
         "feel": 50
       }
     ]
+  },
+  "2026-07-05": {
+    "planned": "🏃 런 8~10km Easy~Moderate",
+    "done": false,
+    "actual": "휴식 (사랑니 회복)",
+    "training_zone": "rest",
+    "note": "사랑니 회복 중. 러닝 취소."
   },
   "2026-07-06": {
     "planned": "🏊 수영 강습 06시",
