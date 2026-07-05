@@ -496,19 +496,19 @@
     },
     "2026-07-07": {
       "date": "2026-07-07",
-      "workout": "🛌 휴식",
-      "detail": "화. 주말 세션(수영+자전거+런) 회복.",
+      "workout": "🏊 수영 자유 30분",
+      "detail": "장마로 러닝 취소. 복귀 첫날 가볍게 수영만. 충주 접수 14:00 잊지 말 것.",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed"
+      "rule": "rainy-season-substitute"
     },
     "2026-07-09": {
       "date": "2026-07-09",
-      "workout": "🏃 템포런 (WU 3km + 템포 5km @5:20 + CD 2km)",
-      "detail": "목. 3회차 템포 5km. 전주 4km 잘 됐으면 5km 진행",
+      "workout": "🏊 수영 자유 40분",
+      "detail": "장마로 러닝 취소. 수영 자유 (킥보드+자유형 반복, 강도 낮게). 목요일은 수영 수업 없으므로 개인 자유 수영.",
       "source": "manual",
       "auto": false,
-      "rule": "user-confirmed"
+      "rule": "rainy-season-substitute"
     },
     "2026-07-12": {
       "date": "2026-07-12",
