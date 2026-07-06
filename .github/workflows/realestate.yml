@@ -31,6 +31,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.REALESTATE_CHAT_ID }}
+          VALIDATE_WATCHLIST_TELEGRAM: "0"
         run: python realestate/scripts/validate_watchlist.py
 
       - name: Save collected data

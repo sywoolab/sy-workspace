@@ -33,12 +33,16 @@ BOT_TOKEN = (os.environ.get("BOT_TOKEN")
              or os.environ.get("REALESTATE_BOT_TOKEN")
              or os.environ.get("TELEGRAM_BOT_TOKEN", ""))
 CHAT_ID = os.environ.get("CHAT_ID") or os.environ.get("TELEGRAM_CHAT_ID", "")
+SEND_TELEGRAM = os.environ.get("VALIDATE_WATCHLIST_TELEGRAM", "1").lower() not in ("0", "false", "no")
 MAX_PRICE = 11.6
 STALE_DAYS = 14
 BASE_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
 def send_telegram(text):
+    if not SEND_TELEGRAM:
+        print("[SKIP] VALIDATE_WATCHLIST_TELEGRAM=0 — 텔레그램 스킵")
+        return
     if not BOT_TOKEN or not CHAT_ID:
         print("[WARN] BOT_TOKEN/CHAT_ID 미설정 — 텔레그램 스킵")
         return

@@ -43,6 +43,7 @@ BOT_TOKEN = (
     or os.environ.get('TELEGRAM_BOT_TOKEN', '')
 )
 CHAT_ID = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
+DASHBOARD_URL = 'https://sywoolab.github.io/training-dashboard/'
 
 
 def _git_show(ref):
@@ -107,24 +108,16 @@ def main():
         return 0
 
     lines = ['📅 운동 스케줄 변경 반영']
+    lines.append(f"추가 {len(added)}건 · 수정 {len(modified)}건 · 삭제 {len(deleted)}건")
     if added:
-        lines.append('')
-        lines.append(f'➕ 추가 {len(added)}건:')
-        for d in added[-5:]:
-            lines.append(f'  {d}: {_summarize_entry(head_overrides[d])}')
+        lines.append(f"➕ 추가: {', '.join(added[-5:])}")
     if modified:
-        lines.append('')
-        lines.append(f'✏️ 수정 {len(modified)}건:')
-        for d in modified[-5:]:
-            lines.append(f'  {d}: {_summarize_entry(head_overrides[d])}')
+        lines.append(f"✏️ 수정: {', '.join(modified[-5:])}")
     if deleted:
-        lines.append('')
-        lines.append(f'🗑️ 삭제 {len(deleted)}건 (⚠️ 의도된 삭제인지 확인):')
-        for d in deleted[-5:]:
-            lines.append(f'  {d}: {_summarize_entry(prev_overrides[d])}')
+        lines.append(f"🗑️ 삭제: {', '.join(deleted[-5:])} (⚠️ 의도 확인)")
 
     lines.append('')
-    lines.append('📊 다음 morning(05:40)/evening(18:00) cron부터 새 스케줄 적용.')
+    lines.append(f'📊 상세 스케줄: {DASHBOARD_URL}')
 
     msg = '\n'.join(lines)
     print(msg)

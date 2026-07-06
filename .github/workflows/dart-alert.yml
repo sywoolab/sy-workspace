@@ -1,8 +1,8 @@
 name: dart-alert
 
 on:
-  schedule:
-    - cron: '0,30 0-8 * * 1-5'  # UTC 0~8시 = KST 9~17시, 평일 30분마다
+  # 정기 알림은 ib-team-news / ib-team-disclosures로 통합.
+  # 필요 시 수동 검증용으로만 실행한다.
   workflow_dispatch:
 
 jobs:
