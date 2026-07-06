@@ -27,24 +27,6 @@ jobs:
 
       - run: pip install requests
 
-      - name: Notify SSOT change (push만)
-        id: notify
-        if: github.event_name == 'push'
-        continue-on-error: true
-        env:
-          BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
-          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python realestate/scripts/notify_realestate_change.py
-
-      - name: Notify failure of SSOT notify step
-        if: github.event_name == 'push' && steps.notify.outcome == 'failure'
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.REALESTATE_BOT_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-            -d text="⚠️ realestate notify_realestate_change.py 실패 — SSOT 변경 텔레 알림 미발송 ($(date '+%Y-%m-%d %H:%M KST'))" || true
-          echo "::warning::notify_realestate_change.py failed — SSOT change not propagated to telegram"
-
       - name: 워치리스트 정합성 검증
         continue-on-error: true
         env:
@@ -59,6 +41,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REALESTATE_SEND_TELEGRAM: "0"
         run: python realestate/scripts/re_brief.py
 
       - name: 실패 시 텔레그램 알림
@@ -80,3 +63,12 @@ jobs:
             git pull --rebase --autostash
             git push
           fi
+
+      - name: Send dashboard link
+        if: success()
+        env:
+          BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          REALESTATE_BOT_TOKEN: ${{ secrets.REALESTATE_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          REALESTATE_NOTIFY_ONLY: "1"
+        run: python realestate/scripts/re_brief.py

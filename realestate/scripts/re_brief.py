@@ -5,7 +5,7 @@ MS 부동산 Dashboard — HTML 생성 스크립트
 - 데이터: scored_all.csv (실거래가 로우데이터 기반), market_config.json (수동)
 - GitHub Pages: docs/re.html
 """
-import os, json, csv, re, requests, xml.etree.ElementTree as ET
+import os, json, csv, re, sys, requests, xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -31,6 +31,8 @@ BOT_TOKEN = (
 )
 CHAT_ID   = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
 PAGES_URL = 'https://sywoolab.github.io/sy-workspace/re.html'
+SEND_TELEGRAM = os.environ.get('REALESTATE_SEND_TELEGRAM', '1').lower() not in ('0', 'false', 'no')
+NOTIFY_ONLY = os.environ.get('REALESTATE_NOTIFY_ONLY', '0').lower() in ('1', 'true', 'yes')
 
 # ─────────────────────────────────────────
 # 데이터 로드
@@ -534,14 +536,28 @@ function switchReTab(btn, idx) {{
 def send_telegram(text):
     if not BOT_TOKEN or not CHAT_ID:
         print('  REALESTATE_BOT_TOKEN / CHAT_ID 누락 — 발송 스킵')
-        return
+        return False
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
-    resp = requests.post(url, data={
-        'chat_id': CHAT_ID, 'text': text, 'parse_mode': 'HTML',
-        'disable_web_page_preview': 'false',
-    }, timeout=30)
-    if not resp.json().get('ok'):
-        print(f'  전송 실패: {resp.text[:200]}')
+    try:
+        resp = requests.post(url, data={
+            'chat_id': CHAT_ID, 'text': text, 'parse_mode': 'HTML',
+            'disable_web_page_preview': 'false',
+        }, timeout=30)
+        ok = resp.json().get('ok', False)
+        if not ok:
+            print(f'  전송 실패: {resp.text[:200]}')
+        return ok
+    except Exception as e:
+        print(f'  텔레그램 전송 예외: {str(e)[:200]}')
+        return False
+
+
+def build_telegram_message():
+    date_tag = NOW.strftime('%y%m%d')
+    return (
+        f'<b>🏠 {date_tag} MS 부동산 Dashboard 업데이트</b>\n'
+        f'<a href="{PAGES_URL}">{PAGES_URL}</a>'
+    )
 
 
 # ─────────────────────────────────────────
@@ -549,6 +565,11 @@ def send_telegram(text):
 # ─────────────────────────────────────────
 
 def main():
+    if NOTIFY_ONLY:
+        send_telegram(build_telegram_message())
+        print(f'  텔레그램 링크 전송: {PAGES_URL}')
+        return 0
+
     print(f'[{NOW}] MS 부동산 Dashboard 생성')
     cfg      = load_config()
     top20_scenarios = {b: load_top20(b) for b in BUDGET_TABS}
@@ -567,17 +588,13 @@ def main():
         f.write(html)
     print(f'  저장: {out}')
 
-    # 텔레그램 (주 1회 실행 시에만)
-    date_tag = NOW.strftime('%y%m%d')
-    tg = (
-        f'<b>🏠 {date_tag} MS 부동산 Dashboard</b>\n\n'
-        f'<a href="{PAGES_URL}">{date_tag} | {PAGES_URL}</a>\n\n'
-        f'📊 관심단지 {len(top20_scenarios[BUDGET_TABS[0]])}개(11.6억 기준) · 청약 {len(chungyak)}개\n'
-        f'🎯 전략: {cfg["strategy"]["current_rec"]}'
-    )
-    send_telegram(tg)
-    print(f'  텔레그램 전송: {PAGES_URL}')
+    if SEND_TELEGRAM:
+        send_telegram(build_telegram_message())
+        print(f'  텔레그램 링크 전송: {PAGES_URL}')
+    else:
+        print('  텔레그램 전송 생략: REALESTATE_SEND_TELEGRAM=0')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
