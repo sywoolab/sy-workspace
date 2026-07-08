@@ -4,3 +4,4 @@
 # 업그레이드 시 garmin_sync.py login_garmin() 의 api.garth.dump() 호출 신규 API 확인 필수
 garminconnect==0.2.40
 requests>=2.31.0
+holidays>=0.76

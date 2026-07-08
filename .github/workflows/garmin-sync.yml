@@ -1,16 +1,15 @@
 name: garmin-sync
 
 on:
-  schedule: []
-  # ⚠️ cron 비활성화 (2026-05-18) — GH Actions IP 풀이 가민 측에 영구 차단 상태
-  # 5/14 fix 후 1회 success → 5/15~5/17 cron 매번 429 + 수동 trigger도 429
-  # 차단 자연 해소 위해 cron 제거. 매 cron 429 시도가 가민 측 차단 강화 신호 되는 것 차단
-  # 수동 sync는 Mac/Win 로컬에서 `gsync` alias 사용 (개인 IP는 차단 안 됨)
-  # 미래 가민 차단 풀리면 workflow_dispatch로 검증 후 cron 부활 가능
+  schedule:
+    - cron: '0 23 * * 0-4'  # KST 평일 08:00 후보. 한국 공휴일이면 gate에서 skip.
+    - cron: '0 3,7 * * *'   # KST 12:00/16:00 후보. 주말/한국 공휴일만 gate에서 실행.
+  # ⚠️ 2026-05 GitHub Actions IP Garmin 429 차단 이력 있음.
+  # 재활성화는 저빈도 schedule gate로 제한하고, 실패 시 기존 garmin_sync.py 오류 알림에 위임한다.
   workflow_dispatch:
     inputs:
       mode:
-        description: 'sync (기본) 또는 resend (오늘 운동 재전송)'
+        description: 'sync (기본), resend (오늘 운동 재전송), gate-only (스케줄 판정만)'
         default: 'sync'
 
 permissions:
@@ -28,7 +27,54 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Schedule gate (KST weekday/weekend/holiday)
+        id: gate
+        env:
+          GITHUB_EVENT_SCHEDULE: ${{ github.event.schedule }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+
+          import holidays
+
+          kst = timezone(timedelta(hours=9))
+          now = datetime.now(kst)
+          today = now.date()
+          schedule = os.environ.get("GITHUB_EVENT_SCHEDULE", "")
+          event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+
+          kr_holidays = holidays.country_holidays("KR", years=[today.year])
+          is_weekend = today.weekday() >= 5
+          is_holiday = today in kr_holidays
+
+          if event_name == "workflow_dispatch":
+              should_run = True
+              reason = "manual dispatch"
+          elif schedule == "0 23 * * 0-4":
+              should_run = today.weekday() < 5 and not is_holiday
+              reason = "weekday 08:00 KST" if should_run else "08:00 skipped: weekend/holiday"
+          elif schedule == "0 3,7 * * *":
+              should_run = is_weekend or is_holiday
+              reason = "weekend/holiday 12:00/16:00 KST" if should_run else "12:00/16:00 skipped: regular weekday"
+          else:
+              should_run = False
+              reason = f"unknown schedule: {schedule}"
+
+          holiday_name = kr_holidays.get(today, "")
+          print(f"KST now={now:%Y-%m-%d %H:%M:%S} weekday={today.weekday()} weekend={is_weekend} holiday={bool(is_holiday)} {holiday_name}")
+          print(f"schedule={schedule!r} event={event_name!r} should_run={should_run} reason={reason}")
+
+          out = Path(os.environ["GITHUB_OUTPUT"])
+          with out.open("a", encoding="utf-8") as f:
+              f.write(f"should_run={'true' if should_run else 'false'}\n")
+              f.write(f"reason={reason}\n")
+          PY
+
       - name: Sync Garmin data
+        if: steps.gate.outputs.should_run == 'true' && github.event.inputs.mode != 'gate-only'
         env:
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
@@ -40,7 +86,7 @@ jobs:
         run: python workout/scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
 
       - name: Commit changes
-        if: always()
+        if: always() && steps.gate.outputs.should_run == 'true' && github.event.inputs.mode != 'gate-only'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
@@ -51,7 +97,7 @@ jobs:
           fi
 
       - name: Adaptive schedule adjustment
-        if: success()
+        if: success() && steps.gate.outputs.should_run == 'true' && github.event.inputs.mode != 'gate-only'
         env:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -65,7 +111,7 @@ jobs:
           fi
 
       - name: Run workout analysis (if workout_log changed)
-        if: success()
+        if: success() && steps.gate.outputs.should_run == 'true' && github.event.inputs.mode != 'gate-only'
         env:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
