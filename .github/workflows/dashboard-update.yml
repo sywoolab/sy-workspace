@@ -5,8 +5,10 @@ on:
     paths:
       - 'workout/workout_log.json'
       - 'workout/data/garmin_health.json'
+      - 'workout/data/training_report.html'
       - 'workout/workout_schedule.json'
       - 'workout/data/race_records.json'
+      - 'workout/scripts/garmin_sync.py'
       - 'workout/scripts/generate_dashboard.py'
       - 'workout/scripts/workout_analysis.py'
   workflow_dispatch:
