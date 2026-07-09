@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'sync (기본), resend (오늘 운동 재전송), gate-only (스케줄 판정만)'
+        description: 'sync (기본), resend (오늘 운동 재전송), health-backfill (건강 데이터 백필), gate-only (스케줄 판정만)'
         default: 'sync'
 
 permissions:

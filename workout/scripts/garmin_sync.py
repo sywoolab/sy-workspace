@@ -278,8 +278,8 @@ def _push_and_update_dashboard(has_new_activity: bool):
     ).stdout.strip()
 
     # (2) HTML 신선본 재생성 — git add 이전. sy-workspace tracked 사본도 같이 commit해야 고아화 차단.
-    dashboard_script = Path(BASE_DIR) / 'workout' / 'scripts' / 'generate_dashboard.py'
-    html_src = Path(BASE_DIR) / 'workout' / 'data' / 'training_report.html'
+    dashboard_script = Path(BASE_DIR) / 'scripts' / 'generate_dashboard.py'
+    html_src = Path(BASE_DIR) / 'data' / 'training_report.html'
     if dashboard_script.exists() and unstaged:
         try:
             r_dash = subprocess.run(
@@ -1160,6 +1160,26 @@ def fetch_health_data(api, date_str):
         print(f"  [WARN] Training Status 조회 실패: {e}")
 
     return health
+
+
+def _date_range_strings(start_date, end_date):
+    """YYYY-MM-DD 문자열 범위를 양끝 포함 리스트로 반환."""
+    start = datetime.strptime(start_date, '%Y-%m-%d').date()
+    end = datetime.strptime(end_date, '%Y-%m-%d').date()
+    if start > end:
+        start, end = end, start
+    return [
+        (start + timedelta(days=i)).strftime('%Y-%m-%d')
+        for i in range((end - start).days + 1)
+    ]
+
+
+def fetch_health_range(api, start_date, end_date):
+    """수면/RHR/HRV 등 건강 데이터를 날짜 범위로 수집."""
+    records = {}
+    for date_str in _date_range_strings(start_date, end_date):
+        records[date_str] = fetch_health_data(api, date_str)
+    return records
 
 
 # ============================================================
@@ -2185,15 +2205,17 @@ def sync():
         )
 
     # 5. 건강 데이터 수집 (항상)
-    health = fetch_health_data(api, TODAY)
-    print(f"  건강 데이터 수집 완료")
+    # 활동은 소급 조회하면서 health를 TODAY만 저장하면 수면/RHR/HRV가 빈 날짜로 남는다.
+    health_records = fetch_health_range(api, start_date, TODAY)
+    health = health_records.get(TODAY) or {'date': TODAY}
+    print(f"  건강 데이터 수집 완료 ({len(health_records)}일)")
 
     # 건강 데이터 저장 (대시보드 표시를 위해 전체 보관 — 삭제 로직 제거)
     # working tree 손상 시 HEAD에서 자동 머지 (#7 방지)
     health_history = _load_with_head_guard(
         HEALTH_FILE, 'workout/data/garmin_health.json', min_key_loss=10,
     )
-    health_history[TODAY] = health
+    health_history.update(health_records)
     # 과거 데이터 정리 안 함 (대시보드 전체 기록 보관용)
     save_json(HEALTH_FILE, health_history)
 
@@ -2520,6 +2542,39 @@ def fill_planned():
         print("[OK] 빈 planned 없음")
 
 
+def backfill_health(days=21):
+    """최근 N일 Garmin 건강 데이터만 다시 수집한다."""
+    try:
+        days = int(days)
+    except (TypeError, ValueError):
+        days = 21
+    days = max(1, min(days, 60))
+    start = (NOW - timedelta(days=days - 1)).strftime('%Y-%m-%d')
+    print(f"[{NOW.strftime('%Y-%m-%d %H:%M')}] 건강 데이터 백필 시작 ({start} ~ {TODAY})")
+
+    api = login_garmin()
+    if api is None:
+        return None
+
+    health_history = _load_with_head_guard(
+        HEALTH_FILE, 'workout/data/garmin_health.json', min_key_loss=10,
+    )
+    before = json.dumps(health_history, ensure_ascii=False, sort_keys=True)
+    records = fetch_health_range(api, start, TODAY)
+    health_history.update(records)
+    after = json.dumps(health_history, ensure_ascii=False, sort_keys=True)
+
+    if before == after:
+        print(f"[OK] 건강 데이터 변경 없음 ({len(records)}일 조회)")
+        return False
+
+    save_json(HEALTH_FILE, health_history)
+    print(f"[OK] 건강 데이터 백필 완료 ({len(records)}일 조회)")
+    _backup_to_onedrive()
+    _push_and_update_dashboard(has_new_activity=False)
+    return True
+
+
 if __name__ == '__main__':
     mode = sys.argv[1] if len(sys.argv) > 1 else 'sync'
     # 로컬 cron(Mac/Win) 시작 시 git pull --rebase (CI에서는 no-op)
@@ -2530,6 +2585,8 @@ if __name__ == '__main__':
             resend_today()
         elif mode == 'fill-planned':
             fill_planned()
+        elif mode == 'health-backfill':
+            result = backfill_health(sys.argv[2] if len(sys.argv) > 2 else 21)
         else:
             result = sync()  # None=로그인 실패, True=변경 있음, False=변경 없음
         # 로컬 cron sync 성공 + 변경 있음 → commit + push retry (CI에서는 no-op, workflow가 처리)
