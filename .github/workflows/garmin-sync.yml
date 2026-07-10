@@ -86,7 +86,7 @@ jobs:
         run: python workout/scripts/garmin_sync.py ${{ github.event.inputs.mode || 'sync' }}
 
       - name: Commit changes
-        if: always() && steps.gate.outputs.should_run == 'true' && github.event.inputs.mode != 'gate-only'
+        if: success() && steps.gate.outputs.should_run == 'true' && github.event.inputs.mode != 'gate-only'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
