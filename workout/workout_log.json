@@ -8649,7 +8649,7 @@
   "2026-07-11": {
     "planned": "수영 개인강습",
     "done": true,
-    "actual": "자전거 64.42km 123분 + 러닝 2.33km @5:31",
+    "actual": "자전거 64.42km 123분 + 러닝 2.33km @5:31 + 수영 1350m 64분 @1:31/100m",
     "metrics": {
       "type": "run",
       "distance_km": 2.33,
@@ -8686,12 +8686,13 @@
       ]
     },
     "training_zone": "interval",
-    "note": "유산소 4.1 / 무산소 2.4 | 부하 211 | 유산소 2.6 | 부하 53",
-    "garmin_id": 23553070094,
+    "note": "유산소 4.1 / 무산소 2.4 | 부하 211 | 유산소 2.6 | 부하 53 | 유산소 2.3 / 무산소 2.0 | 부하 66 | 브릭(순서 추정)",
+    "garmin_id": 23554084406,
     "start_time": "07:14",
     "garmin_ids": [
       23552951353,
-      23553070094
+      23553070094,
+      23554084406
     ],
     "all_metrics": [
       {
@@ -8840,7 +8841,25 @@
         "start_time": "10:04",
         "rpe": 5,
         "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 1350,
+        "duration_min": 64.3,
+        "moving_min": 20.7,
+        "pace_per_100m": "1:31",
+        "avg_hr": 120,
+        "max_hr": 166,
+        "swolf": 30,
+        "strokes": 372,
+        "avg_spm": null,
+        "training_load": 66,
+        "garmin_id": 23554084406,
+        "start_time": "12:55",
+        "rpe": 5,
+        "feel": 50
       }
-    ]
+    ],
+    "is_brick": true
   }
 }
