@@ -372,24 +372,32 @@ def get_latest_metrics(log, workout_type, n=3):
     """최근 N개의 해당 종목 entry 반환.
     복합 활동(브릭·대회)의 경우 top-level metrics.type이 다른 종목이어도
     all_metrics에 해당 종목이 있으면 포함 — 레이스 데이터 누락 방지.
+    metrics.exclude_from_estimate=True인 수동/불완전 기록은 완주 예상 산식에서 제외한다.
     """
     entries = []
+
+    def _usable_for_estimate(entry, metric):
+        return not (entry.get('exclude_from_estimate') or metric.get('exclude_from_estimate'))
+
     for date_key in sorted(log.keys(), reverse=True):
         entry = log[date_key]
         if not entry.get('done'):
             continue
         metrics = entry.get('metrics', {})
         # top-level 매칭 (단일 종목 훈련)
-        if metrics.get('type') == workout_type:
+        if metrics.get('type') == workout_type and _usable_for_estimate(entry, metrics):
             entries.append((date_key, entry))
             if len(entries) >= n:
                 break
             continue
         # all_metrics에 해당 종목이 있는 복합 활동 (브릭·대회)
-        all_m = entry.get('all_metrics', [])
-        if any(m.get('type') == workout_type for m in all_m):
+        all_m = [
+            m for m in entry.get('all_metrics', [])
+            if m.get('type') == workout_type and _usable_for_estimate(entry, m)
+        ]
+        if all_m:
             # 해당 종목의 all_metrics 데이터를 top-level처럼 노출하는 래퍼 entry 생성
-            target_m = next(m for m in all_m if m.get('type') == workout_type)
+            target_m = all_m[0]
             wrapped = {**entry, 'metrics': target_m}
             entries.append((date_key, wrapped))
             if len(entries) >= n:

@@ -1161,7 +1161,7 @@ new Chart(document.getElementById('tlChart'), {{
             for m in e['metrics']:
                 t = m.get('type','')
                 dist = m.get('distance_m') or 0
-                pace = m.get('avg_pace','') or ''
+                pace = m.get('display_pace') or m.get('avg_pace','') or (m.get('pace_per_100m','') if t=='swim' else '') or ''
                 spd  = m.get('avg_speed') or 0
                 if not dist:
                     patterns = {'bike': r'자전거\s+([\d.]+)km', 'run': r'러닝\s+([\d.]+)km',

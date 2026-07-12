@@ -66,6 +66,7 @@ ACTIVITY_TYPE_MAP = {
     'treadmill_running': 'run',
     'trail_running': 'run',
     'track_running': 'run',
+    'swimming': 'swim',
     'lap_swimming': 'swim',
     'open_water_swimming': 'swim',
     'cycling': 'bike',
@@ -2292,18 +2293,27 @@ def sync():
                     m = entry.get('metrics', {})
                     first_am = {
                         'type': m.get('type', ''),
-                        'distance_m': (m.get('distance_km') or 0) * 1000 or None,
+                        'distance_m': m.get('distance_m') or (m.get('distance_km') or 0) * 1000 or None,
                         'duration_sec': (m.get('duration_min') or 0) * 60 or None,
                         'avg_hr': m.get('avg_hr'),
                         'max_hr': m.get('max_hr'),
-                        'avg_pace': m.get('avg_pace') or m.get('pace_per_km'),
+                        'avg_pace': m.get('avg_pace') or m.get('pace_per_km') or m.get('pace_per_100m'),
                         'avg_speed': (m.get('avg_speed_kmh') / 3.6) if m.get('avg_speed_kmh') else None,
                         'training_load': m.get('training_load'),
                         'garmin_id': new_gid,
                         'laps': m.get('laps'),
-                        'open_water': m.get('open_water', False),
+                        'open_water': m.get('open_water', m.get('is_open_water', False)),
                         'start_time': entry.get('start_time'),
                     }
+                    if m.get('type') == 'swim':
+                        first_am.update({
+                            'duration_min': m.get('duration_min'),
+                            'moving_min': m.get('moving_min'),
+                            'pace_per_100m': m.get('pace_per_100m'),
+                            'swolf': m.get('swolf'),
+                            'strokes': m.get('strokes'),
+                            'avg_spm': m.get('avg_spm'),
+                        })
                     # 자가평가 전달 (레드팀 BUG-1 수정 — 필드 생략 패턴 유지)
                     if parsed.get('rpe') is not None:
                         first_am['rpe'] = parsed['rpe']
