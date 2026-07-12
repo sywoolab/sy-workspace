@@ -8861,5 +8861,60 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-07-12": {
+    "planned": "🛌 완전 휴식",
+    "done": true,
+    "actual": "수영 1500m 31분 @2:04/100m + 수영 500m 15분 @3:00/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 500,
+      "duration_min": 15.0,
+      "moving_min": 0.0,
+      "pace_per_100m": "3:00",
+      "avg_hr": null,
+      "max_hr": null,
+      "swolf": null,
+      "strokes": null,
+      "avg_spm": null
+    },
+    "training_zone": "moderate",
+    "note": "",
+    "garmin_id": 23569748269,
+    "start_time": "15:45",
+    "garmin_ids": [
+      23569740513,
+      23569748269
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": null,
+        "duration_sec": 1860.0,
+        "avg_hr": null,
+        "max_hr": null,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": null,
+        "garmin_id": 23569740513,
+        "laps": null,
+        "open_water": false,
+        "start_time": "15:45"
+      },
+      {
+        "type": "swim",
+        "distance_m": 500,
+        "duration_min": 15.0,
+        "moving_min": 0.0,
+        "pace_per_100m": "3:00",
+        "avg_hr": null,
+        "max_hr": null,
+        "swolf": null,
+        "strokes": null,
+        "avg_spm": null,
+        "garmin_id": 23569748269,
+        "start_time": "16:20"
+      }
+    ]
   }
 }
