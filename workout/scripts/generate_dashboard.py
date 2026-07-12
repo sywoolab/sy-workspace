@@ -471,8 +471,13 @@ tr:hover{{background:#15152a}}
                     next_race_gap_str = f'D-{d_left} {rgoal} — <span style="color:#6affa0">달성 가능 (+{abs(gap_min)}분 여유)</span>'
                 break
 
-    # 오늘 할 일
-    today_plan = (sched_data.get('overrides', {}).get(today) or {}).get('workout', '스케줄 미등록')
+    # 오늘 요약: 실제 수행이 있으면 계획보다 우선 표시
+    today_entry = log.get(today) or {}
+    today_actual = (today_entry.get('actual') or '').strip() if today_entry.get('done') else ''
+    if today_actual:
+        today_plan = '실제: ' + (today_actual[:42] + ('…' if len(today_actual) > 42 else ''))
+    else:
+        today_plan = (sched_data.get('overrides', {}).get(today) or {}).get('workout', '스케줄 미등록')
 
     # 핵심 액션 — 러닝 공백 우선, 그 다음 bad/warn 순
     key_action = ''
