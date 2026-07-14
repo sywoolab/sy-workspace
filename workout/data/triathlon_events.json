@@ -59,15 +59,6 @@
   },
   {
     "status": "접수마감",
-    "name": "제7회 충청북도지사배 충주탄금호 전국 철인3종 경기대회(마감)",
-    "location": "충주시 탄금호 국제조정경기장 일원",
-    "course": "스탠다드",
-    "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2044&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.09.19 ~ 20",
-    "reg_period": "접수마감"
-  },
-  {
-    "status": "접수마감",
     "name": "제1회 제주 삼다 철인3종경기 대회",
     "location": "제주도 제주시 김녕해수욕장 인근",
     "course": "김녕해수욕장 인근",
@@ -151,13 +142,13 @@
     "reg_period": "2026-06-24  ~ 2026-07-07"
   },
   {
-    "status": "접수마감",
-    "name": "2026 고령군수배 대가야 전국 철인3종 대회",
+    "status": "목표대회",
+    "name": "대가야트라이애슬론(입문대회)",
     "location": "경북 고령군 다산 은행나무숲 (경북 고령군 다산면 좌학리 969)",
-    "course": "생활체육(스탠다드)",
+    "course": "입문대회",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2085&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.06.27 ~ 28",
-    "reg_period": "접수마감"
+    "date": "2026.10.18 ~ 19",
+    "reg_period": "일정 변경 반영(사용자 확인)"
   },
   {
     "status": "접수마감",
