@@ -9028,5 +9028,54 @@
         "feel": 50
       }
     ]
+  },
+  "2026-07-15": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "수영 1050m 45분 @1:39/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1050,
+      "duration_min": 45.0,
+      "moving_min": 17.5,
+      "pace_per_100m": "1:39",
+      "avg_hr": 132,
+      "max_hr": 170,
+      "swolf": 34,
+      "strokes": 366,
+      "avg_spm": null,
+      "training_load": 119
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.9 / 무산소 2.6 | 부하 119",
+    "garmin_id": 23600194045,
+    "start_time": "06:15",
+    "garmin_ids": [
+      23600194045
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1050,
+        "duration_sec": 2700.0,
+        "avg_hr": 132,
+        "max_hr": 170,
+        "avg_pace": "1:39",
+        "avg_speed": null,
+        "training_load": 119,
+        "garmin_id": 23600194045,
+        "laps": null,
+        "open_water": false,
+        "start_time": "06:15",
+        "duration_min": 45.0,
+        "moving_min": 17.5,
+        "pace_per_100m": "1:39",
+        "swolf": 34,
+        "strokes": 366,
+        "avg_spm": null,
+        "rpe": 4,
+        "feel": 50
+      }
+    ]
   }
 }
