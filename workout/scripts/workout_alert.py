@@ -40,14 +40,14 @@ LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
 # 대회일 & 훈련 시작일
-RACE_DAEGAYA   = datetime(2026, 10, 18, tzinfo=KST)  # 대가야트라이애슬론 입문대회 (10/18~19)
-RACE_TONGYEONG = datetime(2026, 10, 25, tzinfo=KST)  # 통영 월드컵 (A레이스)
-RACE_DAY = RACE_TONGYEONG  # 하위 호환 (format_week 캡용)
+RACE_TURTLE    = datetime(2026, 9, 6, tzinfo=KST)   # 거북섬 올림픽 (B레이스, 9/4~6)
+RACE_DAEGAYA   = datetime(2026, 10, 18, tzinfo=KST)  # 대가야 올림픽 (A레이스, 10/18~19)
+RACE_DAY = RACE_DAEGAYA  # 하위 호환 (format_week 캡용)
 TRAIN_START  = datetime(2026, 3, 16, tzinfo=KST)  # 시즌 시작 (기록 기준)
 RESTART_DATE = datetime(2026, 7, 7, tzinfo=KST)   # 발치 후 복귀 재시작
+DAYS_LEFT_TURTLE    = (RACE_TURTLE.date()    - NOW.date()).days
 DAYS_LEFT_DAEGAYA   = (RACE_DAEGAYA.date()   - NOW.date()).days
-DAYS_LEFT_TONGYEONG = (RACE_TONGYEONG.date() - NOW.date()).days
-DAYS_LEFT = DAYS_LEFT_TONGYEONG  # 하위 호환
+DAYS_LEFT = DAYS_LEFT_DAEGAYA  # 하위 호환
 
 # 주차 계산 (훈련 시작일 기준, 월요일 시작)
 def get_week_number(dt):
@@ -58,10 +58,10 @@ CURRENT_WEEK = get_week_number(NOW)
 
 # Phase 판별 (날짜 기반)
 PHASE1_END    = datetime(2026, 7, 26, tzinfo=KST).date()   # 베이스 복귀 종료
-PHASE2_END    = datetime(2026, 10, 11, tzinfo=KST).date()  # 대가야 전 빌드업 종료
-PHASE3_END    = datetime(2026, 10, 18, tzinfo=KST).date()  # 대가야 대회 주
-RECOVERY_END  = datetime(2026, 10, 21, tzinfo=KST).date()  # 대가야 후 회복
-TAPER_END     = datetime(2026, 10, 25, tzinfo=KST).date()  # 통영 테이퍼/대회
+PHASE2_END    = datetime(2026, 8, 30, tzinfo=KST).date()   # 거북섬 전 빌드업 종료
+PHASE3_END    = datetime(2026, 9, 6, tzinfo=KST).date()    # 거북섬 B레이스 주
+RECOVERY_END  = datetime(2026, 10, 11, tzinfo=KST).date()  # 대가야 A레이스 빌드 종료
+TAPER_END     = datetime(2026, 10, 18, tzinfo=KST).date()  # 대가야 테이퍼/대회
 
 def get_phase(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
@@ -72,11 +72,11 @@ def get_phase(dt):
     elif d <= PHASE2_END:
         return 2, "Phase 2: 빌드업"
     elif d <= PHASE3_END:
-        return 3, "Phase 3: 대가야 테이퍼"
+        return 3, "Phase 3: 거북섬 B레이스"
     elif d <= RECOVERY_END:
-        return 4, "Phase 4: 대가야 회복"
+        return 4, "Phase 4: 대가야 A레이스 빌드"
     elif d <= TAPER_END:
-        return 5, "Phase 5: 통영 테이퍼"
+        return 5, "Phase 5: 대가야 테이퍼"
     return 6, "시즌 완료"
 
 phase, phase_name = get_phase(NOW)
@@ -101,13 +101,13 @@ WEEK_NAMES = {
     22: "W7: 빌드업 ④",
     23: "W8: 빌드업 ⑤",
     24: "W9: 빌드업 ⑥",
-    25: "W10: 빌드업 ⑦",
-    26: "W11: 빌드업 ⑧",
-    27: "W12: 빌드업 ⑨",
-    28: "W13: 빌드업 ⑩",
-    29: "W14: 빌드업 ⑪",
+    25: "W10: 거북섬 B레이스",
+    26: "W11: 회복+재빌드",
+    27: "W12: 대가야 빌드 ①",
+    28: "W13: 대가야 빌드 ②",
+    29: "W14: 대가야 빌드 ③",
     30: "W15: 대가야 테이퍼",
-    31: "W16: 통영 테이퍼/대회 주",
+    31: "W16: 대가야 A레이스 후 회복",
 }
 
 # 요일별 운동 스케줄 (Phase별)
@@ -130,32 +130,32 @@ SCHEDULE = {
         5: ("브릭 → 수영", "자전거 90분 → 러닝 7~8km → 개인강습"),
         6: ("완전 휴식", ""),
     },
-    3: {  # Phase 3: 대가야 테이퍼 (10/12~10/18)
+    3: {  # Phase 3: 거북섬 B레이스 (8/31~9/6)
         0: ("수영 가볍게", "1km"),
         1: ("러닝", "3km 조깅"),
         2: ("자전거 가볍게", "30분"),
         3: ("완전 휴식", ""),
         4: ("수영 가볍게", "1km"),
-        5: ("대가야 준비", "장비 점검 + 짧은 감각 유지"),
-        6: ("대회", "대가야트라이애슬론 입문대회 — 참가/완주 + 전환 운영 점검"),
+        5: ("거북섬 준비", "장비 점검 + 짧은 감각 유지"),
+        6: ("대회", "거북섬 올림픽 B레이스 — 실전점검 + 완주"),
     },
-    4: {  # Phase 4: 대가야 후 회복 (10/19~10/21)
-        0: ("완전 휴식", "대가야 후 회복"),
-        1: ("수영 회복", "가볍게 1km 이하"),
-        2: ("러닝 Easy", "30분 이하, 몸 상태 우선"),
-        3: ("완전 휴식", ""),
-        4: ("수영 가볍게", "1km"),
-        5: ("장비 점검", "통영 참가 시 이동/검수"),
+    4: {  # Phase 4: 대가야 A레이스 빌드 (9/7~10/11)
+        0: ("수영 수업", ""),
+        1: ("러닝 Easy", "6~8km"),
+        2: ("수영 수업", ""),
+        3: ("러닝 볼륨", "8~10km Easy"),
+        4: ("수영 수업", ""),
+        5: ("브릭 → 수영", "자전거 75~90분 → 러닝 5~7km → 개인강습"),
         6: ("완전 휴식", ""),
     },
-    5: {  # Phase 5: 통영 테이퍼 (10/22~10/25)
+    5: {  # Phase 5: 대가야 테이퍼 (10/12~10/18)
         0: ("수영 수업", ""),
         1: ("러닝", "5km @5:10~5:20"),
         2: ("수영 수업", ""),
         3: ("러닝", "3km Easy + 스트라이드"),
         4: ("수영 가볍게", "1km"),
-        5: ("수영 개인강습 or 통영 이동", ""),
-        6: ("완전 휴식 or 통영 대회", ""),
+        5: ("대가야 준비", "장비 점검 + 이동/검수"),
+        6: ("대회", "대가야 올림픽 A레이스 — sub-2:45 + 올림픽 완주 3회차"),
     },
 }
 
@@ -201,22 +201,22 @@ PHASE_GOALS = {
         "min": "러닝 최소 2회, 통증 시 즉시 중단",
     },
     2: {
-        "goal": "대가야/통영 대비 핵심 빌드 — 8월 중 자전거 80km + 러닝 18km 단독 목표",
+        "goal": "거북섬 B레이스 대비 핵심 빌드 — 8월 중 자전거 80km + 러닝 18km 단독 목표",
         "volume": "수영 4회 / 러닝 2회(15~20km) / 자전거+브릭 주1",
         "min": "화 템포 + 토 브릭 필수",
     },
     3: {
-        "goal": "대가야 테이퍼 — 볼륨↓ 컨디션↑",
+        "goal": "거북섬 B레이스 — 실전점검, 무리한 PB 욕심 금지",
         "volume": "수영 2회 / 러닝 1회(3km) / 자전거 1회(30분)",
         "min": "과훈련 금지, 감각 유지만",
     },
     4: {
-        "goal": "대가야 회복 — 통영 참가 여부에 맞춰 피로 제거",
-        "volume": "회복 수영 1회 / Easy 러닝 1회 이내",
-        "min": "통증·수면 저하 시 휴식 우선",
+        "goal": "대가야 A레이스 빌드 — 거북섬 피드백 반영",
+        "volume": "수영 4회 / 러닝 2회(14~18km) / 브릭 1회",
+        "min": "거북섬 후 첫 주는 Easy 우선, 이후 강도 회복",
     },
     5: {
-        "goal": "통영 테이퍼 — A레이스 컨디션 조성",
+        "goal": "대가야 테이퍼 — A레이스 컨디션 조성",
         "volume": "수영 2~3회 / 러닝 2회(8km) / 자전거 1회(30분)",
         "min": "볼륨 50~70% 감소, 강도 낮춤",
     },
@@ -756,7 +756,7 @@ def format_morning():
     est = analysis.get('estimated_finish', '?')
     status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
     vdot = analysis.get('vdot', '?')
-    lines.append(f"🏁 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | 예상 {est} {status_icon} | VDOT {vdot}")
+    lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | 예상 {est} {status_icon} | VDOT {vdot}")
     lines.append("")
 
     # 훈련 진척도
@@ -991,7 +991,7 @@ def format_evening():
         # 휴식일이어도 내일 코칭은 보내기
         coaching = format_tomorrow_coaching()
         if coaching:
-            lines = [f"🏁 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | 😴 오늘은 휴식"]
+            lines = [f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | 😴 오늘은 휴식"]
             lines.append("")
             lines.append(coaching)
             return "\n".join(lines)
@@ -1002,7 +1002,7 @@ def format_evening():
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
-        lines.append(f"🏁 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | ✅ 오늘 운동 완료!")
+        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
@@ -1024,7 +1024,7 @@ def format_evening():
                 lines.append(f"  → {actual}")
     else:
         # 미완료 → 리마인드 + 복구 시나리오
-        lines.append(f"🏁 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | ⚠️ 오늘 운동 기록이 없습니다!")
+        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | ⚠️ 오늘 운동 기록이 없습니다!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if detail:

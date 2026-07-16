@@ -9077,5 +9077,54 @@
         "feel": 50
       }
     ]
+  },
+  "2026-07-16": {
+    "planned": "🏃 Easy 8km",
+    "done": true,
+    "actual": "수영 1250m 34분 @2:12/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1250,
+      "duration_min": 33.7,
+      "moving_min": 27.6,
+      "pace_per_100m": "2:12",
+      "avg_hr": 132,
+      "max_hr": 153,
+      "swolf": 44,
+      "strokes": 567,
+      "avg_spm": null,
+      "training_load": 71
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.9 / 무산소 0.5 | 부하 71",
+    "garmin_id": 23615649548,
+    "start_time": "16:06",
+    "garmin_ids": [
+      23615649548
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1250,
+        "duration_sec": 2022.0000000000002,
+        "avg_hr": 132,
+        "max_hr": 153,
+        "avg_pace": "2:12",
+        "avg_speed": null,
+        "training_load": 71,
+        "garmin_id": 23615649548,
+        "laps": null,
+        "open_water": false,
+        "start_time": "16:06",
+        "duration_min": 33.7,
+        "moving_min": 27.6,
+        "pace_per_100m": "2:12",
+        "swolf": 44,
+        "strokes": 567,
+        "avg_spm": null,
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
   }
 }

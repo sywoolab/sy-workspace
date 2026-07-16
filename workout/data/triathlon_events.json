@@ -76,12 +76,13 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수예정",
+    "status": "B레이스",
     "name": "2026 시흥시장배 거북섬 전국 철인3종대회(토요일: 스프린트 / 일요일: 스탠다드)",
     "location": "경기도 시흥시 시화해역 및 거북섬 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2098&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.09.04 ~ 06",
-    "reg_period": "2026-07-23 14:00 ~ 2026-07-30 23:59"
+    "reg_period": "2026-07-23 14:00 ~ 2026-07-30 23:59",
+    "course": "올림픽"
   },
   {
     "status": "접수중",
@@ -151,13 +152,13 @@
     "reg_period": "2026-06-24  ~ 2026-07-07"
   },
   {
-    "status": "접수마감",
-    "name": "2026 고령군수배 대가야 전국 철인3종 대회",
+    "status": "A레이스",
+    "name": "대가야 올림픽",
     "location": "경북 고령군 다산 은행나무숲 (경북 고령군 다산면 좌학리 969)",
-    "course": "생활체육(스탠다드)",
+    "course": "올림픽",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2085&page=1&sYear=2026&vType=list&field=&keyword=",
-    "date": "2026.06.27 ~ 28",
-    "reg_period": "접수마감"
+    "date": "2026.10.18 ~ 19",
+    "reg_period": "일정 변경 반영(사용자 확인)"
   },
   {
     "status": "접수마감",
