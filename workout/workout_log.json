@@ -9361,5 +9361,74 @@
         "feel": 50
       }
     ]
+  },
+  "2026-07-18": {
+    "planned": "🏊 수영 개인강습 + 🚴 롱바이크 100~120km → 🏃 전환 런 3~5km",
+    "done": true,
+    "actual": "수영 1025m 19분 @1:50/100m + 수영 1475m 56분 @1:24/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1475,
+      "duration_min": 55.5,
+      "moving_min": 20.7,
+      "pace_per_100m": "1:24",
+      "avg_hr": 123,
+      "max_hr": 162,
+      "swolf": 28,
+      "strokes": 400,
+      "avg_spm": null,
+      "training_load": 65,
+      "swim_equipment": "fins"
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.1 / 무산소 0.2 | 부하 36 | 유산소 2.3 / 무산소 2.0 | 부하 65 | 장비 추정",
+    "garmin_id": 23637939593,
+    "start_time": "14:31",
+    "garmin_ids": [
+      23637938125,
+      23637939593
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1025,
+        "duration_sec": 1140.0,
+        "avg_hr": 132,
+        "max_hr": 144,
+        "avg_pace": "1:50",
+        "avg_speed": null,
+        "training_load": 36,
+        "garmin_id": 23637938125,
+        "laps": null,
+        "open_water": false,
+        "start_time": "14:31",
+        "duration_min": 19.0,
+        "moving_min": 18.9,
+        "pace_per_100m": "1:50",
+        "swolf": 38,
+        "strokes": 417,
+        "avg_spm": null,
+        "rpe": 4,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 1475,
+        "duration_min": 55.5,
+        "moving_min": 20.7,
+        "pace_per_100m": "1:24",
+        "avg_hr": 123,
+        "max_hr": 162,
+        "swolf": 28,
+        "strokes": 400,
+        "avg_spm": null,
+        "training_load": 65,
+        "swim_equipment": "fins",
+        "garmin_id": 23637939593,
+        "start_time": "15:01",
+        "rpe": 7,
+        "feel": 50
+      }
+    ]
   }
 }
