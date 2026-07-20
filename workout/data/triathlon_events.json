@@ -42,7 +42,7 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅲ (9.20 일요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2064&page=1&sYear=2026&vType=list&field=&keyword=",
@@ -50,7 +50,7 @@
     "reg_period": "2026-07-20 14:00 ~ 2026-09-11 18:00"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "제 5회 익산 챌린지 아쿠아슬론 챔피언십 시리즈대회 Ⅲ (9.19 토요일)",
     "location": "전북특별자치도 익산시 익산국제철인3종경기장 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2065&page=1&sYear=2026&vType=list&field=&keyword=",
@@ -85,12 +85,12 @@
   },
   {
     "status": "접수마감",
-    "name": "제18회 전국해양스포츠제전[동호인부 추가접수 7월20일 14시]",
+    "name": "제18회 전국해양스포츠제전",
     "location": "경남 거제시 구조라해수욕장 일원",
     "course": "전문체육(엘리트/U23: 스프린트), 학생부(고등부: 스프린트, 중등부: 슈퍼스프린트, 초등부: 아쿠아슬론), 생활체육(스탠다드, 릴레이)",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2041&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.08.27 ~ 30",
-    "reg_period": "2026-06-02 14:00 ~ 2026-07-16 18:00"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수중",
