@@ -9430,5 +9430,130 @@
         "feel": 50
       }
     ]
+  },
+  "2026-07-22": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "자전거 41.57km 104분 + 수영 1525m 40분 @1:48/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1525,
+      "duration_min": 39.9,
+      "moving_min": 27.7,
+      "pace_per_100m": "1:48",
+      "avg_hr": 139,
+      "max_hr": 170,
+      "swolf": 37,
+      "strokes": 611,
+      "avg_spm": null,
+      "training_load": 111
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.9 / 무산소 2.0 | 부하 187 | 유산소 2.9 / 무산소 2.3 | 부하 111",
+    "garmin_id": 23685572997,
+    "start_time": "08:21",
+    "garmin_ids": [
+      23684896044,
+      23685572997
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": 41570.0,
+        "duration_sec": 6246.0,
+        "avg_hr": 145,
+        "max_hr": 187,
+        "avg_pace": null,
+        "avg_speed": 6.666666666666666,
+        "training_load": 187,
+        "garmin_id": 23684896044,
+        "laps": [
+          {
+            "distance": 5000,
+            "duration": 650,
+            "avg_hr": 126,
+            "max_hr": 147,
+            "speed_kmh": 27.7
+          },
+          {
+            "distance": 5000,
+            "duration": 543,
+            "avg_hr": 147,
+            "max_hr": 152,
+            "speed_kmh": 33.2
+          },
+          {
+            "distance": 5000,
+            "duration": 551,
+            "avg_hr": 153,
+            "max_hr": 168,
+            "speed_kmh": 32.7
+          },
+          {
+            "distance": 5000,
+            "duration": 918,
+            "avg_hr": 158,
+            "max_hr": 187,
+            "speed_kmh": 19.6
+          },
+          {
+            "distance": 5000,
+            "duration": 880,
+            "avg_hr": 145,
+            "max_hr": 169,
+            "speed_kmh": 20.5
+          },
+          {
+            "distance": 5000,
+            "duration": 1184,
+            "avg_hr": 149,
+            "max_hr": 168,
+            "speed_kmh": 15.2
+          },
+          {
+            "distance": 5000,
+            "duration": 724,
+            "avg_hr": 138,
+            "max_hr": 166,
+            "speed_kmh": 24.9
+          },
+          {
+            "distance": 5000,
+            "duration": 595,
+            "avg_hr": 142,
+            "max_hr": 162,
+            "speed_kmh": 30.2
+          },
+          {
+            "distance": 1568,
+            "duration": 202,
+            "avg_hr": 147,
+            "max_hr": 159,
+            "speed_kmh": 27.9
+          }
+        ],
+        "open_water": false,
+        "start_time": "08:21",
+        "rpe": 7,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 1525,
+        "duration_min": 39.9,
+        "moving_min": 27.7,
+        "pace_per_100m": "1:48",
+        "avg_hr": 139,
+        "max_hr": 170,
+        "swolf": 37,
+        "strokes": 611,
+        "avg_spm": null,
+        "training_load": 111,
+        "garmin_id": 23685572997,
+        "start_time": "12:08",
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
   }
 }
