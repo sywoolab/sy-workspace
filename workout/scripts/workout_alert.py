@@ -40,7 +40,7 @@ LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
 # 대회일 & 훈련 시작일
-RACE_TURTLE    = datetime(2026, 9, 6, tzinfo=KST)   # 거북섬 올림픽 (B레이스, 9/4~6)
+RACE_TURTLE    = datetime(2026, 9, 6, tzinfo=KST)   # 거북섬 올림픽 (B레이스, 신청완료, 9/4~6)
 RACE_DAEGAYA   = datetime(2026, 10, 18, tzinfo=KST)  # 대가야 올림픽 (A레이스, 10/18~19)
 RACE_DAY = RACE_DAEGAYA  # 하위 호환 (format_week 캡용)
 TRAIN_START  = datetime(2026, 3, 16, tzinfo=KST)  # 시즌 시작 (기록 기준)
@@ -206,7 +206,7 @@ PHASE_GOALS = {
         "min": "화 템포 + 토 브릭 필수",
     },
     3: {
-        "goal": "거북섬 B레이스 — 실전점검, 무리한 PB 욕심 금지",
+        "goal": "거북섬 B레이스 신청완료 — 실전점검, 무리한 PB 욕심 금지",
         "volume": "수영 2회 / 러닝 1회(3km) / 자전거 1회(30분)",
         "min": "과훈련 금지, 감각 유지만",
     },
