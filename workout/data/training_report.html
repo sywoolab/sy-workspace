@@ -35,7 +35,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-07-28 08:13 KST</div>
+<div class="sub">업데이트: 2026-07-28 08:17 KST</div>
 
 <div style="background:#13131f;border:1px solid #6affa044;border-radius:12px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -182,7 +182,7 @@ const allSwim   = [31, 0, 45, 0, 0, 0, 0, 67, 11, 36, 0, 0, 96, 0, 133, 0, 0, 0,
 const allBike   = [0, 0, 0, 0, 179, 0, 0, 164, 88, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 211, 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 187, 0, 0, 0, 0, 0, 0];
 const allRun    = [0, 0, 0, 96, 0, 76, 0, 0, 140, 0, 0, 0, 0, 126, 110, 0, 95, 110, 0, 101, 0, 0, 0, 0, 127, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 190, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 104];
 const allOther  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["09-06", "10-18"];
+const raceDates = ["10-18", "09-06"];
 
 const slice = isMobile ? 30 : 60;
 const labels   = allLabels.slice(-slice);
@@ -273,33 +273,11 @@ new Chart(document.getElementById('tlChart'), {
 
 <div class="section">📅 훈련 계획 (주차별 — 제목 클릭으로 펼치기/접기)</div>
 <details open style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:0;margin-bottom:8px">
-<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside"> <span style="color:#888;font-weight:400;font-size:11px">07/27 ~ 08/02</span> — 주간 계획</summary>
+<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside">W31 <span style="color:#888;font-weight:400;font-size:11px">07/27 ~ 08/02</span> — 재시동 주간 — 빈도 회복 + 강도 제한 <span style="font-size:10px;color:#555">· 목표부하 450~550, Readiness LOW이면 강도보다 빈도</span></summary>
+<div style="font-size:11.5px;color:#aaa;padding:0 14px 6px;line-height:1.5">🎯 스쿠버 피로 후 러닝/수영 루틴 복귀. 거북섬 D-40 구간이므로 무리한 PB 테스트보다 3종 빈도 재확립이 우선.</div>
+<div style="font-size:10.5px;color:#777;padding:0 14px 8px">월 수영 2.4km 완료 · 화 러닝 5.7km 완료 · 수 수영 또는 회복 · 목 Easy 7~8km · 주말 Z2 바이크 60~80km + 짧은 전환런</div>
 <table style="margin:0 8px 10px;width:calc(100% - 16px)"><tbody>
-<tr style="background:#0d2a0d"><td style="color:#fff;font-weight:600;white-space:nowrap">07-28 (화)</td><td style="color:#6affa0">—</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">07-29 (수)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">07-30 (목)</td><td style="color:#ccc">—</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">07-31 (금)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-01 (토)</td><td style="color:#ccc">—</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-02 (일)</td><td style="color:#ccc">—</td></tr>
-</tbody></table>
-</details>
-<details open style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:0;margin-bottom:8px">
-<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside"> <span style="color:#888;font-weight:400;font-size:11px">08/03 ~ 08/09</span> — 주간 계획</summary>
-<table style="margin:0 8px 10px;width:calc(100% - 16px)"><tbody>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-03 (월)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-04 (화)</td><td style="color:#ccc">—</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-05 (수)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-06 (목)</td><td style="color:#ccc">—</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-07 (금)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-08 (토)</td><td style="color:#ccc">—</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-09 (일)</td><td style="color:#ccc">—</td></tr>
-</tbody></table>
-</details>
-<details style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:0;margin-bottom:8px">
-<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside"> <span style="color:#888;font-weight:400;font-size:11px">08/10 ~ 08/16</span> — 주간 계획</summary>
-<table style="margin:0 8px 10px;width:calc(100% - 16px)"><tbody>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-10 (월)</td><td style="color:#ccc">🏊 수영 강습 06시</td></tr>
-<tr><td style="color:#888;font-weight:400;white-space:nowrap">08-11 (화)</td><td style="color:#ccc">—</td></tr>
+<tr style="background:#0d2a0d"><td style="color:#fff;font-weight:600;white-space:nowrap">07-28 (화)</td><td style="color:#6affa0">🏃 러닝 5.7km 빌드업 — 재시동 2회차</td></tr>
 </tbody></table>
 </details>
 
@@ -308,9 +286,9 @@ new Chart(document.getElementById('tlChart'), {
 <tr class="today-row"><td>07-28 (화)</td><td><span style="color:#666;font-size:10.5px">러닝 템포</span></td><td><span class="badge run">🏃 5.7km 5:25</span></td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">104</span><div class="tl-bar"><div class="tl-fill" style="width:17%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 682</div><div style="font-size:10px;color:#ffd56c;margin-top:1px">체감 7/10</div></td><td><span class="r">5h56m</span></td><td><span class="r">54</span></td><td><span class="r">43</span>/<span class="y">50</span></td></tr>
 <tr><td>07-27 (월)</td><td><span style="color:#666;font-size:10.5px">수영 수업</span></td><td><span class="badge swim">🏊 1350m 2:08</span><span class="badge swim">🏊 1050m 1:51</span> ✅</td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">80</span><div class="tl-bar"><div class="tl-fill" style="width:13%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 578</div><div style="font-size:10px;color:#ffd56c;margin-top:1px">체감 7/10</div></td><td><span class="r">5h54m</span></td><td><span class="r">50</span></td><td><span class="y">56</span>/<span class="y">49</span></td></tr>
 <tr><td>07-26 (일)</td><td><span style="color:#666;font-size:10.5px">🛌 완전 휴식</span></td><td><span class="badge run">🏃 6.8km 6:47</span><span class="badge run">🏃 6.8km</span><span class="badge swim">🏊 285m 2:24</span><span class="badge swim">🏊 81m 1:52</span><span class="badge swim">🏊 260m 2:23</span><span class="badge swim">🏊 403m 2:12</span> 💪</td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">200</span><div class="tl-bar"><div class="tl-fill" style="width:33%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 498</div><div style="font-size:10px;color:#ff6c6c;margin-top:1px">체감 8/10</div></td><td><span class="g">7h12m</span></td><td><span class="y">49</span></td><td><span class="y">50</span>/<span class="y">48</span></td></tr>
-<tr class="rest-row"><td>07-25 (토)</td><td><span style="color:#666;font-size:10.5px">수영 개인강습 + 10km 테스트런 (서브50 시도…</span></td><td><span class="rest-badge">—</span> ❌</td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 298</div></td><td><span class="g">8h12m</span></td><td><span class="y">48</span></td><td><span class="g">61</span>/<span class="y">49</span></td></tr>
-<tr class="rest-row"><td>07-24 (금)</td><td>-</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 399</div></td><td><span class="y">6h59m</span></td><td><span class="y">46</span></td><td><span class="g">60</span>/<span class="y">45</span></td></tr>
-<tr class="rest-row"><td>07-23 (목)</td><td><span style="color:#666;font-size:10.5px">템포런 (WU 3km + 템포 6km @5:15~5…</span></td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 711</div></td><td><span class="y">6h53m</span></td><td><span class="r">54</span></td><td><span class="y">47</span>/<span class="y">45</span></td></tr>
+<tr class="rest-row"><td>07-25 (토)</td><td><span style="color:#666;font-size:10.5px">🤿 스쿠버다이빙 교육/실습 — 테스트런 취소</span></td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 298</div></td><td><span class="g">8h12m</span></td><td><span class="y">48</span></td><td><span class="g">61</span>/<span class="y">49</span></td></tr>
+<tr class="rest-row"><td>07-24 (금)</td><td><span style="color:#666;font-size:10.5px">🤿 스쿠버다이빙 교육 — 공식 훈련 스킵</span></td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#6affa0">∑7d 399</div></td><td><span class="y">6h59m</span></td><td><span class="y">46</span></td><td><span class="g">60</span>/<span class="y">45</span></td></tr>
+<tr class="rest-row"><td>07-23 (목)</td><td><span style="color:#666;font-size:10.5px">🤿 스쿠버다이빙 교육/시험 — 공식 훈련 스킵</span></td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 711</div></td><td><span class="y">6h53m</span></td><td><span class="r">54</span></td><td><span class="y">47</span>/<span class="y">45</span></td></tr>
 <tr><td>07-22 (수)</td><td><span style="color:#666;font-size:10.5px">수영 수업</span></td><td><span class="badge bike">🚴 42km 24.0km/h</span><span class="badge swim">🏊 1525m 1:48</span> ✅</td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#ffd56c">298</span><div class="tl-bar"><div class="tl-fill" style="width:50%;background:#ffd56c"></div></div></div><div class="tl7" style="color:#ffd56c">∑7d 782</div><div style="font-size:10px;color:#ffd56c;margin-top:1px">체감 7/10</div></td><td><span class="r">5h43m</span></td><td><span class="r">54</span></td><td><span class="r">38</span>/<span class="r">44</span></td></tr>
 <tr class="rest-row"><td>07-21 (화)</td><td><span style="color:#666;font-size:10.5px">Easy 14~15km</span></td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 603</div></td><td><span class="r">4h44m</span></td><td><span class="r">56</span></td><td><span class="r">35</span>/<span class="r">42</span></td></tr>
 <tr class="rest-row"><td>07-20 (월)</td><td>-</td><td><span class="rest-badge">—</span></td><td style="white-space:nowrap"><div class="tl7" style="color:#ffd56c">∑7d 603</div></td><td><span class="y">6h22m</span></td><td><span class="y">49</span></td><td><span class="y">53</span>/<span class="r">41</span></td></tr>
@@ -495,5 +473,5 @@ new Chart(document.getElementById('tlChart'), {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-07-28 08:13 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-07-28 08:17 KST</div>
 </body></html>
