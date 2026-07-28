@@ -35,7 +35,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-07-28 08:20 KST</div>
+<div class="sub">업데이트: 2026-07-28 14:12 KST</div>
 
 <div style="background:#13131f;border:1px solid #6affa044;border-radius:12px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -52,6 +52,7 @@ tr:hover{background:#15152a}
 <div class="grid">
 <div class="card"><div class="val" style="color:#7c6fff">D-40</div><div class="label">거북섬 올림픽</div><div class="sub-val" style="color:#666">9/6(일)</div><div class="sub-val">신청완료 · B레이스 · 실전점검</div></div>
 <div class="card"><div class="val" style="color:#7c6fff">D-82</div><div class="label">대가야 올림픽 A레이스</div><div class="sub-val" style="color:#666">10/18(일)</div><div class="sub-val">🎯 sub-2:45</div></div>
+<div class="card"><div class="val" style="color:#7c6fff">D-89</div><div class="label">통영 월드컵</div><div class="sub-val" style="color:#666">10/25(일)</div><div class="sub-val">신청완료 · 예비 A/C레이스</div></div>
 <div class="card"><div class="val" style="color:#6affa0">4.9km</div><div class="label">7일 수영</div></div>
 <div class="card"><div class="val" style="color:#ffa06a">42km</div><div class="label">7일 자전거</div></div>
 <div class="card"><div class="val" style="color:#6ab4ff">13km</div><div class="label">7일 러닝</div></div>
@@ -182,7 +183,7 @@ const allSwim   = [31, 0, 45, 0, 0, 0, 0, 67, 11, 36, 0, 0, 96, 0, 133, 0, 0, 0,
 const allBike   = [0, 0, 0, 0, 179, 0, 0, 164, 88, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 211, 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 187, 0, 0, 0, 0, 0, 0];
 const allRun    = [0, 0, 0, 96, 0, 76, 0, 0, 140, 0, 0, 0, 0, 126, 110, 0, 95, 110, 0, 101, 0, 0, 0, 0, 127, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 190, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 104];
 const allOther  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["09-06", "10-18"];
+const raceDates = ["10-18", "10-25", "09-06"];
 
 const slice = isMobile ? 30 : 60;
 const labels   = allLabels.slice(-slice);
@@ -273,9 +274,9 @@ new Chart(document.getElementById('tlChart'), {
 
 <div class="section">📅 훈련 계획 (주차별 — 제목 클릭으로 펼치기/접기)</div>
 <details open style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:0;margin-bottom:8px">
-<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside">W31 <span style="color:#888;font-weight:400;font-size:11px">07/27 ~ 08/02</span> — 재시동 주간 — 빈도 회복 + 강도 제한 <span style="font-size:10px;color:#555">· 목표부하 450~550, Readiness LOW이면 강도보다 빈도</span></summary>
-<div style="font-size:11.5px;color:#aaa;padding:0 14px 6px;line-height:1.5">🎯 스쿠버 피로 후 러닝/수영 루틴 복귀. 거북섬 D-40 구간이므로 무리한 PB 테스트보다 3종 빈도 재확립이 우선.</div>
-<div style="font-size:10.5px;color:#777;padding:0 14px 8px">월 수영 2.4km 완료 · 화 러닝 5.7km 완료 · 수 수영 또는 회복 · 목 Easy 7~8km · 주말 Z2 바이크 60~80km + 짧은 전환런</div>
+<summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside">W31 <span style="color:#888;font-weight:400;font-size:11px">07/27 ~ 08/02</span> — 재시동 주간 — 러닝 3회 골격 복구 <span style="font-size:10px;color:#555">· 목표부하 450~550, Readiness LOW이면 강도보다 빈도</span></summary>
+<div style="font-size:11.5px;color:#aaa;padding:0 14px 6px;line-height:1.5">🎯 스쿠버 피로 후 루틴 복귀. 거북섬까지 러닝 시간 단축이 최대 개선 카드이므로 화·목·주말 러닝 3회 골격을 다시 고정한다.</div>
+<div style="font-size:10.5px;color:#777;padding:0 14px 8px">월 수영 2.4km 완료 · 화 러닝 5.7km 완료 · 수 수영 · 목 Easy 7~8km · 토/일 중 1일 Z2 바이크 60~80km + 브릭런 3~5km</div>
 <table style="margin:0 8px 10px;width:calc(100% - 16px)"><tbody>
 <tr style="background:#0d2a0d"><td style="color:#fff;font-weight:600;white-space:nowrap">07-28 (화)</td><td style="color:#6affa0">🏃 러닝 5.7km 빌드업 — 재시동 2회차</td></tr>
 </tbody></table>
@@ -421,7 +422,8 @@ new Chart(document.getElementById('tlChart'), {
 <tr><td>03-16 (월)</td><td><span style="color:#666;font-size:10.5px">러닝</span></td><td><span class="badge run">🏃 7.6km</span><span class="badge run">🏃 7.6km</span> ✅</td><td style="white-space:nowrap"><div class="tl-bar-wrap"><span style="color:#7c6fff">74</span><div class="tl-bar"><div class="tl-fill" style="width:12%;background:#7c6fff"></div></div></div><div class="tl7" style="color:#6affa0">∑7d 74</div></td><td><span class="r">4h35m</span></td><td><span class="y">48</span></td><td><span class="y">56</span>/<span class="r">41</span></td></tr>
 </tbody></table></div></details><div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody><tr><td style="color:#444;font-weight:600;white-space:nowrap">완료 (06-07)</td><td>한강 쉬엄쉬엄</td><td style="color:#888;font-size:10.5px">수영 1+자전거 20+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">T1 수트 탈의 연습 + 자전거 풀 push</td></tr>
 <tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-40 (09-06)</td><td>거북섬 올림픽</td><td style="color:#888;font-size:10.5px">9/4~6 개최 · 수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">신청완료 · B레이스: 실전점검 + 올림픽 완주 2회차</td></tr>
-<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-82 (10-18)</td><td>대가야 올림픽</td><td style="color:#888;font-size:10.5px">10/18~19 개최 · 수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">🎯 A레이스: sub-2:45 + 올림픽 완주 3회차</td></tr>
+<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-82 (10-18)</td><td>대가야 올림픽</td><td style="color:#888;font-size:10.5px">10/18~19 개최 · 수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">🎯 A레이스 후보: sub-2:45, 연기일 확정 대기</td></tr>
+<tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-89 (10-25)</td><td>통영 월드컵</td><td style="color:#888;font-size:10.5px">10/24~25 개최 · 업다운 난코스 · 수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">신청완료 · 예비 A/C레이스: 수영 즐기기 + 내 페이스 완주, 대가야 불가 시 A 승격</td></tr>
 </tbody></table><div class="section">🏅 완주 대회 아카이브</div>
 <div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:14px">
 <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">
@@ -473,5 +475,5 @@ new Chart(document.getElementById('tlChart'), {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-07-28 08:20 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-07-28 14:12 KST</div>
 </body></html>
