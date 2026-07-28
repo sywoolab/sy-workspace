@@ -16,7 +16,7 @@
     "reg_period": "2026-09-02 14:00 ~ 2026-09-30"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "2026 통영 월드 트라이애슬론 컵",
     "location": "경남 통영시 트라이애슬론광장 일원",
     "course": "전문체육(스프린트), 생활체육(스탠다드)",
@@ -123,7 +123,7 @@
     "location": "경기도 광주 G스타디움",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2102&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.08.01 ~ 02",
-    "reg_period": "2026-06-24 10:00 ~ 2026-07-17 23:59"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
