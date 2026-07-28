@@ -1,13 +1,7 @@
 name: realestate-brief
 
 on:
-  schedule:
-    - cron: '30 22 * * 0'   # 매주 월요일 07:30 KST (UTC 일요일 22:30)
-  push:
-    paths:
-      - 'realestate/data/market_config.json'
-      - 'realestate/data/watchlist_summary.json'
-      - 'realestate/data/chungyak/registry.json'
+  # 부동산 브리프 정기/데이터 변경 알림 중단. 수동 실행만 유지.
   workflow_dispatch:
 
 permissions:

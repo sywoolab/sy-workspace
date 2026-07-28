@@ -1,11 +1,7 @@
 name: realestate-chungyak-daily
 
 on:
-  schedule:
-    # 매일 UTC 23:00 = KST 08:00 (아침 정기 알림)
-    - cron: '0 23 * * *'
-    # 매일 UTC 10:00 = KST 19:00 (저녁 마감 임박 리마인더)
-    - cron: '0 10 * * *'
+  # 부동산 청약 정기 알림 중단. 수동 실행만 유지.
   workflow_dispatch:
     inputs:
       mode:

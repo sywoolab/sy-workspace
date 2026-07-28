@@ -1,8 +1,7 @@
 name: realestate-weekly
 
 on:
-  schedule:
-    - cron: '0 0 * * 6'  # UTC 토요일 00시 = KST 토요일 09시
+  # 부동산 정기 알림 중단. 수동 실행만 유지.
   workflow_dispatch:
 
 jobs:

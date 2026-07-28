@@ -1,15 +1,7 @@
 name: tongyeong-reg-alert
 
 on:
-  schedule:
-    # D-7  | 2026-07-21 09:00 KST = 00:00 UTC
-    - cron: '0 0 21 7 *'
-    # D-1  | 2026-07-27 09:00 KST = 00:00 UTC
-    - cron: '0 0 27 7 *'
-    # D-day 아침 | 2026-07-28 07:00 KST = 2026-07-27 22:00 UTC
-    - cron: '0 22 27 7 *'
-    # D-day 13:30 KST (오픈 30분 전) | 2026-07-28 04:30 UTC
-    - cron: '30 4 28 7 *'
+  # 통영 접수 완료로 자동 알림 중단. 수동 실행만 유지.
   workflow_dispatch:
 
 jobs:
