@@ -1162,13 +1162,12 @@ new Chart(document.getElementById('tlChart'), {{
         if is_rest:
             badges = '<span class="rest-badge">—</span>'
         else:
-            single_m = e.get('log_metrics') or {}
             badges = ''
             for m in e['metrics']:
                 t = m.get('type','')
-                dist = m.get('distance_m') or 0
+                dist = m.get('distance_m') or ((m.get('distance_km') or 0) * 1000) or 0
                 pace = m.get('display_pace') or m.get('avg_pace','') or (m.get('pace_per_100m','') if t=='swim' else '') or ''
-                spd  = m.get('avg_speed') or 0
+                spd  = m.get('avg_speed') or ((m.get('avg_speed_kmh') or 0) / 3.6) or 0
                 if not dist:
                     patterns = {'bike': r'자전거\s+([\d.]+)km', 'run': r'러닝\s+([\d.]+)km',
                                 'swim': r'수영\s+(\d+)m|OW\s+(\d+)m'}
@@ -1180,8 +1179,6 @@ new Chart(document.getElementById('tlChart'), {{
                                 v = next(g for g in m2.groups() if g)
                                 dist = float(v) * (1000 if t in ('bike','run') else 1)
                                 break
-                if not spd and t=='bike' and single_m.get('avg_speed_kmh'):
-                    spd = single_m['avg_speed_kmh'] / 3.6
                 if t=='swim':   info = f"{int(dist)}m {pace}".strip()
                 elif t=='bike': info = f"{dist/1000:.0f}km {spd*3.6:.1f}km/h".strip() if spd else f"{dist/1000:.0f}km"
                 elif t=='run':  info = f"{dist/1000:.1f}km {pace}".strip()
