@@ -637,6 +637,30 @@
       "source": "manual",
       "auto": false,
       "rule": "user-confirmed"
+    },
+    "2026-08-04": {
+      "date": "2026-08-04",
+      "workout": "🏃 Easy 7~8km + 선택 스트라이드 4회",
+      "detail": "화. 8/1 브릭런(5.06km @5:02, avg HR 163)이 역치 이상 자극이었으므로 원래 템포/역치런을 회복성 Easy로 조정. 페이스 5:55~6:15/km, 평균 HR 145~150 이하. 몸 가벼우면 마지막 15~20초 스트라이드 4회만.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-01 high-intensity brick adjustment"
+    },
+    "2026-08-06": {
+      "date": "2026-08-06",
+      "workout": "🏃 메인 품질런 8~10km 빌드업/역치",
+      "detail": "목. 이번 주 메인 러닝. 3km 워밍업 후 4~5km를 5:20~5:30/km로 유지, 쿨다운. 초반 HR이 높거나 기침/피로가 남으면 Easy 8km로 즉시 전환.",
+      "source": "manual",
+      "auto": false,
+      "rule": "quality-run moved from Tue to Thu after hard brick"
+    },
+    "2026-08-08": {
+      "date": "2026-08-08",
+      "workout": "🚴 Z2 자전거 60~90km + 🏃 브릭런 3~5km",
+      "detail": "토/일 중 컨디션 좋은 날 실행. 이번 주 두 번째 고강도 금지. 브릭런은 5:40~6:00/km 안정화 목적, 5분 초반 테스트 금지.",
+      "source": "manual",
+      "auto": false,
+      "rule": "weekend brick controlled after Thu quality"
     }
   },
   "last_analysis": {
@@ -769,10 +793,10 @@
     },
     "2026-08-03": {
       "week": "W32",
-      "title": "러닝 우선 빌드 — 화목주말 3회",
-      "goal": "단독 10km 50분대 초반 기반 형성. 러닝은 화·목·토/일 3회 고정, 수영은 월·수·금, 자전거는 토/일에 배치해 브릭 적응을 누적한다.",
-      "sessions": "월 수영 · 화 템포/역치런(WU 3km→5:20 전후 지속) · 수 수영 · 목 Easy/롱런 8~12km · 금 수영 · 토/일 자전거 60~90km + 브릭런 3~6km",
-      "target_load": "550~650, 러닝 품질 1회 + Easy 1회 + 브릭 1회"
+      "title": "러닝 우선 빌드 — 토요일 고강도 브릭 후 강도 재배치",
+      "goal": "8/1 브릭런이 5.06km @5:02, 평균 HR 163의 역치 이상 자극이었으므로 이번 주 품질훈련을 화요일에서 목요일로 이동한다. 러닝 주 3회 골격은 유지하되 화요일은 회복성 Easy, 목요일을 메인 품질런으로 둔다.",
+      "sessions": "월 수영 완료 · 화 Easy 7~8km + 선택 스트라이드 4회 · 수 수영 · 목 빌드업/역치런 8~10km(WU 3km→5:20~5:30 지속→CD) · 금 수영 · 토/일 자전거 60~90km + 브릭런 3~5km(컨디션 낮으면 Easy)",
+      "target_load": "550~650, 고강도는 8/1 브릭런 포함 주 1~2회 이하로 관리"
     }
   }
 }
