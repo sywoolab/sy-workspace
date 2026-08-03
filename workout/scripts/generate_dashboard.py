@@ -391,8 +391,8 @@ def main():
             if gid:
                 garmin_id_map[dk[5:]] = gid  # key: MM-DD
 
-    # ── 그래프 데이터 (최근 60일) ──
-    chart_entries = entries[-60:]
+    # ── 그래프 데이터 (전체 기간; 화면 기본값은 JS에서 최근 30/60일로 제한) ──
+    chart_entries = entries
     chart_labels = [e['date'][5:] for e in chart_entries]  # MM-DD
     chart_tl7    = [e['tl_7d'] for e in chart_entries]
     # 종목별 TL 분리 (스택 바)
@@ -430,6 +430,10 @@ h1{{color:#fff;font-size:17px;margin-bottom:3px}}
 .chart-wrap{{background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}}
 .chart-inner{{min-width:600px;height:180px}}
 @media(max-width:640px){{.chart-inner{{height:200px}}}}
+.section-row{{display:flex;align-items:center;justify-content:space-between;gap:10px}}
+.chart-range{{display:inline-flex;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:8px;padding:2px;flex-shrink:0}}
+.chart-range button{{appearance:none;border:0;background:transparent;color:#888;font-size:11px;padding:4px 8px;border-radius:6px;cursor:pointer}}
+.chart-range button.active{{background:#7c6fff;color:#fff}}
 table{{width:100%;border-collapse:collapse;font-size:11.5px}}
 th{{background:#1a1a2e;color:#777;padding:7px 7px;text-align:left;position:sticky;top:0;z-index:1}}
 td{{padding:5px 7px;border-bottom:1px solid #1a1a28;vertical-align:middle}}
@@ -897,7 +901,7 @@ mkTrend('estChartRun',  estR, '#6affa0', estDrvR);
         html += '</tbody></table>\n'
 
     html += f"""
-<div class="section">훈련 부하 트렌드 (최근 60일)</div>
+<div class="section section-row"><span>훈련 부하 트렌드</span><span class="chart-range"><button type="button" class="active" data-range="recent">최근</button><button type="button" data-range="all">전체</button></span></div>
 <div class="chart-wrap">
   <div class="chart-inner">
     <canvas id="tlChart"></canvas>
@@ -908,7 +912,7 @@ mkTrend('estChartRun',  estR, '#6affa0', estDrvR);
 const isMobile = window.innerWidth < 640;
 // 날짜(MM-DD) → 가민 활동 ID 매핑
 const garminIdMap = {json.dumps(garmin_id_map, ensure_ascii=False)};
-// 모바일: 최근 30일, PC: 60일
+// 모바일: 최근 30일, PC: 60일. 전체 버튼은 3/16 이후 전체 기간.
 const allLabels = {json.dumps(chart_labels, ensure_ascii=False)};
 const allTl7    = {json.dumps(chart_tl7)};
 const allSwim   = {json.dumps(chart_swim)};
@@ -917,45 +921,57 @@ const allRun    = {json.dumps(chart_run)};
 const allOther  = {json.dumps(chart_other)};
 const raceDates = {json.dumps(list(chart_race_dates))};
 
-const slice = isMobile ? 30 : 60;
-const labels   = allLabels.slice(-slice);
-const tl7Data  = allTl7.slice(-slice);
-const swimData = allSwim.slice(-slice);
-const bikeData = allBike.slice(-slice);
-const runData  = allRun.slice(-slice);
-const otherData= allOther.slice(-slice);
+const defaultSlice = isMobile ? 30 : 60;
+const chartInner = document.querySelector('.chart-inner');
+
+function chartWindow(range) {{
+  const n = range === 'all' ? allLabels.length : Math.min(defaultSlice, allLabels.length);
+  return {{
+    labels: allLabels.slice(-n),
+    tl7: allTl7.slice(-n),
+    swim: allSwim.slice(-n),
+    bike: allBike.slice(-n),
+    run: allRun.slice(-n),
+    other: allOther.slice(-n),
+  }};
+}}
 
 // 모바일: chart-inner 너비를 막대 수에 비례해 늘려 가독성 확보
-const minWidth = Math.max(600, labels.length * (isMobile ? 18 : 14));
-document.querySelector('.chart-inner').style.minWidth = minWidth + 'px';
+function setChartWidth(count, range) {{
+  const pxPerPoint = range === 'all' ? (isMobile ? 13 : 9) : (isMobile ? 18 : 14);
+  chartInner.style.minWidth = Math.max(600, count * pxPerPoint) + 'px';
+}}
 
-new Chart(document.getElementById('tlChart'), {{
+const initialWindow = chartWindow('recent');
+setChartWidth(initialWindow.labels.length, 'recent');
+
+const tlChart = new Chart(document.getElementById('tlChart'), {{
   data: {{
-    labels: labels,
+    labels: initialWindow.labels,
     datasets: [
       {{
-        type: 'bar', label: '🏊 수영', data: swimData,
+        type: 'bar', label: '🏊 수영', data: initialWindow.swim,
         backgroundColor: '#6ab4ff66', borderColor: '#6ab4ff', borderWidth: 1,
         stack: 'tl', order: 2,
       }},
       {{
-        type: 'bar', label: '🚴 자전거', data: bikeData,
+        type: 'bar', label: '🚴 자전거', data: initialWindow.bike,
         backgroundColor: '#ffa06a66', borderColor: '#ffa06a', borderWidth: 1,
         stack: 'tl', order: 2,
       }},
       {{
-        type: 'bar', label: '🏃 러닝', data: runData,
+        type: 'bar', label: '🏃 러닝', data: initialWindow.run,
         backgroundColor: '#6affa066', borderColor: '#6affa0', borderWidth: 1,
         stack: 'tl', order: 2,
       }},
       {{
-        type: 'bar', label: '기타', data: otherData,
+        type: 'bar', label: '기타', data: initialWindow.other,
         backgroundColor: '#7c6fff44', borderColor: '#7c6fff', borderWidth: 1,
         stack: 'tl', order: 2,
       }},
       {{
         type: 'line', label: '∑7일 누적',
-        data: tl7Data,
+        data: initialWindow.tl7,
         borderColor: '#fff', backgroundColor: 'transparent',
         borderWidth: 1.5, pointRadius: 0, tension: 0.3, order: 1,
       }},
@@ -966,7 +982,7 @@ new Chart(document.getElementById('tlChart'), {{
     maintainAspectRatio: false,
     onClick: (evt, elements) => {{
       if (!elements.length) return;
-      const label = labels[elements[0].index];  // MM-DD
+      const label = tlChart.data.labels[elements[0].index];  // MM-DD
       const gid = garminIdMap[label];
       if (gid) {{
         window.open('https://connect.garmin.com/modern/activity/' + gid, '_blank');
@@ -990,7 +1006,7 @@ new Chart(document.getElementById('tlChart'), {{
     scales: {{
       x: {{
         stacked: true,
-        ticks: {{ color: '#666', maxTicksLimit: isMobile ? 8 : 12, font: {{ size: isMobile ? 11 : 10 }} }},
+        ticks: {{ color: '#666', maxTicksLimit: isMobile ? 8 : 14, font: {{ size: isMobile ? 11 : 10 }} }},
         grid: {{ color: '#1a1a2a' }},
       }},
       y: {{
@@ -1001,6 +1017,22 @@ new Chart(document.getElementById('tlChart'), {{
       }},
     }},
   }}
+}});
+
+document.querySelectorAll('.chart-range button').forEach((btn) => {{
+  btn.addEventListener('click', () => {{
+    const range = btn.dataset.range;
+    const win = chartWindow(range);
+    setChartWidth(win.labels.length, range);
+    tlChart.data.labels = win.labels;
+    tlChart.data.datasets[0].data = win.swim;
+    tlChart.data.datasets[1].data = win.bike;
+    tlChart.data.datasets[2].data = win.run;
+    tlChart.data.datasets[3].data = win.other;
+    tlChart.data.datasets[4].data = win.tl7;
+    document.querySelectorAll('.chart-range button').forEach((b) => b.classList.toggle('active', b === btn));
+    tlChart.update();
+  }});
 }});
 </script>
 

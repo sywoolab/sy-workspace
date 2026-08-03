@@ -17,6 +17,10 @@ h1{color:#fff;font-size:17px;margin-bottom:3px}
 .chart-wrap{background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .chart-inner{min-width:600px;height:180px}
 @media(max-width:640px){.chart-inner{height:200px}}
+.section-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.chart-range{display:inline-flex;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:8px;padding:2px;flex-shrink:0}
+.chart-range button{appearance:none;border:0;background:transparent;color:#888;font-size:11px;padding:4px 8px;border-radius:6px;cursor:pointer}
+.chart-range button.active{background:#7c6fff;color:#fff}
 table{width:100%;border-collapse:collapse;font-size:11.5px}
 th{background:#1a1a2e;color:#777;padding:7px 7px;text-align:left;position:sticky;top:0;z-index:1}
 td{padding:5px 7px;border-bottom:1px solid #1a1a28;vertical-align:middle}
@@ -35,7 +39,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-08-04 08:33 KST</div>
+<div class="sub">업데이트: 2026-08-04 08:39 KST</div>
 
 <div style="background:#13131f;border:1px solid #6affa044;border-radius:12px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -165,7 +169,7 @@ mkTrend('estChartRun',  estR, '#6affa0', estDrvR);
 <div style="font-size:11px;color:#6ab4ff;margin:6px 0 12px;padding-left:4px">💡 바꿈터 단축 추가 가능: 대구 T1 4분 → 목표 3분 이하 = -2분 (연습으로 해결 가능)</div>
 </tbody></table>
 
-<div class="section">훈련 부하 트렌드 (최근 60일)</div>
+<div class="section section-row"><span>훈련 부하 트렌드</span><span class="chart-range"><button type="button" class="active" data-range="recent">최근</button><button type="button" data-range="all">전체</button></span></div>
 <div class="chart-wrap">
   <div class="chart-inner">
     <canvas id="tlChart"></canvas>
@@ -176,54 +180,66 @@ mkTrend('estChartRun',  estR, '#6affa0', estDrvR);
 const isMobile = window.innerWidth < 640;
 // 날짜(MM-DD) → 가민 활동 ID 매핑
 const garminIdMap = {"03-16": 22186820977, "03-17": 22197070483, "03-18": 22208690872, "03-19": 22220408340, "03-21": 22244393614, "03-22": 22255298354, "03-23": 22266012629, "03-25": 22288934001, "04-01": 22365977315, "04-03": 22391608564, "04-04": 22400498338, "04-06": 22420838221, "04-09": 22460934896, "04-13": 22505402955, "04-14": 22516118233, "04-15": 22528574592, "04-16": 22545321435, "04-17": 22552647893, "04-18": 22564644270, "04-19": 22577771619, "04-21": 22599063228, "04-22": 22611743245, "04-23": 22624082572, "04-25": 22651580277, "04-26": 22660678804, "04-29": 22697052331, "04-30": 22707547233, "05-01": 22720857149, "05-02": 22732716056, "05-03": 22743428925, "05-05": 22766516296, "05-06": 22778636157, "05-07": 22790504203, "05-08": 22806762030, "05-09": 22815490756, "05-10": 22826840674, "05-14": 22873558899, "05-16": 22895719936, "05-17": 22907468981, "05-19": 22929086155, "05-20": 22941462430, "05-22": 22965398918, "05-23": 22977544937, "05-24": 22989918598, "05-25": 23003038921, "05-26": 23012759623, "05-27": 23024779610, "05-28": 23037351408, "05-29": 23049478118, "05-30": 23062931935, "06-01": 23085043890, "06-02": 23096582474, "06-03": 23112858823, "06-04": 23121426953, "06-06": 23146299323, "06-07": 23157730314, "06-08": 23169213991, "06-11": 23207042060, "06-12": 23216957076, "06-13": 23228118716, "06-14": 23240862491, "06-15": 23251485734, "06-16": 23262821849, "06-18": 23288194390, "06-19": 23302270015, "06-22": 23333706966, "06-23": 23344849096, "06-24": 23357094474, "06-26": 23380739858, "06-27": 23391927483, "06-28": 23402530845, "07-04": 23470732733, "07-06": 23492954004, "07-09": 23528867535, "07-10": 23540982709, "07-11": 23552951353, "07-12": 23569740513, "07-13": 23575666119, "07-15": 23600194045, "07-16": 23615649548, "07-17": 23625458165, "07-18": 23637939593, "07-22": 23684896044, "07-26": 23732639688, "07-27": 23746171376, "07-28": 23755807428, "07-30": 23781921151, "08-01": 23806471891, "08-03": 23829842001, "08-04": 23841813322};
-// 모바일: 최근 30일, PC: 60일
-const allLabels = ["06-06", "06-07", "06-08", "06-09", "06-10", "06-11", "06-12", "06-13", "06-14", "06-15", "06-16", "06-17", "06-18", "06-19", "06-20", "06-21", "06-22", "06-23", "06-24", "06-25", "06-26", "06-27", "06-28", "06-29", "06-30", "07-01", "07-02", "07-03", "07-04", "07-05", "07-06", "07-07", "07-08", "07-09", "07-10", "07-11", "07-12", "07-13", "07-14", "07-15", "07-16", "07-17", "07-18", "07-19", "07-20", "07-21", "07-22", "07-23", "07-24", "07-25", "07-26", "07-27", "07-28", "07-29", "07-30", "07-31", "08-01", "08-02", "08-03", "08-04"];
-const allTl7    = [627, 866, 857, 761, 582, 602, 728, 740, 647, 706, 816, 816, 821, 728, 485, 339, 273, 290, 351, 250, 310, 373, 596, 567, 440, 379, 379, 286, 413, 190, 261, 261, 261, 365, 426, 566, 649, 637, 637, 756, 723, 974, 745, 662, 603, 603, 782, 711, 399, 298, 498, 578, 682, 384, 480, 480, 839, 639, 601, 609];
-const allSwim   = [67, 11, 36, 0, 0, 96, 0, 133, 0, 0, 0, 0, 0, 33, 0, 0, 29, 0, 61, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 104, 61, 66, 83, 59, 0, 119, 71, 51, 101, 0, 0, 0, 111, 0, 0, 0, 99, 80, 0, 0, 0, 0, 46, 0, 42, 0];
-const allBike   = [164, 88, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 211, 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 187, 0, 0, 0, 0, 0, 0, 0, 0, 0, 193, 0, 0, 0];
-const allRun    = [0, 140, 0, 0, 0, 0, 126, 110, 0, 95, 110, 0, 101, 0, 0, 0, 0, 127, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 190, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 104, 0, 96, 0, 120, 0, 0, 112];
-const allOther  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const raceDates = ["10-25", "10-18", "09-06"];
+// 모바일: 최근 30일, PC: 60일. 전체 버튼은 3/16 이후 전체 기간.
+const allLabels = ["03-16", "03-17", "03-18", "03-19", "03-20", "03-21", "03-22", "03-23", "03-24", "03-25", "03-26", "03-27", "03-28", "03-29", "03-30", "03-31", "04-01", "04-02", "04-03", "04-04", "04-05", "04-06", "04-07", "04-08", "04-09", "04-10", "04-11", "04-12", "04-13", "04-14", "04-15", "04-16", "04-17", "04-18", "04-19", "04-20", "04-21", "04-22", "04-23", "04-24", "04-25", "04-26", "04-27", "04-28", "04-29", "04-30", "05-01", "05-02", "05-03", "05-04", "05-05", "05-06", "05-07", "05-08", "05-09", "05-10", "05-11", "05-12", "05-13", "05-14", "05-15", "05-16", "05-17", "05-18", "05-19", "05-20", "05-21", "05-22", "05-23", "05-24", "05-25", "05-26", "05-27", "05-28", "05-29", "05-30", "05-31", "06-01", "06-02", "06-03", "06-04", "06-05", "06-06", "06-07", "06-08", "06-09", "06-10", "06-11", "06-12", "06-13", "06-14", "06-15", "06-16", "06-17", "06-18", "06-19", "06-20", "06-21", "06-22", "06-23", "06-24", "06-25", "06-26", "06-27", "06-28", "06-29", "06-30", "07-01", "07-02", "07-03", "07-04", "07-05", "07-06", "07-07", "07-08", "07-09", "07-10", "07-11", "07-12", "07-13", "07-14", "07-15", "07-16", "07-17", "07-18", "07-19", "07-20", "07-21", "07-22", "07-23", "07-24", "07-25", "07-26", "07-27", "07-28", "07-29", "07-30", "07-31", "08-01", "08-02", "08-03", "08-04"];
+const allTl7    = [74, 198, 303, 365, 365, 834, 835, 839, 715, 674, 612, 612, 143, 142, 64, 64, 98, 98, 341, 544, 544, 607, 607, 509, 606, 363, 160, 160, 194, 272, 350, 422, 475, 576, 926, 829, 868, 835, 742, 689, 933, 645, 645, 528, 576, 603, 900, 621, 603, 603, 658, 619, 560, 288, 246, 1126, 1126, 1071, 1017, 1096, 1071, 1565, 873, 873, 948, 992, 869, 938, 741, 752, 795, 818, 824, 909, 855, 565, 322, 324, 322, 451, 442, 427, 627, 866, 857, 761, 582, 602, 728, 740, 647, 706, 816, 816, 821, 728, 485, 339, 273, 290, 351, 250, 310, 373, 596, 567, 440, 379, 379, 286, 413, 190, 261, 261, 261, 365, 426, 566, 649, 637, 637, 756, 723, 974, 745, 662, 603, 603, 782, 711, 399, 298, 498, 578, 682, 384, 480, 480, 839, 639, 601, 609];
+const allSwim   = [0, 124, 105, 0, 0, 162, 0, 78, 0, 64, 0, 0, 0, 0, 0, 0, 98, 0, 118, 114, 0, 63, 0, 0, 97, 0, 0, 0, 97, 0, 78, 0, 53, 101, 46, 0, 0, 45, 0, 0, 0, 62, 0, 0, 93, 0, 0, 66, 44, 0, 3, 0, 0, 25, 24, 77, 0, 0, 0, 123, 0, 0, 0, 0, 75, 44, 0, 69, 71, 0, 43, 0, 50, 0, 15, 31, 0, 45, 0, 0, 0, 0, 67, 11, 36, 0, 0, 96, 0, 133, 0, 0, 0, 0, 0, 33, 0, 0, 29, 0, 61, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 104, 61, 66, 83, 59, 0, 119, 71, 51, 101, 0, 0, 0, 111, 0, 0, 0, 99, 80, 0, 0, 0, 0, 46, 0, 42, 0];
+const allBike   = [0, 0, 0, 0, 0, 213, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 169, 0, 0, 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 0, 238, 0, 0, 0, 0, 0, 0, 0, 0, 381, 0, 0, 0, 0, 0, 518, 232, 0, 0, 0, 0, 0, 146, 243, 0, 0, 0, 0, 0, 0, 0, 0, 0, 179, 0, 0, 164, 88, 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 211, 0, 0, 0, 0, 0, 200, 0, 0, 0, 0, 187, 0, 0, 0, 0, 0, 0, 0, 0, 0, 193, 0, 0, 0];
+const allRun    = [74, 0, 0, 62, 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 0, 0, 304, 0, 117, 0, 76, 0, 181, 0, 0, 0, 0, 103, 59, 0, 0, 0, 52, 54, 44, 0, 0, 466, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 104, 0, 0, 98, 0, 85, 0, 0, 0, 0, 96, 0, 76, 0, 0, 140, 0, 0, 0, 0, 126, 110, 0, 95, 110, 0, 101, 0, 0, 0, 0, 127, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 190, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 104, 0, 96, 0, 120, 0, 0, 112];
+const allOther  = [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const raceDates = ["10-25", "09-06", "10-18"];
 
-const slice = isMobile ? 30 : 60;
-const labels   = allLabels.slice(-slice);
-const tl7Data  = allTl7.slice(-slice);
-const swimData = allSwim.slice(-slice);
-const bikeData = allBike.slice(-slice);
-const runData  = allRun.slice(-slice);
-const otherData= allOther.slice(-slice);
+const defaultSlice = isMobile ? 30 : 60;
+const chartInner = document.querySelector('.chart-inner');
+
+function chartWindow(range) {
+  const n = range === 'all' ? allLabels.length : Math.min(defaultSlice, allLabels.length);
+  return {
+    labels: allLabels.slice(-n),
+    tl7: allTl7.slice(-n),
+    swim: allSwim.slice(-n),
+    bike: allBike.slice(-n),
+    run: allRun.slice(-n),
+    other: allOther.slice(-n),
+  };
+}
 
 // 모바일: chart-inner 너비를 막대 수에 비례해 늘려 가독성 확보
-const minWidth = Math.max(600, labels.length * (isMobile ? 18 : 14));
-document.querySelector('.chart-inner').style.minWidth = minWidth + 'px';
+function setChartWidth(count, range) {
+  const pxPerPoint = range === 'all' ? (isMobile ? 13 : 9) : (isMobile ? 18 : 14);
+  chartInner.style.minWidth = Math.max(600, count * pxPerPoint) + 'px';
+}
 
-new Chart(document.getElementById('tlChart'), {
+const initialWindow = chartWindow('recent');
+setChartWidth(initialWindow.labels.length, 'recent');
+
+const tlChart = new Chart(document.getElementById('tlChart'), {
   data: {
-    labels: labels,
+    labels: initialWindow.labels,
     datasets: [
       {
-        type: 'bar', label: '🏊 수영', data: swimData,
+        type: 'bar', label: '🏊 수영', data: initialWindow.swim,
         backgroundColor: '#6ab4ff66', borderColor: '#6ab4ff', borderWidth: 1,
         stack: 'tl', order: 2,
       },
       {
-        type: 'bar', label: '🚴 자전거', data: bikeData,
+        type: 'bar', label: '🚴 자전거', data: initialWindow.bike,
         backgroundColor: '#ffa06a66', borderColor: '#ffa06a', borderWidth: 1,
         stack: 'tl', order: 2,
       },
       {
-        type: 'bar', label: '🏃 러닝', data: runData,
+        type: 'bar', label: '🏃 러닝', data: initialWindow.run,
         backgroundColor: '#6affa066', borderColor: '#6affa0', borderWidth: 1,
         stack: 'tl', order: 2,
       },
       {
-        type: 'bar', label: '기타', data: otherData,
+        type: 'bar', label: '기타', data: initialWindow.other,
         backgroundColor: '#7c6fff44', borderColor: '#7c6fff', borderWidth: 1,
         stack: 'tl', order: 2,
       },
       {
         type: 'line', label: '∑7일 누적',
-        data: tl7Data,
+        data: initialWindow.tl7,
         borderColor: '#fff', backgroundColor: 'transparent',
         borderWidth: 1.5, pointRadius: 0, tension: 0.3, order: 1,
       },
@@ -234,7 +250,7 @@ new Chart(document.getElementById('tlChart'), {
     maintainAspectRatio: false,
     onClick: (evt, elements) => {
       if (!elements.length) return;
-      const label = labels[elements[0].index];  // MM-DD
+      const label = tlChart.data.labels[elements[0].index];  // MM-DD
       const gid = garminIdMap[label];
       if (gid) {
         window.open('https://connect.garmin.com/modern/activity/' + gid, '_blank');
@@ -258,7 +274,7 @@ new Chart(document.getElementById('tlChart'), {
     scales: {
       x: {
         stacked: true,
-        ticks: { color: '#666', maxTicksLimit: isMobile ? 8 : 12, font: { size: isMobile ? 11 : 10 } },
+        ticks: { color: '#666', maxTicksLimit: isMobile ? 8 : 14, font: { size: isMobile ? 11 : 10 } },
         grid: { color: '#1a1a2a' },
       },
       y: {
@@ -269,6 +285,22 @@ new Chart(document.getElementById('tlChart'), {
       },
     },
   }
+});
+
+document.querySelectorAll('.chart-range button').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const range = btn.dataset.range;
+    const win = chartWindow(range);
+    setChartWidth(win.labels.length, range);
+    tlChart.data.labels = win.labels;
+    tlChart.data.datasets[0].data = win.swim;
+    tlChart.data.datasets[1].data = win.bike;
+    tlChart.data.datasets[2].data = win.run;
+    tlChart.data.datasets[3].data = win.other;
+    tlChart.data.datasets[4].data = win.tl7;
+    document.querySelectorAll('.chart-range button').forEach((b) => b.classList.toggle('active', b === btn));
+    tlChart.update();
+  });
 });
 </script>
 
@@ -486,5 +518,5 @@ new Chart(document.getElementById('tlChart'), {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-08-04 08:33 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-08-04 08:39 KST</div>
 </body></html>
