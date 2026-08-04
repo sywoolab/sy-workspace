@@ -56,7 +56,8 @@ BOT_TOKEN = (os.environ.get('BOT_TOKEN')
              or os.environ.get('TELEGRAM_BOT_TOKEN', ''))
 CHAT_ID = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
 
-RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
+# Current primary short-term race for Garmin auto-detection alerts.
+RACE_DAY = datetime(2026, 9, 6, tzinfo=KST)  # 거북섬 올림픽 B레이스
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 
@@ -1209,7 +1210,7 @@ def _count_types_from_entry(entry):
                 counts[t] += 1
                 seen_types.add(t)
             if t == 'run':
-                run_km += m.get('distance_km', 0)
+                run_km += m.get('distance_km') or ((m.get('distance_m') or 0) / 1000)
     else:
         t = entry.get('metrics', {}).get('type', '')
         if t in counts:
@@ -1274,7 +1275,7 @@ VDOT_ZONES = {
 # Phase별 주간 목표
 PHASE_WEEKLY_TARGETS = {
     1: {'swim': 4, 'run': 3, 'run_km': (20, 23), 'bike': 1, 'desc': '베이스 — Easy 90% / Tempo 10%'},
-    2: {'swim': 3, 'run': 3, 'run_km': (21, 25), 'bike': 2, 'desc': '빌드 — Easy 80% / Tempo 15% / Interval 5%'},
+    2: {'swim': 3, 'run': 3, 'run_km': (18, 23), 'bike': 2, 'desc': '빌드 — Easy 80% / Tempo 15% / Interval 5%'},
     3: {'swim': 2, 'run': 2, 'run_km': (10, 10), 'bike': 1, 'desc': '테이퍼 — 볼륨 감소, 강도 유지'},
 }
 
@@ -1673,14 +1674,17 @@ def format_week_schedule(workout_log):
         lines.append(line)
 
     # 주간 진척 요약
-    targets = {1: (4, 3, 20), 2: (3, 3, 21), 3: (2, 2, 10)}
-    swim_t, run_t, km_t = targets.get(phase_num, (4, 3, 20))
+    phase_targets = PHASE_WEEKLY_TARGETS.get(phase_num, PHASE_WEEKLY_TARGETS[1])
+    swim_t = phase_targets['swim']
+    run_t = phase_targets['run']
+    km_lo, km_hi = phase_targets['run_km']
+    km_target = f"{km_lo}~{km_hi}" if km_lo != km_hi else str(km_lo)
 
     swim_bar = "●" * swim_count + "○" * max(0, swim_t - swim_count)
     run_bar = "●" * run_count + "○" * max(0, run_t - run_count)
 
     lines.append("")
-    lines.append(f"  수영 {swim_bar} {swim_count}/{swim_t} | 러닝 {run_bar} {run_count}/{run_t} ({run_km:.0f}km/{km_t}km) | 자전거 {bike_count}회")
+    lines.append(f"  수영 {swim_bar} {swim_count}/{swim_t} | 러닝 {run_bar} {run_count}/{run_t} ({run_km:.0f}km/{km_target}km) | 자전거 {bike_count}회")
 
     return "\n".join(lines)
 
