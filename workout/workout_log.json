@@ -10771,5 +10771,121 @@
         "feel": 50
       }
     ]
+  },
+  "2026-08-07": {
+    "planned": "수영 수업",
+    "done": true,
+    "actual": "수영 1025m 44분 @1:32/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1025,
+      "duration_min": 44.3,
+      "moving_min": 15.9,
+      "pace_per_100m": "1:32",
+      "avg_hr": 117,
+      "max_hr": 158,
+      "swolf": 30,
+      "strokes": 288,
+      "avg_spm": null,
+      "training_load": 57
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.2 / 무산소 1.5 | 부하 57",
+    "garmin_id": 23893409677,
+    "start_time": "06:12",
+    "garmin_ids": [
+      23893409677
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1025,
+        "duration_sec": 2658.0,
+        "avg_hr": 117,
+        "max_hr": 158,
+        "avg_pace": "1:32",
+        "avg_speed": null,
+        "training_load": 57,
+        "garmin_id": 23893409677,
+        "laps": null,
+        "open_water": false,
+        "start_time": "06:12",
+        "duration_min": 44.3,
+        "moving_min": 15.9,
+        "pace_per_100m": "1:32",
+        "swolf": 30,
+        "strokes": 288,
+        "avg_spm": null,
+        "rpe": 4,
+        "feel": 50
+      }
+    ]
+  },
+  "2026-08-08": {
+    "planned": "🚴 Z2 자전거 60~90km + 🏃 브릭런 3~5km",
+    "done": true,
+    "actual": "OW 138m 4분 @2:42/100m + 수영 1325m 62분 @1:43/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1325,
+      "duration_min": 62.4,
+      "moving_min": 22.8,
+      "pace_per_100m": "1:43",
+      "avg_hr": 109,
+      "max_hr": 170,
+      "swolf": 34,
+      "strokes": 411,
+      "avg_spm": null,
+      "training_load": 40
+    },
+    "training_zone": "easy",
+    "note": "유산소 0.8 / 무산소 0.9 | 부하 23 | 유산소 1.9 / 무산소 1.1 | 부하 40",
+    "garmin_id": 23893410201,
+    "start_time": "06:58",
+    "garmin_ids": [
+      23893409900,
+      23893410201
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 138,
+        "duration_sec": 240.0,
+        "avg_hr": 133,
+        "max_hr": 151,
+        "avg_pace": "2:42",
+        "avg_speed": null,
+        "training_load": 23,
+        "garmin_id": 23893409900,
+        "laps": null,
+        "open_water": true,
+        "start_time": "06:58",
+        "duration_min": 4.0,
+        "moving_min": 3.7,
+        "pace_per_100m": "2:42",
+        "swolf": 59,
+        "strokes": 87,
+        "avg_spm": null,
+        "rpe": 1,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 1325,
+        "duration_min": 62.4,
+        "moving_min": 22.8,
+        "pace_per_100m": "1:43",
+        "avg_hr": 109,
+        "max_hr": 170,
+        "swolf": 34,
+        "strokes": 411,
+        "avg_spm": null,
+        "training_load": 40,
+        "garmin_id": 23893410201,
+        "start_time": "07:02",
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
