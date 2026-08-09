@@ -404,7 +404,7 @@ def main():
     chart_other= [max(0, e['total_tl'] - chart_swim[i] - chart_bike[i] - chart_run[i])
                   for i, e in enumerate(chart_entries)]
     # 대회 날짜에 vertical line 표시
-    chart_race_dates = {r[0][5:] for r in races}
+    chart_race_dates = sorted({r[0][5:] for r in races})
 
     now_str = now.strftime('%Y-%m-%d %H:%M KST')
 
@@ -919,7 +919,7 @@ const allSwim   = {json.dumps(chart_swim)};
 const allBike   = {json.dumps(chart_bike)};
 const allRun    = {json.dumps(chart_run)};
 const allOther  = {json.dumps(chart_other)};
-const raceDates = {json.dumps(list(chart_race_dates))};
+const raceDates = {json.dumps(chart_race_dates)};
 
 const defaultSlice = isMobile ? 30 : 60;
 const chartInner = document.querySelector('.chart-inner');
