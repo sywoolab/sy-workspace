@@ -127,7 +127,7 @@ SCHEDULE = {
         0: ("수영 수업", ""),
         1: ("러닝 템포", "WU 3km → 5:20 전후 지속주 → CD"),
         2: ("수영 수업", ""),
-        3: ("러닝 축소 품질/Easy", "총 6km 기준. 피로 시 Easy 5~6km, HR 145~150 이하"),
+        3: ("러닝 Easy/롱런", "8~10km. WU 2km @6:30 전후 → 5~6km 점진 빌드 → CD 2km, HR 145~150 이하"),
         4: ("수영 수업", ""),
         5: ("자전거 + 브릭런", "토/일 중 1회. 자전거 60~90km → 러닝 3~6km"),
         6: ("자전거/브릭 예비일", "토요일 미실시 시 오늘 진행, 실시했으면 회복"),
@@ -203,9 +203,9 @@ PHASE_GOALS = {
         "min": "러닝 최소 2회, 통증 시 즉시 중단",
     },
     2: {
-        "goal": "거북섬 B레이스 대비 핵심 빌드 — 러닝 시간 단축을 최우선, 브릭 적응 병행",
+        "goal": "거북섬 B레이스 sub-2:40 목표 — 러닝 시간 단축을 최우선, 브릭 적응 병행",
         "volume": "수영 월수금 / 러닝 화목주말 3회(18~23km) / 자전거 토일 중 1~2회",
-        "min": "화 Easy/템포 조절 + 목 축소 품질/Easy + 주말 브릭런 필수",
+        "min": "화 템포 + 목 Easy/롱런 8~10km + 주말 브릭런 필수",
     },
     3: {
         "goal": "거북섬 B레이스 신청완료 — 실전점검, 무리한 PB 욕심 금지",
@@ -758,7 +758,7 @@ def format_morning():
     est = analysis.get('estimated_finish', '?')
     status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
     vdot = analysis.get('vdot', '?')
-    lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | 예상 {est} {status_icon} | VDOT {vdot}")
+    lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | 예상 {est} {status_icon} | VDOT {vdot}")
     lines.append("")
 
     # 훈련 진척도
@@ -873,9 +873,10 @@ def format_tomorrow_coaching():
             lines.append(f"  → 템포 3km @ {tempo_p}/km")
             lines.append(f"  → 쿨다운 2km Easy")
             lines.append(f"  ⚠️ 워밍업/쿨다운은 반드시 느리게")
-        elif "Long" in tomorrow_workout or "long" in tomorrow_workout:
+        elif "Long" in tomorrow_workout or "long" in tomorrow_workout or "롱런" in tomorrow_workout:
             lines.append(f"  Easy {easy_p}/km — 대화 가능 속도")
-            lines.append(f"  거리 채우기가 목표, 페이스 ❌")
+            lines.append(f"  WU 2km → 점진 빌드 → CD 2km")
+            lines.append(f"  거리 채우기가 목표, 5:20대 추격 금지")
         elif "코어" in tomorrow_workout:
             lines.append(f"  러닝 Easy {easy_p}/km + 코어 15분")
             lines.append(f"  코어: 플랭크/사이드/버드독 각 30초×3")
@@ -993,7 +994,7 @@ def format_evening():
         # 휴식일이어도 내일 코칭은 보내기
         coaching = format_tomorrow_coaching()
         if coaching:
-            lines = [f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | 😴 오늘은 휴식"]
+            lines = [f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | 😴 오늘은 휴식"]
             lines.append("")
             lines.append(coaching)
             return "\n".join(lines)
@@ -1004,7 +1005,7 @@ def format_evening():
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
-        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | ✅ 오늘 운동 완료!")
+        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
@@ -1026,7 +1027,7 @@ def format_evening():
                 lines.append(f"  → {actual}")
     else:
         # 미완료 → 리마인드 + 복구 시나리오
-        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | ⚠️ 오늘 운동 기록이 없습니다!")
+        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 대가야 D-{DAYS_LEFT_DAEGAYA} | 통영 D-{DAYS_LEFT_TONGYEONG} | ⚠️ 오늘 운동 기록이 없습니다!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if detail:

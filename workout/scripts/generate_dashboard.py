@@ -159,6 +159,12 @@ def days_until(d):
     target = datetime.strptime(d, '%Y-%m-%d').replace(tzinfo=KST)
     return (target.date() - datetime.now(KST).date()).days
 
+def target_minutes_from_goal(goal):
+    m = _re.search(r'sub-(\d+):(\d+)', goal or '')
+    if not m:
+        return None
+    return int(m.group(1)) * 60 + int(m.group(2))
+
 def type_emoji(t):
     return {'swim':'🏊','run':'🏃','bike':'🚴','brick':'🏊→🚴→🏃','strength':'💪'}.get(t,'🏋')
 
@@ -252,8 +258,9 @@ def main():
 
     # ── 목표별 처방 계산 ──
     # race_targets: (대회날짜, 이름, 목표분)
-    # 대가야를 A레이스로 두고, 거북섬은 중간점검 B레이스로 둔다.
+    # 거북섬은 B레이스지만 사용자가 2026-08-11에 sub-2:40 목표를 명시했다.
     race_targets = [
+        ("2026-09-06", "거북섬", 160),    # sub-2:40 (B레이스 목표)
         ("2026-10-18", "대가야", 165),    # sub-2:45 (A레이스)
     ]
 
@@ -326,7 +333,7 @@ def main():
         }
 
     races = [
-        ("2026-09-06", "거북섬 올림픽", "신청완료 · B레이스 · 실전점검"),
+        ("2026-09-06", "거북섬 올림픽", "🎯 sub-2:40 · B레이스 목표"),
         ("2026-10-18", "대가야 올림픽 A레이스", "🎯 sub-2:45"),
         ("2026-10-25", "통영 월드컵", "신청완료 · 예비 A/C레이스"),
     ]
@@ -465,8 +472,9 @@ tr:hover{{background:#15152a}}
         total_m_for_gap = est.get('total', 0)
         for rdate, rname, rgoal in races:
             if days_until(rdate) > 0 and 'sub-' in rgoal:
-                th_, tm_ = rgoal.replace('🎯 sub-', '').split(':')
-                target_min = int(th_)*60 + int(tm_)
+                target_min = target_minutes_from_goal(rgoal)
+                if target_min is None:
+                    continue
                 gap_min = round(total_m_for_gap - target_min)
                 next_race_name = rname
                 d_left = days_until(rdate)
@@ -576,9 +584,9 @@ tr:hover{{background:#15152a}}
         next_target_label = None
         for rdate, rname, rgoal in races:
             if days_until(rdate) > 0 and 'sub-' in rgoal:
-                t_str = rgoal.replace('🎯 sub-', '')
-                th, tm_str = t_str.split(':')
-                target_total = int(th)*60 + int(tm_str)
+                target_total = target_minutes_from_goal(rgoal)
+                if target_total is None:
+                    continue
                 next_target_race = rname
                 next_target_min = target_total
                 next_target_label = rgoal
