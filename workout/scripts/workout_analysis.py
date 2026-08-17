@@ -185,6 +185,7 @@ TYPE_MULTIPLIER = {'run': 1.3, 'swim': 1.0, 'bike': 0.8, 'brick': 1.4}
 SWIM_EQUIPMENT_MULTIPLIER = {
     'none': 1.0,       # 맨몸 = 기준
     'fins': 0.7,       # 오리발: 하체 부담 감소
+    'short_fins': 0.85,  # 숏핀: long fins보다 보조효과 작음
     'paddles': 1.2,    # 패들: 상체 부하 증가
     'pull_buoy': 0.8,  # 풀부이: 하체 비활성
     'fins_paddles': 0.9,  # 오리발+패들
@@ -195,6 +196,7 @@ SWIM_EQUIPMENT_MULTIPLIER = {
 SWIM_EQUIPMENT_PACE_CORRECTION = {
     'none': 0,
     'fins': 12,        # 오리발 착용 시 맨몸보다 ~12초 빠름
+    'short_fins': 6,   # 숏핀은 long fins보다 페이스 보정폭을 작게 적용
     'paddles': 6,      # 패들 착용 시 ~6초 빠름
     'pull_buoy': 4,    # 풀부이 ~4초 빠름
     'fins_paddles': 15, # 오리발+패들 ~15초 빠름

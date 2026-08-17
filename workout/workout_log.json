@@ -12121,7 +12121,7 @@
       ]
     },
     "training_zone": "easy",
-    "note": "유산소 3.2 / 무산소 2.1 | 부하 132 | 유산소 3.0 / 무산소 1.3 | 부하 96",
+    "note": "유산소 3.2 / 무산소 2.1 | 부하 132 | 유산소 3.0 / 무산소 1.3 | 부하 96 | 사용자 보고: 수영 숏핀, 러닝 트레일+로드(중간 산, Garmin 상승 109m)",
     "garmin_id": 24004909517,
     "start_time": "07:12",
     "garmin_ids": [
@@ -12148,6 +12148,7 @@
         "swolf": 39,
         "strokes": 1268,
         "avg_spm": null,
+        "swim_equipment": "short_fins",
         "rpe": 7,
         "feel": 50
       },
