@@ -76,12 +76,12 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수마감",
-    "name": "2026 시흥시장배 거북섬 전국 철인3종대회(토요일: 스프린트 / 일요일: 스탠다드)",
+    "status": "접수중",
+    "name": "2026 시흥시장배 거북섬 전국 철인3종대회(토요일: 스프린트 / 일요일: 스탠다드) 중등부, 주니어부 모집 - 8월 26일 17:00 마감",
     "location": "경기도 시흥시 시화해역 및 거북섬 일원",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2098&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.09.04 ~ 06",
-    "reg_period": "접수마감"
+    "reg_period": "2026-07-23 14:00 ~ 2026-08-26 17:00"
   },
   {
     "status": "접수마감",
