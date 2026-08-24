@@ -12870,5 +12870,45 @@
         "feel": 50
       }
     ]
+  },
+  "2026-08-25": {
+    "planned": "🚴 로라 45~60분 Z2",
+    "done": true,
+    "actual": "자전거 40분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 0.0,
+      "duration_min": 40.2,
+      "avg_speed_kmh": null,
+      "avg_hr": 131,
+      "max_hr": 157,
+      "avg_power": 119.0,
+      "training_load": 36
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.2 | 부하 36",
+    "garmin_id": 24102995109,
+    "start_time": "06:28",
+    "garmin_ids": [
+      24102995109
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": null,
+        "duration_sec": 2412.0,
+        "avg_hr": 131,
+        "max_hr": 157,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 36,
+        "garmin_id": 24102995109,
+        "laps": null,
+        "open_water": false,
+        "start_time": "06:28",
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
   }
 }
