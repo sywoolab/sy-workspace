@@ -8,7 +8,7 @@
     "reg_period": "2026-07-08 10:00 ~ 2026-08-25 23:59"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "제22회 울진 트라이애슬론 대회",
     "location": "울진군 후포면 요트경기장",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2111&page=1&sYear=2026&vType=list&field=&keyword=",
@@ -93,7 +93,7 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "2026 철인3종 8차 대회규정 정기교육",
     "location": "온라인 ZOOM",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2112&page=1&sYear=2026&vType=list&field=&keyword=",
