@@ -736,11 +736,11 @@
     },
     "2026-08-29": {
       "date": "2026-08-29",
-      "workout": "🏊 개인강습 기술 중심 + 🚴 남북코스 약 45km + 🏃 선택 브릭 1~2km Easy",
-      "detail": "거북섬 D-8 실외 감각·에어로 포지션·장비·보급 리허설. 남북코스는 대부분 Z2로 타고 평지에서 레이스 노력 10분×2만 허용. 브릭은 다리가 가벼울 때만 6:00/km 전후 1~2km, 무거우면 생략. 새 장비·새 보급 금지, 폭염을 피해 이른 아침 진행.",
+      "workout": "🏊 OW 약 1km + 🚴 양수역 반환 약 65km Z2 + 🏃 선택 브릭 최대 5km Easy",
+      "detail": "거북섬 D-8 마지막 종합 리허설. OW는 모래톱 왕복 약 1km로 호흡·사이팅만 확인하고 1.8km를 억지로 채우지 않음. 사이클은 65km 대부분 Z2, 선두 추격·업힐 경쟁 금지. 브릭은 당일 다리와 심박이 정상일 때만 5km Easy, 무거우면 1~2km 또는 생략. 10km 런 금지. 새 장비·새 보급 금지.",
       "source": "manual",
       "auto": false,
-      "rule": "2026-08-24 garmin-load-taper-adjustment"
+      "rule": "2026-08-25 user-confirmed-final-rehearsal"
     },
     "2026-08-30": {
       "date": "2026-08-30",
@@ -749,6 +749,54 @@
       "source": "manual",
       "auto": false,
       "rule": "2026-08-24 garmin-load-taper-adjustment"
+    },
+    "2026-08-31": {
+      "date": "2026-08-31",
+      "workout": "🏊 수영 Easy/기술 1.0~1.2km 또는 휴식",
+      "detail": "8/29 종합 리허설 회복. 호흡·자세·사이팅 감각만 유지하고 강한 킥·무산소 세트 금지. 피로가 남으면 수영도 생략.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-25 race-week-taper"
+    },
+    "2026-09-01": {
+      "date": "2026-09-01",
+      "workout": "🏃 러닝 5~6km Easy + 짧은 레이스 감각",
+      "detail": "WU 3km Easy → 2분 @레이스 목표 노력×3(사이 2분 Easy) → CD. 총거리 6km 상한, 전력 템포·인터벌 금지. Readiness POOR면 4~5km Easy만.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-25 race-week-taper"
+    },
+    "2026-09-02": {
+      "date": "2026-09-02",
+      "workout": "🚴 로라 35~40분 레이스 감각",
+      "detail": "10분 Easy → 레이스 노력 3분×3(사이 4분 Easy) → 쿨다운. 케이던스 85~95rpm, 고토크·스프린트·브릭런 금지. 배치 목적은 체력 향상이 아니라 페달링·에어로 감각 유지.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-25 race-week-taper"
+    },
+    "2026-09-03": {
+      "date": "2026-09-03",
+      "workout": "🏃 러닝 4km Easy + 스트라이드 3~4회",
+      "detail": "Easy로 몸을 풀고 20초 스트라이드 3~4회(완전 회복 보행/조깅). 목표 페이스 지속주 금지. 다리가 무거우면 3km Easy로 종료.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-25 race-week-taper"
+    },
+    "2026-09-04": {
+      "date": "2026-09-04",
+      "workout": "🏊 수영 0.8~1.0km Easy",
+      "detail": "기술·호흡 중심, 여유 있으면 50m 레이스 리듬×4(각 구간 충분히 회복). 어깨 피로나 수면 부족 시 생략.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-25 race-week-taper"
+    },
+    "2026-09-05": {
+      "date": "2026-09-05",
+      "workout": "🛏 휴식 + 장비·보급·T1/T2 최종 점검",
+      "detail": "신체 훈련은 하지 않음. 이동 후 몸이 굳으면 선택적으로 자전거 10~15분 회복스핀만. 새 장비·새 보급·추가 런 금지.",
+      "source": "manual",
+      "auto": false,
+      "rule": "2026-08-25 race-week-taper"
     },
     "2026-09-06": {
       "date": "2026-09-06",
