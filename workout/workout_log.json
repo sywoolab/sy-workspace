@@ -13096,5 +13096,45 @@
         "feel": 50
       }
     ]
+  },
+  "2026-08-30": {
+    "planned": "🛌 완전 휴식",
+    "done": true,
+    "actual": "자전거 73분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 0.0,
+      "duration_min": 72.7,
+      "avg_speed_kmh": null,
+      "avg_hr": 146,
+      "max_hr": 165,
+      "avg_power": 122.0,
+      "training_load": 75
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.0 | 부하 75",
+    "garmin_id": 24165832218,
+    "start_time": "07:39",
+    "garmin_ids": [
+      24165832218
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": null,
+        "duration_sec": 4362.0,
+        "avg_hr": 146,
+        "max_hr": 165,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 75,
+        "garmin_id": 24165832218,
+        "laps": null,
+        "open_water": false,
+        "start_time": "07:39",
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
