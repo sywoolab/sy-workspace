@@ -1335,6 +1335,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
         ("2026-09-06", "거북섬 올림픽", "9/4~6 개최 · 수영 1.5+자전거 40+러닝 10km", "신청완료 · B레이스: 실전점검 + 올림픽 완주 2회차"),
         ("2026-10-25", "통영 월드컵", "10/24~25 개최 · 업다운 난코스 · 수영 1.5+자전거 40+러닝 10km", "신청완료 · 시즌 마무리 참가/완주, 기록보다 경험"),
+        ("2026-11-15", "고베 마라톤", "풀마라톤 42.195km", "신청완료 · 1차 목표 sub-4:00 · 전 구간 무보행"),
     ]
     html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
     for rdate, rname, rdist, rgoal in all_races_ext:
@@ -1346,6 +1347,48 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
             dstr = f'D-{d} ({rdate[5:]})'
         html += f'<tr><td style="color:{dcol};font-weight:600;white-space:nowrap">{dstr}</td><td>{rname}</td><td style="color:#888;font-size:10.5px">{rdist}</td><td style="color:#6affa0;font-size:10.5px">{rgoal}</td></tr>\n'
     html += '</tbody></table>'
+
+    # ── 고베 마라톤 sub-4 준비 로드맵 ──
+    # 철인 예상기록 계산과는 분리한다. 마라톤은 주간 러닝 볼륨·롱런·무릎 반응으로 판정한다.
+    kobe_weeks = [
+        ("09/07~09/13", "25~30km", "16~18km", "거북섬 회복 후 러닝 4회 골격 복구"),
+        ("09/14~09/20", "30~34km", "18~20km", "전 구간 무보행·보급 연습 시작"),
+        ("09/21~09/27", "34~38km", "21~23km", "하프 1:55 이내 무보행 체크"),
+        ("09/28~10/04", "28~32km", "16~18km", "회복 주·무릎 반응 확인"),
+        ("10/05~10/11", "38~42km", "24~26km", "시간당 탄수화물 50~60g 실전 연습"),
+        ("10/12~10/18", "42~46km", "28~30km", "첫 핵심 롱런·보행 없이 완료"),
+        ("10/19~10/25", "약 45km*", "30~32km*", "최종 핵심 롱런; 통영 참가 시 대회로 대체·재조정"),
+        ("10/26~11/01", "35~40km", "22~24km", "후반 일부 MP 5:40~5:45/km"),
+        ("11/02~11/08", "25~30km", "16~18km", "테이퍼 시작·피로 제거"),
+        ("11/09~11/15", "12~18km + 대회", "대회 42.195km", "볼륨 최소화·11/15 고베"),
+    ]
+    kobe_checks = [
+        ("9월 말", "하프 1:55 이내 무보행", "서브4 가능성 유지"),
+        ("10월 중순", "28~30km 안정 완주 + 정상 보급", "서브4 가능권 진입"),
+        ("10월 하순", "30~32km 안정 완주·다음날 회복", "서브4가 현실적인 목표"),
+        ("상시", "무릎 통증 3/10 미만·다음날 계단 이상 없음", "증량 진행; 이상 시 수영·자전거로 대체"),
+    ]
+    html += '<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
+    html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
+             'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55">'
+             '<b style="color:#ffd56c">현재 판정:</b> 도전 가능한 목표이나 장거리 적응이 핵심. '
+             '10km 47분은 필수조건이 아니며, 주 4회 러닝과 28~32km 핵심 롱런을 부상 없이 완성하는 것이 우선. '
+             '평지 롱런을 기본으로 하고 남산 업다운은 필요 시 금요일 저녁 또는 토요일 아침, 초기 2주 1회 이하로 배치.'
+             '</div>\n')
+    html += '<table><thead><tr><th>주차</th><th>주간 러닝</th><th>롱런</th><th>핵심 목표</th></tr></thead><tbody>\n'
+    for week, volume, long_run, focus in kobe_weeks:
+        html += (f'<tr><td style="white-space:nowrap;color:#888">{week}</td>'
+                 f'<td style="color:#6affa0;font-weight:600">{volume}</td>'
+                 f'<td style="color:#6ab4ff;font-weight:600">{long_run}</td>'
+                 f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
+    html += '</tbody></table>\n'
+    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 통영 출전 여부·강도에 따라 10/19 주 핵심 롱런은 반드시 재배치. 35km 이상 롱런은 기본계획에 넣지 않고 회복·무릎 지표가 모두 양호할 때만 별도 판단.</div>\n'
+    html += '<table><thead><tr><th>판정 시점</th><th>통과 기준</th><th>의미</th></tr></thead><tbody>\n'
+    for timing, criterion, implication in kobe_checks:
+        html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
+                 f'<td style="color:#ddd">{criterion}</td>'
+                 f'<td style="color:#ffd56c;font-size:10.5px">{implication}</td></tr>\n')
+    html += '</tbody></table>\n'
 
     # ── 완주 대회 아카이브 ──
     race_records_file = BASE / 'data' / 'race_records.json'
