@@ -13136,5 +13136,175 @@
         "feel": 50
       }
     ]
+  },
+  "2026-09-02": {
+    "planned": "🚴 로라 35~40분 레이스 감각",
+    "done": true,
+    "actual": "러닝 7.8km @5:58",
+    "metrics": {
+      "type": "run",
+      "distance_km": 7.8,
+      "pace_per_km": "5:58",
+      "avg_hr": 144,
+      "max_hr": 171,
+      "cadence": 174,
+      "training_load": 109,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 403,
+          "avg_hr": 118,
+          "max_hr": 135,
+          "pace_sec": 403,
+          "pace_str": "6:43"
+        },
+        {
+          "distance": 1000,
+          "duration": 360,
+          "avg_hr": 138,
+          "max_hr": 144,
+          "pace_sec": 360,
+          "pace_str": "6:00"
+        },
+        {
+          "distance": 1000,
+          "duration": 358,
+          "avg_hr": 141,
+          "max_hr": 147,
+          "pace_sec": 358,
+          "pace_str": "5:57"
+        },
+        {
+          "distance": 1000,
+          "duration": 356,
+          "avg_hr": 145,
+          "max_hr": 153,
+          "pace_sec": 356,
+          "pace_str": "5:56"
+        },
+        {
+          "distance": 1000,
+          "duration": 352,
+          "avg_hr": 148,
+          "max_hr": 153,
+          "pace_sec": 352,
+          "pace_str": "5:52"
+        },
+        {
+          "distance": 1000,
+          "duration": 339,
+          "avg_hr": 150,
+          "max_hr": 156,
+          "pace_sec": 339,
+          "pace_str": "5:39"
+        },
+        {
+          "distance": 1000,
+          "duration": 344,
+          "avg_hr": 157,
+          "max_hr": 163,
+          "pace_sec": 344,
+          "pace_str": "5:43"
+        },
+        {
+          "distance": 800,
+          "duration": 284,
+          "avg_hr": 159,
+          "max_hr": 171,
+          "pace_sec": 354,
+          "pace_str": "5:54"
+        }
+      ]
+    },
+    "training_zone": "easy",
+    "note": "유산소 3.2 / 무산소 0.8 | 부하 109",
+    "garmin_id": 24210510677,
+    "start_time": "22:08",
+    "garmin_ids": [
+      24210510677
+    ],
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_m": 7800.0,
+        "duration_sec": null,
+        "avg_hr": 144,
+        "max_hr": 171,
+        "avg_pace": "5:58",
+        "avg_speed": null,
+        "training_load": 109,
+        "garmin_id": 24210510677,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 403,
+            "avg_hr": 118,
+            "max_hr": 135,
+            "pace_sec": 403,
+            "pace_str": "6:43"
+          },
+          {
+            "distance": 1000,
+            "duration": 360,
+            "avg_hr": 138,
+            "max_hr": 144,
+            "pace_sec": 360,
+            "pace_str": "6:00"
+          },
+          {
+            "distance": 1000,
+            "duration": 358,
+            "avg_hr": 141,
+            "max_hr": 147,
+            "pace_sec": 358,
+            "pace_str": "5:57"
+          },
+          {
+            "distance": 1000,
+            "duration": 356,
+            "avg_hr": 145,
+            "max_hr": 153,
+            "pace_sec": 356,
+            "pace_str": "5:56"
+          },
+          {
+            "distance": 1000,
+            "duration": 352,
+            "avg_hr": 148,
+            "max_hr": 153,
+            "pace_sec": 352,
+            "pace_str": "5:52"
+          },
+          {
+            "distance": 1000,
+            "duration": 339,
+            "avg_hr": 150,
+            "max_hr": 156,
+            "pace_sec": 339,
+            "pace_str": "5:39"
+          },
+          {
+            "distance": 1000,
+            "duration": 344,
+            "avg_hr": 157,
+            "max_hr": 163,
+            "pace_sec": 344,
+            "pace_str": "5:43"
+          },
+          {
+            "distance": 800,
+            "duration": 284,
+            "avg_hr": 159,
+            "max_hr": 171,
+            "pace_sec": 354,
+            "pace_str": "5:54"
+          }
+        ],
+        "open_water": false,
+        "start_time": "22:08",
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
   }
 }
