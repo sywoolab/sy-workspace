@@ -248,7 +248,7 @@ def main():
         if bad_count >= 2:
             verdict = ('red', '개선 필요', '핵심 종목 공백 발생. 이번 주 러닝·브릭 우선 복구 필요.')
         elif bad_count == 1 or warn_count >= 2:
-            verdict = ('yellow', '부분 보완 필요', '자전거 기반은 좋음. 러닝·브릭 비중 높여야 거북섬 목표와 통영 완주 안정성이 올라감.')
+            verdict = ('yellow', '부분 보완 필요', '자전거 기반은 좋음. 러닝 빈도와 롱런을 높여야 고베 sub-4 가능성이 올라감.')
         else:
             verdict = ('green', '순항 중', '전 종목 균형 잡힘. 현재 페이스 유지.')
 
@@ -333,7 +333,6 @@ def main():
 
     races = [
         ("2026-09-06", "거북섬 올림픽", "🎯 sub-2:40 · B레이스 목표"),
-        ("2026-10-25", "통영 월드컵", "신청완료 · 시즌 마무리 참가/완주"),
     ]
 
     now = datetime.now(KST)
@@ -1334,7 +1333,6 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
     all_races_ext = [
         ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
         ("2026-09-06", "거북섬 올림픽", "9/4~6 개최 · 수영 1.5+자전거 40+러닝 10km", "신청완료 · B레이스: 실전점검 + 올림픽 완주 2회차"),
-        ("2026-10-25", "통영 월드컵", "10/24~25 개최 · 업다운 난코스 · 수영 1.5+자전거 40+러닝 10km", "신청완료 · 시즌 마무리 참가/완주, 기록보다 경험"),
         ("2026-11-15", "고베 마라톤", "풀마라톤 42.195km", "신청완료 · 1차 목표 sub-4:00 · 전 구간 무보행"),
     ]
     html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
@@ -1358,9 +1356,9 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("09/28~10/04", "30~34km", "18~20km", "회복 주·무릎 반응 확인"),
         ("10/05~10/11", "38~42km", "26~28km", "연휴 활용·시간당 탄수화물 50~60g"),
         ("10/12~10/18", "42~46km", "30~32km", "최장거리 핵심 롱런·보행 없이 완료"),
-        ("10/19~10/25", "35~40km*", "22~26km*", "흡수 주; 통영 참가 시 대회로 대체·재조정"),
-        ("10/26~11/01", "38~42km", "28~30km", "마지막 핵심주·후반 일부 MP 5:35~5:45/km"),
-        ("11/02~11/08", "25~30km", "16~18km", "테이퍼 시작·피로 제거"),
+        ("10/19~10/25", "30~34km", "18~20km", "최장거리 흡수·통영 취소로 마라톤 회복에 집중"),
+        ("10/26~11/01", "30~34km", "20~22km", "마지막 MP 점검·후반 일부 5:35~5:45/km"),
+        ("11/02~11/08", "22~26km", "14~16km", "테이퍼·피로 제거"),
         ("11/09~11/15", "12~18km + 대회", "대회 42.195km", "볼륨 최소화·11/15 고베"),
     ]
     kobe_checks = [
@@ -1384,7 +1382,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#6ab4ff;font-weight:600">{long_run}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table>\n'
-    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 추석 연휴(9/24~27)는 여러 훈련을 몰아넣지 않고 22~24km 롱런 전후 휴식 확보에 활용. 통영 출전 여부·강도에 따라 10/19 주는 반드시 재조정. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
+    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 추석 연휴(9/24~27)는 여러 훈련을 몰아넣지 않고 22~24km 롱런 전후 휴식 확보에 활용. 통영 대회는 취소했으며 10/19 주는 최장거리 후 회복·흡수에 사용. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
     html += '<table><thead><tr><th>판정 시점</th><th>통과 기준</th><th>의미</th></tr></thead><tbody>\n'
     for timing, criterion, implication in kobe_checks:
         html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
