@@ -6747,19 +6747,19 @@
   },
   "2026-09-03": {
     "date": "2026-09-03",
-    "steps": 363,
+    "steps": 6315,
     "stress": {
-      "avg": 26,
+      "avg": 28,
       "max": 90,
-      "rest": 51.36,
-      "low": 24.53,
-      "medium": 7.97,
-      "high": 2.1
+      "rest": 41.59,
+      "low": 29.57,
+      "medium": 7.42,
+      "high": 1.36
     },
     "body_battery": {
       "max": 40,
       "min": 5,
-      "start": 36
+      "start": 22
     },
     "resting_hr": 48,
     "sleep": {
