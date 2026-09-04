@@ -13428,5 +13428,54 @@
       }
     ],
     "is_brick": true
+  },
+  "2026-09-04": {
+    "planned": "🏊 수영 0.8~1.0km Easy",
+    "done": true,
+    "actual": "수영 1500m 31분 @2:05/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1500,
+      "duration_min": 31.4,
+      "moving_min": 31.4,
+      "pace_per_100m": "2:05",
+      "avg_hr": 133,
+      "max_hr": 153,
+      "swolf": 43,
+      "strokes": 682,
+      "avg_spm": null,
+      "training_load": 65
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.5 / 무산소 1.3 | 부하 65",
+    "garmin_id": 24231394775,
+    "start_time": "15:03",
+    "garmin_ids": [
+      24231394775
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1500,
+        "duration_sec": 1884.0,
+        "avg_hr": 133,
+        "max_hr": 153,
+        "avg_pace": "2:05",
+        "avg_speed": null,
+        "training_load": 65,
+        "garmin_id": 24231394775,
+        "laps": null,
+        "open_water": false,
+        "start_time": "15:03",
+        "duration_min": 31.4,
+        "moving_min": 31.4,
+        "pace_per_100m": "2:05",
+        "swolf": 43,
+        "strokes": 682,
+        "avg_spm": null,
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
