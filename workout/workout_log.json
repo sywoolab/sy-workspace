@@ -13477,5 +13477,74 @@
         "feel": 50
       }
     ]
+  },
+  "2026-09-05": {
+    "planned": "🛏 휴식 + 장비·보급·T1/T2 최종 점검",
+    "done": true,
+    "actual": "OW 202m 5분 @2:09/100m + OW 205m 5분 @2:14/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 205,
+      "duration_min": 4.8,
+      "moving_min": 4.6,
+      "pace_per_100m": "2:14",
+      "avg_hr": 132,
+      "max_hr": 143,
+      "swolf": 50,
+      "strokes": 119,
+      "avg_spm": null,
+      "is_open_water": true,
+      "training_load": 12
+    },
+    "training_zone": "moderate",
+    "note": "유산소 0.3 | 부하 4 | 유산소 1.0 | 부하 12",
+    "garmin_id": 24242714011,
+    "start_time": "16:05",
+    "garmin_ids": [
+      24242713571,
+      24242714011
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 202,
+        "duration_sec": 276.0,
+        "avg_hr": 110,
+        "max_hr": 120,
+        "avg_pace": "2:09",
+        "avg_speed": null,
+        "training_load": 4,
+        "garmin_id": 24242713571,
+        "laps": null,
+        "open_water": true,
+        "start_time": "16:05",
+        "duration_min": 4.6,
+        "moving_min": 4.3,
+        "pace_per_100m": "2:09",
+        "swolf": 50,
+        "strokes": 122,
+        "avg_spm": null,
+        "rpe": 4,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 205,
+        "duration_min": 4.8,
+        "moving_min": 4.6,
+        "pace_per_100m": "2:14",
+        "avg_hr": 132,
+        "max_hr": 143,
+        "swolf": 50,
+        "strokes": 119,
+        "avg_spm": null,
+        "is_open_water": true,
+        "training_load": 12,
+        "garmin_id": 24242714011,
+        "start_time": "16:15",
+        "rpe": 4,
+        "feel": 50
+      }
+    ]
   }
 }
