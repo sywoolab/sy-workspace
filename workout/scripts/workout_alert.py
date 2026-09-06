@@ -39,15 +39,13 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
-# 대회일 & 훈련 시작일
-RACE_TURTLE    = datetime(2026, 9, 6, tzinfo=KST)   # 거북섬 올림픽 (B레이스, 신청완료, 9/4~6)
-RACE_TONGYEONG = datetime(2026, 10, 25, tzinfo=KST)  # 통영 월드컵 (신청완료, 시즌 마무리 참가/완주)
-RACE_DAY = RACE_TONGYEONG  # 하위 호환 (format_week 캡용)
+# 현재 목표 대회: 고베 마라톤. 거북섬은 2026-09-06 완료 이력이다.
+RACE_KOBE = datetime(2026, 11, 15, tzinfo=KST)
+RACE_DAY = RACE_KOBE
 TRAIN_START  = datetime(2026, 3, 16, tzinfo=KST)  # 시즌 시작 (기록 기준)
 RESTART_DATE = datetime(2026, 7, 7, tzinfo=KST)   # 발치 후 복귀 재시작
-DAYS_LEFT_TURTLE    = (RACE_TURTLE.date()    - NOW.date()).days
-DAYS_LEFT_TONGYEONG = (RACE_TONGYEONG.date() - NOW.date()).days
-DAYS_LEFT = DAYS_LEFT_TONGYEONG  # 하위 호환
+DAYS_LEFT_KOBE = (RACE_KOBE.date() - NOW.date()).days
+DAYS_LEFT = DAYS_LEFT_KOBE
 
 # 주차 계산 (훈련 시작일 기준, 월요일 시작)
 def get_week_number(dt):
@@ -60,8 +58,9 @@ CURRENT_WEEK = get_week_number(NOW)
 PHASE1_END    = datetime(2026, 7, 26, tzinfo=KST).date()   # 베이스 복귀 종료
 PHASE2_END    = datetime(2026, 8, 30, tzinfo=KST).date()   # 거북섬 전 빌드업 종료
 PHASE3_END    = datetime(2026, 9, 6, tzinfo=KST).date()    # 거북섬 B레이스 주
-RECOVERY_END  = datetime(2026, 10, 11, tzinfo=KST).date()  # 통영 빌드 종료
-TAPER_END     = datetime(2026, 10, 25, tzinfo=KST).date()  # 통영 테이퍼/대회
+RECOVERY_END  = datetime(2026, 9, 13, tzinfo=KST).date()
+BUILD_END     = datetime(2026, 10, 25, tzinfo=KST).date()
+TAPER_END     = RACE_KOBE.date()
 
 def get_phase(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
@@ -74,10 +73,12 @@ def get_phase(dt):
     elif d <= PHASE3_END:
         return 3, "Phase 3: 거북섬 B레이스"
     elif d <= RECOVERY_END:
-        return 4, "Phase 4: 통영 빌드"
+        return 4, "Phase 4: 거북섬 회복·마라톤 전환"
+    elif d <= BUILD_END:
+        return 5, "Phase 5: 고베 sub-4 빌드"
     elif d <= TAPER_END:
-        return 5, "Phase 5: 통영 테이퍼"
-    return 6, "시즌 완료"
+        return 6, "Phase 6: 고베 피크·테이퍼"
+    return 7, "고베 마라톤 완료"
 
 phase, phase_name = get_phase(NOW)
 
@@ -102,12 +103,12 @@ WEEK_NAMES = {
     23: "W8: 빌드업 ⑤",
     24: "W9: 빌드업 ⑥",
     25: "W10: 거북섬 B레이스",
-    26: "W11: 회복+재빌드",
-    27: "W12: 통영 빌드 ①",
-    28: "W13: 통영 빌드 ②",
-    29: "W14: 통영 빌드 ③",
-    30: "W15: 통영 테이퍼",
-    31: "W16: 시즌 마무리 회복",
+    26: "W11: 거북섬 회복·고베 전환",
+    27: "W12: 고베 빌드 ①", 28: "W13: 고베 빌드 ②",
+    29: "W14: 고베 빌드 ③", 30: "W15: 고베 빌드 ④",
+    31: "W16: 고베 피크", 32: "W17: 고베 흡수",
+    33: "W18: 고베 테이퍼 ①", 34: "W19: 고베 테이퍼 ②",
+    35: "W20: 고베 레이스 주",
 }
 
 # 요일별 운동 스케줄 (Phase별)
@@ -139,23 +140,29 @@ SCHEDULE = {
         5: ("거북섬 준비", "장비 점검 + 짧은 감각 유지"),
         6: ("대회", "거북섬 올림픽 B레이스 — 실전점검 + 완주"),
     },
-    4: {  # Phase 4: 통영 빌드 (9/7~10/11)
-        0: ("수영 수업", ""),
-        1: ("러닝 템포", "난코스 대비 5:15~5:25 지속주"),
-        2: ("수영 수업", ""),
-        3: ("러닝 Easy/롱런", "8~12km Easy, HR 145 이하"),
-        4: ("수영 수업", ""),
-        5: ("자전거 + 브릭런", "토/일 중 1회. 자전거 60~90km → 러닝 3~6km"),
-        6: ("자전거/브릭 예비일", "토요일 미실시 시 오늘 진행, 실시했으면 회복"),
+    4: {
+        0: ("완전 휴식", "거북섬 다음날 충격 회복"),
+        1: ("회복 수영 또는 휴식", "1.0~1.3km Easy"),
+        2: ("수영 수업", "기술·Easy"),
+        3: ("러닝 Easy", "5~6km, 통증·피로 없을 때만"),
+        4: ("수영 Easy 또는 휴식", "회복 우선"),
+        5: ("러닝 Easy", "5~6km, 강도 금지"),
+        6: ("롱런", "12~14km Easy, 회복 미흡 시 8~10km"),
     },
-    5: {  # Phase 5: 통영 테이퍼 (10/12~10/25)
-        0: ("수영 수업", ""),
-        1: ("러닝", "5km @5:10~5:20"),
-        2: ("수영 수업", ""),
-        3: ("러닝", "3km Easy + 스트라이드"),
-        4: ("수영 가볍게", "1km"),
-        5: ("대회 준비", "통영 장비 점검 + 이동/검수"),
-        6: ("대회", "통영 월드컵 — 시즌 마무리 참가/완주, 난코스 무리 금지"),
+    5: {
+        0: ("수영 Easy 또는 휴식", "회복 보조"),
+        1: ("러닝 품질", "WU/CD 포함 7~10km; 템포 또는 MP, 강도는 주 1회"),
+        2: ("수영 수업", "기술·Easy"),
+        3: ("러닝 Easy", "7~10km, 대화 가능한 강도"),
+        4: ("수영 Easy 또는 휴식", "롱런 전 피로 제거"),
+        5: ("러닝 Easy", "5~8km + 스트라이드 4~6회"),
+        6: ("롱런", "주간 목표에 따른 평지 롱런 + 보급 연습"),
+    },
+    6: {
+        0: ("완전 휴식", ""), 1: ("러닝 MP 터치", "볼륨 축소, 감각 유지"),
+        2: ("수영 Easy", "회복"), 3: ("러닝 Easy", "5~8km"),
+        4: ("완전 휴식", ""), 5: ("러닝 Easy", "3~5km + 스트라이드"),
+        6: ("롱런/대회", "테이퍼 주차 목표에 따름"),
     },
 }
 
@@ -211,14 +218,19 @@ PHASE_GOALS = {
         "min": "과훈련 금지, 감각 유지만",
     },
     4: {
-        "goal": "통영 빌드 — 거북섬 피드백 반영, 시즌 마무리 참가/완주",
-        "volume": "수영 월수금 / 러닝 화목주말 3회(18~26km) / 자전거 토일 중 1~2회",
-        "min": "화 템포 + 목 Easy/롱런 + 주말 브릭런 필수",
+        "goal": "거북섬 회복 후 고베 마라톤 러닝 4회 골격 전환",
+        "volume": "러닝 3회(22~28km) / 수영 1~2회 회복 보조",
+        "min": "통증 없이 Easy 러닝 재개, 피로 시 거리 축소",
     },
     5: {
-        "goal": "통영 테이퍼 — 기록보다 참가/완주, 난코스 무리 금지",
-        "volume": "수영 2~3회 / 러닝 2회(8km) / 자전거 1회(30분)",
-        "min": "볼륨 50~70% 감소, 강도 낮춤",
+        "goal": "고베 sub-4 빌드 — 주 4회 러닝, 롱런·보급 적응 우선",
+        "volume": "러닝 4회(주차별 30~46km) / 수영 1~2회 회복 보조",
+        "min": "품질 1회 + Easy 2회 + 평지 롱런 1회",
+    },
+    6: {
+        "goal": "고베 피크·테이퍼 — 강도 감각은 유지하고 볼륨만 감축",
+        "volume": "러닝 3~4회 / 수영 0~1회 Easy",
+        "min": "새 자극 금지, 수면·보급·페이스 전략 고정",
     },
 }
 
@@ -756,7 +768,7 @@ def format_morning():
     est = analysis.get('estimated_finish', '?')
     status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
     vdot = analysis.get('vdot', '?')
-    lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 통영 D-{DAYS_LEFT_TONGYEONG} 참가/완주 | 예상 {est} {status_icon} | VDOT {vdot}")
+    lines.append(f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | 목표 3:55 · sub-4 방어 · 무보행 | VDOT {vdot}")
     lines.append("")
 
     # 훈련 진척도
@@ -778,7 +790,7 @@ def format_morning():
 
     # 다음 주 (대회 후가 아니면)
     next_week = CURRENT_WEEK + 1
-    if next_week <= 7:
+    if NOW.date() + timedelta(days=7) <= RACE_DAY.date():
         lines.append(format_week(next_week, is_current_week=False))
         lines.append("")
 
@@ -945,9 +957,9 @@ def format_recovery_scenario(missed_workout):
                 elif wtype == 'bike':
                     bike_count += 1
 
-    run_need = max(0, 3 - run_count)
+    run_need = max(0, 4 - run_count)
 
-    lines.append(f"  현재: 러닝 {run_count}/3 | 수영 {swim_count}/4 | 자전거 {bike_count}/1")
+    lines.append(f"  현재: 러닝 {run_count}/4 | 수영 {swim_count}회 | 자전거 {bike_count}회")
 
     if remaining <= 0:
         lines.append(f"  🔴 이번 주 마감 — 다음 주 볼륨 보충 필요")
@@ -992,7 +1004,7 @@ def format_evening():
         # 휴식일이어도 내일 코칭은 보내기
         coaching = format_tomorrow_coaching()
         if coaching:
-            lines = [f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 통영 D-{DAYS_LEFT_TONGYEONG} 참가/완주 | 😴 오늘은 휴식"]
+            lines = [f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | 😴 오늘은 휴식"]
             lines.append("")
             lines.append(coaching)
             return "\n".join(lines)
@@ -1003,7 +1015,7 @@ def format_evening():
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
-        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 통영 D-{DAYS_LEFT_TONGYEONG} 참가/완주 | ✅ 오늘 운동 완료!")
+        lines.append(f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
@@ -1025,7 +1037,7 @@ def format_evening():
                 lines.append(f"  → {actual}")
     else:
         # 미완료 → 리마인드 + 복구 시나리오
-        lines.append(f"🏁 거북섬 D-{DAYS_LEFT_TURTLE} sub-2:40 | 통영 D-{DAYS_LEFT_TONGYEONG} 참가/완주 | ⚠️ 오늘 운동 기록이 없습니다!")
+        lines.append(f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | ⚠️ 오늘 운동 기록이 없습니다!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if detail:

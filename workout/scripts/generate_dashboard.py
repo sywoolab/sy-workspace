@@ -191,25 +191,23 @@ def main():
         today_dt = datetime.strptime(today_str, '%Y-%m-%d').replace(tzinfo=KST)
         cutoff = (today_dt - timedelta(days=14)).strftime('%Y-%m-%d')
 
-        swim_cnt = bike_cnt = run_cnt = brick_cnt = 0
-        bike_km_total = run_km_total = 0
+        swim_cnt = bike_cnt = run_cnt = 0
+        run_km_total = longest_run = 0
         last_run_date = None
 
         for dk in sorted(log.keys(), reverse=True):
             if dk < cutoff: break
             e = log[dk]
-            types = {m.get('type') for m in e.get('all_metrics', [])}
             for m in e.get('all_metrics', []):
                 t = m.get('type')
                 if t == 'swim': swim_cnt += 1
-                elif t == 'bike':
-                    bike_cnt += 1
-                    bike_km_total += m.get('distance_km') or (m.get('distance_m') or 0)/1000
+                elif t == 'bike': bike_cnt += 1
                 elif t == 'run':
                     run_cnt += 1
-                    run_km_total += m.get('distance_km') or m.get('distance_m', 0)/1000
+                    distance = m.get('distance_km') or m.get('distance_m', 0)/1000
+                    run_km_total += distance
+                    longest_run = max(longest_run, distance)
                     if last_run_date is None: last_run_date = dk
-            if {'bike', 'run'} <= types: brick_cnt += 1
 
         run_gap_days = (today_dt - datetime.strptime(last_run_date, '%Y-%m-%d').replace(tzinfo=KST)).days if last_run_date else 99
 
@@ -217,40 +215,27 @@ def main():
         # 러닝
         if run_gap_days >= 14:
             items.append({'sport': '🏃 러닝', 'status': 'bad',   'msg': f'{run_gap_days}일째 런 없음 — VDOT 정체·하락 위험'})
-        elif run_cnt < 2:
-            items.append({'sport': '🏃 러닝', 'status': 'warn',  'msg': f'주 {run_cnt/2:.1f}회 평균 — 목표(주 3회) 미달'})
+        elif run_cnt < 6:
+            items.append({'sport': '🏃 러닝 빈도', 'status': 'warn', 'msg': f'14일 {run_cnt}회 — 고베 목표 주 4회 골격 복구 필요'})
         else:
-            items.append({'sport': '🏃 러닝', 'status': 'good',  'msg': f'14일 {run_cnt}회 {run_km_total:.0f}km'})
-        # 자전거
-        if bike_km_total >= 100:
-            items.append({'sport': '🚴 자전거', 'status': 'good', 'msg': f'14일 {bike_km_total:.0f}km — 볼륨 충분'})
-        elif bike_km_total >= 50:
-            items.append({'sport': '🚴 자전거', 'status': 'warn', 'msg': f'14일 {bike_km_total:.0f}km — 장거리 1회 추가 권장'})
+            items.append({'sport': '🏃 러닝 빈도', 'status': 'good', 'msg': f'14일 {run_cnt}회 {run_km_total:.0f}km'})
+        if longest_run >= 18:
+            items.append({'sport': '🛣️ 롱런', 'status': 'good', 'msg': f'최근 14일 최장 {longest_run:.1f}km'})
+        elif longest_run >= 14:
+            items.append({'sport': '🛣️ 롱런', 'status': 'warn', 'msg': f'최근 최장 {longest_run:.1f}km — 단계적으로 18km 이상 확대'})
         else:
-            items.append({'sport': '🚴 자전거', 'status': 'bad',  'msg': f'14일 {bike_km_total:.0f}km — 라이딩 부족'})
-        # 수영
-        if swim_cnt >= 4:
-            items.append({'sport': '🏊 수영', 'status': 'good',  'msg': f'14일 {swim_cnt}회 — 빈도 양호'})
-        elif swim_cnt >= 2:
-            items.append({'sport': '🏊 수영', 'status': 'warn',  'msg': f'14일 {swim_cnt}회 — 주 3회 목표 미달'})
-        else:
-            items.append({'sport': '🏊 수영', 'status': 'bad',   'msg': f'14일 {swim_cnt}회 — 빈도 부족'})
-        # 브릭
-        if brick_cnt >= 2:
-            items.append({'sport': '🔗 브릭',  'status': 'good',  'msg': f'14일 {brick_cnt}회 — 전환 감각 유지'})
-        elif brick_cnt == 1:
-            items.append({'sport': '🔗 브릭',  'status': 'warn',  'msg': '14일 1회 — 주 1회 이상 권장'})
-        else:
-            items.append({'sport': '🔗 브릭',  'status': 'bad',   'msg': '14일 0회 — 자전거→런 전환 감각 저하 중'})
+            items.append({'sport': '🛣️ 롱런', 'status': 'warn', 'msg': f'최근 최장 {longest_run:.1f}km — 이번 블록 핵심 보완'})
+        items.append({'sport': '🏊🚴 보조훈련', 'status': 'good',
+                      'msg': f'14일 수영 {swim_cnt}회·자전거 {bike_cnt}회 — 회복·유산소 보조로 운용'})
 
         bad_count = sum(1 for i in items if i['status'] == 'bad')
         warn_count = sum(1 for i in items if i['status'] == 'warn')
         if bad_count >= 2:
-            verdict = ('red', '개선 필요', '핵심 종목 공백 발생. 이번 주 러닝·브릭 우선 복구 필요.')
+            verdict = ('red', '개선 필요', '고베 sub-4 대비 러닝 빈도·롱런 기반을 우선 복구해야 함.')
         elif bad_count == 1 or warn_count >= 2:
-            verdict = ('yellow', '부분 보완 필요', '자전거 기반은 좋음. 러닝 빈도와 롱런을 높여야 고베 sub-4 가능성이 올라감.')
+            verdict = ('yellow', '마라톤 전환 중', '거북섬 회복 후 러닝 빈도와 롱런을 단계적으로 확대.')
         else:
-            verdict = ('green', '순항 중', '전 종목 균형 잡힘. 현재 페이스 유지.')
+            verdict = ('green', '순항 중', '고베 sub-4 러닝 골격을 유지하고 보조훈련은 회복 위주로 운용.')
 
         return items, verdict
 
@@ -259,9 +244,7 @@ def main():
     # ── 목표별 처방 계산 ──
     # race_targets: (대회날짜, 이름, 목표분)
     # 거북섬은 B레이스지만 사용자가 2026-08-11에 sub-2:40 목표를 명시했다.
-    race_targets = [
-        ("2026-09-06", "거북섬", 160),    # sub-2:40 (B레이스 목표)
-    ]
+    race_targets = []  # 철인 목표 처방은 시즌 종료. 고베 마라톤 로드맵을 사용한다.
 
     def _prescription(est, target_total_min):
         """현재 분할 → 목표 달성 처방 반환."""
@@ -332,7 +315,7 @@ def main():
         }
 
     races = [
-        ("2026-09-06", "거북섬 올림픽", "🎯 sub-2:40 · B레이스 목표"),
+        ("2026-11-15", "고베 마라톤", "🎯 3:55 · sub-4 방어 · 무보행"),
     ]
 
     now = datetime.now(KST)
@@ -379,9 +362,18 @@ def main():
     _today = _date.today()
     _week_start = str(_today - timedelta(days=6))
     week_entries = [e for e in entries if e['date'] >= _week_start]
-    week_swim = sum(m.get('distance_m',0) or 0 for e in week_entries for m in e['metrics'] if m.get('type')=='swim')
-    week_bike = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='bike')
-    week_run  = sum((m.get('distance_m',0) or 0)/1000 for e in week_entries for m in e['metrics'] if m.get('type')=='run')
+    week_swim = sum(m.get('distance_m', 0) or (m.get('distance_km', 0) or 0) * 1000
+                    for e in week_entries for m in e['metrics'] if m.get('type') == 'swim')
+    week_bike = sum(m.get('distance_km') or (m.get('distance_m', 0) or 0) / 1000
+                    for e in week_entries for m in e['metrics'] if m.get('type') == 'bike')
+    week_run = sum(m.get('distance_km') or (m.get('distance_m', 0) or 0) / 1000
+                   for e in week_entries for m in e['metrics'] if m.get('type') == 'run')
+    week_run_count = sum(1 for e in week_entries if any(m.get('type') == 'run' for m in e['metrics']))
+    recent_run_distances = [
+        m.get('distance_km') or (m.get('distance_m', 0) or 0) / 1000
+        for e in entries[-42:] for m in e['metrics'] if m.get('type') == 'run'
+    ]
+    recent_longest_run = max(recent_run_distances, default=0)
     week_tl   = sum(e['total_tl'] for e in week_entries)
 
     # ── 날짜 → 가민 활동 ID 매핑 (클릭 시 가민 커넥트로 이동) ──
@@ -418,7 +410,7 @@ def main():
     html = f"""<!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>철인3종 훈련 대시보드</title>
+<title>고베마라톤 sub-4 훈련 대시보드</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -455,7 +447,7 @@ tr:hover{{background:#15152a}}
 .tl-fill{{height:100%;border-radius:2px}}
 .tl7{{font-size:10px;color:#888}}
 </style></head><body>
-<h1>🏊‍♂️ 철인3종 훈련 대시보드</h1>
+<h1>🏃 고베마라톤 sub-4 훈련 대시보드</h1>
 <div class="sub">업데이트: {now_str}</div>
 """
 
@@ -463,23 +455,8 @@ tr:hover{{background:#15152a}}
     vc = {'red': '#ff6c6c', 'yellow': '#ffd56c', 'green': '#6affa0'}.get(diag_verdict[0], '#888')
     vi = {'red': '❌', 'yellow': '⚠️', 'green': '✅'}.get(diag_verdict[0], '📊')
 
-    # 다음 대회 + 예상 gap
-    next_race_name, next_race_gap_str = '', ''
-    if est:
-        total_m_for_gap = est.get('total', 0)
-        for rdate, rname, rgoal in races:
-            if days_until(rdate) > 0 and 'sub-' in rgoal:
-                target_min = target_minutes_from_goal(rgoal)
-                if target_min is None:
-                    continue
-                gap_min = round(total_m_for_gap - target_min)
-                next_race_name = rname
-                d_left = days_until(rdate)
-                if gap_min > 0:
-                    next_race_gap_str = f'D-{d_left} {rgoal} — 현재 {int(total_m_for_gap)//60}:{int(total_m_for_gap)%60:02d} 예상, <span style="color:#ff6c6c">-{gap_min}분 필요</span>'
-                else:
-                    next_race_gap_str = f'D-{d_left} {rgoal} — <span style="color:#6affa0">달성 가능 (+{abs(gap_min)}분 여유)</span>'
-                break
+    next_race_name = '고베 마라톤'
+    next_race_gap_str = f'D-{days_until("2026-11-15")} · 목표 3:55 · sub-4 방어 · 전 구간 무보행'
 
     # 오늘 요약: 실제 수행이 있으면 계획보다 우선 표시
     today_entry = log.get(today) or {}
@@ -534,10 +511,10 @@ tr:hover{{background:#15152a}}
                  f'<div class="sub-val">{goal}</div>'
                  f'</div>\n')
 
-    html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_swim//100/10:.1f}km</div><div class="label">7일 수영</div></div>
-<div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">7일 자전거</div></div>
-<div class="card"><div class="val" style="color:#6ab4ff">{week_run:.0f}km</div><div class="label">7일 러닝</div></div>
-<div class="card"><div class="val" style="color:#ff6aff">{int(week_tl)}</div><div class="label">7일 누적부하</div></div>
+    html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_run:.1f}km</div><div class="label">최근 7일 러닝</div></div>
+<div class="card"><div class="val" style="color:#6ab4ff">{week_run_count}/4</div><div class="label">최근 7일 러닝 횟수</div></div>
+<div class="card"><div class="val" style="color:#ffd56c">{recent_longest_run:.1f}km</div><div class="label">최근 6주 최장거리</div></div>
+<div class="card"><div class="val" style="color:#aaa">{week_swim//100/10:.1f}km</div><div class="label">보조훈련 · 7일 수영</div><div class="sub-val">자전거 {week_bike:.0f}km · 총부하 {int(week_tl)}</div></div>
 </div>
 """
 

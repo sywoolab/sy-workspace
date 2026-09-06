@@ -806,6 +806,34 @@
       "auto": false,
       "rule": "2026-08-11 geobukseom-sub240-plan"
     },
+    "2026-09-07": {
+      "date": "2026-09-07", "workout": "🛏 완전 휴식", "detail": "거북섬 다음날. 러닝 충격과 총부하 회복, 보충운동 금지.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
+    "2026-09-08": {
+      "date": "2026-09-08", "workout": "🏊 회복 수영 또는 휴식", "detail": "1.0~1.3km Easy. 다리 통증·피로가 남으면 완전 휴식.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
+    "2026-09-09": {
+      "date": "2026-09-09", "workout": "🏊 수영 수업", "detail": "기술·Easy 중심, 하체 강도 최소화.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
+    "2026-09-10": {
+      "date": "2026-09-10", "workout": "🏃 러닝 Easy 5~6km", "detail": "대화 가능한 강도. 관절·힘줄 통증 또는 비정상 피로 시 중단.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
+    "2026-09-11": {
+      "date": "2026-09-11", "workout": "🏊 수영 Easy 또는 휴식", "detail": "회복 목적. 주말 러닝을 위해 피로를 만들지 않음.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
+    "2026-09-12": {
+      "date": "2026-09-12", "workout": "🏃 러닝 Easy 5~6km", "detail": "평지 위주, 강도 금지. 일요일 롱런 전 다리 상태 확인.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
+    "2026-09-13": {
+      "date": "2026-09-13", "workout": "🏃 롱런 12~14km Easy", "detail": "거북섬 회복이 완전할 때만. 회복 미흡 시 8~10km로 축소하고 거리 보충 금지.",
+      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+    },
     "2026-10-25": {
       "date": "2026-10-25",
       "workout": "통영 월드컵 — 참가 취소 (운동 일정 아님)",
@@ -880,10 +908,10 @@
     }
   ],
   "season_target": {
-    "next_race": "2026-09-04~06 거북섬 올림픽 (B레이스, 신청완료, 목표 sub-2:40)",
-    "target_time": "거북섬 B레이스는 훈련형으로 운영 / 고베 마라톤 11/15: 목표 3:55, 1차 방어선 sub-4:00, 전 구간 무보행",
-    "reasoning": "2026-09-03 사용자 확인: 통영 월드컵 참가 취소. 거북섬 이후 훈련 우선순위를 고베 마라톤 sub-4로 전환하고 주 4회 러닝, 주간 볼륨, 평지 롱런과 보급 적응을 중심으로 운영한다.",
-    "fall_target": "거북섬 올림픽 9/6(훈련형 운영) → 고베 마라톤 11/15(목표 3:55, sub-4 방어, 무보행)",
+    "next_race": "2026-11-15 고베 마라톤 (신청완료, 목표 3:55, sub-4 방어, 전 구간 무보행)",
+    "target_time": "고베 마라톤 11/15: 목표 3:55, 1차 방어선 sub-4:00, 전 구간 무보행",
+    "reasoning": "2026-09-06 거북섬 올림픽 완주 후 고베 마라톤 sub-4를 단일 최우선 목표로 전환. 주 4회 러닝, 주간 볼륨, 평지 롱런과 보급 적응을 중심으로 운영한다.",
+    "fall_target": "거북섬 올림픽 9/6 완료 → 고베 마라톤 11/15(목표 3:55, sub-4 방어, 무보행)",
     "long_term_2027": "하프 아이언맨 70.3 도전"
   },
   "weekly_goals": {

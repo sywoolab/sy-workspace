@@ -35,13 +35,13 @@ SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 HEALTH_FILE = os.path.join(BASE_DIR, 'data', 'garmin_health.json')
 QUEUE_FILE = os.path.join(BASE_DIR, 'data', 'improvement_queue.json')
 
-RACE_DAY = datetime(2026, 5, 10, tzinfo=KST)
-TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
+RACE_DAY = datetime(2026, 11, 15, tzinfo=KST)
+TRAIN_START = datetime(2026, 9, 7, tzinfo=KST)
 
 # Phase 경계일
-PHASE1_END = datetime(2026, 4, 5, tzinfo=KST).date()
-PHASE2_END = datetime(2026, 4, 26, tzinfo=KST).date()
-PHASE3_END = datetime(2026, 5, 10, tzinfo=KST).date()
+PHASE1_END = datetime(2026, 9, 13, tzinfo=KST).date()
+PHASE2_END = datetime(2026, 10, 25, tzinfo=KST).date()
+PHASE3_END = RACE_DAY.date()
 
 # 텔레그램 (운동 봇 fallback 체인)
 BOT_TOKEN = (os.environ.get('BOT_TOKEN')
@@ -79,40 +79,40 @@ VDOT_TABLE = [
 # 요일: 0=월 ~ 6=일
 # ============================================================
 BASE_SCHEDULE = {
-    1: {  # Phase 1: 베이스
-        0: {"workout": "수영 수업", "detail": "", "type": "swim"},
-        1: {"workout": "러닝 Easy", "detail": "5~6km @6:00+", "type": "run", "base_km": 6},
-        2: {"workout": "수영 수업", "detail": "", "type": "swim"},
-        3: {"workout": "러닝 + 코어", "detail": "6~7km + 코어 15분", "type": "run", "base_km": 7},
-        4: {"workout": "수영 수업", "detail": "", "type": "swim"},
-        5: {"workout": "브릭 → 수영", "detail": "자전거 60분 → 러닝 5km → 수영", "type": "brick", "base_km": 5},
-        6: {"workout": "완전 휴식", "detail": "", "type": "rest"},
+    1: {  # 거북섬 회복·마라톤 전환
+        0: {"workout": "완전 휴식", "detail": "거북섬 다음날", "type": "rest"},
+        1: {"workout": "회복 수영 또는 휴식", "detail": "1.0~1.3km Easy", "type": "swim"},
+        2: {"workout": "수영 수업", "detail": "기술·Easy", "type": "swim"},
+        3: {"workout": "러닝 Easy", "detail": "5~6km", "type": "run", "base_km": 6},
+        4: {"workout": "수영 Easy 또는 휴식", "detail": "회복 우선", "type": "swim"},
+        5: {"workout": "러닝 Easy", "detail": "5~6km", "type": "run", "base_km": 6},
+        6: {"workout": "롱런", "detail": "12~14km Easy", "type": "run", "base_km": 13},
     },
-    2: {  # Phase 2: 빌드
-        0: {"workout": "수영 수업", "detail": "", "type": "swim"},
-        1: {"workout": "러닝 템포", "detail": "7km: 2up→3@5:10→2dn", "type": "run", "base_km": 7},
-        2: {"workout": "수영 수업", "detail": "", "type": "swim"},
-        3: {"workout": "러닝 Easy", "detail": "7~8km Easy", "type": "run", "base_km": 8},
-        4: {"workout": "수영 수업", "detail": "", "type": "swim"},
-        5: {"workout": "브릭 → 수영", "detail": "자전거 75~90분 → 러닝 5km → 수영", "type": "brick", "base_km": 5},
-        6: {"workout": "완전 휴식", "detail": "", "type": "rest"},
+    2: {  # 고베 sub-4 빌드
+        0: {"workout": "수영 Easy 또는 휴식", "detail": "회복 보조", "type": "swim"},
+        1: {"workout": "러닝 품질", "detail": "WU/CD 포함 7~10km, 강도 주 1회", "type": "run", "base_km": 8},
+        2: {"workout": "수영 수업", "detail": "기술·Easy", "type": "swim"},
+        3: {"workout": "러닝 Easy", "detail": "7~10km 대화 가능 강도", "type": "run", "base_km": 8},
+        4: {"workout": "수영 Easy 또는 휴식", "detail": "롱런 전 피로 제거", "type": "swim"},
+        5: {"workout": "러닝 Easy", "detail": "5~8km + 스트라이드", "type": "run", "base_km": 6},
+        6: {"workout": "롱런", "detail": "주차별 평지 롱런 + 보급 연습", "type": "run", "base_km": 20},
     },
-    3: {  # Phase 3: 테이퍼
-        0: {"workout": "수영 수업", "detail": "가볍게", "type": "swim"},
-        1: {"workout": "러닝", "detail": "6km 레이스 페이스", "type": "run", "base_km": 6},
-        2: {"workout": "수영 수업", "detail": "가볍게", "type": "swim"},
-        3: {"workout": "러닝 Easy", "detail": "4km + 스트라이드", "type": "run", "base_km": 4},
-        4: {"workout": "수영 가볍게", "detail": "1km", "type": "swim"},
-        5: {"workout": "수영 개인교습", "detail": "사이팅 연습", "type": "swim"},
-        6: {"workout": "완전 휴식", "detail": "", "type": "rest"},
+    3: {  # 피크·테이퍼
+        0: {"workout": "완전 휴식", "detail": "", "type": "rest"},
+        1: {"workout": "러닝 MP 터치", "detail": "볼륨 축소, 감각 유지", "type": "run", "base_km": 7},
+        2: {"workout": "수영 Easy", "detail": "회복", "type": "swim"},
+        3: {"workout": "러닝 Easy", "detail": "5~8km", "type": "run", "base_km": 6},
+        4: {"workout": "완전 휴식", "detail": "", "type": "rest"},
+        5: {"workout": "러닝 Easy", "detail": "3~5km + 스트라이드", "type": "run", "base_km": 4},
+        6: {"workout": "롱런/대회", "detail": "테이퍼 주차 목표", "type": "run", "base_km": 12},
     },
 }
 
 # Phase별 주간 목표
 PHASE_TARGETS = {
-    1: {"swim": 4, "run": 3, "run_km": 20, "bike": 1, "weekly_load": 300},
-    2: {"swim": 3, "run": 3, "run_km": 21, "bike": 2, "weekly_load": 380},
-    3: {"swim": 2, "run": 2, "run_km": 10, "bike": 1, "weekly_load": 200},
+    1: {"swim": 2, "run": 3, "run_km": 24, "bike": 0, "weekly_load": 300},
+    2: {"swim": 1, "run": 4, "run_km": 38, "bike": 0, "weekly_load": 450},
+    3: {"swim": 1, "run": 3, "run_km": 22, "bike": 0, "weekly_load": 280},
 }
 
 # Override 우선순위 (낮을수록 높은 우선순위)
@@ -164,12 +164,12 @@ def seconds_to_pace(secs):
 def get_phase(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
     if d <= PHASE1_END:
-        return 1, "Phase 1: 베이스"
+        return 1, "Phase 1: 거북섬 회복·마라톤 전환"
     elif d <= PHASE2_END:
-        return 2, "Phase 2: 빌드"
+        return 2, "Phase 2: 고베 sub-4 빌드"
     elif d <= PHASE3_END:
-        return 3, "Phase 3: 테이퍼"
-    return 0, "대회 완료"
+        return 3, "Phase 3: 고베 피크·테이퍼"
+    return 0, "고베 마라톤 완료"
 
 
 def get_phase_end_date(phase):

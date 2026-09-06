@@ -310,8 +310,35 @@ def reg_status_label(status, reg_period):
         return '⚪', status if status else '미정'
 
 
-def format_triathlon_message(events):
-    """텔레그램 메시지 포맷 - 대회일순, 가독성 중심"""
+def event_key(event):
+    """대회 식별키. 상세 URL을 우선하고 없으면 이름을 사용."""
+    return event.get('url') or event.get('name', '').strip()
+
+
+def registration_changes(events, known_events):
+    """신규 대회와 접수에 직접 관련된 변경만 반환한다."""
+    known = {event_key(e): e for e in known_events if event_key(e)}
+    changes = []
+    for event in events:
+        key = event_key(event)
+        if not key:
+            continue
+        previous = known.get(key)
+        if previous is None:
+            changes.append(('신규 대회', event, None))
+            continue
+        changed_fields = [
+            field for field in ('status', 'reg_period')
+            if (event.get(field) or '').strip() != (previous.get(field) or '').strip()
+        ]
+        if changed_fields:
+            changes.append(('접수 변경', event, previous))
+    return changes
+
+
+def format_triathlon_message(changes):
+    """텔레그램 메시지 포맷 - 신규 대회/접수 변경만 표시."""
+    events = [item[1] for item in changes]
     if not events:
         return None
 
@@ -335,8 +362,8 @@ def format_triathlon_message(events):
 
     future.sort(key=sort_key)
 
-    lines = [f'🏊🚴🏃 <b>철인3종 대회 일정</b> ({TODAY})']
-    lines.append('🟢접수중 🟡접수예정 🔴마감')
+    change_by_key = {event_key(event): (kind, previous) for kind, event, previous in changes}
+    lines = [f'🔔 <b>철인3종 접수 신규 알림</b> ({TODAY})']
     lines.append('')
 
     current_month = None
@@ -387,8 +414,8 @@ def format_triathlon_message(events):
         else:
             name_line = name_escaped
 
-        # 한 줄: 이모지 날짜 | 대회명
-        lines.append(f'{emoji} <b>{short_date}</b> ({dday}) {name_line}')
+        kind, previous = change_by_key.get(event_key(e), ('접수 변경', None))
+        lines.append(f'{emoji} <b>[{kind}] {short_date}</b> ({dday}) {name_line}')
 
         # 두번째 줄: 장소 + 접수 상태
         detail_parts = []
@@ -397,11 +424,14 @@ def format_triathlon_message(events):
             loc_short = re.match(r'[가-힣]+(?:특별자치도)?\s+[가-힣]+[시군구]', location)
             detail_parts.append(loc_short.group() if loc_short else location[:20])
         detail_parts.append(reg_label)
+        if previous is not None:
+            old_status = previous.get('status') or '미정'
+            old_period = previous.get('reg_period') or '일정 미정'
+            detail_parts.append(f'기존: {old_status} / {old_period}')
         lines.append(f'   {" | ".join(detail_parts)}')
         lines.append('')
 
-    # 요약
-    lines.append(f'접수중 {count_open} / 예정 {count_upcoming} / 마감 {count_closed}')
+    lines.append(f'신규·접수변경 {len(future)}건')
     lines.append(f'🔗 https://www.triathlon.or.kr/events/tour/')
 
     return '\n'.join(lines)
@@ -424,6 +454,8 @@ def main():
 
     print(f"[{NOW}] 철인3종 대회 모니터링")
 
+    known_events = load_known_events()
+
     # 크롤링
     events = fetch_events()
     print(f"  수집된 대회: {len(events)}건")
@@ -431,10 +463,12 @@ def main():
     for e in events:
         print(f"    {e.get('status', '?'):6s} | {e.get('name', '?'):30s} | {e.get('date', '?')}")
 
-    # 저장
+    changes = registration_changes(events, known_events)
+
+    # 전체 스냅샷은 항상 저장
     save_events(events)
 
-    # 미래 대회가 있으면 전송 (접수 상태 무관)
+    # 미래 대회의 신규 등록 또는 접수 상태/기간 변경만 전송
     today_dt = NOW.replace(hour=0, minute=0, second=0, microsecond=0)
     future = [e for e in events if parse_event_date(e.get('date', '')) and parse_event_date(e.get('date', '')) >= today_dt]
 
@@ -443,7 +477,13 @@ def main():
         return
 
     # 메시지 생성 & 전송
-    msg = format_triathlon_message(events)
+    future_keys = {event_key(e) for e in future}
+    changes = [c for c in changes if event_key(c[1]) in future_keys]
+    if not changes:
+        print("  접수 관련 신규 변동 없음 — 텔레그램 미전송")
+        return
+
+    msg = format_triathlon_message(changes)
     if msg:
         ok = send_telegram(msg)
         print(f"  텔레그램 전송: {'성공' if ok else '실패'}")
