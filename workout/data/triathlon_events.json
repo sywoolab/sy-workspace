@@ -41,7 +41,7 @@
     "reg_period": "접수마감"
   },
   {
-    "status": "접수예정",
+    "status": "접수중",
     "name": "2026 철인3종 10차 대회규정 정기교육",
     "location": "온라인 ZOOM",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2119&page=1&sYear=2026&vType=list&field=&keyword=",
@@ -96,7 +96,7 @@
     "location": "온라인 ZOOM",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2113&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.09.02",
-    "reg_period": "2026-07-08 14:00 ~ 2026-09-01 23:59"
+    "reg_period": "접수마감"
   },
   {
     "status": "접수마감",
