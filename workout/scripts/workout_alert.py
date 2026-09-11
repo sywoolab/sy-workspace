@@ -101,14 +101,13 @@ WEEK_NAMES = {
     21: "W6: 빌드업 ③",
     22: "W7: 빌드업 ④",
     23: "W8: 빌드업 ⑤",
-    24: "W9: 빌드업 ⑥",
-    25: "W10: 거북섬 B레이스",
-    26: "W11: 거북섬 회복·고베 전환",
-    27: "W12: 고베 빌드 ①", 28: "W13: 고베 빌드 ②",
-    29: "W14: 고베 빌드 ③", 30: "W15: 고베 빌드 ④",
-    31: "W16: 고베 피크", 32: "W17: 고베 흡수",
-    33: "W18: 고베 테이퍼 ①", 34: "W19: 고베 테이퍼 ②",
-    35: "W20: 고베 레이스 주",
+    24: "W10: 거북섬 B레이스",
+    25: "W11: 거북섬 회복·고베 전환",
+    26: "W12: 고베 빌드 ①", 27: "W13: 고베 빌드 ②",
+    28: "W14: 고베 빌드 ③", 29: "W15: 고베 빌드 ④",
+    30: "W16: 고베 피크", 31: "W17: 고베 흡수",
+    32: "W18: 고베 테이퍼 ①", 33: "W19: 고베 테이퍼 ②",
+    34: "W20: 고베 레이스 주",
 }
 
 # 요일별 운동 스케줄 (Phase별)
@@ -243,6 +242,8 @@ DOW_EMOJI = {
     '아쿠아슬론': '🏁',
     '오픈워터': '🌊',
     '러닝': '🏃',
+    '롱런': '🏃',
+    '품질런': '🏃',
     '자전거': '🚴',
     '수영': '🏊',
     '휴식': '😴',
@@ -643,7 +644,7 @@ def format_fitness_split(analysis):
 
 
 def format_training_progress(analysis):
-    """전체 훈련 진척도 — 대회 목표 달성 트래킹"""
+    """고베 마라톤 훈련 진척도 — 러닝 거리·빈도 중심."""
     lines = []
     lines.append("📈 훈련 진척도")
 
@@ -662,45 +663,38 @@ def format_training_progress(analysis):
         "🟡" if isinstance(vdot, (int, float)) and vdot >= 37 else "🔴")
     lines.append(f"  VDOT: {vdot} → 목표 39 {vdot_icon}")
 
-    # 브릭/OW 카운트 — 로그에서 동적 계산 (schedule 정적 필드는 stale 가능, 2026-06-07 근본 수정)
-    try:
-        from workout_analysis import count_bricks, count_ow
-        brick_count = count_bricks(WORKOUT_LOG)
-        ow_count = count_ow(WORKOUT_LOG)
-    except Exception as e:
-        if not isinstance(e, ImportError):
-            # L0 §자동화 산출물 검증 — fallback 발동 사유 노출 (무음 회귀 금지)
-            print(f"[WARN] 브릭/OW 동적 계산 실패: {e} → schedule 정적 필드 fallback")
+    # 이번 주 실제 러닝은 오래된 철인 분석값이 아니라 로그에서 직접 집계한다.
+    week_monday = NOW.date() - timedelta(days=NOW.weekday())
+    week_sunday = week_monday + timedelta(days=6)
+    run_count = 0
+    run_km = 0.0
+    longest_km = 0.0
+    for date_key, entry in WORKOUT_LOG.items():
         try:
-            with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
-                schedule = json.load(f)
-            brick_count = schedule.get('brick_count', 0)
-            ow_count = schedule.get('ow_count', 0)
-        except (FileNotFoundError, json.JSONDecodeError):
-            brick_count = 0
-            ow_count = 0
+            d = datetime.strptime(date_key, '%Y-%m-%d').date()
+        except (TypeError, ValueError):
+            continue
+        if not (week_monday <= d <= week_sunday) or not entry.get('done'):
+            continue
+        metrics_list = entry.get('all_metrics') or [entry.get('metrics', {})]
+        day_run_km = 0.0
+        for metrics in metrics_list:
+            if metrics.get('type') != 'run':
+                continue
+            km = metrics.get('distance_km')
+            if km is None:
+                km = (metrics.get('distance_m') or 0) / 1000
+            day_run_km += float(km or 0)
+        if day_run_km > 0:
+            run_count += 1
+            run_km += day_run_km
+            longest_km = max(longest_km, day_run_km)
 
-    brick_icon = "🟢" if brick_count >= 6 else ("🟡" if brick_count >= 3 else "🔴")
-    ow_icon = "🟢" if ow_count >= 3 else ("🟡" if ow_count >= 1 else "🔴")
-    lines.append(f"  브릭: {brick_count}/6회 {brick_icon} | OW: {ow_count}/3회 {ow_icon}")
-
-    # 러닝 주간 빈도 (이번 주)
-    weekly = analysis.get('weekly_summary', {})
-    run_info = weekly.get('run', {})
-    run_count = run_info.get('count', 0)
-    run_target = run_info.get('target', 3)
-    run_icon = "🟢" if run_count >= run_target else ("🟡" if run_count >= run_target - 1 else "🔴")
-    lines.append(f"  금주 러닝: {run_count}/{run_target}회 {run_icon}")
-
-    # 목표 달성 전망
-    est = analysis.get('estimated_finish', '?')
-    status = analysis.get('status', '')
-    if status == 'green':
-        lines.append(f"  ✅ 현재 페이스 유지하면 목표 달성 가능")
-    elif status == 'yellow':
-        lines.append(f"  ⚠️ 예상 {est} — 러닝 빈도+브릭 쌓으면 🟢 전환 가능")
-    elif status == 'red':
-        lines.append(f"  🔴 예상 {est} — 스케줄 강화 필요")
+    run_target = 3 if phase == 4 else 4
+    distance_target = "24~28km" if phase == 4 else "30~46km(주차별)"
+    lines.append(f"  금주 러닝: {run_count}/{run_target}회 · {run_km:.1f}km / 목표 {distance_target}")
+    lines.append(f"  금주 최장거리: {longest_km:.1f}km · 핵심은 주말 평지 롱런과 보급 연습")
+    lines.append("  수영·자전거는 회복·유산소 보조로만 운영")
 
     return "\n".join(lines)
 

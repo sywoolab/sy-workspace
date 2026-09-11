@@ -823,16 +823,44 @@
       "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
     },
     "2026-09-11": {
-      "date": "2026-09-11", "workout": "🏊 수영 Easy 또는 휴식", "detail": "회복 목적. 주말 러닝을 위해 피로를 만들지 않음.",
-      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+      "date": "2026-09-11", "workout": "🏃 러닝 6.23km", "detail": "실제 5:42/km, 평균심박 147. 마지막 가속을 포함한 점진주로 수행.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 user-confirmed"
     },
     "2026-09-12": {
-      "date": "2026-09-12", "workout": "🏃 러닝 Easy 5~6km", "detail": "평지 위주, 강도 금지. 일요일 롱런 전 다리 상태 확인.",
-      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+      "date": "2026-09-12", "workout": "🏃 06시 회복런 4km + 🏊 12시 수영 레슨", "detail": "러닝 6:20~6:40/km, HR 140 이하로 가속 없이 종료. 러닝 후 탄수화물·단백질 보충 및 60~90분 수면. 수영은 기술 중심, 강한 킥 최소화.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 user-confirmed"
     },
     "2026-09-13": {
-      "date": "2026-09-13", "workout": "🏃 롱런 12~14km Easy", "detail": "거북섬 회복이 완전할 때만. 회복 미흡 시 8~10km로 축소하고 거리 보충 금지.",
-      "source": "manual", "auto": false, "rule": "2026-09-07 kobe-transition"
+      "date": "2026-09-13", "workout": "🏃 평지 롱런 14km Easy", "detail": "무보행·통제된 심박이 목표. 6:05~6:25/km 범위에서 대화 가능한 강도, 40~50분에 젤 1개 보급 연습. 무릎 통증 또는 HR 드리프트가 크면 12km에서 종료.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 user-confirmed"
+    },
+    "2026-09-14": {
+      "date": "2026-09-14", "workout": "🏊 회복 수영 또는 완전 휴식", "detail": "전날 롱런 흡수. 러닝 보충 금지.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
+    },
+    "2026-09-15": {
+      "date": "2026-09-15", "workout": "🏃 품질런 총 7km", "detail": "WU 2km Easy → 마라톤페이스 3km(5:35~5:40/km) → CD 2km. 강도는 주 1회만.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
+    },
+    "2026-09-16": {
+      "date": "2026-09-16", "workout": "🏊 수영 수업 Easy·기술", "detail": "러닝 회복 보조. 하체 고강도 최소화.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
+    },
+    "2026-09-17": {
+      "date": "2026-09-17", "workout": "🏃 러닝 Easy 5km", "detail": "6:05~6:25/km, 대화 가능한 강도. 페이스보다 회복 우선.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
+    },
+    "2026-09-18": {
+      "date": "2026-09-18", "workout": "🏊 수영 Easy 또는 휴식", "detail": "주말 러닝을 위한 회복일.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
+    },
+    "2026-09-19": {
+      "date": "2026-09-19", "workout": "🏃 러닝 Easy 4km + 스트라이드 4회", "detail": "Easy 종료 후 20초 가속 4회, 완전회복. 다음날 롱런에 피로를 남기지 않음.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
+    },
+    "2026-09-20": {
+      "date": "2026-09-20", "workout": "🏃 평지 롱런 18km Easy", "detail": "무보행·보급 적응. 40~45분마다 젤, 수분·전해질 병행. 무릎 통증 시 즉시 종료.",
+      "source": "manual", "auto": false, "rule": "2026-09-11 kobe-weekly-run-plan"
     },
     "2026-10-25": {
       "date": "2026-10-25",
