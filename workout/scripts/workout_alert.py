@@ -101,13 +101,13 @@ WEEK_NAMES = {
     21: "W6: 빌드업 ③",
     22: "W7: 빌드업 ④",
     23: "W8: 빌드업 ⑤",
-    24: "W10: 거북섬 B레이스",
-    25: "W11: 거북섬 회복·고베 전환",
-    26: "W12: 고베 빌드 ①", 27: "W13: 고베 빌드 ②",
-    28: "W14: 고베 빌드 ③", 29: "W15: 고베 빌드 ④",
-    30: "W16: 고베 피크", 31: "W17: 고베 흡수",
-    32: "W18: 고베 테이퍼 ①", 33: "W19: 고베 테이퍼 ②",
-    34: "W20: 고베 레이스 주",
+    24: "W9: 거북섬 B레이스",
+    25: "W10: 거북섬 회복·고베 전환",
+    26: "W11: 고베 빌드 ①", 27: "W12: 고베 빌드 ②",
+    28: "W13: 고베 빌드 ③", 29: "W14: 고베 빌드 ④",
+    30: "W15: 고베 피크", 31: "W16: 고베 흡수",
+    32: "W17: 고베 테이퍼 ①", 33: "W18: 고베 테이퍼 ②",
+    34: "W19: 고베 레이스 주", 35: "W20: 고베 레이스 후",
 }
 
 # 요일별 운동 스케줄 (Phase별)
@@ -770,13 +770,6 @@ def format_morning():
     if progress:
         lines.append(progress)
         lines.append("")
-
-    # 현재 체력 기반 종목별 분할 + 스케줄 준수율
-    if analysis.get('splits'):
-        fitness_split = format_fitness_split(analysis)
-        if fitness_split:
-            lines.append(fitness_split)
-            lines.append("")
 
     # 이번 주
     lines.append(format_week(CURRENT_WEEK, is_current_week=True))
