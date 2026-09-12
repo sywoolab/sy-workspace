@@ -14035,5 +14035,163 @@
         "feel": 50
       }
     ]
+  },
+  "2026-09-12": {
+    "planned": "🏃 06시 회복런 4km + 🏊 12시 수영 레슨",
+    "done": true,
+    "actual": "러닝 4.5km @6:34 + 수영 525m 11분 @2:04/100m + 수영 1100m 61분 @1:40/100m",
+    "metrics": {
+      "type": "run",
+      "distance_km": 4.5,
+      "pace_per_km": "6:34",
+      "avg_hr": 122,
+      "max_hr": 142,
+      "cadence": 170,
+      "training_load": 39,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 392,
+          "avg_hr": 102,
+          "max_hr": 117,
+          "pace_sec": 392,
+          "pace_str": "6:31"
+        },
+        {
+          "distance": 1000,
+          "duration": 376,
+          "avg_hr": 123,
+          "max_hr": 135,
+          "pace_sec": 376,
+          "pace_str": "6:15"
+        },
+        {
+          "distance": 1000,
+          "duration": 398,
+          "avg_hr": 128,
+          "max_hr": 142,
+          "pace_sec": 398,
+          "pace_str": "6:38"
+        },
+        {
+          "distance": 1000,
+          "duration": 406,
+          "avg_hr": 132,
+          "max_hr": 141,
+          "pace_sec": 406,
+          "pace_str": "6:45"
+        },
+        {
+          "distance": 499,
+          "duration": 205,
+          "avg_hr": 125,
+          "max_hr": 130,
+          "pace_sec": 410,
+          "pace_str": "6:50"
+        }
+      ]
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.3 | 부하 39 | 유산소 2.4 / 무산소 0.2 | 부하 45 | 유산소 2.4 / 무산소 2.1 | 부하 72",
+    "garmin_id": 24328217309,
+    "start_time": "08:43",
+    "garmin_ids": [
+      24327185856,
+      24328217039,
+      24328217309
+    ],
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_m": 4500.0,
+        "duration_sec": null,
+        "avg_hr": 122,
+        "max_hr": 142,
+        "avg_pace": "6:34",
+        "avg_speed": null,
+        "training_load": 39,
+        "garmin_id": 24327185856,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 392,
+            "avg_hr": 102,
+            "max_hr": 117,
+            "pace_sec": 392,
+            "pace_str": "6:31"
+          },
+          {
+            "distance": 1000,
+            "duration": 376,
+            "avg_hr": 123,
+            "max_hr": 135,
+            "pace_sec": 376,
+            "pace_str": "6:15"
+          },
+          {
+            "distance": 1000,
+            "duration": 398,
+            "avg_hr": 128,
+            "max_hr": 142,
+            "pace_sec": 398,
+            "pace_str": "6:38"
+          },
+          {
+            "distance": 1000,
+            "duration": 406,
+            "avg_hr": 132,
+            "max_hr": 141,
+            "pace_sec": 406,
+            "pace_str": "6:45"
+          },
+          {
+            "distance": 499,
+            "duration": 205,
+            "avg_hr": 125,
+            "max_hr": 130,
+            "pace_sec": 410,
+            "pace_str": "6:50"
+          }
+        ],
+        "open_water": false,
+        "start_time": "08:43",
+        "rpe": 3,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 525,
+        "duration_min": 11.1,
+        "moving_min": 10.9,
+        "pace_per_100m": "2:04",
+        "avg_hr": 150,
+        "max_hr": 164,
+        "swolf": 43,
+        "strokes": 237,
+        "avg_spm": null,
+        "training_load": 45,
+        "garmin_id": 24328217039,
+        "start_time": "11:46",
+        "rpe": 4,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 1100,
+        "duration_min": 60.7,
+        "moving_min": 18.5,
+        "pace_per_100m": "1:40",
+        "avg_hr": 122,
+        "max_hr": 160,
+        "swolf": 33,
+        "strokes": 348,
+        "avg_spm": null,
+        "training_load": 72,
+        "garmin_id": 24328217309,
+        "start_time": "11:59",
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
