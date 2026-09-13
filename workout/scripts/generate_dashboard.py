@@ -1373,11 +1373,11 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
     def _kobe_week_assessment(period, target_count, min_total, min_long):
         start, end, count, total, longest = _weekly_run_actual(period)
         if start > today:
-            return '—', '예정', '계획 주차 시작 전'
+            return '—', '예정', '시작 전'
         actual = ('아직 기록 없음' if count == 0 else
                   f'{total:.2f}km · 최장 {longest:.2f}km · {count}회')
         if end >= today:
-            return actual, '진행 중', '완료된 러닝 기준; 주차 종료 후 최종 판정'
+            return actual, '진행 중', '주차 종료 후 판정'
 
         checks = {
             '거리': total >= min_total,
@@ -1388,9 +1388,9 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         assessment = '완료' if passed == 3 else ('부분완료' if passed else '미완료')
         detail = ' · '.join(f'{name} {"✓" if ok else "미달"}' for name, ok in checks.items())
         if period == '08/31~09/06':
-            detail += ' · 거북섬 10.15km @5:20 완주'
+            detail += ' · 대회런 10.15km @5:20'
         elif period == '09/07~09/13':
-            detail += ' · 사용자 보고: 무급수·무보급, 후반 심박 상승, 오른쪽 무릎 안쪽 쑤심'
+            detail += ' · 사용자: 무급수·무보급, 후반 HR↑, 무릎 안쪽 쑤심'
         return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
         ("9월 말", "하프 1:55 이내 무보행", "서브4 가능성 유지"),
@@ -1406,7 +1406,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
              '주 4회 러닝과 28~32km 핵심 롱런을 부상 없이 완성하는 것이 우선. '
              '평지 롱런을 기본으로 하고 남산 업다운은 필요 시 금요일 저녁 또는 토요일 아침, 초기 2주 1회 이하로 배치.'
              '</div>\n')
-    html += ('<div style="overflow-x:auto"><table style="min-width:980px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
+    html += ('<div style="overflow-x:auto"><table style="min-width:850px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
              '<th>실제 수행</th><th>품질 판정</th><th>코멘트</th><th>핵심 목표</th></tr></thead><tbody>\n')
     for week, volume, long_run, target_count, min_total, min_long, focus in kobe_weeks:
         actual, assessment, comment = _kobe_week_assessment(week, target_count, min_total, min_long)
@@ -1419,7 +1419,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#6ab4ff;font-weight:600">{long_run}</td>'
                  f'<td style="color:#ddd;font-size:10.5px;white-space:nowrap">{actual}</td>'
                  f'<td style="color:{assessment_color};font-weight:600;white-space:nowrap">{assessment}</td>'
-                 f'<td style="color:#bbb;font-size:10.5px;min-width:220px">{comment}</td>'
+                 f'<td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">{comment}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table></div>\n'
     html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 추석 연휴(9/24~27)는 여러 훈련을 몰아넣지 않고 22~24km 롱런 전후 휴식 확보에 활용. 통영 대회는 취소했으며 10/19 주는 최장거리 후 회복·흡수에 사용. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
