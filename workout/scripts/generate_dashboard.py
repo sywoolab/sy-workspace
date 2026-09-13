@@ -1325,19 +1325,73 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
 
     # ── 고베 마라톤 sub-4 준비 로드맵 ──
     # 철인 예상기록 계산과는 분리한다. 마라톤은 주간 러닝 볼륨·롱런·무릎 반응으로 판정한다.
+    # period, volume label, long-run label, target run count, minimum weekly km,
+    # minimum long-run km, focus.  The numeric criteria make the completion
+    # assessment reproducible instead of relying on prose parsing.
     kobe_weeks = [
-        ("08/31~09/06", "약 20~21km", "거북섬 런 10km", "대회 주간·수 7.8km + 목 브릭 3km + 일 10km"),
-        ("09/07~09/13", "24~28km", "14~16km", "거북섬 회복 후 러닝 4회 골격 복구"),
-        ("09/14~09/20", "30~34km", "18~20km", "전 구간 무보행·보급 연습 시작"),
-        ("09/21~09/27", "35~38km", "22~24km", "추석 연휴 핵심 롱런·평지·보급·무보행"),
-        ("09/28~10/04", "30~34km", "18~20km", "회복 주·무릎 반응 확인"),
-        ("10/05~10/11", "38~42km", "26~28km", "연휴 활용·시간당 탄수화물 50~60g"),
-        ("10/12~10/18", "42~46km", "30~32km", "최장거리 핵심 롱런·보행 없이 완료"),
-        ("10/19~10/25", "30~34km", "18~20km", "최장거리 흡수·통영 취소로 마라톤 회복에 집중"),
-        ("10/26~11/01", "30~34km", "20~22km", "마지막 MP 점검·후반 일부 5:35~5:45/km"),
-        ("11/02~11/08", "22~26km", "14~16km", "테이퍼·피로 제거"),
-        ("11/09~11/15", "12~18km + 대회", "대회 42.195km", "볼륨 최소화·11/15 고베"),
+        ("08/31~09/06", "약 20~21km", "거북섬 런 10km", 3, 20, 10, "대회 주간·수 7.8km + 목 브릭 3km + 일 10km"),
+        ("09/07~09/13", "24~28km", "14~16km", 4, 24, 14, "거북섬 회복 후 러닝 4회 골격 복구"),
+        ("09/14~09/20", "30~34km", "18~20km", 4, 30, 18, "전 구간 무보행·보급 연습 시작"),
+        ("09/21~09/27", "35~38km", "22~24km", 4, 35, 22, "추석 연휴 핵심 롱런·평지·보급·무보행"),
+        ("09/28~10/04", "30~34km", "18~20km", 4, 30, 18, "회복 주·무릎 반응 확인"),
+        ("10/05~10/11", "38~42km", "26~28km", 4, 38, 26, "연휴 활용·시간당 탄수화물 50~60g"),
+        ("10/12~10/18", "42~46km", "30~32km", 4, 42, 30, "최장거리 핵심 롱런·보행 없이 완료"),
+        ("10/19~10/25", "30~34km", "18~20km", 4, 30, 18, "최장거리 흡수·통영 취소로 마라톤 회복에 집중"),
+        ("10/26~11/01", "30~34km", "20~22km", 4, 30, 20, "마지막 MP 점검·후반 일부 5:35~5:45/km"),
+        ("11/02~11/08", "22~26km", "14~16km", 4, 22, 14, "테이퍼·피로 제거"),
+        ("11/09~11/15", "12~18km + 대회", "대회 42.195km", 3, 12, 42.195, "볼륨 최소화·11/15 고베"),
     ]
+
+    def _weekly_run_actual(period):
+        """Return run count, total distance and longest run for a MM/DD~MM/DD period."""
+        start_md, end_md = period.split('~')
+        start = f'2026-{start_md.replace("/", "-")}'
+        end = f'2026-{end_md.replace("/", "-")}'
+        count = 0
+        total = 0.0
+        longest = 0.0
+        for day, entry in log.items():
+            if not (start <= day <= end):
+                continue
+            metrics = entry.get('all_metrics') or [entry.get('metrics', {})]
+            ran_that_day = False
+            for metric in metrics:
+                if metric.get('type') != 'run':
+                    continue
+                distance = metric.get('distance_km')
+                if distance is None:
+                    distance = (metric.get('distance_m') or 0) / 1000
+                if distance <= 0:
+                    continue
+                ran_that_day = True
+                total += distance
+                longest = max(longest, distance)
+            if ran_that_day:
+                count += 1
+        return start, end, count, total, longest
+
+    def _kobe_week_assessment(period, target_count, min_total, min_long):
+        start, end, count, total, longest = _weekly_run_actual(period)
+        if start > today:
+            return '—', '예정', '계획 주차 시작 전'
+        actual = ('아직 기록 없음' if count == 0 else
+                  f'{total:.2f}km · 최장 {longest:.2f}km · {count}회')
+        if end >= today:
+            return actual, '진행 중', '완료된 러닝 기준; 주차 종료 후 최종 판정'
+
+        checks = {
+            '거리': total >= min_total,
+            '롱런': longest >= min_long,
+            '빈도': count >= target_count,
+        }
+        passed = sum(checks.values())
+        assessment = '완료' if passed == 3 else ('부분완료' if passed else '미완료')
+        detail = ' · '.join(f'{name} {"✓" if ok else "미달"}' for name, ok in checks.items())
+        if period == '08/31~09/06':
+            detail += ' · 거북섬 10.15km @5:20 완주'
+        elif period == '09/07~09/13':
+            detail += ' · 사용자 보고: 무급수·무보급, 후반 심박 상승, 오른쪽 무릎 안쪽 쑤심'
+        return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
         ("9월 말", "하프 1:55 이내 무보행", "서브4 가능성 유지"),
         ("10월 중순", "28~30km 안정 완주 + 정상 보급", "서브4 가능권 진입"),
@@ -1352,13 +1406,22 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
              '주 4회 러닝과 28~32km 핵심 롱런을 부상 없이 완성하는 것이 우선. '
              '평지 롱런을 기본으로 하고 남산 업다운은 필요 시 금요일 저녁 또는 토요일 아침, 초기 2주 1회 이하로 배치.'
              '</div>\n')
-    html += '<table><thead><tr><th>주차</th><th>주간 러닝</th><th>롱런</th><th>핵심 목표</th></tr></thead><tbody>\n'
-    for week, volume, long_run, focus in kobe_weeks:
+    html += ('<div style="overflow-x:auto"><table style="min-width:980px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
+             '<th>실제 수행</th><th>품질 판정</th><th>코멘트</th><th>핵심 목표</th></tr></thead><tbody>\n')
+    for week, volume, long_run, target_count, min_total, min_long, focus in kobe_weeks:
+        actual, assessment, comment = _kobe_week_assessment(week, target_count, min_total, min_long)
+        assessment_color = {
+            '완료': '#6affa0', '부분완료': '#ffd56c', '미완료': '#ff6c6c',
+            '진행 중': '#6ab4ff', '예정': '#666',
+        }.get(assessment.split(' (')[0], '#aaa')
         html += (f'<tr><td style="white-space:nowrap;color:#888">{week}</td>'
                  f'<td style="color:#6affa0;font-weight:600">{volume}</td>'
                  f'<td style="color:#6ab4ff;font-weight:600">{long_run}</td>'
+                 f'<td style="color:#ddd;font-size:10.5px;white-space:nowrap">{actual}</td>'
+                 f'<td style="color:{assessment_color};font-weight:600;white-space:nowrap">{assessment}</td>'
+                 f'<td style="color:#bbb;font-size:10.5px;min-width:220px">{comment}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
-    html += '</tbody></table>\n'
+    html += '</tbody></table></div>\n'
     html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 추석 연휴(9/24~27)는 여러 훈련을 몰아넣지 않고 22~24km 롱런 전후 휴식 확보에 활용. 통영 대회는 취소했으며 10/19 주는 최장거리 후 회복·흡수에 사용. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
     html += '<table><thead><tr><th>판정 시점</th><th>통과 기준</th><th>의미</th></tr></thead><tbody>\n'
     for timing, criterion, implication in kobe_checks:
