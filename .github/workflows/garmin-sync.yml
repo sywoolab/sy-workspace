@@ -2,8 +2,8 @@ name: garmin-sync
 
 on:
   schedule:
-    - cron: '0 23 * * 0-4'  # KST 평일 08:00 후보. 한국 공휴일이면 gate에서 skip.
-    - cron: '0 3,7 * * *'   # KST 12:00/16:00 후보. 주말/한국 공휴일만 gate에서 실행.
+    - cron: '0 23 * * 1'  # KST 화요일 08:00 주 1회 — 로컬 launchd 백업용. ⚠️ 429 차단 이력으로 주 1회로 제한
+    - cron: '0 3 * * 6'  # KST 토요일 12:00 주 1회 — 주말 백업. 로컬 launchd가 primary
   # ⚠️ 2026-05 GitHub Actions IP Garmin 429 차단 이력 있음.
   # 재활성화는 저빈도 schedule gate로 제한하고, 실패 시 기존 garmin_sync.py 오류 알림에 위임한다.
   workflow_dispatch:
@@ -53,10 +53,10 @@ jobs:
           if event_name == "workflow_dispatch":
               should_run = True
               reason = "manual dispatch"
-          elif schedule == "0 23 * * 0-4":
+          elif schedule == "0 23 * * 1":
               should_run = today.weekday() < 5 and not is_holiday
               reason = "weekday 08:00 KST" if should_run else "08:00 skipped: weekend/holiday"
-          elif schedule == "0 3,7 * * *":
+          elif schedule == "0 3 * * 6":
               should_run = is_weekend or is_holiday
               reason = "weekend/holiday 12:00/16:00 KST" if should_run else "12:00/16:00 skipped: regular weekday"
           else:
