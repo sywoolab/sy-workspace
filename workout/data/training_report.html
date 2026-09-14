@@ -39,7 +39,7 @@ tr:hover{background:#15152a}
 .tl7{font-size:10px;color:#888}
 </style></head><body>
 <h1>🏃 고베마라톤 sub-4 훈련 대시보드</h1>
-<div class="sub">업데이트: 2026-09-14 08:51 KST</div>
+<div class="sub">업데이트: 2026-09-14 11:38 KST</div>
 
 <div style="background:#13131f;border:1px solid #6affa044;border-radius:12px;padding:14px 16px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -206,6 +206,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {
 });
 </script>
 
+<div id="kobe-roadmap-anchor"></div>
 <div class="section">📅 훈련 계획 (주차별 — 제목 클릭으로 펼치기/접기)</div>
 <details open style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:0;margin-bottom:8px">
 <summary style="cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:#7c6fff;list-style-position:inside"> <span style="color:#888;font-weight:400;font-size:11px">09/14 ~ 09/20</span> — 주간 계획</summary>
@@ -471,7 +472,8 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {
 </tbody></table></div></details><div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody><tr><td style="color:#444;font-weight:600;white-space:nowrap">완료 (06-07)</td><td>한강 쉬엄쉬엄</td><td style="color:#888;font-size:10.5px">수영 1+자전거 20+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">T1 수트 탈의 연습 + 자전거 풀 push</td></tr>
 <tr><td style="color:#444;font-weight:600;white-space:nowrap">완료 (09-06)</td><td>거북섬 올림픽</td><td style="color:#888;font-size:10.5px">9/4~6 개최 · 수영 1.5+자전거 40+러닝 10km</td><td style="color:#6affa0;font-size:10.5px">신청완료 · B레이스: 실전점검 + 올림픽 완주 2회차</td></tr>
 <tr><td style="color:#7c6fff;font-weight:600;white-space:nowrap">D-62 (11-15)</td><td>고베 마라톤</td><td style="color:#888;font-size:10.5px">풀마라톤 42.195km</td><td style="color:#6affa0;font-size:10.5px">신청완료 · 1차 목표 sub-4:00 · 전 구간 무보행</td></tr>
-</tbody></table><div class="section">🏃 고베 마라톤 sub-4 로드맵</div>
+</tbody></table><div id="kobe-roadmap">
+<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>
 <div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55"><b style="color:#ffd56c">현재 판정:</b> 도전 가능한 목표이나 장거리 적응이 핵심. 목표 기록은 3:55(평균 5:34/km), 1차 방어선은 sub-4:00. 10km 47분은 필수조건이 아니며, 주 4회 러닝과 28~32km 핵심 롱런을 부상 없이 완성하는 것이 우선. 평지 롱런을 기본으로 하고 남산 업다운은 필요 시 금요일 저녁 또는 토요일 아침, 초기 2주 1회 이하로 배치.</div>
 <div style="overflow-x:auto"><table style="min-width:850px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th><th>실제 수행</th><th>품질 판정</th><th>코멘트</th><th>핵심 목표</th></tr></thead><tbody>
 <tr><td style="white-space:nowrap;color:#888">08/31~09/06</td><td style="color:#6affa0;font-weight:600">약 20~21km</td><td style="color:#6ab4ff;font-weight:600">거북섬 런 10km</td><td style="color:#ddd;font-size:10.5px;white-space:nowrap">21.28km · 최장 10.15km · 3회</td><td style="color:#6affa0;font-weight:600;white-space:nowrap">완료 (3/3)</td><td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">거리 ✓ · 롱런 ✓ · 빈도 ✓ · 대회런 10.15km @5:20</td><td style="color:#aaa;font-size:10.5px">대회 주간·수 7.8km + 목 브릭 3km + 일 10km</td></tr>
@@ -493,6 +495,8 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {
 <tr><td style="white-space:nowrap;color:#888">10월 하순</td><td style="color:#ddd">30~32km 안정 완주·다음날 회복</td><td style="color:#ffd56c;font-size:10.5px">서브4가 현실적인 목표</td></tr>
 <tr><td style="white-space:nowrap;color:#888">상시</td><td style="color:#ddd">무릎 통증 3/10 미만·다음날 계단 이상 없음</td><td style="color:#ffd56c;font-size:10.5px">증량 진행; 이상 시 수영·자전거로 대체</td></tr>
 </tbody></table>
+</div>
+<script>document.getElementById("kobe-roadmap-anchor").replaceWith(document.getElementById("kobe-roadmap"));</script>
 <div class="section">🏅 완주 대회 아카이브</div>
 <div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:14px">
 <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">
@@ -544,5 +548,5 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {
 </div>
 </div>
 
-<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-09-14 08:51 KST</div>
+<div style="color:#2a2a3a;font-size:10px;margin-top:12px;text-align:center">sy-workspace · 2026-09-14 11:38 KST</div>
 </body></html>

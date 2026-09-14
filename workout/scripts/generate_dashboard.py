@@ -1018,6 +1018,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
 }});
 </script>
 
+<div id="kobe-roadmap-anchor"></div>
 <div class="section">📅 훈련 계획 (주차별 — 제목 클릭으로 펼치기/접기)</div>
 """
 
@@ -1398,7 +1399,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("10월 하순", "30~32km 안정 완주·다음날 회복", "서브4가 현실적인 목표"),
         ("상시", "무릎 통증 3/10 미만·다음날 계단 이상 없음", "증량 진행; 이상 시 수영·자전거로 대체"),
     ]
-    html += '<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
+    html += '<div id="kobe-roadmap">\n<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
     html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
              'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55">'
              '<b style="color:#ffd56c">현재 판정:</b> 도전 가능한 목표이나 장거리 적응이 핵심. '
@@ -1428,7 +1429,11 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
                  f'<td style="color:#ddd">{criterion}</td>'
                  f'<td style="color:#ffd56c;font-size:10.5px">{implication}</td></tr>\n')
-    html += '</tbody></table>\n'
+    html += '</tbody></table>\n</div>\n'
+    html += ('<script>'
+             'document.getElementById("kobe-roadmap-anchor").replaceWith('
+             'document.getElementById("kobe-roadmap"));'
+             '</script>\n')
 
     # ── 완주 대회 아카이브 ──
     race_records_file = BASE / 'data' / 'race_records.json'
