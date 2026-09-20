@@ -1333,7 +1333,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("08/31~09/06", "약 20~21km", "거북섬 런 10km", 3, 20, 10, "대회 주간·수 7.8km + 목 브릭 3km + 일 10km"),
         ("09/07~09/13", "24~28km", "14~16km", 4, 24, 14, "거북섬 회복 후 러닝 4회 골격 복구"),
         ("09/14~09/20", "30~34km", "18~20km", 4, 30, 18, "전 구간 무보행·보급 연습 시작"),
-        ("09/21~09/27", "35~38km", "22~24km", 4, 35, 22, "추석 연휴 핵심 롱런·평지·보급·무보행"),
+        ("09/21~09/27", "24~26km", "14~16km", 3, 24, 14, "월~수 출장·직전 롱런 흡수·목요일부터 통증 게이트 후 재개"),
         ("09/28~10/04", "30~34km", "18~20km", 4, 30, 18, "회복 주·무릎 반응 확인"),
         ("10/05~10/11", "38~42km", "26~28km", 4, 38, 26, "연휴 활용·시간당 탄수화물 50~60g"),
         ("10/12~10/18", "42~46km", "30~32km", 4, 42, 30, "최장거리 핵심 롱런·보행 없이 완료"),
@@ -1373,11 +1373,12 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
 
     def _kobe_week_assessment(period, target_count, min_total, min_long):
         start, end, count, total, longest = _weekly_run_actual(period)
+        user_closed_weeks = {'09/14~09/20'}  # 2026-09-20: user explicitly ended the training week
         if start > today:
             return '—', '예정', '시작 전'
         actual = ('아직 기록 없음' if count == 0 else
                   f'{total:.2f}km · 최장 {longest:.2f}km · {count}회')
-        if end >= today:
+        if end >= today and period not in user_closed_weeks:
             return actual, '진행 중', '주차 종료 후 판정'
 
         checks = {
@@ -1392,6 +1393,8 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
             detail += ' · 대회런 10.15km @5:20'
         elif period == '09/07~09/13':
             detail += ' · 사용자: 무급수·무보급, 후반 HR↑, 무릎 안쪽 쑤심'
+        elif period == '09/14~09/20':
+            detail += ' · 무릎 부담 예방 종료, 족저근막 아주 약한 전조'
         return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
         ("9월 말", "하프 1:55 이내 무보행", "서브4 가능성 유지"),
@@ -1423,7 +1426,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">{comment}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table></div>\n'
-    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 추석 연휴(9/24~27)는 여러 훈련을 몰아넣지 않고 22~24km 롱런 전후 휴식 확보에 활용. 통영 대회는 취소했으며 10/19 주는 최장거리 후 회복·흡수에 사용. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
+    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 9/21~23 출장은 완전휴식으로 고정하고 누락 운동을 목~일에 몰아넣지 않음. 9/24부터 무릎·족저근막 통증 게이트를 통과할 때만 재개하며, 주말 롱런은 14~16km로 제한. 통영 대회는 취소했으며 10/19 주는 최장거리 후 회복·흡수에 사용. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
     html += '<table><thead><tr><th>판정 시점</th><th>통과 기준</th><th>의미</th></tr></thead><tbody>\n'
     for timing, criterion, implication in kobe_checks:
         html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
