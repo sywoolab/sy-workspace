@@ -15826,5 +15826,54 @@
         "feel": 50
       }
     ]
+  },
+  "2026-10-03": {
+    "planned": "🏃 Easy 5~6km 또는 휴식",
+    "done": true,
+    "actual": "수영 2500m 46분 @1:48/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 2500,
+      "duration_min": 46.1,
+      "moving_min": 45.4,
+      "pace_per_100m": "1:48",
+      "avg_hr": 138,
+      "max_hr": 171,
+      "swolf": 38,
+      "strokes": 1042,
+      "avg_spm": null,
+      "training_load": 107
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.0 / 무산소 2.2 | 부하 107",
+    "garmin_id": 24585583717,
+    "start_time": "09:58",
+    "garmin_ids": [
+      24585583717
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 2500,
+        "duration_sec": 2766.0,
+        "avg_hr": 138,
+        "max_hr": 171,
+        "avg_pace": "1:48",
+        "avg_speed": null,
+        "training_load": 107,
+        "garmin_id": 24585583717,
+        "laps": null,
+        "open_water": false,
+        "start_time": "09:58",
+        "duration_min": 46.1,
+        "moving_min": 45.4,
+        "pace_per_100m": "1:48",
+        "swolf": 38,
+        "strokes": 1042,
+        "avg_spm": null,
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
