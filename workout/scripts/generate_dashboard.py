@@ -1407,7 +1407,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
              'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55">'
              '<b style="color:#ffd56c">현재 판정:</b> 도전 가능한 목표이나 장거리 적응이 핵심. '
              '목표 기록은 3:55(평균 5:34/km), 1차 방어선은 sub-4:00. 10km 47분은 필수조건이 아니며, '
-             '주 4회 러닝과 28~32km 핵심 롱런을 부상 없이 완성하는 것이 우선. '
+             '주 4회 러닝과 조건부 28~30km 핵심 롱런을 부상 없이 완성하는 것이 우선. '
              '평지 롱런을 기본으로 하고 남산 업다운은 필요 시 금요일 저녁 또는 토요일 아침, 초기 2주 1회 이하로 배치.'
              '</div>\n')
     html += ('<div style="overflow-x:auto"><table style="min-width:850px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
