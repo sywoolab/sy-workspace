@@ -1334,12 +1334,12 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("09/07~09/13", "24~28km", "14~16km", 4, 24, 14, "거북섬 회복 후 러닝 4회 골격 복구"),
         ("09/14~09/20", "30~34km", "18~20km", 4, 30, 18, "전 구간 무보행·보급 연습 시작"),
         ("09/21~09/27", "24~26km", "14~16km", 3, 24, 14, "월~수 출장·직전 롱런 흡수·목요일부터 통증 게이트 후 재개"),
-        ("09/28~10/04", "13~20km", "8~10km", 3, 13, 8, "고베 서브4 목표 유지·무릎/뒤꿈치 증상 게이트형 복귀"),
-        ("10/05~10/11", "38~42km", "26~28km", 4, 38, 26, "연휴 활용·시간당 탄수화물 50~60g"),
-        ("10/12~10/18", "42~46km", "30~32km", 4, 42, 30, "최장거리 핵심 롱런·보행 없이 완료"),
-        ("10/19~10/25", "30~34km", "18~20km", 4, 30, 18, "최장거리 흡수·통영 취소로 마라톤 회복에 집중"),
-        ("10/26~11/01", "30~34km", "20~22km", 4, 30, 20, "마지막 MP 점검·후반 일부 5:35~5:45/km"),
-        ("11/02~11/08", "22~26km", "14~16km", 4, 22, 14, "테이퍼·피로 제거"),
+        ("09/28~10/04", "실제 39.12km", "실제 26.57km", 3, 30, 20, "26.57km @5:36 완주·후반까지 다리와 호흡 여유, 운동 후 무릎 반응 관리"),
+        ("10/05~10/11", "회복 18~24km", "10~14km", 3, 18, 10, "27km 흡수·무릎/발바닥 증상 게이트·강도 금지"),
+        ("10/12~10/18", "30~36km", "18~20km", 3, 30, 18, "10/18 Easy 상태검증·이후 48시간 반응 확인"),
+        ("10/19~10/25", "38~44km", "조건부 28~30km", 4, 38, 28, "10/25 최종 피크 LSD·보급/신발/복장 리허설·30km 상한"),
+        ("10/26~11/01", "26~32km", "16~18km", 4, 26, 16, "30km 흡수·테이퍼 시작·거리 추가 금지"),
+        ("11/02~11/08", "18~24km", "10~12km", 3, 18, 10, "테이퍼·피로 제거·짧은 목표페이스 감각만"),
         ("11/09~11/15", "12~18km + 대회", "대회 42.195km", 3, 12, 42.195, "볼륨 최소화·11/15 고베"),
     ]
 
@@ -1400,16 +1400,38 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("9월 말", "하프 1:55 이내 무보행", "서브4 가능성 유지"),
         ("10/18", "18~20km Easy + 48시간 증상 확인", "피크 LSD 허용 판단"),
         ("10/25", "조건부 28~30km 안정 완주 + 정상 보급", "서브4 가능권 진입"),
-        ("10월 하순", "30~32km 안정 완주·다음날 회복", "서브4가 현실적인 목표"),
-        ("상시", "무릎 통증 3/10 미만·다음날 계단 이상 없음", "증량 진행; 이상 시 수영·자전거로 대체"),
+        ("10/26~27", "30km 후 48시간 통증 0~1/10·정상 보행", "서브4 확률 추가 상향"),
+        ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "증량 진행; 이상 시 수영·자전거로 대체"),
     ]
     html += '<div id="kobe-roadmap">\n<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
     html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
              'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55">'
-             '<b style="color:#ffd56c">현재 판정:</b> 도전 가능한 목표이나 장거리 적응이 핵심. '
-             '목표 기록은 3:55(평균 5:34/km), 1차 방어선은 sub-4:00. 10km 47분은 필수조건이 아니며, '
-             '주 4회 러닝과 조건부 28~30km 핵심 롱런을 부상 없이 완성하는 것이 우선. '
-             '평지 롱런을 기본으로 하고 남산 업다운은 필요 시 금요일 저녁 또는 토요일 아침, 초기 2주 1회 이하로 배치.'
+             '<b style="color:#ffd56c">현재 판정:</b> <b style="color:#6affa0">sub-4 가능성 55~65%</b> · '
+             '<b style="color:#6ab4ff">3:55 가능성 40~50%</b>. 기존 30% 미만 구간에서는 벗어났다. '
+             '근거는 10/4 실제 26.57km를 목표 페이스에 가까운 5:36/km로 완주했고, 마지막까지 페이스 붕괴 없이 '
+             '사용자 체감상 다리와 호흡 모두 최소 5km 이상 여유가 남았다는 점이다. 반면 평균 HR 165·후반 HR 170~181, '
+             'TL 365, 운동 후 오른쪽 무릎 일시 5/10 및 특정 자세 3/10, 소염제 복용은 하향 요인이다. '
+             '10/25 28~30km를 Easy 강도로 무통 완주하고 이후 48시간 반응이 0~1/10이면 sub-4 가능성은 70~80% 범위로 재평가한다. '
+             '목표 기록은 3:55(평균 5:34/km), 1차 방어선은 sub-4:00이며 35km 훈련은 필요하지 않다.'
+             '</div>\n')
+    html += ('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-bottom:12px">'
+             '<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:11px 13px;line-height:1.55">'
+             '<div style="color:#6affa0;font-weight:700;margin-bottom:5px">10/4 장거리 긍정 신호</div>'
+             '<div style="font-size:11px;color:#bbb">26.57km · 2:28:58 · 5:36/km · 케이던스 175<br>'
+             '후반까지 페이스 붕괴 없음 · 러닝 중 무통·매우 상쾌<br>'
+             '사용자 체감: 다리와 호흡 모두 남았고 최소 5km 추가 가능, 약 32km까지 가능했을 것으로 판단</div></div>'
+             '<div style="background:#13131f;border:1px solid #3a2a2a;border-radius:10px;padding:11px 13px;line-height:1.55">'
+             '<div style="color:#ff8b8b;font-weight:700;margin-bottom:5px">남은 리스크·중단 기준</div>'
+             '<div style="font-size:11px;color:#bbb">평균 HR 165 · 최대 187 · 후반 HR 170~181 · 유산소 TE 5.0 · TL 365<br>'
+             '오른쪽 무릎: 시작 1 → 중간 자세별 2 → 종료 직후 약 10초간 5 → 귀가 후 일시 3 → 현재 기본 1/10<br>'
+             '특정 자세 3/10 재현 · 발바닥 뻐근함 · 소염제 복용 중(성분/용량 미확인)<br>'
+             '붓기·잠김·불안정성, 보행 변화 또는 통증 증가 시 러닝 중단·진료 고려</div></div>'
+             '<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:11px 13px;line-height:1.55">'
+             '<div style="color:#6ab4ff;font-weight:700;margin-bottom:5px">남은 LSD·테이퍼</div>'
+             '<div style="font-size:11px;color:#bbb">10/11 조건부 10~14km → 10/18 Easy 18~20km → '
+             '10/25 조건부 28~30km → 11/1 16~18km → 11/8 10~12km → 11/15 고베<br>'
+             '10/18은 5:55~6:15/km 범위에서 통증·심박 우선, 10/25는 6:00~6:15/km 전후의 대화 가능한 강도. '
+             '빠르게 달릴 능력 확인이 아니라 보급·근골격 내구성과 다음날 회복을 확인한다.</div></div>'
              '</div>\n')
     html += ('<div style="overflow-x:auto"><table style="min-width:850px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
              '<th>실제 수행</th><th>품질 판정</th><th>코멘트</th><th>핵심 목표</th></tr></thead><tbody>\n')
@@ -1427,7 +1449,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">{comment}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table></div>\n'
-    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 9/21~23 출장은 완전휴식으로 고정하고 누락 운동을 목~일에 몰아넣지 않음. 9/24부터 무릎·족저근막 통증 게이트를 통과할 때만 재개하며, 주말 롱런은 14~16km로 제한. 통영 대회는 취소했으며 10/19 주는 최장거리 후 회복·흡수에 사용. 35km 이상 롱런은 기본계획에 넣지 않음.</div>\n'
+    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 10/4 26.57km는 계획보다 강한 마라톤페이스급 장거리였다. 러닝 중에는 통증 없이 매우 상쾌했고 다리·호흡 모두 최소 5km 이상 여유가 남았으나, 후반 심박과 운동 후 무릎 반응을 고려해 다음 장거리는 속도 증명이 아니라 회복 가능한 강도와 48시간 무증상 확인이 목적이다. 10/18 18~20km 검증 후 10/25 조건부 28~30km를 마지막 피크로 실시하며, 30km 초과 및 35km 훈련은 하지 않는다.</div>\n'
     html += '<table><thead><tr><th>판정 시점</th><th>통과 기준</th><th>의미</th></tr></thead><tbody>\n'
     for timing, criterion, implication in kobe_checks:
         html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
