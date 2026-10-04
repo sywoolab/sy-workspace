@@ -7974,29 +7974,21 @@
   },
   "2026-10-04": {
     "date": "2026-10-04",
-    "steps": 27917,
+    "steps": 29253,
     "stress": {
       "avg": 25,
-      "max": 72,
-      "rest": 40.96,
-      "low": 20.4,
-      "medium": 3.4,
-      "high": 0.0
+      "max": 96,
+      "rest": 38.52,
+      "low": 19.19,
+      "medium": 3.2,
+      "high": 0.58
     },
     "body_battery": {
       "max": 40,
       "min": 5,
-      "start": 11
+      "start": 9
     },
     "resting_hr": 51,
-    "sleep": {
-      "duration_min": 254,
-      "score": 52,
-      "deep_min": 81,
-      "light_min": 138,
-      "rem_min": 35,
-      "awake_min": 25
-    },
     "hrv": {
       "weekly_avg": 48,
       "last_night": 52,
