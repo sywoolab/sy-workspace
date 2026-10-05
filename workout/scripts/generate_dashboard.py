@@ -1397,11 +1397,11 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
             detail += ' · 무릎 부담 예방 종료, 족저근막 아주 약한 전조'
         return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
-        ("9월 말", "하프 1:55 이내 무보행", "서브4 가능성 유지"),
-        ("10/11", "18~20km Easy + 48시간 증상 확인", "피크 LSD 허용 판단"),
-        ("10/18", "조건부 30~32km 안정 완주 + 정상 보급", "서브4 가능권 진입"),
-        ("10/19~20", "30~32km 후 48시간 통증 0~1/10·정상 보행", "서브4 확률 추가 상향"),
-        ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "증량 진행; 이상 시 수영·자전거로 대체"),
+        ("9월 말", "하프 1:55 이내 무보행", "✅ 대체 달성", "10/4 26.57km 무보행 · 가장 빠른 연속 하프 1:56:24(5.47~26.57km) · 기준보다 1:24 느리지만 5.47km 추가 거리로 지속능력 확인"),
+        ("10/11", "18~20km Easy + 이후 48시간 증상 확인", "🟡 부분 달성", "10/4에 거리능력은 이미 확인 · 운동 후 무릎 반응과 현재 발바닥 뻐근함 때문에 회복 게이트는 10/11 및 이후 48시간 반응으로 최종 판정"),
+        ("10/18", "조건부 30~32km 안정 완주 + 정상 보급", "⏳ 예정", "10/11 롱런과 이후 48시간이 소염제 없이 0~1/10일 때만 실시"),
+        ("10/19~20", "30~32km 후 48시간 통증 0~1/10·정상 보행", "⏳ 예정", "피크 LSD 완료 후 판정"),
+        ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "🟡 관찰 중", "현재 무릎 약 1/10·발바닥 뻐근함 · 악화 여부 지속 확인"),
     ]
     html += '<div id="kobe-roadmap">\n<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
     html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
@@ -1450,12 +1450,14 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table></div>\n'
     html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 10/4 26.57km는 계획보다 강한 마라톤페이스급 장거리였다. 러닝 중에는 통증 없이 매우 상쾌했고 다리·호흡 모두 최소 5km 이상 여유가 남았으나, 후반 심박과 운동 후 무릎 반응을 고려해 다음 장거리는 속도 증명이 아니라 회복 가능한 강도와 48시간 무증상 확인이 목적이다. 10/11 18~20km 검증 후 10/18 조건부 30~32km를 마지막 피크로 실시하며, 이후 20~22km부터 테이퍼한다.</div>\n'
-    html += '<table><thead><tr><th>판정 시점</th><th>통과 기준</th><th>의미</th></tr></thead><tbody>\n'
-    for timing, criterion, implication in kobe_checks:
+    html += '<div style="overflow-x:auto"><table style="min-width:900px"><thead><tr><th>판정 시점</th><th>통과 기준</th><th>현재 상태</th><th>판정 근거</th></tr></thead><tbody>\n'
+    for timing, criterion, status, evidence in kobe_checks:
+        status_color = '#6affa0' if '✅' in status else ('#ffd56c' if '🟡' in status else '#6ab4ff')
         html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
                  f'<td style="color:#ddd">{criterion}</td>'
-                 f'<td style="color:#ffd56c;font-size:10.5px">{implication}</td></tr>\n')
-    html += '</tbody></table>\n</div>\n'
+                 f'<td style="color:{status_color};font-weight:700;white-space:nowrap">{status}</td>'
+                 f'<td style="color:#aaa;font-size:10.5px;min-width:280px">{evidence}</td></tr>\n')
+    html += '</tbody></table></div>\n</div>\n'
     html += ('<script>'
              'document.getElementById("kobe-roadmap-anchor").replaceWith('
              'document.getElementById("kobe-roadmap"));'
