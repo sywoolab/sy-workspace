@@ -1312,11 +1312,13 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
         ("2026-09-06", "거북섬 올림픽", "9/4~6 개최 · 수영 1.5+자전거 40+러닝 10km", "신청완료 · B레이스: 실전점검 + 올림픽 완주 2회차"),
         ("2026-11-15", "고베 마라톤", "풀마라톤 42.195km", "신청완료 · 1차 목표 sub-4:00 · 전 구간 무보행"),
+        ("2027-05-29", "군산·새만금 T100", "100km: 수영 2+자전거 80+러닝 18km", "결제완료 · 5/29~30 행사 주말(개인전 일자 미확정) · 기준 sub-5 · 예상 4:55~5:10 · 공격 4:45"),
     ]
     html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
     for rdate, rname, rdist, rgoal in all_races_ext:
         d = days_until(rdate)
-        if d < 0: dstr, dcol = f'완료 ({rdate[5:]})', '#444'
+        if rname == "군산·새만금 T100": dstr, dcol = '5/29~30 행사', '#7c6fff'
+        elif d < 0: dstr, dcol = f'완료 ({rdate[5:]})', '#444'
         elif d == 0: dstr, dcol = '🏁 오늘!', '#ff6c6c'
         else:
             dcol = '#ff6c6c' if d<7 else '#ffd56c' if d<21 else '#7c6fff'
