@@ -11,6 +11,7 @@ import training_snapshot as snapshot
 import garmin_sync
 import workout_alert
 import workout_analysis
+import adaptive_scheduler
 
 
 class SnapshotTests(unittest.TestCase):
@@ -18,7 +19,7 @@ class SnapshotTests(unittest.TestCase):
         self.log, self.schedule = snapshot.load_snapshot()
         self.today = date(2026, 10, 6)
         now = datetime(2026, 10, 6, 10, tzinfo=timezone(timedelta(hours=9)))
-        for module in (garmin_sync, workout_alert, workout_analysis):
+        for module in (garmin_sync, workout_alert, workout_analysis, adaptive_scheduler):
             for field, value in [('NOW', now), ('TODAY', self.today.isoformat())]:
                 patcher = patch.object(module, field, value)
                 patcher.start()
@@ -66,6 +67,11 @@ class SnapshotTests(unittest.TestCase):
             self.assertEqual(post.call_count, len(parts))
             post.return_value.json.return_value = {'ok': False}
             self.assertFalse(snapshot.send_messages(text, 'test', 'test'))
+
+    def test_may_vdot_history_does_not_generate_current_plateau_alarm(self):
+        self.assertIsNone(adaptive_scheduler.rule_c2_vdot_stagnation(self.schedule))
+        items = adaptive_scheduler._detect_improvement_items(self.log, self.schedule, {})
+        self.assertNotIn('plateau', [item['type'] for item in items])
 
     def test_current_analysis_preserves_confirmed_schedule(self):
         before = Path(workout_analysis.SCHEDULE_FILE).read_bytes()

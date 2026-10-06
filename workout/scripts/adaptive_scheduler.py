@@ -845,9 +845,18 @@ def _has_brick_run(log, min_km):
     return False
 
 
+def recent_vdot_history(schedule):
+    """Require dated, recent observations before declaring a current plateau."""
+    cutoff = (NOW.date() - timedelta(days=28)).isoformat()
+    history = [h for h in schedule.get('vdot_history', [])
+               if isinstance(h, dict) and cutoff <= h.get('date', '') <= TODAY
+               and isinstance(h.get('vdot'), (int, float))]
+    return sorted(history, key=lambda h: h['date'])
+
+
 def rule_c2_vdot_stagnation(schedule):
     """C2: VDOT 3주 정체 감지 — 보고만"""
-    history = schedule.get('vdot_history', [])
+    history = recent_vdot_history(schedule)
     if len(history) < 3:
         return None
 
@@ -1220,7 +1229,7 @@ def _detect_improvement_items(workout_log, schedule_data, health_data):
         })
 
     # 2. VDOT 3주 정체 → 훈련 자극 변경 필요
-    vdot_history = schedule_data.get('vdot_history', [])
+    vdot_history = recent_vdot_history(schedule_data)
     if len(vdot_history) >= 3:
         recent_3 = [v['vdot'] if isinstance(v, dict) else v for v in vdot_history[-3:]]
         if max(recent_3) - min(recent_3) <= 1:
