@@ -160,13 +160,8 @@ def seconds_to_hhmm(secs):
 
 
 def send_telegram(text):
-    if not BOT_TOKEN or not CHAT_ID:
-        print(f"[SKIP] 텔레그램 토큰/챗ID 없음")
-        print(text)
-        return False
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    resp = requests.post(url, data={"chat_id": CHAT_ID, "text": text}, timeout=30)
-    return resp.json().get('ok', False)
+    from training_snapshot import send_messages
+    return send_messages(text, BOT_TOKEN, CHAT_ID)
 
 
 # ============================================================
@@ -1891,6 +1886,12 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
     workout_log entry의 all_metrics 시간순 순회로 전환.
     new_activities는 "어느 날짜가 갱신됐나" 판별용으로만 사용.
     """
+    if NOW.date().isoformat() >= '2026-09-07':
+        from training_snapshot import format_snapshot
+        dates = sorted({p['date'] for p in parsed_activities if p.get('date')})
+        return format_snapshot(workout_log, schedule_data, NOW.date(),
+                               title='가민 운동 기록 및 확정 계획', activity_dates=dates)
+
     lines = []
     # 헤더에 sync 시각 명시 — 며칠치 활동을 한 알림에 묶어 보낼 때 사용자 혼동 방지
     sync_label = f"{NOW.month}/{NOW.day} {NOW.strftime('%H:%M')}"

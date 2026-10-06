@@ -6,7 +6,7 @@ on:
       - 'workout/workout_schedule.json'
   workflow_dispatch:
 
-# workout_schedule.json 변경 시 텔레그램 즉시 알림.
+# 확정 스케줄 스냅샷 검증. 텔레그램은 홈페이지 배포 후 같은 스냅샷을 전송한다.
 # HTML 갱신은 dashboard-update.yml이 담당 (paths 중복으로 둘 다 trigger됨, race 없음).
 # 2026-05-24 추가 — schedule 변경 즉시 텔레 알림 갭 보완.
 
@@ -27,8 +27,8 @@ jobs:
 
       - run: pip install requests python-dotenv
 
-      - name: Notify schedule change
+      - name: Validate confirmed schedule snapshot
         env:
           BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python workout/scripts/notify_schedule_change.py
+        run: python workout/scripts/notify_training_update.py --dry-run

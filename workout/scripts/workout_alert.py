@@ -314,7 +314,7 @@ def get_schedule_for_date(dt):
     date_key = dt.strftime('%Y-%m-%d')
 
     # 오버라이드가 있으면 우선 적용
-    override = SCHEDULE_OVERRIDES.get(date_key)
+    override = load_schedule_overrides().get(date_key)
     if override:
         workout = override.get('workout', '휴식')
         detail = override.get('detail', '')
@@ -753,6 +753,11 @@ def load_condition():
 
 
 def format_morning():
+    if TODAY >= "2026-09-07":
+        from training_snapshot import load_snapshot, format_snapshot
+        log, schedule = load_snapshot()
+        return format_snapshot(log, schedule, NOW.date(), title="아침 운동·확정 계획") + "\n\n" + (load_condition() or "")
+
     if phase == 0:
         return None
 
@@ -836,6 +841,13 @@ def format_morning():
 
 
 def format_tomorrow_coaching():
+    if TODAY >= "2026-09-07":
+        from training_snapshot import load_snapshot, day_plan
+        _, schedule = load_snapshot()
+        tomorrow = NOW.date() + timedelta(days=1)
+        workout, detail = day_plan(schedule, tomorrow)
+        return f"📋 내일({tomorrow:%m/%d}) 확정 계획\n{workout}\n{detail}"
+
     """내일 운동에 대한 코칭 코멘트 생성"""
     tomorrow = NOW + timedelta(days=1)
     tomorrow_workout, tomorrow_detail = get_schedule_for_date(tomorrow)
@@ -984,6 +996,14 @@ def format_recovery_scenario(missed_workout):
 
 
 def format_evening():
+    if TODAY >= "2026-09-07":
+        from training_snapshot import load_snapshot, day_plan
+        log, schedule = load_snapshot()
+        workout, detail = day_plan(schedule, NOW.date())
+        entry = log.get(TODAY, {})
+        today_line = ("✅ 실제: " + entry.get("actual", "운동 완료")) if entry.get("done") else ("오늘 확정 계획: " + workout + "\n" + detail)
+        return today_line + "\n\n" + format_tomorrow_coaching() + "\n확정 일정의 회복 조건을 우선하며 미완료 운동을 추가로 보충하지 않습니다."
+
     workout, detail = get_today_workout()
     if workout is None:
         return None
@@ -1051,8 +1071,8 @@ def format_evening():
 
 
 def send_telegram(text):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(url, data={"chat_id": CHAT_ID, "text": text})
+    from training_snapshot import send_messages
+    return send_messages(text, BOT_TOKEN, CHAT_ID)
 
 
 if __name__ == '__main__':

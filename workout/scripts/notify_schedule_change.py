@@ -81,49 +81,9 @@ def _send_telegram(text):
 
 
 def main():
-    head = _git_show('HEAD')
-    prev = _git_show('HEAD~1')
-
-    if not isinstance(head, dict):
-        print('[SKIP] HEAD workout_schedule.json 파싱 실패')
-        return 0
-    if not isinstance(prev, dict):
-        print('[SKIP] HEAD~1 비교 대상 없음 (신규 또는 첫 commit)')
-        return 0
-
-    head_overrides = head.get('overrides', {})
-    prev_overrides = prev.get('overrides', {})
-
-    added = sorted(set(head_overrides.keys()) - set(prev_overrides.keys()))
-    deleted = sorted(set(prev_overrides.keys()) - set(head_overrides.keys()))
-    modified = []
-    for d in sorted(set(head_overrides.keys()) & set(prev_overrides.keys())):
-        if json.dumps(head_overrides[d], sort_keys=True, ensure_ascii=False) != json.dumps(
-            prev_overrides[d], sort_keys=True, ensure_ascii=False
-        ):
-            modified.append(d)
-
-    if not added and not modified and not deleted:
-        print('[SKIP] schedule overrides 변경 없음')
-        return 0
-
-    lines = ['📅 운동 스케줄 변경 반영']
-    lines.append(f"추가 {len(added)}건 · 수정 {len(modified)}건 · 삭제 {len(deleted)}건")
-    if added:
-        lines.append(f"➕ 추가: {', '.join(added[-5:])}")
-    if modified:
-        lines.append(f"✏️ 수정: {', '.join(modified[-5:])}")
-    if deleted:
-        lines.append(f"🗑️ 삭제: {', '.join(deleted[-5:])} (⚠️ 의도 확인)")
-
-    lines.append('')
-    lines.append(f'📊 상세 스케줄: {DASHBOARD_URL}')
-
-    msg = '\n'.join(lines)
-    print(msg)
-    ok = _send_telegram(msg)
-    print(f'  텔레그램: {"성공" if ok else "실패"}')
-    return 0
+    # Full content is shared with the homepage deployment notification.
+    from notify_training_update import main as notify
+    return notify()
 
 
 if __name__ == '__main__':

@@ -1139,6 +1139,15 @@ def main():
         print("  workout_log.json 비어있음")
         return
 
+    if TODAY >= '2026-09-07':
+        from training_snapshot import format_snapshot, send_messages
+        msg = format_snapshot(log, load_json(SCHEDULE_FILE), NOW.date(), title='운동 기록·확정 계획')
+        print(msg)
+        if '--dry-run' not in __import__('sys').argv:
+            ok = send_messages(msg, BOT_TOKEN, CHAT_ID)
+            print(f'텔레그램 전송: {"성공" if ok else "실패"}')
+        return
+
     msg = format_analysis_message(log)
     if not msg:
         print("  분석 메시지 없음")

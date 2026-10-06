@@ -11,19 +11,27 @@ on:
       - 'workout/scripts/garmin_sync.py'
       - 'workout/scripts/generate_dashboard.py'
       - 'workout/scripts/workout_analysis.py'
+      - 'workout/scripts/training_snapshot.py'
+      - 'workout/scripts/notify_training_update.py'
   workflow_dispatch:
+
+concurrency:
+  group: training-dashboard-update
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - run: pip install requests
+      - run: pip install requests python-dotenv
 
       - name: Generate dashboard HTML
         run: python workout/scripts/generate_dashboard.py
@@ -43,3 +51,10 @@ jobs:
             git commit -m "auto: 훈련 대시보드 업데이트 $(date '+%Y-%m-%d %H:%M')"
             git push
           fi
+
+      - name: Notify the deployed training snapshot
+        env:
+          BOT_TOKEN: ${{ secrets.TRAINING_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TRAINING_BEFORE_SHA: ${{ github.event.before }}
+        run: python workout/scripts/notify_training_update.py

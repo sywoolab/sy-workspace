@@ -123,50 +123,9 @@ def _send_telegram(text):
 
 
 def main():
-    head = _git_show('HEAD')
-    prev = _git_show('HEAD~1')
-
-    if not isinstance(head, dict):
-        print('[SKIP] HEAD workout_log.json 파싱 실패')
-        return 0
-    if not isinstance(prev, dict):
-        # 신규 추가 (HEAD~1에 파일 없음) — 전체를 변경으로 보지 않고 조용히 종료
-        print('[SKIP] HEAD~1 비교 대상 없음 (신규 또는 첫 commit)')
-        return 0
-
-    added_dates = sorted(set(head.keys()) - set(prev.keys()))
-    deleted_dates = sorted(set(prev.keys()) - set(head.keys()))
-    modified_dates = []
-    for d in sorted(set(head.keys()) & set(prev.keys())):
-        if json.dumps(head[d], sort_keys=True, ensure_ascii=False) != json.dumps(
-            prev[d], sort_keys=True, ensure_ascii=False
-        ):
-            modified_dates.append(d)
-
-    if not added_dates and not modified_dates and not deleted_dates:
-        print('[SKIP] workout_log 변경 없음')
-        return 0
-
-    lines = ['📝 운동 기록 변경 반영']
-    lines.append(
-        f"추가 {len(added_dates)}건 · 수정 {len(modified_dates)}건 · 삭제 {len(deleted_dates)}건"
-    )
-    if added_dates:
-        lines.append(f"➕ 추가: {', '.join(added_dates[-5:])}")
-    if modified_dates:
-        lines.append(f"✏️ 수정: {', '.join(modified_dates[-5:])}")
-    if deleted_dates:
-        # L0 §"권한·데이터 보호" 보호 파일군 — 삭제는 가장 위험한 변경. 항상 알림.
-        lines.append(f"🗑️ 삭제: {', '.join(deleted_dates[-5:])} (⚠️ 의도 확인)")
-
-    lines.append('')
-    lines.append(f'📊 상세/분석: {DASHBOARD_URL}')
-
-    msg = '\n'.join(lines)
-    print(msg)
-    ok = _send_telegram(msg)
-    print(f'  텔레그램: {"성공" if ok else "실패"}')
-    return 0
+    # Full content is shared with the homepage deployment notification.
+    from notify_training_update import main as notify
+    return notify()
 
 
 if __name__ == '__main__':
