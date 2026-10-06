@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """훈련 대시보드 HTML 생성 (자동 업데이트용)"""
 import json, re as _re
+from html import escape
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
@@ -1435,6 +1436,20 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
              '10/11은 6:10~6:35/km 범위에서 통증·심박 우선, 10/18은 6:00~6:20/km의 대화 가능한 강도. '
              '빠르게 달릴 능력 확인이 아니라 보급·근골격 내구성과 다음날 회복을 확인한다.</div></div>'
              '</div>\n')
+    for report_date, report_entry in sorted(log.items(), reverse=True):
+        fueling = report_entry.get('fueling_report', {})
+        if not fueling.get('summary'):
+            continue
+        review = report_entry.get('fueling_review', {})
+        html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
+                 'padding:11px 13px;margin-bottom:12px;line-height:1.6">'
+                 f'<div style="color:#ffd56c;font-weight:700">{escape(report_date)} 실제 보급 기록</div>'
+                 f'<div style="font-size:11px;color:#bbb">{escape(fueling["summary"])}</div>')
+        if review.get('summary'):
+            html += f'<div style="font-size:11px;color:#9fc6ef;margin-top:6px">보급 해석: {escape(review["summary"])}</div>'
+        if review.get('source_url'):
+            html += f'<a style="font-size:10px;color:#888" href="{escape(review["source_url"], quote=True)}">AIS 보급 안내</a>'
+        html += '</div>\n'
     html += ('<div style="overflow-x:auto"><table style="min-width:850px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
              '<th>실제 수행</th><th>품질 판정</th><th>코멘트</th><th>핵심 목표</th></tr></thead><tbody>\n')
     for week, volume, long_run, target_count, min_total, min_long, focus in kobe_weeks:

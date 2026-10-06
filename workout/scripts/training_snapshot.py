@@ -80,6 +80,11 @@ def format_snapshot(log, schedule, today, title='운동·확정 계획 최신 �
             lines.append(f"✅ {key}: {entry.get('actual', '운동 완료')}")
             if entry.get('note'):
                 lines.append(f"기록 메모: {entry['note']}")
+            review = entry.get('fueling_review', {})
+            if review.get('summary'):
+                lines.append(f"보급 해석: {review['summary']}")
+            if review.get('source_url'):
+                lines.append(f"보급 근거: {review['source_url']}")
     lines.extend(['', format_progress(log, schedule, today), '', format_plan(log, schedule, today),
                   '', f'📊 홈페이지: {DASHBOARD_URL}'])
     return '\n'.join(lines)
