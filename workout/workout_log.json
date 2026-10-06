@@ -16407,5 +16407,54 @@
         "feel": 50
       }
     ]
+  },
+  "2026-10-07": {
+    "planned": "🏊 수영 강습 06시 — 회복 강도 또는 스킵",
+    "done": true,
+    "actual": "수영 1050m 41분 @2:02/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1050,
+      "duration_min": 40.6,
+      "moving_min": 21.4,
+      "pace_per_100m": "2:02",
+      "avg_hr": 128,
+      "max_hr": 167,
+      "swolf": 42,
+      "strokes": 495,
+      "avg_spm": null,
+      "training_load": 62
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.5 / 무산소 1.4 | 부하 62",
+    "garmin_id": 24633342868,
+    "start_time": "06:20",
+    "garmin_ids": [
+      24633342868
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1050,
+        "duration_sec": 2436.0,
+        "avg_hr": 128,
+        "max_hr": 167,
+        "avg_pace": "2:02",
+        "avg_speed": null,
+        "training_load": 62,
+        "garmin_id": 24633342868,
+        "laps": null,
+        "open_water": false,
+        "start_time": "06:20",
+        "duration_min": 40.6,
+        "moving_min": 21.4,
+        "pace_per_100m": "2:02",
+        "swolf": 42,
+        "strokes": 495,
+        "avg_spm": null,
+        "rpe": 4,
+        "feel": 50
+      }
+    ]
   }
 }
