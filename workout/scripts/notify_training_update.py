@@ -56,6 +56,10 @@ def main():
                 msg += f'\n{key}: ' + (entry.get('workout', '') if entry else '확정 세션 삭제')
                 if entry and entry.get('detail'):
                     msg += '\n  ' + entry['detail']
+    strategy = schedule.get('kobe_race_strategy')
+    if strategy and (before_schedule is None or strategy != before_schedule.get('kobe_race_strategy')):
+        from race_strategy import strategy_text
+        msg += '\n\n📌 저장한 레이스 전략\n' + strategy_text(strategy)
     print(msg)
     if '--dry-run' in sys.argv:
         return 0

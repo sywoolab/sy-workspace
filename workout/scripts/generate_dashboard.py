@@ -1406,6 +1406,9 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("10/19~20", "30~32km 후 48시간 통증 0~1/10·정상 보행", "⏳ 예정", "피크 LSD 완료 후 판정"),
         ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "🟡 관찰 중", "현재 무릎 약 1/10·발바닥 뻐근함 · 악화 여부 지속 확인"),
     ]
+    if sched_data.get('kobe_race_strategy'):
+        from race_strategy import strategy_html
+        html += strategy_html(sched_data['kobe_race_strategy'])
     html += '<div id="kobe-roadmap">\n<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
     html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
              'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55">'
