@@ -16456,5 +16456,191 @@
         "feel": 50
       }
     ]
+  },
+  "2026-10-09": {
+    "planned": "🏊 수영 강습일 — 휴관 시 휴식 / 가능 시 회복 수영 1000~1500m",
+    "done": true,
+    "actual": "러닝 8.01km @5:59",
+    "metrics": {
+      "type": "run",
+      "distance_km": 8.01,
+      "pace_per_km": "5:59",
+      "avg_hr": 143,
+      "max_hr": 170,
+      "cadence": 178,
+      "training_load": 106,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 380,
+          "avg_hr": 134,
+          "max_hr": 155,
+          "pace_sec": 380,
+          "pace_str": "6:20"
+        },
+        {
+          "distance": 1000,
+          "duration": 361,
+          "avg_hr": 139,
+          "max_hr": 146,
+          "pace_sec": 361,
+          "pace_str": "6:01"
+        },
+        {
+          "distance": 1000,
+          "duration": 360,
+          "avg_hr": 143,
+          "max_hr": 146,
+          "pace_sec": 360,
+          "pace_str": "5:59"
+        },
+        {
+          "distance": 1000,
+          "duration": 343,
+          "avg_hr": 145,
+          "max_hr": 151,
+          "pace_sec": 343,
+          "pace_str": "5:43"
+        },
+        {
+          "distance": 1000,
+          "duration": 364,
+          "avg_hr": 140,
+          "max_hr": 149,
+          "pace_sec": 364,
+          "pace_str": "6:03"
+        },
+        {
+          "distance": 1000,
+          "duration": 356,
+          "avg_hr": 145,
+          "max_hr": 152,
+          "pace_sec": 356,
+          "pace_str": "5:55"
+        },
+        {
+          "distance": 1000,
+          "duration": 353,
+          "avg_hr": 147,
+          "max_hr": 158,
+          "pace_sec": 353,
+          "pace_str": "5:52"
+        },
+        {
+          "distance": 1000,
+          "duration": 358,
+          "avg_hr": 155,
+          "max_hr": 170,
+          "pace_sec": 358,
+          "pace_str": "5:58"
+        },
+        {
+          "distance": 9,
+          "duration": 3,
+          "avg_hr": 152,
+          "max_hr": 152,
+          "pace_sec": 346,
+          "pace_str": "5:46"
+        }
+      ]
+    },
+    "training_zone": "easy",
+    "note": "유산소 3.3 / 무산소 0.6 | 부하 106",
+    "garmin_id": 24658443113,
+    "start_time": "11:04",
+    "garmin_ids": [
+      24658443113
+    ],
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_m": 8010.0,
+        "duration_sec": null,
+        "avg_hr": 143,
+        "max_hr": 170,
+        "avg_pace": "5:59",
+        "avg_speed": null,
+        "training_load": 106,
+        "garmin_id": 24658443113,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 380,
+            "avg_hr": 134,
+            "max_hr": 155,
+            "pace_sec": 380,
+            "pace_str": "6:20"
+          },
+          {
+            "distance": 1000,
+            "duration": 361,
+            "avg_hr": 139,
+            "max_hr": 146,
+            "pace_sec": 361,
+            "pace_str": "6:01"
+          },
+          {
+            "distance": 1000,
+            "duration": 360,
+            "avg_hr": 143,
+            "max_hr": 146,
+            "pace_sec": 360,
+            "pace_str": "5:59"
+          },
+          {
+            "distance": 1000,
+            "duration": 343,
+            "avg_hr": 145,
+            "max_hr": 151,
+            "pace_sec": 343,
+            "pace_str": "5:43"
+          },
+          {
+            "distance": 1000,
+            "duration": 364,
+            "avg_hr": 140,
+            "max_hr": 149,
+            "pace_sec": 364,
+            "pace_str": "6:03"
+          },
+          {
+            "distance": 1000,
+            "duration": 356,
+            "avg_hr": 145,
+            "max_hr": 152,
+            "pace_sec": 356,
+            "pace_str": "5:55"
+          },
+          {
+            "distance": 1000,
+            "duration": 353,
+            "avg_hr": 147,
+            "max_hr": 158,
+            "pace_sec": 353,
+            "pace_str": "5:52"
+          },
+          {
+            "distance": 1000,
+            "duration": 358,
+            "avg_hr": 155,
+            "max_hr": 170,
+            "pace_sec": 358,
+            "pace_str": "5:58"
+          },
+          {
+            "distance": 9,
+            "duration": 3,
+            "avg_hr": 152,
+            "max_hr": 152,
+            "pace_sec": 346,
+            "pace_str": "5:46"
+          }
+        ],
+        "open_water": false,
+        "start_time": "11:04",
+        "rpe": 4,
+        "feel": 50
+      }
+    ]
   }
 }
