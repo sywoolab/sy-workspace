@@ -1338,7 +1338,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         ("09/14~09/20", "30~34km", "18~20km", 4, 30, 18, "전 구간 무보행·보급 연습 시작"),
         ("09/21~09/27", "24~26km", "14~16km", 3, 24, 14, "월~수 출장·직전 롱런 흡수·목요일부터 통증 게이트 후 재개"),
         ("09/28~10/04", "실제 39.12km", "실제 26.57km", 3, 30, 20, "26.57km @5:36 완주·후반까지 다리와 호흡 여유, 운동 후 무릎 반응 관리"),
-        ("10/05~10/11", "회복 22~24km", "조건부 18~20km", 2, 22, 18, "27km 흡수·연휴 마지막 날 Easy 상태확인·증상 게이트"),
+        ("10/05~10/11", "회복 22~24km", "조건부 20km", 2, 22, 18, "27km 흡수·연휴 마지막 날 Easy 상태확인·증상 게이트"),
         ("10/12~10/18", "38~42km", "조건부 30~32km", 3, 38, 30, "10/18 최종 피크 LSD·보급/신발/복장 리허설"),
         ("10/19~10/25", "30~34km", "20~22km", 3, 30, 20, "30~32km 흡수·Easy 중심·거리 추가 금지"),
         ("10/26~11/01", "26~32km", "16~18km", 4, 26, 16, "테이퍼 시작·피로 제거·거리 추가 금지"),
@@ -1401,7 +1401,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
         ("9월 말", "하프 1:55 이내 무보행", "✅ 대체 달성", "10/4 26.57km 무보행 · 가장 빠른 연속 하프 1:56:24(5.47~26.57km) · 기준보다 1:24 느리지만 5.47km 추가 거리로 지속능력 확인"),
-        ("10/11", "18~20km Easy + 이후 48시간 증상 확인", "🟡 부분 달성", "10/4에 거리능력은 이미 확인 · 운동 후 무릎 반응과 현재 발바닥 뻐근함 때문에 회복 게이트는 10/11 및 이후 48시간 반응으로 최종 판정"),
+        ("10/11", "20km(후반 5:40 표류 테스트) + 이후 48시간 증상 확인", "⏳ 예정", "10/10 무릎 0/10 · 4km 워밍업 후 5:38~5:42, 심박 165 브레이크 · 젤 2포로 10/4 대비 심박 표류 감소 여부 확인"),
         ("10/18", "조건부 30~32km 안정 완주 + 정상 보급", "⏳ 예정", "10/11 롱런과 이후 48시간이 소염제 없이 0~1/10일 때만 실시"),
         ("10/19~20", "30~32km 후 48시간 통증 0~1/10·정상 보행", "⏳ 예정", "피크 LSD 완료 후 판정"),
         ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "🟡 관찰 중", "현재 무릎 약 1/10·발바닥 뻐근함 · 악화 여부 지속 확인"),
@@ -1434,9 +1434,9 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
              '붓기·잠김·불안정성, 보행 변화 또는 통증 증가 시 러닝 중단·진료 고려</div></div>'
              '<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:11px 13px;line-height:1.55">'
              '<div style="color:#6ab4ff;font-weight:700;margin-bottom:5px">남은 LSD·테이퍼</div>'
-             '<div style="font-size:11px;color:#bbb">10/11 조건부 18~20km → 10/18 조건부 30~32km → '
+             '<div style="font-size:11px;color:#bbb">10/11 조건부 20km → 10/18 조건부 30~32km → '
              '10/25 20~22km → 11/1 16~18km → 11/8 10~12km → 11/15 고베<br>'
-             '10/11은 6:10~6:35/km 범위에서 통증·심박 우선, 10/18은 6:00~6:20/km의 대화 가능한 강도. '
+             '10/11은 4km 워밍업 후 5:38~5:42 유지(심박 165 초과 시 6:00 감속, 젤 2포)로 보급 시 심박 표류 확인, 10/18은 6:00~6:20/km의 대화 가능한 강도. '
              '빠르게 달릴 능력 확인이 아니라 보급·근골격 내구성과 다음날 회복을 확인한다.</div></div>'
              '</div>\n')
     for report_date, report_entry in sorted(log.items(), reverse=True):
@@ -1469,7 +1469,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">{comment}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table></div>\n'
-    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 10/4 26.57km는 계획보다 강한 마라톤페이스급 장거리였다. 러닝 중에는 통증 없이 매우 상쾌했고 다리·호흡 모두 최소 5km 이상 여유가 남았으나, 후반 심박과 운동 후 무릎 반응을 고려해 다음 장거리는 속도 증명이 아니라 회복 가능한 강도와 48시간 무증상 확인이 목적이다. 10/11 18~20km 검증 후 10/18 조건부 30~32km를 마지막 피크로 실시하며, 이후 20~22km부터 테이퍼한다.</div>\n'
+    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 10/4 26.57km는 계획보다 강한 마라톤페이스급 장거리였다. 러닝 중에는 통증 없이 매우 상쾌했고 다리·호흡 모두 최소 5km 이상 여유가 남았으나, 후반 심박과 운동 후 무릎 반응을 고려해 다음 장거리는 속도 증명이 아니라 회복 가능한 강도와 48시간 무증상 확인이 목적이다. 10/11 20km(후반 5:40 표류 테스트) 검증 후 10/18 조건부 30~32km를 마지막 피크로 실시하며, 이후 20~22km부터 테이퍼한다.</div>\n'
     html += '<div style="overflow-x:auto"><table style="min-width:900px"><thead><tr><th>판정 시점</th><th>통과 기준</th><th>현재 상태</th><th>판정 근거</th></tr></thead><tbody>\n'
     for timing, criterion, status, evidence in kobe_checks:
         status_color = '#6affa0' if '✅' in status else ('#ffd56c' if '🟡' in status else '#6ab4ff')
