@@ -16649,5 +16649,54 @@
     "actual": "휴식 — 전날 과음으로 운동 스킵",
     "note": "사용자 확인(10/9): 수요일 과음으로 목요일 운동 휴식.",
     "training_zone": "rest"
+  },
+  "2026-10-10": {
+    "planned": "🏊 오픈워터 수영 약 1km 천천히 (러닝·자전거 없음)",
+    "done": true,
+    "actual": "수영 2000m 41분 @2:03/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 2000,
+      "duration_min": 41.2,
+      "moving_min": 41.2,
+      "pace_per_100m": "2:03",
+      "avg_hr": 137,
+      "max_hr": 169,
+      "swolf": 42,
+      "strokes": 904,
+      "avg_spm": null,
+      "training_load": 101
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.2 / 무산소 0.8 | 부하 101",
+    "garmin_id": 24668690400,
+    "start_time": "09:34",
+    "garmin_ids": [
+      24668690400
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 2000,
+        "duration_sec": 2472.0,
+        "avg_hr": 137,
+        "max_hr": 169,
+        "avg_pace": "2:03",
+        "avg_speed": null,
+        "training_load": 101,
+        "garmin_id": 24668690400,
+        "laps": null,
+        "open_water": false,
+        "start_time": "09:34",
+        "duration_min": 41.2,
+        "moving_min": 41.2,
+        "pace_per_100m": "2:03",
+        "swolf": 42,
+        "strokes": 904,
+        "avg_spm": null,
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
