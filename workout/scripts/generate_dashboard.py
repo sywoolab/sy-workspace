@@ -1382,7 +1382,10 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         actual = ('아직 기록 없음' if count == 0 else
                   f'{total:.2f}km · 최장 {longest:.2f}km · {count}회')
         if end >= today and period not in user_closed_weeks:
-            return actual, '진행 중', '주차 종료 후 판정'
+            # Close the current week on its final day once that day's session is logged.
+            final_day_logged = end == today and log.get(end, {}).get('done', False)
+            if end > today or not final_day_logged:
+                return actual, '진행 중', '주차 종료 후 판정'
 
         checks = {
             '거리': total >= min_total,
@@ -1398,13 +1401,16 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
             detail += ' · 사용자: 무급수·무보급, 후반 HR↑, 무릎 안쪽 쑤심'
         elif period == '09/14~09/20':
             detail += ' · 무릎 부담 예방 종료, 족저근막 아주 약한 전조'
+        elif period == '10/05~10/11':
+            detail += ' · 회복주 계획 22~24km보다 4.02km 초과; 10/11 HR 표류·무릎 반응은 이후 48시간 관찰'
         return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
         ("9월 말", "하프 1:55 이내 무보행", "✅ 대체 달성", "10/4 26.57km 무보행 · 가장 빠른 연속 하프 1:56:24(5.47~26.57km) · 기준보다 1:24 느리지만 5.47km 추가 거리로 지속능력 확인"),
-        ("10/11", "20km(후반 5:40 표류 테스트) + 이후 48시간 증상 확인", "🟡 완료·표류 유지", "20.01km · 5~20km 평균 5:40 · 심박 159(5~14km)→171(17~20km), 10/4와 표류 폭 동일(+12) · 젤 2포에도 표류 폭은 유사했으나 수면 271분·준비도 1점 등 컨디션 교란이 있어 원인 단정 불가 · 종료 직후 무릎 3/10→1/10"),
-        ("10/18", "조건부 30km: Easy 빌드업 + 마지막 5km 점진 가속", "⏳ 예정", "10/13 무릎 0~1/10일 때만 진행 · 마지막 5km 5:42→5:35 안팎 · 30km에서 종료 권장, 모든 회복 기준 충족 시에만 32km · 5km만으로 5:35 지속 가능성을 확정하지 않음"),
+        ("10/11", "20km(후반 5:40 표류 테스트) + 이후 48시간 증상 확인", "🟡 러닝 완료·48시간 관찰 중", "20.01km @5:45 · 평균 HR 162/최대 186 · 5~14km HR159→17~20km HR171(+12), 10/4와 비슷한 표류. 젤 8·15km 섭취에도 표류 감소는 관찰되지 않았으나 제품·탄수화물량 미기록, 수면 271분·점수59·준비도1·코스 영향으로 원인 단정 불가. 무릎 종료 직후 3/10→오후 1/10. 노바블라스트 착용 후 발 붓기 없음·발바닥 통증 거의 없음(사용자 보고), 신발 효과 인과는 미확인."),
+        ("10/13", "48시간 반응 확인 후 Easy 5~6km 여부 결정", "⏳ 증상 게이트 대기", "소염제 없이 무릎·발바닥 0~1/10, 악화·붓기·잠김·불안정성 없을 때만 평지 Easy. 통증이 늘거나 보행이 달라지면 중단."),
+        ("10/18", "조건부 30km: Easy 빌드업 + 마지막 5km 점진 가속", "⏳ 예정", "10/13 증상 게이트 통과 때만 진행 · 마지막 5km 5:42→5:35 안팎 · 30km 종료 기본, 마지막 2km 동안 HR175 이상이 2km 지속되지 않고 무릎·보행·여유 조건도 모두 통과할 때만 32km · 보급은 익숙한 젤 4포로 약 33g/h 리허설"),
         ("10/19~20", "30~32km 후 48시간 통증 0~1/10·정상 보행", "⏳ 예정", "피크 LSD 완료 후 판정"),
-        ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "🟡 관찰 중", "현재 무릎 약 1/10·발바닥 뻐근함 · 악화 여부 지속 확인"),
+        ("상시", "무릎 통증 0~1/10·붓기/잠김/불안정성 없음", "🟡 관찰 중", "10/11 종료 직후 무릎 3/10→오후 1/10. 노바블라스트 착용 후 발 붓기 없음·발바닥 통증 거의 없음(사용자 보고); 48시간 반응 추적 중"),
     ]
     if sched_data.get('kobe_race_strategy'):
         from race_strategy import strategy_html
@@ -1412,13 +1418,13 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
     html += '<div id="kobe-roadmap">\n<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
     html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
              'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.55">'
-             '<b style="color:#ffd56c">현재 판정:</b> <b style="color:#6affa0">sub-4 가능성 55~65%</b> · '
-             '<b style="color:#6ab4ff">3:55 가능성 40~50%</b>. 기존 30% 미만 구간에서는 벗어났다. '
-             '근거는 10/4 실제 26.57km를 목표 페이스에 가까운 5:36/km로 완주했고, 마지막까지 페이스 붕괴 없이 '
-             '사용자 체감상 다리와 호흡 모두 최소 5km 이상 여유가 남았다는 점이다. 반면 평균 HR 165·후반 HR 170~181, '
-             'TL 365, 운동 후 오른쪽 무릎 일시 5/10 및 특정 자세 3/10, 소염제 복용은 하향 요인이다. '
-             '10/18 30km를 증상 악화 없이 마치고 마지막 5km를 5:42에서 5:35/km 안팎까지 올릴 때의 반응을 확인한다. 32km는 30km 지점에서 모든 회복 기준이 충족될 때만 선택하며, 5km 테스트만으로 5:35/km 지속 가능성을 확정하지 않고 10/11 표류 결과와 함께 sub-4 전략을 재평가한다. '
-             '목표 기록은 3:55(평균 5:34/km), 1차 방어선은 sub-4:00이며 35km 훈련은 필요하지 않다.'
+             '<b style="color:#ffd56c">현재 판정(10/11 기록 반영):</b> <b style="color:#ffd56c">sub-4 가능성 약 40~50%</b> · '
+             '<b style="color:#6ab4ff">3:55 가능성 약 20~30%</b>. 통계모형이 아닌 현재 훈련자료 기반의 거친 코칭 추정치다. '
+             '긍정 신호는 10/4 26.57km @5:36에서 페이스 붕괴가 없었고 5km 이상 여유를 느꼈으며, 10/11도 20.01km를 완주했다는 점이다. '
+             '다만 10/4 평균 HR165·후반 170~181과 무릎 종료 후 일시 5/10, 10/11 평균 HR162·후반 159→171(+12) 표류 및 종료 직후 무릎 3/10 재현은 거리 지속성의 미검증 요인이다. '
+             '10/11은 수면 271분·훈련준비도 1점이라 수행을 단정적으로 낮춰 해석하지 않고, 젤 2포에도 HR 표류 감소가 관찰되지 않았지만 제품·탄수화물량이 기록되지 않아 보급 실패로 판정하지 않는다. '
+             '노바블라스트 착용 후 발 붓기 없음·발바닥 통증 감소는 편안함 측면의 긍정 보고이나 성능·부상 예방 효과를 입증하지는 않는다. '
+             '10/18 조건부 30km와 48시간 무악화 회복, 주간 러닝 지속성을 확인한 뒤 다시 판단한다. 목표 3:55(5:34/km)는 도전 목표, sub-4(평균 5:41/km)는 1차 방어선이며 35km 훈련은 필요하지 않다.'
              '</div>\n')
     html += ('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-bottom:12px">'
              '<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:11px 13px;line-height:1.55">'
@@ -1428,13 +1434,13 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
              '사용자 체감: 다리와 호흡 모두 남았고 최소 5km 추가 가능, 약 32km까지 가능했을 것으로 판단</div></div>'
              '<div style="background:#13131f;border:1px solid #3a2a2a;border-radius:10px;padding:11px 13px;line-height:1.55">'
              '<div style="color:#ff8b8b;font-weight:700;margin-bottom:5px">남은 리스크·중단 기준</div>'
-             '<div style="font-size:11px;color:#bbb">평균 HR 165 · 최대 187 · 후반 HR 170~181 · 유산소 TE 5.0 · TL 365<br>'
-             '오른쪽 무릎: 시작 1 → 중간 자세별 2 → 종료 직후 약 10초간 5 → 귀가 후 일시 3 → 현재 기본 1/10<br>'
-             '특정 자세 3/10 재현 · 발바닥 뻐근함 · 소염제 복용 중(성분/용량 미확인)<br>'
-             '붓기·잠김·불안정성, 보행 변화 또는 통증 증가 시 러닝 중단·진료 고려</div></div>'
+             '<div style="font-size:11px;color:#bbb">10/4: 평균 HR165 · 최대187 · 후반 HR170~181 · 유산소 TE5.0 · TL365<br>'
+             '10/4 무릎: 시작1 → 특정 자세2 → 종료 직후 일시5 → 귀가 후3, 당시 소염제 복용 보고(성분·용량 미확인)<br>'
+             '10/11 무릎: 주행 중1 → 종료 직후 오른쪽3/왼쪽1 → 오후 오른쪽1. 노바블라스트 후 발 붓기 없음·발바닥 통증 거의 없음(사용자 보고)<br>'
+             '48시간 증상 추적 중 · 붓기·잠김·불안정성, 보행 변화 또는 통증 증가 시 러닝 중단·진료 고려</div></div>'
              '<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:11px 13px;line-height:1.55">'
              '<div style="color:#6ab4ff;font-weight:700;margin-bottom:5px">남은 LSD·테이퍼</div>'
-             '<div style="font-size:11px;color:#bbb">10/11 조건부 20km → 10/18 조건부 30~32km → '
+             '<div style="font-size:11px;color:#bbb">10/11 20.01km 완료·48시간 증상 관찰 → 10/18 조건부 30km(회복 기준 모두 충족 시 최대 32km) → '
              '10/25 20~22km → 11/1 16~18km → 11/8 10~12km → 11/15 고베<br>'
              '10/11은 4km 워밍업 후 5:38~5:42 유지(심박 165 초과 시 6:00 감속, 젤 2포)로 심박 표류를 확인했으며 수면 부족 등 컨디션 교란도 있었다. 10/18은 첫 3km 6:00~6:10, 3~25km 5:50~6:00으로 점진 빌드업 후 마지막 5km는 여유가 있을 때 5:42에서 5:35/km 안팎까지 올린다. 30km 종료를 기본으로 하고, 마지막 2km 동안 심박 175 이상이 2km 지속되지 않았으며 무릎 0/10·정상 보행·호흡과 다리에 분명한 여유가 모두 있을 때만 최대 32km까지 연장한다. 심박 170 미만은 필수조건이 아니다. 5:30 가속은 하지 않는다. '
              '빠르게 달릴 능력 확인이 아니라 보급·근골격 내구성과 다음날 회복을 확인한다.</div></div>'
@@ -1469,7 +1475,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                  f'<td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">{comment}</td>'
                  f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
     html += '</tbody></table></div>\n'
-    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 10/4 26.57km는 계획보다 강한 마라톤페이스급 장거리였다. 러닝 중에는 통증 없이 매우 상쾌했고 다리·호흡 모두 최소 5km 이상 여유가 남았으나, 후반 심박과 운동 후 무릎 반응을 고려해 다음 장거리는 회복 가능한 강도와 증상 확인을 우선한다. 10/11 20km는 5:40 안팎에서 심박 표류가 확인됐지만 수면 271분·준비도 1점 등 컨디션 교란이 있어 원인을 단정하지 않는다. 10/18 조건부 30km는 3km 6:00~6:10, 3~25km 5:50~6:00 점진 빌드업 후 마지막 5km 5:42에서 5:35/km 안팎까지 올리며, 완전히 여유로울 때만 32km를 검토한다.</div>\n'
+    html += '<div style="font-size:10.5px;color:#666;margin:5px 0 12px">* 10/4 26.57km @5:36은 높은 심박과 종료 후 무릎 반응이 있었지만 러닝 중 체감 여유도 컸다. 10/11은 20.01km @5:45, 평균 HR162·최대186, 후반 HR 표류 +12. 젤 8·15km를 먹었으나 제품·탄수화물량과 실제 수분량이 빠져 있어 보급 효과는 판단 보류; 수면 271분·준비도1도 교란 요인이다. 회복주 실제 28.02km는 계획 22~24km 상한을 넘었고 2회 러닝/롱런20.01km는 기준을 충족했다. 10/18은 3km 6:00~6:10, 3~25km 5:50~6:00, 마지막5km 5:42→5:35 안팎의 조건부 30km이며, 32km 연장은 회복 신호가 모두 좋을 때만 선택한다. 보급은 익숙한 24.4g 젤 4포로 약 33g/h를 리허설하고 실제 수분·위장 반응도 기록한다.</div>\n'
     html += '<div style="overflow-x:auto"><table style="min-width:900px"><thead><tr><th>판정 시점</th><th>통과 기준</th><th>현재 상태</th><th>판정 근거</th></tr></thead><tbody>\n'
     for timing, criterion, status, evidence in kobe_checks:
         status_color = '#6affa0' if '✅' in status else ('#ffd56c' if '🟡' in status else '#6ab4ff')
