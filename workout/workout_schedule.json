@@ -951,12 +951,12 @@
       "source": "manual", "auto": false, "rule": "2026-10-05 two-week-kobe-plan"
     },
     "2026-10-13": {
-      "date": "2026-10-13", "workout": "🏃 Easy 5~6km", "detail": "10/11 롱런 후 48시간 동안 소염제 없이 통증 0~1/10이고 악화가 없을 때만 평지 6:15~6:40/km. 품질구간·스트라이드 없이 회복 상태만 확인한다.",
-      "source": "manual", "auto": false, "rule": "2026-10-05 two-week-kobe-plan"
+      "date": "2026-10-13", "workout": "😴 휴식 (Easy 런은 10/14로 이동)", "detail": "전날 음주로 아침 HRV 25(주간 42)·수면 점수 25·바디배터리 최고 10. 회복 우선으로 러닝 생략, 일찍 취침. 10/18 30km까지 금주.",
+      "source": "manual", "auto": false, "rule": "2026-10-13 claude-user-agreed-recovery-shift"
     },
     "2026-10-14": {
-      "date": "2026-10-14", "workout": "🏊 수영 강습 06시 — 회복 1200~1800m 또는 스킵", "detail": "수요일 정규 강습에서 러닝 충격 없이 유산소 감각만 유지한다. 발바닥·무릎 반응이 있으면 강한 킥·핀·벽 차기를 제외하거나 강습을 스킵한다.",
-      "source": "manual", "auto": false, "rule": "2026-10-05 two-week-kobe-plan"
+      "date": "2026-10-14", "workout": "🏃 Easy 6km + 🏊 수영 회복", "detail": "10/13 휴식분 이동. 러닝 6km 평지 6:15~6:40/km, 아주 가볍게, 거리 추가 금지(주간 6+4+30=40km). 수영은 정규 강습에서 숨차지 않는 회복 강도만, 강한 킥·핀·벽 차기 제외. 아침 HRV 40 미만이거나 오른쪽 뒤꿈치 1/10 초과면 수영 생략, HRV 30 미만이면 러닝 4km로 축소.",
+      "source": "manual", "auto": false, "rule": "2026-10-13 claude-user-agreed-recovery-shift"
     },
     "2026-10-15": {
       "date": "2026-10-15", "workout": "🏃 Easy 3~4km", "detail": "10/18 피크 LSD 전 마지막 짧은 러닝. 평지 6:20~6:45/km로 다리만 풀고 품질구간·스트라이드·거리 추가는 하지 않는다. 통증 증가 시 즉시 종료한다.",
