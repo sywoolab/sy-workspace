@@ -974,6 +974,30 @@
       "date": "2026-10-18", "workout": "😴 휴식 (30km는 10/17로 이동)", "detail": "전날 30km + 술자리 다음 날. 러닝 없이 수분·식사·수면으로 회복. 무릎·발바닥·뒤꿈치 반응을 기록하고 산책 정도만 허용.",
       "source": "manual", "auto": false, "rule": "2026-10-14 claude-user-agreed-longrun-to-sat"
     },
+    "2026-10-19": {
+      "date": "2026-10-19", "workout": "😴 완전 휴식 (수영 스킵)", "detail": "10/17 30km 후 48시간 회복 확인. 러닝·수영 없이 수면·식사 우선. 무릎·발바닥·뒤꿈치 반응 기록.",
+      "source": "manual", "auto": false, "rule": "2026-10-15 claude-user-agreed-weekday-easy-w43"
+    },
+    "2026-10-20": {
+      "date": "2026-10-20", "workout": "🏃 Easy 6km", "detail": "10/17 이후 48시간 무릎 0~1/10·붓기 없음·정상 보행일 때만. 평지 6:20~6:40/km(10/15 6.03km @6:27 HR131 수준), 끝까지 일정하게 달리고 마지막에 빨라지지 않기. 품질구간·스트라이드·거리 추가 없음. 다음 날 아침 무릎 0~1/10이면 그대로, 1/10 초과이거나 계단에서 느껴지면 4km로 줄이거나 휴식.",
+      "source": "manual", "auto": false, "rule": "2026-10-15 claude-user-agreed-weekday-easy-w43"
+    },
+    "2026-10-21": {
+      "date": "2026-10-21", "workout": "🏊 수영 회복 또는 휴식", "detail": "회복 강도만. 자유형·풀부이 위주, 평영·강한 킥·핀·벽 차기 제외, 20~30분 이내. 무릎 1/10 초과면 휴식.",
+      "source": "manual", "auto": false, "rule": "2026-10-15 claude-user-agreed-weekday-easy-w43"
+    },
+    "2026-10-22": {
+      "date": "2026-10-22", "workout": "🏃 Easy 6km", "detail": "10/20과 동일: 평지 6:20~6:40/km, 마지막 가속 금지, 거리 추가 없음. 다음 날 아침 무릎 0~1/10이면 그대로, 1/10 초과이거나 계단에서 느껴지면 4km로 줄이거나 휴식.",
+      "source": "manual", "auto": false, "rule": "2026-10-15 claude-user-agreed-weekday-easy-w43"
+    },
+    "2026-10-23": {
+      "date": "2026-10-23", "workout": "🛏 휴식 (수영은 가볍게 선택)", "detail": "10/25 대회 구간 리허설 이틀 전. 기본 휴식, 수영 시 자유형·풀부이로 가볍게만(평영 제외).",
+      "source": "manual", "auto": false, "rule": "2026-10-15 claude-user-agreed-weekday-easy-w43"
+    },
+    "2026-10-24": {
+      "date": "2026-10-24", "workout": "🛏 휴식 + 리허설 준비", "detail": "10/25 전날. 수영 개인강습 스킵 권장, 러닝·하체 근력 금지. 젤·신발(노바블라스트)·복장 준비, 음주 금지, 일찍 취침(워치 착용).",
+      "source": "manual", "auto": false, "rule": "2026-10-15 claude-user-agreed-weekday-easy-w43"
+    },
     "2026-10-25": {
       "date": "2026-10-25",
       "workout": "🏃 조건부 21~25km — Easy 3~7km + 대회 구간 리허설(5:45→5:40→5:35) 18km, 대회 페이스로 종료 (통영 참가 취소)",
