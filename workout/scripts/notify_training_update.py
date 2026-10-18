@@ -43,23 +43,20 @@ def main():
             print('[안내] 이전 로그 비교 불가 — 오늘 기록과 최신 확정 계획 전송')
     today = datetime.now(timezone(timedelta(hours=9))).date()
     dates = changed_dates(log, before) if before else [today.isoformat()]
-    msg = format_snapshot(log, schedule, today, title='홈페이지 업데이트 · 최신 확정 내용', activity_dates=dates)
+    msg = format_snapshot(log, schedule, today, title='운동 스케줄 업데이트', activity_dates=dates)
     if before_schedule is not None:
         previous = before_schedule.get('overrides', {})
         current = schedule.get('overrides', {})
         changes = sorted(key for key in set(previous) | set(current)
                          if previous.get(key) != current.get(key))
         if changes:
-            msg += '\n\n📌 이번 반영에서 변경한 확정 세션 (전체)'
+            msg += '\n\n📌 변경된 일정'
             for key in changes:
                 entry = current.get(key)
-                msg += f'\n{key}: ' + (entry.get('workout', '') if entry else '확정 세션 삭제')
-                if entry and entry.get('detail'):
-                    msg += '\n  ' + entry['detail']
+                msg += f'\n{key[5:].replace("-", "/")} ' + (entry.get('workout', '') if entry else '삭제')
     strategy = schedule.get('kobe_race_strategy')
-    if strategy and (before_schedule is None or strategy != before_schedule.get('kobe_race_strategy')):
-        from race_strategy import strategy_text
-        msg += '\n\n📌 저장한 레이스 전략\n' + strategy_text(strategy)
+    if strategy and before_schedule is not None and strategy != before_schedule.get('kobe_race_strategy'):
+        msg += '\n\n📌 레이스 전략 갱신 — 상세는 홈페이지'
     print(msg)
     if '--dry-run' in sys.argv:
         return 0

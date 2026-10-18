@@ -20,6 +20,13 @@ def day_plan(schedule, day):
     return ('🏊 수영 강습 06시', '') if day.weekday() in (0, 2, 4) else ('계획 미등록', '')
 
 
+def day_brief(schedule, day):
+    """Telegram line: workout title + optional short `brief` (full detail stays on the homepage)."""
+    workout, _ = day_plan(schedule, day)
+    entry = schedule.get('overrides', {}).get(day.isoformat()) or {}
+    return workout, entry.get('brief') or ''
+
+
 def run_stats(log, start, end):
     days, total, longest = 0, 0.0, 0.0
     for key, entry in log.items():
@@ -39,54 +46,41 @@ def run_stats(log, start, end):
 def format_progress(log, schedule, today):
     monday = today - timedelta(days=today.weekday())
     days, km, longest = run_stats(log, monday, today)
-    goal = schedule.get('weekly_goals', {}).get(monday.isoformat(), {})
-    return '\n'.join([
-        f'📈 금주 실제 러닝: {days}일 · {km:.2f}km · 최장 {longest:.2f}km',
-        f"확정 목표: {goal.get('target_load') or '주간 목표 미등록'}",
-        '일별 조건과 회복 기준을 우선하며 미완료 운동을 몰아서 보충하지 않습니다.',
-    ])
+    return f'📈 이번 주 러닝 {days}일 · {km:.1f}km · 최장 {longest:.1f}km'
 
 
-def format_plan(log, schedule, today, weeks=2):
+def format_plan(log, schedule, today, weeks=None):
+    """Short schedule: one line per day, `brief` only for upcoming days that have one."""
+    if weeks is None:
+        weeks = 2 if today.weekday() >= 5 else 1
     monday = today - timedelta(days=today.weekday())
     lines = []
     for week in range(weeks):
         start = monday + timedelta(days=7 * week)
-        goal = schedule.get('weekly_goals', {}).get(start.isoformat(), {})
-        lines.append(f"📅 {start:%m/%d}~{start + timedelta(days=6):%m/%d} {goal.get('title', '주간 계획')}")
-        for field, label in [('target_load', '확정 목표'), ('goal', '목적'), ('sessions', '세션')]:
-            if goal.get(field):
-                lines.append(f'{label}: {goal[field]}')
+        lines.append(f"📅 {start:%m/%d}~{start + timedelta(days=6):%m/%d}")
         for offset in range(7):
             day = start + timedelta(days=offset)
-            workout, detail = day_plan(schedule, day)
-            lines.append(f"{day:%m/%d}({'월화수목금토일'[day.weekday()]}) {workout}")
-            if detail:
-                lines.append(f'  {detail}')
+            workout, brief = day_brief(schedule, day)
+            label = f"{day:%m/%d}({'월화수목금토일'[day.weekday()]})"
             entry = log.get(day.isoformat(), {})
             if entry.get('done'):
-                lines.append(f"  ✅ 실제: {entry.get('actual', '운동 완료')}")
-            elif day < today and '휴식' not in workout:
-                lines.append('  기록 없음 (미수행으로 단정하지 않음)')
+                lines.append(f"{label} ✅ {entry.get('actual', '운동 완료')}")
+                continue
+            lines.append(f"{label} {workout}" + (' 👈' if day == today else ''))
+            if brief and day >= today:
+                lines.append(f'  {brief}')
         lines.append('')
     return '\n'.join(lines).strip()
 
 
-def format_snapshot(log, schedule, today, title='운동·확정 계획 최신 반영', activity_dates=None):
-    lines = [f'📣 {title} ({today.isoformat()})', schedule.get('season_target', {}).get('target_time', ''), '']
+def format_snapshot(log, schedule, today, title='운동 스케줄', activity_dates=None):
+    lines = [f'📣 {title} ({today:%m/%d})']
     for key in (activity_dates if activity_dates is not None else [today.isoformat()]):
         entry = log.get(key, {})
         if entry.get('done'):
-            lines.append(f"✅ {key}: {entry.get('actual', '운동 완료')}")
-            if entry.get('note'):
-                lines.append(f"기록 메모: {entry['note']}")
-            review = entry.get('fueling_review', {})
-            if review.get('summary'):
-                lines.append(f"보급 해석: {review['summary']}")
-            if review.get('source_url'):
-                lines.append(f"보급 근거: {review['source_url']}")
+            lines.append(f"✅ {key[5:].replace('-', '/')} {entry.get('actual', '운동 완료')}")
     lines.extend(['', format_progress(log, schedule, today), '', format_plan(log, schedule, today),
-                  '', f'📊 홈페이지: {DASHBOARD_URL}'])
+                  '', f'📊 상세: {DASHBOARD_URL}'])
     return '\n'.join(lines)
 
 

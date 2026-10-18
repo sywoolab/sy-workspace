@@ -1890,7 +1890,7 @@ def format_workout_message(parsed_activities, health, plan_adjustments, schedule
         from training_snapshot import format_snapshot
         dates = sorted({p['date'] for p in parsed_activities if p.get('date')})
         return format_snapshot(workout_log, schedule_data, NOW.date(),
-                               title='가민 운동 기록 및 확정 계획', activity_dates=dates)
+                               title='가민 운동 기록', activity_dates=dates)
 
     lines = []
     # 헤더에 sync 시각 명시 — 며칠치 활동을 한 알림에 묶어 보낼 때 사용자 혼동 방지

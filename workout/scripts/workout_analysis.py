@@ -1141,7 +1141,7 @@ def main():
 
     if TODAY >= '2026-09-07':
         from training_snapshot import format_snapshot, send_messages
-        msg = format_snapshot(log, load_json(SCHEDULE_FILE), NOW.date(), title='운동 기록·확정 계획')
+        msg = format_snapshot(log, load_json(SCHEDULE_FILE), NOW.date(), title='운동 기록')
         print(msg)
         if '--dry-run' not in __import__('sys').argv:
             ok = send_messages(msg, BOT_TOKEN, CHAT_ID)

@@ -32,13 +32,23 @@ class SnapshotTests(unittest.TestCase):
             workout_alert.format_morning,
         ):
             msg = formatter()
-            for text in ('1125m', '22~24km', '38~42km', '30~32km', '소염제', '수영 개인강습'):
-                self.assertIn(text, msg)
-            for text in ('예상 2:57', '브릭 0회', 'OFF TRACK', '러닝 0/4', '최소:'):
+            self.assertIn('1125m', msg)
+            for text in ('예상 2:57', '브릭 0회', 'OFF TRACK', '러닝 0/4', '최소:', '기록 메모'):
                 self.assertNotIn(text, msg)
-        for i in range(5, 19):
-            entry = self.schedule['overrides'][f'2026-10-{i:02}']
-            self.assertIn(entry['detail'], snapshot.format_plan(self.log, self.schedule, self.today))
+
+    def test_telegram_plan_is_short_and_uses_brief_not_detail(self):
+        day = date(2026, 10, 19)
+        msg = snapshot.format_snapshot(self.log, self.schedule, day)
+        self.assertLess(len(msg), 1500)
+        for offset in range(7):
+            key = (day + timedelta(days=offset)).isoformat()
+            entry = self.schedule['overrides'].get(key, {})
+            if entry.get('workout'):
+                self.assertIn(entry['workout'], msg)
+            if entry.get('detail'):
+                self.assertNotIn(entry['detail'], msg)
+            if entry.get('brief'):
+                self.assertIn(entry['brief'], msg)
 
     def test_newly_confirmed_schedule_is_read_without_restart(self):
         changed = copy.deepcopy(self.schedule['overrides'])
