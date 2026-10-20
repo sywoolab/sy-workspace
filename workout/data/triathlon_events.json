@@ -13,7 +13,7 @@
     "course": "듀애슬론 코스(달리기(run) 8km, 사이클(bike) 84km, 달리기(run) 8km)",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2129&page=1&sYear=2026&vType=list&field=&keyword=",
     "date": "2026.11.07 ~ 08",
-    "reg_period": "2026-09-29 14:00 ~ 2026-10-20"
+    "reg_period": "2026-09-29 14:00 ~ 2026-10-31"
   },
   {
     "status": "접수마감",
@@ -33,7 +33,7 @@
     "reg_period": "2026-07-28 14:00 ~ 2026-09-23 24:00"
   },
   {
-    "status": "접수중",
+    "status": "접수마감",
     "name": "2026 철인3종 11차 대회규정 정기교육",
     "location": "온라인 ZOOM",
     "url": "https://www.triathlon.or.kr/events/tour/overview/?mode=overview&tourcd=2120&page=1&sYear=2026&vType=list&field=&keyword=",
