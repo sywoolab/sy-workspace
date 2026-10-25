@@ -8814,19 +8814,19 @@
   },
   "2026-10-25": {
     "date": "2026-10-25",
-    "steps": 92,
+    "steps": 31460,
     "stress": {
-      "avg": 16,
-      "max": 75,
-      "rest": 79.43,
-      "low": 14.67,
-      "medium": 0.51,
-      "high": 0.0
+      "avg": 17,
+      "max": 96,
+      "rest": 56.68,
+      "low": 11.46,
+      "medium": 0.48,
+      "high": 0.12
     },
     "body_battery": {
       "max": 84,
-      "min": 40,
-      "start": 77
+      "min": 34,
+      "start": 34
     },
     "resting_hr": 46,
     "sleep": {
@@ -8843,8 +8843,8 @@
       "status": "BALANCED"
     },
     "training_readiness": {
-      "score": 48,
-      "level": "LOW"
+      "score": 8,
+      "level": "POOR"
     },
     "training_status": {
       "status": null,
