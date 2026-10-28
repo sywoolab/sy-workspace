@@ -8934,19 +8934,19 @@
   },
   "2026-10-28": {
     "date": "2026-10-28",
-    "steps": 1197,
+    "steps": 1500,
     "stress": {
-      "avg": 18,
+      "avg": 20,
       "max": 75,
-      "rest": 58.99,
-      "low": 12.5,
-      "medium": 1.54,
+      "rest": 55.58,
+      "low": 12.4,
+      "medium": 4.34,
       "high": 0.0
     },
     "body_battery": {
       "max": 59,
       "min": 9,
-      "start": 48
+      "start": 45
     },
     "resting_hr": 47,
     "sleep": {
