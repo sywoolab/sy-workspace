@@ -1327,6 +1327,14 @@
       "source": "manual",
       "auto": false,
       "rule": "2026-10-25 claude-user-agreed-sub4-536"
+    },
+    "2026-10-30": {
+      "date": "2026-10-30",
+      "workout": "🛏 휴식 (06시 수영 강습 스킵)",
+      "detail": "원래 금요일 06시 수영 강습일. 사용자 보고(10/30): 전날(10/29) 과음 → 강습 스킵, 대체 자유수영도 하지 않고 휴식. 수분·탄수화물·수면 회복, 10/30~31 금주. 11/1 하프 패트롤 이틀 전.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
     }
   },
   "last_analysis": {
