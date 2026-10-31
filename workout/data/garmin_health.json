@@ -8974,19 +8974,19 @@
   },
   "2026-10-29": {
     "date": "2026-10-29",
-    "steps": 9570,
+    "steps": 14233,
     "stress": {
-      "avg": 22,
-      "max": 91,
-      "rest": 60.66,
-      "low": 12.7,
-      "medium": 2.46,
-      "high": 1.02
+      "avg": 37,
+      "max": 94,
+      "rest": 30.32,
+      "low": 27.52,
+      "medium": 19.12,
+      "high": 2.52
     },
     "body_battery": {
       "max": 53,
       "min": 5,
-      "start": 42
+      "start": 5
     },
     "resting_hr": 49,
     "sleep": {
@@ -9005,6 +9005,86 @@
     "training_readiness": {
       "score": 35,
       "level": "LOW"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-10-30": {
+    "date": "2026-10-30",
+    "steps": 9458,
+    "stress": {
+      "avg": 46,
+      "max": 94,
+      "rest": 7.92,
+      "low": 42.01,
+      "medium": 27.22,
+      "high": 4.44
+    },
+    "body_battery": {
+      "max": 18,
+      "min": 5,
+      "start": 5
+    },
+    "resting_hr": 53,
+    "sleep": {
+      "duration_min": 182,
+      "score": 29,
+      "deep_min": 61,
+      "light_min": 121,
+      "rem_min": 0,
+      "awake_min": 15
+    },
+    "hrv": {
+      "weekly_avg": 49,
+      "last_night": 40,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 7,
+      "level": "POOR"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-10-31": {
+    "date": "2026-10-31",
+    "steps": 10068,
+    "stress": {
+      "avg": 32,
+      "max": 83,
+      "rest": 26.74,
+      "low": 26.26,
+      "medium": 6.32,
+      "high": 1.46
+    },
+    "body_battery": {
+      "max": 10,
+      "min": 5,
+      "start": 5
+    },
+    "resting_hr": 53,
+    "sleep": {
+      "duration_min": 135,
+      "score": 30,
+      "deep_min": 41,
+      "light_min": 94,
+      "rem_min": 0,
+      "awake_min": 0
+    },
+    "hrv": {
+      "weekly_avg": 51,
+      "last_night": 56,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 2,
+      "level": "POOR"
     },
     "training_status": {
       "status": null,
