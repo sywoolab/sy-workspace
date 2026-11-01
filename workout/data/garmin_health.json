@@ -9054,14 +9054,14 @@
   },
   "2026-10-31": {
     "date": "2026-10-31",
-    "steps": 15958,
+    "steps": 17221,
     "stress": {
-      "avg": 37,
-      "max": 87,
-      "rest": 20.89,
-      "low": 20.54,
-      "medium": 10.39,
-      "high": 2.92
+      "avg": 52,
+      "max": 96,
+      "rest": 12.8,
+      "low": 16.24,
+      "medium": 14.88,
+      "high": 15.09
     },
     "body_battery": {
       "max": 10,
@@ -9085,6 +9085,86 @@
     "training_readiness": {
       "score": 2,
       "level": "POOR"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-11-01": {
+    "date": "2026-11-01",
+    "steps": 12606,
+    "stress": {
+      "avg": 38,
+      "max": 99,
+      "rest": 22.54,
+      "low": 31.33,
+      "medium": 13.11,
+      "high": 3.83
+    },
+    "body_battery": {
+      "max": 53,
+      "min": 8,
+      "start": 11
+    },
+    "resting_hr": 52,
+    "sleep": {
+      "duration_min": 0,
+      "score": null,
+      "deep_min": 0,
+      "light_min": 0,
+      "rem_min": 0,
+      "awake_min": 0
+    },
+    "hrv": {
+      "weekly_avg": 49,
+      "last_night": null,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 49,
+      "level": "LOW"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-11-02": {
+    "date": "2026-11-02",
+    "steps": 1443,
+    "stress": {
+      "avg": 9,
+      "max": 75,
+      "rest": 74.77,
+      "low": 4.55,
+      "medium": 0.91,
+      "high": 0.0
+    },
+    "body_battery": {
+      "max": 85,
+      "min": 11,
+      "start": 70
+    },
+    "resting_hr": 46,
+    "sleep": {
+      "duration_min": 349,
+      "score": 74,
+      "deep_min": 54,
+      "light_min": 228,
+      "rem_min": 67,
+      "awake_min": 0
+    },
+    "hrv": {
+      "weekly_avg": 55,
+      "last_night": 62,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 65,
+      "level": "MODERATE"
     },
     "training_status": {
       "status": null,
