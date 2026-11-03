@@ -19211,5 +19211,319 @@
         "feel": 50
       }
     ]
+  },
+  "2026-11-03": {
+    "planned": "🏃 고베 페이스 확인 15~16km (최대 18km): Easy 4km + 5:36 10km(조건부 12km) + Easy 1~2km — 반차 오후",
+    "done": true,
+    "actual": "러닝 15.26km @5:40",
+    "metrics": {
+      "type": "run",
+      "distance_km": 15.26,
+      "pace_per_km": "5:40",
+      "avg_hr": 143,
+      "max_hr": 159,
+      "cadence": 178,
+      "training_load": 142,
+      "laps": [
+        {
+          "distance": 1000,
+          "duration": 359,
+          "avg_hr": 116,
+          "max_hr": 131,
+          "pace_sec": 359,
+          "pace_str": "5:58"
+        },
+        {
+          "distance": 1000,
+          "duration": 344,
+          "avg_hr": 129,
+          "max_hr": 136,
+          "pace_sec": 344,
+          "pace_str": "5:44"
+        },
+        {
+          "distance": 1000,
+          "duration": 347,
+          "avg_hr": 133,
+          "max_hr": 137,
+          "pace_sec": 347,
+          "pace_str": "5:47"
+        },
+        {
+          "distance": 1000,
+          "duration": 331,
+          "avg_hr": 142,
+          "max_hr": 146,
+          "pace_sec": 331,
+          "pace_str": "5:30"
+        },
+        {
+          "distance": 1000,
+          "duration": 337,
+          "avg_hr": 143,
+          "max_hr": 147,
+          "pace_sec": 337,
+          "pace_str": "5:37"
+        },
+        {
+          "distance": 1000,
+          "duration": 338,
+          "avg_hr": 143,
+          "max_hr": 148,
+          "pace_sec": 338,
+          "pace_str": "5:38"
+        },
+        {
+          "distance": 735,
+          "duration": 253,
+          "avg_hr": 142,
+          "max_hr": 145,
+          "pace_sec": 344,
+          "pace_str": "5:43"
+        },
+        {
+          "distance": 1000,
+          "duration": 340,
+          "avg_hr": 143,
+          "max_hr": 147,
+          "pace_sec": 340,
+          "pace_str": "5:39"
+        },
+        {
+          "distance": 272,
+          "duration": 94,
+          "avg_hr": 146,
+          "max_hr": 148,
+          "pace_sec": 345,
+          "pace_str": "5:44"
+        },
+        {
+          "distance": 1000,
+          "duration": 338,
+          "avg_hr": 146,
+          "max_hr": 150,
+          "pace_sec": 338,
+          "pace_str": "5:38"
+        },
+        {
+          "distance": 1000,
+          "duration": 340,
+          "avg_hr": 149,
+          "max_hr": 152,
+          "pace_sec": 340,
+          "pace_str": "5:39"
+        },
+        {
+          "distance": 1000,
+          "duration": 334,
+          "avg_hr": 150,
+          "max_hr": 155,
+          "pace_sec": 334,
+          "pace_str": "5:33"
+        },
+        {
+          "distance": 1000,
+          "duration": 338,
+          "avg_hr": 150,
+          "max_hr": 153,
+          "pace_sec": 338,
+          "pace_str": "5:38"
+        },
+        {
+          "distance": 1000,
+          "duration": 339,
+          "avg_hr": 152,
+          "max_hr": 156,
+          "pace_sec": 339,
+          "pace_str": "5:39"
+        },
+        {
+          "distance": 1000,
+          "duration": 336,
+          "avg_hr": 151,
+          "max_hr": 155,
+          "pace_sec": 336,
+          "pace_str": "5:35"
+        },
+        {
+          "distance": 1000,
+          "duration": 339,
+          "avg_hr": 154,
+          "max_hr": 159,
+          "pace_sec": 339,
+          "pace_str": "5:38"
+        },
+        {
+          "distance": 253,
+          "duration": 84,
+          "avg_hr": 153,
+          "max_hr": 157,
+          "pace_sec": 333,
+          "pace_str": "5:32"
+        }
+      ]
+    },
+    "training_zone": "moderate",
+    "note": "유산소 3.8 | 부하 142",
+    "garmin_id": 24947661293,
+    "start_time": "14:13",
+    "garmin_ids": [
+      24947661293
+    ],
+    "all_metrics": [
+      {
+        "type": "run",
+        "distance_m": 15260.0,
+        "duration_sec": null,
+        "avg_hr": 143,
+        "max_hr": 159,
+        "avg_pace": "5:40",
+        "avg_speed": null,
+        "training_load": 142,
+        "garmin_id": 24947661293,
+        "laps": [
+          {
+            "distance": 1000,
+            "duration": 359,
+            "avg_hr": 116,
+            "max_hr": 131,
+            "pace_sec": 359,
+            "pace_str": "5:58"
+          },
+          {
+            "distance": 1000,
+            "duration": 344,
+            "avg_hr": 129,
+            "max_hr": 136,
+            "pace_sec": 344,
+            "pace_str": "5:44"
+          },
+          {
+            "distance": 1000,
+            "duration": 347,
+            "avg_hr": 133,
+            "max_hr": 137,
+            "pace_sec": 347,
+            "pace_str": "5:47"
+          },
+          {
+            "distance": 1000,
+            "duration": 331,
+            "avg_hr": 142,
+            "max_hr": 146,
+            "pace_sec": 331,
+            "pace_str": "5:30"
+          },
+          {
+            "distance": 1000,
+            "duration": 337,
+            "avg_hr": 143,
+            "max_hr": 147,
+            "pace_sec": 337,
+            "pace_str": "5:37"
+          },
+          {
+            "distance": 1000,
+            "duration": 338,
+            "avg_hr": 143,
+            "max_hr": 148,
+            "pace_sec": 338,
+            "pace_str": "5:38"
+          },
+          {
+            "distance": 735,
+            "duration": 253,
+            "avg_hr": 142,
+            "max_hr": 145,
+            "pace_sec": 344,
+            "pace_str": "5:43"
+          },
+          {
+            "distance": 1000,
+            "duration": 340,
+            "avg_hr": 143,
+            "max_hr": 147,
+            "pace_sec": 340,
+            "pace_str": "5:39"
+          },
+          {
+            "distance": 272,
+            "duration": 94,
+            "avg_hr": 146,
+            "max_hr": 148,
+            "pace_sec": 345,
+            "pace_str": "5:44"
+          },
+          {
+            "distance": 1000,
+            "duration": 338,
+            "avg_hr": 146,
+            "max_hr": 150,
+            "pace_sec": 338,
+            "pace_str": "5:38"
+          },
+          {
+            "distance": 1000,
+            "duration": 340,
+            "avg_hr": 149,
+            "max_hr": 152,
+            "pace_sec": 340,
+            "pace_str": "5:39"
+          },
+          {
+            "distance": 1000,
+            "duration": 334,
+            "avg_hr": 150,
+            "max_hr": 155,
+            "pace_sec": 334,
+            "pace_str": "5:33"
+          },
+          {
+            "distance": 1000,
+            "duration": 338,
+            "avg_hr": 150,
+            "max_hr": 153,
+            "pace_sec": 338,
+            "pace_str": "5:38"
+          },
+          {
+            "distance": 1000,
+            "duration": 339,
+            "avg_hr": 152,
+            "max_hr": 156,
+            "pace_sec": 339,
+            "pace_str": "5:39"
+          },
+          {
+            "distance": 1000,
+            "duration": 336,
+            "avg_hr": 151,
+            "max_hr": 155,
+            "pace_sec": 336,
+            "pace_str": "5:35"
+          },
+          {
+            "distance": 1000,
+            "duration": 339,
+            "avg_hr": 154,
+            "max_hr": 159,
+            "pace_sec": 339,
+            "pace_str": "5:38"
+          },
+          {
+            "distance": 253,
+            "duration": 84,
+            "avg_hr": 153,
+            "max_hr": 157,
+            "pace_sec": 333,
+            "pace_str": "5:32"
+          }
+        ],
+        "open_water": false,
+        "start_time": "14:13",
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
