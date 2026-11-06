@@ -1393,17 +1393,19 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
             '빈도': count >= target_count,
         }
         passed = sum(checks.values())
+        # 2026-11-06: 계획 세션을 다음 주로 옮긴 주는 미완료 대신 이월로 표기
+        carried_over_weeks = {'10/26~11/01': '11/1 하프 우천 취소 → 11/3(다음 주) 대회 페이스 15km로 이월 수행'}
+        if period in carried_over_weeks:
+            return actual, '이월 → 다음 주', carried_over_weeks[period]
         assessment = '완료' if passed == 3 else ('부분완료' if passed else '미완료')
         detail = ' · '.join(f'{name} {"✓" if ok else "미달"}' for name, ok in checks.items())
-        if period == '10/26~11/01':
-            detail += ' · 11/1 하프 우천 취소 → 11/3으로 이월'
         return actual, f'{assessment} ({passed}/3)', detail
     kobe_checks = [
         ("10/4", "26km 지속력", "✅ 통과", "26.57km @5:36 무보행 완주"),
         ("10/17", "30km 완주 + 48시간 무악화", "✅ 통과", "30.01km @5:52, 마지막 5km 약 5:34 · 이후 48시간 무릎 0/10"),
         ("10/25", "대회 페이스 심박 (랩 평균 HR 165 이하)", "✅ 통과", "19km @5:38 · 23km 이후 가속 시 HR 157→165 → 35km 전 가속 금지 근거"),
         ("11/3", "대회 페이스 심박 재확인 (랩 평균 HR 155 이하)", "✅ 통과", "12.26km @5:37 평균 HR147·최고 랩 154 (무보급) · 10/25 대비 HR 2~4 낮음, 표류 기울기 약 +1/km는 동일"),
-        ("11/8", "마지막 감각 + 젤 위장 테스트", "예정", "10km 중 5:36 2~3km, 5~6km 지점 젤 1포 + 물"),
+        ("11/8", "마지막 감각", "예정", "10km: Easy 7km + 마지막 3km 5:35~5:36 (젤 테스트 생략 — 장거리 섭취 이력 충분, 젤 6포는 대회용 보존)"),
         ("상시", "무릎 0~1/10 · 붓기 없음", "🟡 관찰", "11/3 주행 중 1~1.5, 종료 후 1.5 → 11/4 0/10 (다음 날 회복)"),
     ]
     if sched_data.get('kobe_race_strategy'):
@@ -1428,7 +1430,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                              '5:37 이상 유지 시 시계 1% 과대면 sub-4 실패 → 5:35 목표<br>'
                              '무릎 1~1.5/10 간헐 (다음 날 회복) → 2/10 이상 지속 시 페이스 하향')
              + card.format(b='#2a2a4a', c='#6ab4ff', t='남은 일정',
-                           x='11/5 Easy 5km → 11/8 10km (5:36 2~3km, 젤 테스트)<br>'
+                           x='11/6 Easy 5.45km 완료 → 11/8 10km (마지막 3km 5:35~5:36)<br>'
                              '11/10 Easy 5km + 5:36 1~2km → 11/12 Easy 3~4km<br>'
                              '11/13 휴식 → 11/14 이동·접수 → 11/15 고베<br>금주 · 수면 · 카보로딩(11/12~14)')
              + '</div>\n')
@@ -1438,7 +1440,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         actual, assessment, comment = _kobe_week_assessment(week, target_count, min_total, min_long)
         assessment_color = {
             '완료': '#6affa0', '부분완료': '#ffd56c', '미완료': '#ff6c6c',
-            '진행 중': '#6ab4ff', '예정': '#666',
+            '진행 중': '#6ab4ff', '예정': '#666', '이월 → 다음 주': '#c9a0ff',
         }.get(assessment.split(' (')[0], '#aaa')
         html += (f'<tr><td style="white-space:nowrap;color:#888">{week}</td>'
                  f'<td style="color:#6affa0;font-weight:600">{volume}</td>'
