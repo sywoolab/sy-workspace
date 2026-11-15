@@ -9574,19 +9574,19 @@
   },
   "2026-11-13": {
     "date": "2026-11-13",
-    "steps": 482,
+    "steps": 11111,
     "stress": {
-      "avg": 12,
-      "max": 82,
-      "rest": 84.77,
-      "low": 7.06,
-      "medium": 0.44,
-      "high": 0.22
+      "avg": 24,
+      "max": 87,
+      "rest": 44.86,
+      "low": 17.78,
+      "medium": 4.58,
+      "high": 2.01
     },
     "body_battery": {
       "max": 92,
-      "min": 26,
-      "start": 86
+      "min": 25,
+      "start": 29
     },
     "resting_hr": 43,
     "sleep": {
@@ -9605,6 +9605,86 @@
     "training_readiness": {
       "score": 84,
       "level": "HIGH"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-11-14": {
+    "date": "2026-11-14",
+    "steps": 18917,
+    "stress": {
+      "avg": 35,
+      "max": 96,
+      "rest": 27.85,
+      "low": 24.42,
+      "medium": 12.11,
+      "high": 4.2
+    },
+    "body_battery": {
+      "max": 71,
+      "min": 5,
+      "start": 8
+    },
+    "resting_hr": 43,
+    "sleep": {
+      "duration_min": 296,
+      "score": 56,
+      "deep_min": 63,
+      "light_min": 216,
+      "rem_min": 17,
+      "awake_min": 21
+    },
+    "hrv": {
+      "weekly_avg": 59,
+      "last_night": 59,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 59,
+      "level": "MODERATE"
+    },
+    "training_status": {
+      "status": null,
+      "load": null,
+      "vo2max_run": null
+    }
+  },
+  "2026-11-15": {
+    "date": "2026-11-15",
+    "steps": 53353,
+    "stress": {
+      "avg": 14,
+      "max": 94,
+      "rest": 42.42,
+      "low": 0.93,
+      "medium": 0.7,
+      "high": 1.28
+    },
+    "body_battery": {
+      "max": 81,
+      "min": 8,
+      "start": 10
+    },
+    "resting_hr": 43,
+    "sleep": {
+      "duration_min": 381,
+      "score": 82,
+      "deep_min": 90,
+      "light_min": 205,
+      "rem_min": 86,
+      "awake_min": 0
+    },
+    "hrv": {
+      "weekly_avg": 62,
+      "last_night": 68,
+      "status": "BALANCED"
+    },
+    "training_readiness": {
+      "score": 2,
+      "level": "POOR"
     },
     "training_status": {
       "status": null,
