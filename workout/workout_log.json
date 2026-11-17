@@ -21070,5 +21070,54 @@
         "feel": 50
       }
     ]
+  },
+  "2026-11-17": {
+    "planned": "🛏 회복 (오사카 시내 · 러닝 금지)",
+    "done": true,
+    "actual": "수영 1050m 35분 @1:27/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1050,
+      "duration_min": 34.6,
+      "moving_min": 15.2,
+      "pace_per_100m": "1:27",
+      "avg_hr": 109,
+      "max_hr": 140,
+      "swolf": 29,
+      "strokes": 303,
+      "avg_spm": null,
+      "training_load": 16
+    },
+    "training_zone": "easy",
+    "note": "유산소 1.3 | 부하 16",
+    "garmin_id": 25102851744,
+    "start_time": "07:33",
+    "garmin_ids": [
+      25102851744
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1050,
+        "duration_sec": 2076.0,
+        "avg_hr": 109,
+        "max_hr": 140,
+        "avg_pace": "1:27",
+        "avg_speed": null,
+        "training_load": 16,
+        "garmin_id": 25102851744,
+        "laps": null,
+        "open_water": false,
+        "start_time": "07:33",
+        "duration_min": 34.6,
+        "moving_min": 15.2,
+        "pace_per_100m": "1:27",
+        "swolf": 29,
+        "strokes": 303,
+        "avg_spm": null,
+        "rpe": 3,
+        "feel": 50
+      }
+    ]
   }
 }
