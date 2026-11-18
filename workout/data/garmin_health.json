@@ -9774,19 +9774,19 @@
   },
   "2026-11-18": {
     "date": "2026-11-18",
-    "steps": 55,
+    "steps": 18914,
     "stress": {
-      "avg": 15,
-      "max": 75,
-      "rest": 90.34,
-      "low": 7.3,
-      "medium": 0.2,
-      "high": 0.0
+      "avg": 30,
+      "max": 93,
+      "rest": 37.86,
+      "low": 17.71,
+      "medium": 11.79,
+      "high": 1.71
     },
     "body_battery": {
       "max": 70,
       "min": 5,
-      "start": 69
+      "start": 16
     },
     "resting_hr": 49,
     "sleep": {
