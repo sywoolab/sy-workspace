@@ -217,7 +217,7 @@ def main():
         if run_gap_days >= 14:
             items.append({'sport': '🏃 러닝', 'status': 'bad',   'msg': f'{run_gap_days}일째 런 없음 — VDOT 정체·하락 위험'})
         elif run_cnt < 6:
-            items.append({'sport': '🏃 러닝 빈도', 'status': 'warn', 'msg': f'14일 {run_cnt}회 — 고베 목표 주 4회 골격 복구 필요'})
+            items.append({'sport': '🏃 러닝 빈도', 'status': 'warn', 'msg': f'14일 {run_cnt}회 — 겨울 기초기 목표 주 3회 골격'})
         else:
             items.append({'sport': '🏃 러닝 빈도', 'status': 'good', 'msg': f'14일 {run_cnt}회 {run_km_total:.0f}km'})
         if longest_run >= 18:
@@ -226,17 +226,21 @@ def main():
             items.append({'sport': '🛣️ 롱런', 'status': 'warn', 'msg': f'최근 최장 {longest_run:.1f}km — 단계적으로 18km 이상 확대'})
         else:
             items.append({'sport': '🛣️ 롱런', 'status': 'warn', 'msg': f'최근 최장 {longest_run:.1f}km — 이번 블록 핵심 보완'})
-        items.append({'sport': '🏊🚴 보조훈련', 'status': 'good',
-                      'msg': f'14일 수영 {swim_cnt}회·자전거 {bike_cnt}회 — 회복·유산소 보조로 운용'})
+        if bike_cnt >= 3:
+            items.append({'sport': '🚴 자전거', 'status': 'good', 'msg': f'14일 {bike_cnt}회 — 실내 주 2회 골격 유지'})
+        else:
+            items.append({'sport': '🚴 자전거', 'status': 'warn', 'msg': f'14일 {bike_cnt}회 — T100 비중 1위 종목, 실내 주 2회로 복구'})
+        items.append({'sport': '🏊 수영', 'status': 'good' if swim_cnt >= 4 else 'warn',
+                      'msg': f'14일 {swim_cnt}회 — 강습 주 3회 + 개인강습 유지'})
 
         bad_count = sum(1 for i in items if i['status'] == 'bad')
         warn_count = sum(1 for i in items if i['status'] == 'warn')
         if bad_count >= 2:
-            verdict = ('red', '개선 필요', '고베 sub-4 대비 러닝 빈도·롱런 기반을 우선 복구해야 함.')
+            verdict = ('red', '개선 필요', 'T100 대비 3종목 기본 빈도(러닝 3·자전거 2·수영 3)부터 복구.')
         elif bad_count == 1 or warn_count >= 2:
-            verdict = ('yellow', '마라톤 전환 중', '거북섬 회복 후 러닝 빈도와 롱런을 단계적으로 확대.')
+            verdict = ('yellow', '기초기 빌드 중', '고베 회복 후 러닝·실내 자전거 빈도를 단계적으로 확대.')
         else:
-            verdict = ('green', '순항 중', '고베 sub-4 러닝 골격을 유지하고 보조훈련은 회복 위주로 운용.')
+            verdict = ('green', '순항 중', 'T100 겨울 기초 골격 유지 — Easy 위주, 품질은 주 1~2회.')
 
         return items, verdict
 
@@ -316,7 +320,7 @@ def main():
         }
 
     races = [
-        ("2026-11-15", "고베 마라톤", "🎯 3:55 · sub-4 방어 · 무보행"),
+        ("2027-05-29", "군산·새만금 T100", "🎯 5시간 이내 · 수영2+자전거80+러닝18km"),
     ]
 
     now = datetime.now(KST)
@@ -411,7 +415,7 @@ def main():
     html = f"""<!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>고베마라톤 sub-4 훈련 대시보드</title>
+<title>군산·새만금 T100 훈련 대시보드</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
@@ -448,7 +452,7 @@ tr:hover{{background:#15152a}}
 .tl-fill{{height:100%;border-radius:2px}}
 .tl7{{font-size:10px;color:#888}}
 </style></head><body>
-<h1>🏃 고베마라톤 sub-4 훈련 대시보드</h1>
+<h1>🏊🚴🏃 군산·새만금 T100 훈련 대시보드</h1>
 <div class="sub">업데이트: {now_str}</div>
 """
 
@@ -456,8 +460,8 @@ tr:hover{{background:#15152a}}
     vc = {'red': '#ff6c6c', 'yellow': '#ffd56c', 'green': '#6affa0'}.get(diag_verdict[0], '#888')
     vi = {'red': '❌', 'yellow': '⚠️', 'green': '✅'}.get(diag_verdict[0], '📊')
 
-    next_race_name = '고베 마라톤'
-    next_race_gap_str = f'D-{days_until("2026-11-15")} · 목표 3:55 · sub-4 방어 · 전 구간 무보행'
+    next_race_name = '군산·새만금 T100'
+    next_race_gap_str = f'T100 D-{days_until("2027-05-29")} (5/29~30 행사) · 기준 5시간 이내'
 
     # 오늘 요약: 실제 수행이 있으면 계획보다 우선 표시
     today_entry = log.get(today) or {}
@@ -513,9 +517,9 @@ tr:hover{{background:#15152a}}
                  f'</div>\n')
 
     html += f"""<div class="card"><div class="val" style="color:#6affa0">{week_run:.1f}km</div><div class="label">최근 7일 러닝</div></div>
-<div class="card"><div class="val" style="color:#6ab4ff">{week_run_count}/4</div><div class="label">최근 7일 러닝 횟수</div></div>
-<div class="card"><div class="val" style="color:#ffd56c">{recent_longest_run:.1f}km</div><div class="label">최근 6주 최장거리</div></div>
-<div class="card"><div class="val" style="color:#aaa">{week_swim//100/10:.1f}km</div><div class="label">보조훈련 · 7일 수영</div><div class="sub-val">자전거 {week_bike:.0f}km · 총부하 {int(week_tl)}</div></div>
+<div class="card"><div class="val" style="color:#6ab4ff">{week_run_count}/3</div><div class="label">최근 7일 러닝 횟수</div></div>
+<div class="card"><div class="val" style="color:#ffa06a">{week_bike:.0f}km</div><div class="label">최근 7일 자전거</div></div>
+<div class="card"><div class="val" style="color:#6ab4ff">{week_swim//100/10:.1f}km</div><div class="label">최근 7일 수영</div><div class="sub-val">러닝 최장(6주) {recent_longest_run:.1f}km · 총부하 {int(week_tl)}</div></div>
 </div>
 """
 
@@ -1019,7 +1023,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
 }});
 </script>
 
-<div id="kobe-roadmap-anchor"></div>
+<div id="season-roadmap-anchor"></div>
 <div class="section">📅 훈련 계획 (주차별 — 제목 클릭으로 펼치기/접기)</div>
 """
 
@@ -1310,11 +1314,9 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
 
     # 대회 일정 섹션
     all_races_ext = [
-        ("2026-06-07", "한강 쉬엄쉬엄", "수영 1+자전거 20+러닝 10km", "T1 수트 탈의 연습 + 자전거 풀 push"),
-        ("2026-09-06", "거북섬 올림픽", "9/4~6 개최 · 수영 1.5+자전거 40+러닝 10km", "신청완료 · B레이스: 실전점검 + 올림픽 완주 2회차"),
-        ("2026-11-15", "고베 마라톤", "풀마라톤 42.195km", "신청완료 · 1차 목표 sub-4:00 · 전 구간 무보행"),
         ("2027-05-29", "군산·새만금 T100", "100km: 수영 2+자전거 80+러닝 18km", "결제완료 · 5/29~30 행사 주말(개인전 일자 미확정) · 기준 sub-5 · 예상 4:55~5:10 · 공격 4:45"),
     ]
+    all_races_ext = [r for r in all_races_ext if days_until(r[0]) >= 0]  # 완료 대회는 완주 아카이브로 이동
     html += '<div class="section">주요 대회 일정</div><table><thead><tr><th>D-day</th><th>대회</th><th>거리</th><th>목표/포인트</th></tr></thead><tbody>'
     for rdate, rname, rdist, rgoal in all_races_ext:
         d = days_until(rdate)
@@ -1327,142 +1329,32 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         html += f'<tr><td style="color:{dcol};font-weight:600;white-space:nowrap">{dstr}</td><td>{rname}</td><td style="color:#888;font-size:10.5px">{rdist}</td><td style="color:#6affa0;font-size:10.5px">{rgoal}</td></tr>\n'
     html += '</tbody></table>'
 
-    # ── 고베 마라톤 sub-4 준비 로드맵 ──
-    # 철인 예상기록 계산과는 분리한다. 마라톤은 주간 러닝 볼륨·롱런·무릎 반응으로 판정한다.
-    # period, volume label, long-run label, target run count, minimum weekly km,
-    # minimum long-run km, focus.  The numeric criteria make the completion
-    # assessment reproducible instead of relying on prose parsing.
-    kobe_weeks = [
-        ("08/31~09/06", "약 20~21km", "거북섬 런 10km", 3, 20, 10, "대회 주간·수 7.8km + 목 브릭 3km + 일 10km"),
-        ("09/07~09/13", "24~28km", "14~16km", 4, 24, 14, "거북섬 회복 후 러닝 4회 골격 복구"),
-        ("09/14~09/20", "30~34km", "18~20km", 4, 30, 18, "전 구간 무보행·보급 연습 시작"),
-        ("09/21~09/27", "24~26km", "14~16km", 3, 24, 14, "월~수 출장·직전 롱런 흡수·목요일부터 통증 게이트 후 재개"),
-        ("09/28~10/04", "실제 39.12km", "실제 26.57km", 3, 30, 20, "26.57km @5:36 지속력 확인"),
-        ("10/05~10/11", "회복 26.01~28.01km", "조건부 20km", 2, 26.01, 18, "회복 + 10/11 20km 심박 표류 테스트"),
-        ("10/12~10/18", "38~42km", "조건부 30km(최대 32km)", 3, 38, 30, "10/17 30km 완주 (마지막 5km 약 5:34)"),
-        ("10/19~10/25", "30~37km", "21~25km", 3, 30, 21, "10/25 대회 페이스 리허설 19km @5:38"),
-        ("10/26~11/01", "26~32km", "16~18km", 4, 26, 16, "테이퍼 시작·피로 제거"),
-        ("11/02~11/08", "30~33km (하프 이월 포함)", "15~18km", 3, 30, 15, "11/3 대회 페이스 12km 심박 확인 · 11/8 마지막 감각"),
-        ("11/09~11/15", "12~18km + 대회", "대회 42.195km", 3, 12, 42.195, "볼륨 최소화·11/15 고베"),
-    ]
-
-    def _weekly_run_actual(period):
-        """Return run count, total distance and longest run for a MM/DD~MM/DD period."""
-        start_md, end_md = period.split('~')
-        start = f'2026-{start_md.replace("/", "-")}'
-        end = f'2026-{end_md.replace("/", "-")}'
-        count = 0
-        total = 0.0
-        longest = 0.0
-        for day, entry in log.items():
-            if not (start <= day <= end):
-                continue
-            metrics = entry.get('all_metrics') or [entry.get('metrics', {})]
-            ran_that_day = False
-            for metric in metrics:
-                if metric.get('type') != 'run':
-                    continue
-                distance = metric.get('distance_km')
-                if distance is None:
-                    distance = (metric.get('distance_m') or 0) / 1000
-                if distance <= 0:
-                    continue
-                ran_that_day = True
-                total += distance
-                longest = max(longest, distance)
-            if ran_that_day:
-                count += 1
-        return start, end, count, total, longest
-
-    def _kobe_week_assessment(period, target_count, min_total, min_long):
-        start, end, count, total, longest = _weekly_run_actual(period)
-        user_closed_weeks = {'09/14~09/20'}  # 2026-09-20: user explicitly ended the training week
-        if start > today:
-            return '—', '예정', '시작 전'
-        actual = ('아직 기록 없음' if count == 0 else
-                  f'{total:.2f}km · 최장 {longest:.2f}km · {count}회')
-        if end >= today and period not in user_closed_weeks:
-            # Close the current week on its final day once that day's session is logged.
-            final_day_logged = end == today and log.get(end, {}).get('done', False)
-            if end > today or not final_day_logged:
-                return actual, '진행 중', '주차 종료 후 판정'
-
-        checks = {
-            '거리': total >= min_total,
-            '롱런': longest >= min_long,
-            '빈도': count >= target_count,
-        }
-        passed = sum(checks.values())
-        # 2026-11-06: 계획 세션을 다음 주로 옮긴 주는 미완료 대신 이월로 표기
-        carried_over_weeks = {'10/26~11/01': '11/1 하프 우천 취소 → 11/3(다음 주) 대회 페이스 15km로 이월 수행'}
-        if period in carried_over_weeks:
-            return actual, '이월 → 다음 주', carried_over_weeks[period]
-        assessment = '완료' if passed == 3 else ('부분완료' if passed else '미완료')
-        detail = ' · '.join(f'{name} {"✓" if ok else "미달"}' for name, ok in checks.items())
-        return actual, f'{assessment} ({passed}/3)', detail
-    kobe_checks = [
-        ("10/4", "26km 지속력", "✅ 통과", "26.57km @5:36 무보행 완주"),
-        ("10/17", "30km 완주 + 48시간 무악화", "✅ 통과", "30.01km @5:52, 마지막 5km 약 5:34 · 이후 48시간 무릎 0/10"),
-        ("10/25", "대회 페이스 심박 (랩 평균 HR 165 이하)", "✅ 통과", "19km @5:38 · 23km 이후 가속 시 HR 157→165 → 35km 전 가속 금지 근거"),
-        ("11/3", "대회 페이스 심박 재확인 (랩 평균 HR 155 이하)", "✅ 통과", "12.26km @5:37 평균 HR147·최고 랩 154 (무보급) · 10/25 대비 HR 2~4 낮음, 표류 기울기 약 +1/km는 동일"),
-        ("11/8", "마지막 감각", "예정", "10km: Easy 7km + 마지막 3km 5:35~5:36 (젤 테스트 생략 — 장거리 섭취 이력 충분, 젤 6포는 대회용 보존)"),
-        ("상시", "무릎 0~1/10 · 붓기 없음", "🟡 관찰", "11/3 주행 중 1~1.5, 종료 후 1.5 → 11/4 0/10 (다음 날 회복)"),
-    ]
-    if sched_data.get('kobe_race_strategy'):
-        from race_strategy import strategy_html
-        html += strategy_html(sched_data['kobe_race_strategy'])
-    html += '<div id="kobe-roadmap">\n<div class="section">🏃 고베 마라톤 sub-4 로드맵</div>\n'
-    html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
-             'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.6">'
-             '<b style="color:#ffd56c">현재 판정 (11/3 반영):</b> <b style="color:#6affa0">완주 확실</b> · '
-             '<b style="color:#ffd56c">sub-4 가능권(여유 약 1분의 경계선)</b><br>'
-             '운영: 0~3km 5:45~5:50 → 3~5km 5:40 → 5km~결승 5:35 목표(5:34 이하 금지), 35km 이후에도 가속 없이 유지. '
-             '예상 3:58:45~3:58:53(시계 1% 과대) · 시계=공식이면 3:56:23.'
-             '</div>\n')
-    card = ('<div style="background:#13131f;border:1px solid {b};border-radius:10px;padding:11px 13px;line-height:1.6">'
-            '<div style="color:{c};font-weight:700;margin-bottom:5px">{t}</div><div style="font-size:11px;color:#bbb">{x}</div></div>')
-    html += ('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-bottom:12px">'
-             + card.format(b='#2a2a4a', c='#6affa0', t='핵심 근거',
-                           x='10/4 26.57km @5:36 연속 완주<br>10/17 30km 완주 (마지막 5km 약 5:34)<br>'
-                             '10/25 대회 페이스 19km @5:38<br>11/3 대회 페이스 12.26km @5:37 · HR147 (무보급)')
-             + card.format(b='#3a2a2a', c='#ff8b8b', t='리스크와 대응',
-                           x='심박 표류 약 +1/km → 35km 전 가속 금지, 젤·급수로 지연<br>'
-                             '5:37 이상 유지 시 시계 1% 과대면 sub-4 실패 → 5:35 목표<br>'
-                             '무릎 1~1.5/10 간헐 (다음 날 회복) → 2/10 이상 지속 시 페이스 하향')
-             + card.format(b='#2a2a4a', c='#6ab4ff', t='남은 일정',
-                           x='11/6 Easy 5.45km 완료 → 11/8 10km (마지막 3km 5:35~5:36)<br>'
-                             '11/10 Easy 5km + 5:36 1~2km → 11/12 Easy 3~4km<br>'
-                             '11/13 휴식 → 11/14 이동·접수 → 11/15 고베<br>금주 · 수면 · 카보로딩(11/12~14)')
-             + '</div>\n')
-    html += ('<div style="overflow-x:auto"><table style="min-width:850px"><thead><tr><th>주차</th><th>계획 거리</th><th>계획 롱런</th>'
-             '<th>실제 수행</th><th>품질 판정</th><th>코멘트</th><th>핵심 목표</th></tr></thead><tbody>\n')
-    for week, volume, long_run, target_count, min_total, min_long, focus in kobe_weeks:
-        actual, assessment, comment = _kobe_week_assessment(week, target_count, min_total, min_long)
-        assessment_color = {
-            '완료': '#6affa0', '부분완료': '#ffd56c', '미완료': '#ff6c6c',
-            '진행 중': '#6ab4ff', '예정': '#666', '이월 → 다음 주': '#c9a0ff',
-        }.get(assessment.split(' (')[0], '#aaa')
-        html += (f'<tr><td style="white-space:nowrap;color:#888">{week}</td>'
-                 f'<td style="color:#6affa0;font-weight:600">{volume}</td>'
-                 f'<td style="color:#6ab4ff;font-weight:600">{long_run}</td>'
-                 f'<td style="color:#ddd;font-size:10.5px;white-space:nowrap">{actual}</td>'
-                 f'<td style="color:{assessment_color};font-weight:600;white-space:nowrap">{assessment}</td>'
-                 f'<td style="color:#bbb;font-size:10px;min-width:125px;max-width:165px;line-height:1.35">{comment}</td>'
-                 f'<td style="color:#aaa;font-size:10.5px">{focus}</td></tr>\n')
-    html += '</tbody></table></div>\n'
-    html += '<div style="margin-bottom:12px"></div>\n'
-    html += '<div style="overflow-x:auto"><table style="min-width:900px"><thead><tr><th>판정 시점</th><th>통과 기준</th><th>현재 상태</th><th>판정 근거</th></tr></thead><tbody>\n'
-    for timing, criterion, status, evidence in kobe_checks:
-        status_color = '#6affa0' if '✅' in status else ('#ffd56c' if '🟡' in status else '#6ab4ff')
-        html += (f'<tr><td style="white-space:nowrap;color:#888">{timing}</td>'
-                 f'<td style="color:#ddd">{criterion}</td>'
-                 f'<td style="color:{status_color};font-weight:700;white-space:nowrap">{status}</td>'
-                 f'<td style="color:#aaa;font-size:10.5px;min-width:280px">{evidence}</td></tr>\n')
-    html += '</tbody></table></div>\n</div>\n'
-    html += ('<script>'
-             'document.getElementById("kobe-roadmap-anchor").replaceWith('
-             'document.getElementById("kobe-roadmap"));'
-             '</script>\n')
+    # ── T100 시즌 로드맵 (2026-11-20 사용자 확정: 러닝 중심 → 3종목, 겨울 자전거는 실내 전용) ──
+    season_plan = sched_data.get('season_plan', [])
+    if season_plan:
+        html += '<div id="season-roadmap">\n<div class="section">🗺️ 군산·새만금 T100 시즌 로드맵</div>\n'
+        if sched_data.get('season_plan_note'):
+            html += ('<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;'
+                     'padding:11px 14px;margin-bottom:10px;font-size:11.5px;color:#aaa;line-height:1.6">'
+                     f'{sched_data["season_plan_note"]}</div>\n')
+        html += ('<div style="overflow-x:auto"><table style="min-width:760px"><thead><tr><th>단계</th><th>기간</th>'
+                 '<th>🏊 수영</th><th>🚴 자전거</th><th>🏃 러닝</th><th>핵심</th></tr></thead><tbody>\n')
+        for ph in season_plan:
+            is_now = ph['start'] <= today <= ph['end']
+            row_bg = ' style="background:#0d2a0d"' if is_now else ''
+            period = f"{ph['start'][5:].replace('-', '/')} ~ {ph['end'][5:].replace('-', '/')}"
+            html += (f'<tr{row_bg}><td style="white-space:nowrap;color:{"#6affa0" if is_now else "#ddd"};font-weight:600">'
+                     f'{ph["name"]}{" ◀ 현재" if is_now else ""}</td>'
+                     f'<td style="white-space:nowrap;color:#888">{period}</td>'
+                     f'<td style="color:#6ab4ff;font-size:10.5px">{ph.get("swim", "")}</td>'
+                     f'<td style="color:#ffa06a;font-size:10.5px">{ph.get("bike", "")}</td>'
+                     f'<td style="color:#6affa0;font-size:10.5px">{ph.get("run", "")}</td>'
+                     f'<td style="color:#aaa;font-size:10.5px">{ph.get("focus", "")}</td></tr>\n')
+        html += '</tbody></table></div>\n</div>\n'
+        html += ('<script>'
+                 'document.getElementById("season-roadmap-anchor").replaceWith('
+                 'document.getElementById("season-roadmap"));'
+                 '</script>\n')
 
     # ── 완주 대회 아카이브 ──
     race_records_file = BASE / 'data' / 'race_records.json'
@@ -1470,7 +1362,7 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
         race_records = json.loads(race_records_file.read_text(encoding='utf-8'))
         if race_records:
             html += '<div class="section">🏅 완주 대회 아카이브</div>\n'
-            for rec in race_records:
+            for rec in sorted(race_records, key=lambda r: r.get('date', ''), reverse=True):
                 rdate = rec.get('date', '')
                 rname = rec.get('name', '')
                 rtype = rec.get('type', '')
@@ -1485,13 +1377,14 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                 notes = rec.get('notes', [])
 
                 dt_r = datetime.strptime(rdate, '%Y-%m-%d')
+                rtype_label = {'marathon': '풀마라톤'}.get(rtype, rtype)
                 dow_r = ['월','화','수','목','금','토','일'][dt_r.weekday()]
                 date_label = f"{rdate} ({dow_r})"
 
                 html += f'<div style="background:#13131f;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:14px">\n'
                 html += f'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px">\n'
                 html += f'  <span style="font-size:16px;font-weight:700;color:#ffd56c">{rname}</span>\n'
-                html += f'  <span style="font-size:12px;color:#666">{date_label} · {rtype}</span>\n'
+                html += f'  <span style="font-size:12px;color:#666">{date_label} · {rtype_label}</span>\n'
                 html += f'  <span style="font-size:22px;font-weight:700;color:#7c6fff;margin-left:auto">{official}</span>\n'
                 if std_ext:
                     html += f'  <span style="font-size:11px;color:#555">(표준거리 환산 {std_ext})</span>\n'
@@ -1499,8 +1392,10 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
 
                 # 분할 기록
                 html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px">\n'
-                # 페이스를 별도 줄로 크게 표시 (2026-06-07 사용자 피드백: 페이스 가독성)
-                for label, color, val, pace, sub in [
+                # 마라톤은 3종 분할 대신 공식 통과 기록 표시 (2026-11-20 고베 추가)
+                split_cards = [(cp['label'], '#6affa0', cp['time'], cp.get('pace', ''), cp.get('sub', ''))
+                               for cp in rec.get('checkpoints', [])] if rtype == 'marathon' else [
+
                     ('🏊 수영', '#6ab4ff',
                      swim_s.get('time','—'),
                      f"{swim_s.get('pace_per_100m','—')}/100m",
@@ -1515,7 +1410,8 @@ document.querySelectorAll('.chart-range button').forEach((btn) => {{
                      run_s.get('time','—'),
                      f"{run_s.get('pace_per_km','—')}/km",
                      f"{run_s.get('distance_km','')}km"),
-                ]:
+                ]
+                for label, color, val, pace, sub in split_cards:
                     opacity = '0.4' if label in ('T1','T2') else '1'
                     pace_html = (f'<div style="font-size:14px;font-weight:700;color:#fff;margin-top:2px">{pace}</div>'
                                  if pace else '')

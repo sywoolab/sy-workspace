@@ -71,5 +71,56 @@
     ],
     "timing_note": "협회 화면의 표시 구간 합계는 2:48:16으로 공식 총기록 2:48:15와 1초 차이. 공식 표기값을 그대로 보존함.",
     "official_result_url": "https://triathlon.or.kr/results/results/record/?field=&keyword=&mode=record&page=1&sPart=28785&sYear=2026&tourcd=2098"
+  },
+  {
+    "date": "2026-11-15",
+    "name": "고베 마라톤 2026",
+    "location": "일본 고베",
+    "type": "marathon",
+    "official_time": "3:57:09",
+    "splits": {
+      "run": {
+        "time": "3:57:09",
+        "distance_km": 42.195,
+        "pace_per_km": "5:38"
+      }
+    },
+    "standard_extrapolated": "",
+    "checkpoints": [
+      {
+        "label": "하프",
+        "time": "1:59:15",
+        "sub": "넷 · 전반"
+      },
+      {
+        "label": "30km",
+        "time": "2:49:25",
+        "sub": "넷 통과"
+      },
+      {
+        "label": "35km",
+        "time": "3:17:35",
+        "sub": "넷 통과"
+      },
+      {
+        "label": "40km",
+        "time": "3:45:38",
+        "sub": "넷 통과"
+      },
+      {
+        "label": "🏁 결승",
+        "time": "3:57:09",
+        "pace": "5:38/km",
+        "sub": "넷 · 그로스 4:01:59"
+      }
+    ],
+    "notes": [
+      "풀코스 개인 최고 기록, 첫 sub-4 (2024년 약 4시간 대비). 배번 16763.",
+      "넷 기준 전반 1:59:15 / 후반 1:57:54 — 네거티브 스플릿 1분 21초.",
+      "40km~결승 2.195km 11:31(약 5:15/km). 시계 기준 39km 이후 5:19→4:57로 가속 마무리.",
+      "시계 3:57:11·42.60km(약 1% 과대). 본인 체감 '여유로웠다' — 30km 이상 장거리를 추가하면 다음 풀은 3:50 초반이 현실적.",
+      "다음 목표: 2027-05-29~30 군산·새만금 T100."
+    ],
+    "official_result_url": ""
   }
 ]

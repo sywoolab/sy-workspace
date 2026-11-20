@@ -39,13 +39,14 @@ BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 LOG_FILE = os.path.join(BASE_DIR, 'workout_log.json')
 SCHEDULE_FILE = os.path.join(BASE_DIR, 'workout_schedule.json')
 
-# 현재 목표 대회: 고베 마라톤. 거북섬은 2026-09-06 완료 이력이다.
+# 현재 목표 대회: 2027 군산·새만금 T100 (5/29~30 행사 주말). 고베 마라톤은 2026-11-15 완료 이력이다.
 RACE_KOBE = datetime(2026, 11, 15, tzinfo=KST)
-RACE_DAY = RACE_KOBE
+RACE_T100 = datetime(2027, 5, 29, tzinfo=KST)
+RACE_DAY = RACE_T100
+SEASON_START = datetime(2026, 11, 16, tzinfo=KST)  # T100 시즌 시작 (고베 다음 날)
 TRAIN_START  = datetime(2026, 3, 16, tzinfo=KST)  # 시즌 시작 (기록 기준)
 RESTART_DATE = datetime(2026, 7, 7, tzinfo=KST)   # 발치 후 복귀 재시작
-DAYS_LEFT_KOBE = (RACE_KOBE.date() - NOW.date()).days
-DAYS_LEFT = DAYS_LEFT_KOBE
+DAYS_LEFT = (RACE_T100.date() - NOW.date()).days
 
 # 주차 계산 (훈련 시작일 기준, 월요일 시작)
 def get_week_number(dt):
@@ -78,7 +79,16 @@ def get_phase(dt):
         return 5, "Phase 5: 고베 sub-4 빌드"
     elif d <= TAPER_END:
         return 6, "Phase 6: 고베 피크·테이퍼"
-    return 7, "고베 마라톤 완료"
+    # T100 시즌 (2026-11-20 사용자 확정, 겨울 자전거는 실내 전용)
+    elif d <= datetime(2026, 12, 6).date():
+        return 7, "T100 0단계: 고베 회복"
+    elif d <= datetime(2027, 2, 28).date():
+        return 8, "T100 1단계: 겨울 기초"
+    elif d <= datetime(2027, 4, 11).date():
+        return 9, "T100 2단계: 빌드 1"
+    elif d <= datetime(2027, 5, 16).date():
+        return 10, "T100 3단계: 빌드 2"
+    return 11, "T100 4단계: 테이퍼"
 
 phase, phase_name = get_phase(NOW)
 
@@ -107,7 +117,8 @@ WEEK_NAMES = {
     28: "W13: 고베 빌드 ③", 29: "W14: 고베 빌드 ④",
     30: "W15: 고베 피크", 31: "W16: 고베 흡수",
     32: "W17: 고베 테이퍼 ①", 33: "W18: 고베 테이퍼 ②",
-    34: "W19: 고베 레이스 주", 35: "W20: 고베 레이스 후",
+    34: "W19: 고베 레이스 주", 35: "R1: 고베 회복 ①",
+    36: "R2: 고베 회복 ②", 37: "R3: 고베 회복 ③",
 }
 
 # 요일별 운동 스케줄 (Phase별)
@@ -162,6 +173,38 @@ SCHEDULE = {
         2: ("수영 Easy", "회복"), 3: ("러닝 Easy", "5~8km"),
         4: ("완전 휴식", ""), 5: ("러닝 Easy", "3~5km + 스트라이드"),
         6: ("롱런/대회", "테이퍼 주차 목표에 따름"),
+    },
+    7: {  # T100 0단계: 고베 회복 (일별 override 우선)
+        0: ("수영 수업", ""), 1: ("러닝 Easy", "5~6km, 통증 0~1/10일 때만"),
+        2: ("수영 수업 + 실내 자전거", "45~60분 Z2"), 3: ("러닝 Easy", "6km"),
+        4: ("수영 수업 또는 휴식", ""), 5: ("수영 개인강습 + 실내 자전거", "60~75분 Z2"),
+        6: ("러닝 Easy", "8~10km"),
+    },
+    8: {  # T100 1단계: 겨울 기초 — 시간 비중 수영30/자전거35/러닝35
+        0: ("수영 수업", ""), 1: ("러닝 Easy + 스트라이드", "6~8km + 코어 15분"),
+        2: ("수영 수업 + 실내 자전거", "60분 (1월부터 스윗스팟 2×15분)"),
+        3: ("러닝 Easy/품질", "6~8km (1월부터 템포 1회) + 근력 20분"),
+        4: ("휴식 (수영 수업 선택)", "주간 완전휴식 1일"),
+        5: ("수영 개인강습 + 실내 자전거", "90→120분 Z2 (2월부터 직후 러닝 15분)"),
+        6: ("롱런", "10→16km Easy"),
+    },
+    9: {  # T100 2단계: 빌드 1 — 야외 전환
+        0: ("수영 수업", ""), 1: ("러닝 품질", "템포 또는 인터벌 8~10km"),
+        2: ("수영 수업 + 실내 자전거", "60분 스윗스팟"), 3: ("러닝 Easy", "8~10km"),
+        4: ("휴식", ""), 5: ("롱라이드", "60→80km (날씨 나쁘면 실내 2시간)"),
+        6: ("롱런", "14~16km"),
+    },
+    10: {  # T100 3단계: 빌드 2 — 브릭·오픈워터
+        0: ("수영 수업", ""), 1: ("러닝 품질", "레이스 페이스 8~10km"),
+        2: ("수영 수업 + 실내 자전거", "60분"), 3: ("러닝 Easy", "8km"),
+        4: ("휴식", ""), 5: ("브릭 (격주)", "자전거 80~100km → 러닝 5~8km"),
+        6: ("롱런 또는 오픈워터", "18~20km 1회 포함 / 5월 OW"),
+    },
+    11: {  # T100 4단계: 테이퍼
+        0: ("수영 수업", ""), 1: ("러닝 레이스 페이스 터치", "볼륨 축소"),
+        2: ("실내 자전거", "45분 + 레이스 강도 3×5분"), 3: ("러닝 Easy", "5~6km"),
+        4: ("휴식", ""), 5: ("짧은 브릭", "자전거 30분 → 러닝 10분"),
+        6: ("대회 주 일정에 따름", ""),
     },
 }
 
@@ -230,6 +273,31 @@ PHASE_GOALS = {
         "goal": "고베 피크·테이퍼 — 강도 감각은 유지하고 볼륨만 감축",
         "volume": "러닝 3~4회 / 수영 0~1회 Easy",
         "min": "새 자극 금지, 수면·보급·페이스 전략 고정",
+    },
+    7: {
+        "goal": "고베 회복 — 러닝 복귀 테스트 후 Easy, 실내 자전거로 유산소 유지",
+        "volume": "러닝 2~3회(~22km) / 실내 자전거 2회 Z1~Z2 / 수영 강습",
+        "min": "계단·무릎 통증 0~1/10, 강도 금지",
+    },
+    8: {
+        "goal": "T100 겨울 기초 — 시간 비중 수영30/자전거35/러닝35, 주 7~8시간",
+        "volume": "러닝 3회 25~35km / 실내 자전거 2회 / 수영 3~4회 / 근력 2회",
+        "min": "러닝 3 + 실내 자전거 2 + 수영 3",
+    },
+    9: {
+        "goal": "T100 빌드 1 — 야외 롱라이드 60→80km, 수영 2km 연속",
+        "volume": "러닝 3~4회 30~40km / 자전거 2회 / 수영 3회",
+        "min": "롱라이드 1 + 롱런 1 + 품질 1",
+    },
+    10: {
+        "goal": "T100 빌드 2 — 격주 브릭, 러닝 18~20km 1회, 오픈워터 재개",
+        "volume": "자전거 비중 45% / 러닝 30% / 수영 25%, 주 9~11시간",
+        "min": "브릭 2회 + 러닝 18km 1회 + OW 1회",
+    },
+    11: {
+        "goal": "T100 테이퍼 — 거리 축소, 강도 유지",
+        "volume": "평소 대비 40~60%",
+        "min": "새 자극 금지, 수면·보급 고정",
     },
 }
 
@@ -644,13 +712,13 @@ def format_fitness_split(analysis):
 
 
 def format_training_progress(analysis):
-    """고베 마라톤 훈련 진척도 — 러닝 거리·빈도 중심."""
+    """T100 시즌 진척도 — 러닝 거리·빈도 중심."""
     lines = []
     lines.append("📈 훈련 진척도")
 
     # 전체 진행률 (훈련 시작 ~ 대회)
-    total_days = (RACE_DAY.date() - TRAIN_START.date()).days
-    elapsed = (NOW.date() - TRAIN_START.date()).days
+    total_days = (RACE_DAY.date() - SEASON_START.date()).days
+    elapsed = (NOW.date() - SEASON_START.date()).days
     pct = min(100, round(elapsed / total_days * 100)) if total_days > 0 else 0
     bar_filled = pct // 10
     bar_empty = 10 - bar_filled
@@ -690,11 +758,11 @@ def format_training_progress(analysis):
             run_km += day_run_km
             longest_km = max(longest_km, day_run_km)
 
-    run_target = 3 if phase == 4 else 4
-    distance_target = "24~28km" if phase == 4 else "30~46km(주차별)"
+    run_target = 3 if phase in (4, 7, 8) else 4
+    distance_target = {4: "24~28km", 7: "15~22km", 8: "25~35km"}.get(phase, "30~40km(주차별)")
     lines.append(f"  금주 러닝: {run_count}/{run_target}회 · {run_km:.1f}km / 목표 {distance_target}")
-    lines.append(f"  금주 최장거리: {longest_km:.1f}km · 핵심은 주말 평지 롱런과 보급 연습")
-    lines.append("  수영·자전거는 회복·유산소 보조로만 운영")
+    lines.append(f"  금주 최장거리: {longest_km:.1f}km")
+    lines.append("  겨울 자전거는 실내 주 2회 (평일 60분 + 토 90~120분)")
 
     return "\n".join(lines)
 
@@ -767,7 +835,7 @@ def format_morning():
     est = analysis.get('estimated_finish', '?')
     status_icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(analysis.get('status', ''), '⚪')
     vdot = analysis.get('vdot', '?')
-    lines.append(f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | 목표 3:55 · sub-4 방어 · 무보행 | VDOT {vdot}")
+    lines.append(f"🏊🚴🏃 군산·새만금 T100 D-{DAYS_LEFT} | 기준 5시간 이내 | VDOT {vdot}")
     lines.append("")
 
     # 훈련 진척도
@@ -1011,7 +1079,7 @@ def format_evening():
         # 휴식일이어도 내일 코칭은 보내기
         coaching = format_tomorrow_coaching()
         if coaching:
-            lines = [f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | 😴 오늘은 휴식"]
+            lines = [f"🏊🚴🏃 T100 D-{DAYS_LEFT} | 😴 오늘은 휴식"]
             lines.append("")
             lines.append(coaching)
             return "\n".join(lines)
@@ -1022,7 +1090,7 @@ def format_evening():
     # 오늘 운동 완료했으면 칭찬 메시지
     today_done = is_done(TODAY)
     if today_done:
-        lines.append(f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | ✅ 오늘 운동 완료!")
+        lines.append(f"🏊🚴🏃 T100 D-{DAYS_LEFT} | ✅ 오늘 운동 완료!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         # P2: format_today_workout 재사용 → all_metrics 시작시각 [HH:MM] 포함 상세 표기
@@ -1044,7 +1112,7 @@ def format_evening():
                 lines.append(f"  → {actual}")
     else:
         # 미완료 → 리마인드 + 복구 시나리오
-        lines.append(f"🏃 고베 마라톤 D-{DAYS_LEFT_KOBE} | ⚠️ 오늘 운동 기록이 없습니다!")
+        lines.append(f"🏊🚴🏃 T100 D-{DAYS_LEFT} | ⚠️ 오늘 운동 기록이 없습니다!")
         lines.append("")
         lines.append(f"{get_emoji(workout)} {workout}")
         if detail:

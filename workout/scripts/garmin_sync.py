@@ -57,7 +57,7 @@ BOT_TOKEN = (os.environ.get('BOT_TOKEN')
 CHAT_ID = os.environ.get('CHAT_ID') or os.environ.get('TELEGRAM_CHAT_ID', '')
 
 # Current primary race for Garmin auto-detection alerts.
-RACE_DAY = datetime(2026, 11, 15, tzinfo=KST)  # 고베 마라톤
+RACE_DAY = datetime(2027, 5, 29, tzinfo=KST)  # 군산·새만금 T100 (고베 11/15 완료)
 TRAIN_START = datetime(2026, 3, 16, tzinfo=KST)
 DAYS_LEFT = (RACE_DAY.date() - NOW.date()).days
 

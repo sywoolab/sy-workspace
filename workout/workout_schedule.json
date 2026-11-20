@@ -1371,6 +1371,142 @@
       "source": "manual",
       "auto": false,
       "rule": "2026-11-10 user-confirmed-osaka-usj"
+    },
+    "2026-11-20": {
+      "date": "2026-11-20",
+      "workout": "🛏 휴식",
+      "detail": "고베 회복 1주차. HRV 64로 회복, Readiness 아직 낮음.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-21": {
+      "date": "2026-11-21",
+      "workout": "🏊 수영 개인강습(가볍게) + 🚴 실내 40분 Z1",
+      "detail": "실내 자전거 복귀. 케이던스 90 전후, 심박 125 이하. 다리 회복용.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-22": {
+      "date": "2026-11-22",
+      "workout": "🏃 러닝 복귀 테스트 4~5km (6:30/km보다 느리게)",
+      "detail": "러닝은 계단 내려가기·무릎 통증 0~1/10, 안정시 HR 47 이하일 때만. 통증 2/10 이상이면 즉시 중단 후 걷기.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-23": {
+      "date": "2026-11-23",
+      "workout": "🏊 수영 강습 06시",
+      "detail": "회복 2주차 시작.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-24": {
+      "date": "2026-11-24",
+      "workout": "🏃 Easy 5km",
+      "detail": "러닝은 계단 내려가기·무릎 통증 0~1/10, 안정시 HR 47 이하일 때만. 6:20~6:40/km.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-25": {
+      "date": "2026-11-25",
+      "workout": "🏊 수영 강습 + 🚴 실내 45분 Z2",
+      "detail": "저녁 실내. 파워/심박 Z2(HR 130~140), 마지막 5분 케이던스 100 스핀.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-26": {
+      "date": "2026-11-26",
+      "workout": "🏃 Easy 6km",
+      "detail": "러닝은 계단 내려가기·무릎 통증 0~1/10, 안정시 HR 47 이하일 때만.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-27": {
+      "date": "2026-11-27",
+      "workout": "🏊 수영 강습 또는 휴식",
+      "detail": "회식·수면 부족이면 휴식.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-28": {
+      "date": "2026-11-28",
+      "workout": "🏊 수영 개인강습 + 🚴 실내 60분 Z2",
+      "detail": "실내 60분 Z2. 다리 이상 없으면 마지막 10분 템포 직전(HR 145) 허용.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-29": {
+      "date": "2026-11-29",
+      "workout": "🏃 Easy 8km",
+      "detail": "러닝은 계단 내려가기·무릎 통증 0~1/10, 안정시 HR 47 이하일 때만.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-11-30": {
+      "date": "2026-11-30",
+      "workout": "🏊 수영 강습 06시",
+      "detail": "회복 3주차.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-12-01": {
+      "date": "2026-12-01",
+      "workout": "🏃 Easy 6km + 스트라이드 4×20초",
+      "detail": "스트라이드는 전력 아님(5km 페이스 정도). + 코어 15분.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-12-02": {
+      "date": "2026-12-02",
+      "workout": "🏊 수영 강습 + 🚴 실내 60분 Z2",
+      "detail": "Z2 50분 + 1분 강/1분 약 ×5 케이던스 드릴.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-12-03": {
+      "date": "2026-12-03",
+      "workout": "🏃 Easy 6km + 근력 20분",
+      "detail": "하체(스쿼트·런지·카프레이즈)·코어. 무거운 중량 금지.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-12-04": {
+      "date": "2026-12-04",
+      "workout": "🛏 휴식 (수영 강습 선택)",
+      "detail": "주간 완전휴식 1일 확보.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-12-05": {
+      "date": "2026-12-05",
+      "workout": "🏊 수영 개인강습 + 🚴 실내 75분 Z2",
+      "detail": "Z2 지속. 12/7부터 겨울 기초기 진입.",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
+    },
+    "2026-12-06": {
+      "date": "2026-12-06",
+      "workout": "🏃 Easy 10km",
+      "detail": "러닝은 계단 내려가기·무릎 통증 0~1/10, 안정시 HR 47 이하일 때만. 이상 없으면 12/7부터 기초기(러닝 주 3회·실내 자전거 주 2회).",
+      "source": "manual",
+      "auto": false,
+      "rule": "user-confirmed"
     }
   },
   "last_analysis": {
@@ -1438,9 +1574,9 @@
     }
   ],
   "season_target": {
-    "next_race": "2026-11-15 고베 마라톤 (신청완료, 목표 sub-4 방어, 5:36 고정, 전 구간 무보행)",
-    "target_time": "고베 마라톤 11/15: 목표 sub-4:00 방어(10/25 사용자 확정, 3:55 목표 폐기), 전 구간 무보행",
-    "reasoning": "2026-09-06 거북섬 올림픽 완주 후 고베 마라톤 sub-4를 단일 최우선 목표로 유지한다. 고베 이후에는 결제 완료한 2027 군산·새만금 T100 100km를 차기 A레이스로 전환하며, 주 4회 러닝·평지 롱런·보급 적응으로 만든 내구성을 수영 2km·자전거 80km·러닝 18km에 연결한다.",
+    "next_race": "2027-05-29~30 군산·새만금 T100 100km (수영 2·자전거 80·러닝 18km)",
+    "target_time": "기준 5시간 이내(예상 4:55~5:10, 공격 4:45)",
+    "reasoning": "고베 마라톤(11/15, 넷 3:57:09) 완료. 러닝 중심에서 3종목으로 전환. 경기 시간 비중이 가장 큰 자전거(약 절반)를 겨울 실내 주 2회로 유지하고, 봄에 야외 롱라이드·브릭으로 80km 내구성을 만든다.",
     "fall_target": "거북섬 올림픽 9/6 완료 → 고베 마라톤 11/15(목표 3:55, sub-4 방어, 무보행)",
     "long_term_2027": "2027-05-29~30 군산·새만금 T100 100km 참가 확정(결제완료). 기준 목표 sub-5, 현재 예상 4:55~5:10, 공격 목표 4:45. 100km 개인전 정확한 경기일은 추후 공식 선수안내서로 확정"
   },
@@ -1606,6 +1742,24 @@
       "goal": "신선한 다리로 출발. 수면 최우선, 음주 금지. 11/14 이동·접수, 11/15 0~5km 5:45~5:50 → 5:36 고정.",
       "sessions": "화 Easy 5km+5:36 1~2km · 목 Easy 3~4km · 금 휴식 · 토 이동+접수 · 일 🏁 고베 마라톤",
       "target_load": "러닝 9~11km + 대회 42.195km"
+    },
+    "2026-11-16": {
+      "week": "R1",
+      "title": "고베 회복 1주 — 러닝 금지, 실내 자전거 복귀",
+      "goal": "회복 우선. 주말 실내 자전거 Z1, 일요일 러닝 복귀 테스트",
+      "sessions": "토 개인강습+실내 40분 Z1 · 일 복귀 테스트 4~5km"
+    },
+    "2026-11-23": {
+      "week": "R2",
+      "title": "회복 2주 — 러닝 3회 ~19km, 실내 자전거 2회",
+      "goal": "전부 Easy. 무릎·계단 통증 0~1/10 유지 확인",
+      "sessions": "화 5km · 수 실내 45분 · 목 6km · 토 실내 60분 · 일 8km · 수영 강습"
+    },
+    "2026-11-30": {
+      "week": "R3",
+      "title": "회복 3주 — 러닝 ~22km, 실내 자전거 2회, 근력 시작",
+      "goal": "스트라이드·근력 재도입. 12/7 겨울 기초기 진입 준비",
+      "sessions": "화 6km+스트라이드 · 수 실내 60분 · 목 6km+근력 · 토 실내 75분 · 일 10km"
     }
   },
   "kobe_race_strategy": {
@@ -1731,5 +1885,53 @@
         "url": "https://www.ausport.gov.au/ais/nutrition/supplements/group_a/sports-foods2/sports-drink/how-and-when-do-i-use-it"
       }
     ]
-  }
+  },
+  "season_plan_note": "<b style='color:#ffd56c'>종목 비중(주간 시간 기준)</b> — 겨울 기초기: 🏊 30% · 🚴 35% · 🏃 35% (주 7~8시간) → 빌드기: 🏊 25% · 🚴 45% · 🏃 30% (주 9~11시간). 실내 자전거 1시간은 쉬는 구간이 없어 야외 약 1.2~1.3시간에 해당. 4주마다 회복 주(거리 40~50% 감소).",
+  "season_plan": [
+    {
+      "name": "0. 회복",
+      "start": "2026-11-16",
+      "end": "2026-12-06",
+      "swim": "강습 그대로(가볍게)",
+      "bike": "실내 주 2회 Z1~Z2 40→75분",
+      "run": "복귀 테스트 → 주 19→22km, 전부 Easy",
+      "focus": "고베 회복·무릎 게이트"
+    },
+    {
+      "name": "1. 겨울 기초",
+      "start": "2026-12-07",
+      "end": "2027-02-28",
+      "swim": "강습 주 3 + 개인강습, 기술·거리",
+      "bike": "실내 주 2회: 평일 60분(1월부터 스윗스팟 2×15분) + 토 90→120분 Z2",
+      "run": "주 3회 25~35km, 일 롱런 10→16km",
+      "focus": "근력 주 2·감량 76~77kg·2월 토 실내 후 러닝 15분 브릭"
+    },
+    {
+      "name": "2. 빌드 1",
+      "start": "2027-03-01",
+      "end": "2027-04-11",
+      "swim": "2km 연속 수영",
+      "bike": "야외 전환, 토 롱라이드 60→80km + 평일 실내 1회",
+      "run": "주 3~4회 30~40km, 롱런 14~16km, 템포 1회",
+      "focus": "자전거 거리 내구성"
+    },
+    {
+      "name": "3. 빌드 2",
+      "start": "2027-04-12",
+      "end": "2027-05-16",
+      "swim": "5월 오픈워터 재개",
+      "bike": "격주 브릭 80~100km + 러닝 5~8km",
+      "run": "러닝 18~20km 단독 1회",
+      "focus": "레이스 페이스·보급 리허설"
+    },
+    {
+      "name": "4. 테이퍼",
+      "start": "2027-05-17",
+      "end": "2027-05-30",
+      "swim": "강도 유지",
+      "bike": "거리 축소·강도 유지",
+      "run": "거리 축소",
+      "focus": "🏁 군산·새만금 T100"
+    }
+  ]
 }
