@@ -21168,5 +21168,45 @@
         "feel": 50
       }
     ]
+  },
+  "2026-11-24": {
+    "planned": "🏃 Easy 5km",
+    "done": true,
+    "actual": "자전거 46분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 0.0,
+      "duration_min": 45.7,
+      "avg_speed_kmh": null,
+      "avg_hr": 127,
+      "max_hr": 152,
+      "avg_power": 70.0,
+      "training_load": 24
+    },
+    "training_zone": "easy",
+    "note": "유산소 2.0 | 부하 24",
+    "garmin_id": 25181914211,
+    "start_time": "18:24",
+    "garmin_ids": [
+      25181914211
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": null,
+        "duration_sec": 2742.0,
+        "avg_hr": 127,
+        "max_hr": 152,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 24,
+        "garmin_id": 25181914211,
+        "laps": null,
+        "open_water": false,
+        "start_time": "18:24",
+        "rpe": 4,
+        "feel": 50
+      }
+    ]
   }
 }
