@@ -21208,5 +21208,112 @@
         "feel": 50
       }
     ]
+  },
+  "2026-11-27": {
+    "planned": "🛏 기본 휴식 (수영 가면 가볍게)",
+    "done": true,
+    "actual": "자전거 45분",
+    "metrics": {
+      "type": "bike",
+      "distance_km": 0.0,
+      "duration_min": 45.2,
+      "avg_speed_kmh": null,
+      "avg_hr": 136,
+      "max_hr": 161,
+      "avg_power": 77.0,
+      "training_load": 33
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.2 | 부하 33",
+    "garmin_id": 25215559197,
+    "start_time": "21:55",
+    "garmin_ids": [
+      25215559197
+    ],
+    "all_metrics": [
+      {
+        "type": "bike",
+        "distance_m": null,
+        "duration_sec": 2712.0,
+        "avg_hr": 136,
+        "max_hr": 161,
+        "avg_pace": null,
+        "avg_speed": null,
+        "training_load": 33,
+        "garmin_id": 25215559197,
+        "laps": null,
+        "open_water": false,
+        "start_time": "21:55",
+        "rpe": 5,
+        "feel": 50
+      }
+    ]
+  },
+  "2026-11-28": {
+    "planned": "🏊 수영 개인강습 + 🏃 Easy 7km",
+    "done": true,
+    "actual": "수영 1250m 56분 @1:48/100m + 수영 1000m 23분 @1:52/100m",
+    "metrics": {
+      "type": "swim",
+      "distance_m": 1000,
+      "duration_min": 22.7,
+      "moving_min": 18.7,
+      "pace_per_100m": "1:52",
+      "avg_hr": 141,
+      "max_hr": 169,
+      "swolf": 39,
+      "strokes": 430,
+      "avg_spm": null,
+      "training_load": 70
+    },
+    "training_zone": "moderate",
+    "note": "유산소 2.2 / 무산소 1.2 | 부하 46 | 유산소 2.8 / 무산소 1.3 | 부하 70",
+    "garmin_id": 25221377340,
+    "start_time": "13:03",
+    "garmin_ids": [
+      25221377010,
+      25221377340
+    ],
+    "all_metrics": [
+      {
+        "type": "swim",
+        "distance_m": 1250,
+        "duration_sec": 3336.0,
+        "avg_hr": 116,
+        "max_hr": 161,
+        "avg_pace": "1:48",
+        "avg_speed": null,
+        "training_load": 46,
+        "garmin_id": 25221377010,
+        "laps": null,
+        "open_water": false,
+        "start_time": "13:03",
+        "duration_min": 55.6,
+        "moving_min": 22.6,
+        "pace_per_100m": "1:48",
+        "swolf": 35,
+        "strokes": 410,
+        "avg_spm": null,
+        "rpe": 4,
+        "feel": 50
+      },
+      {
+        "type": "swim",
+        "distance_m": 1000,
+        "duration_min": 22.7,
+        "moving_min": 18.7,
+        "pace_per_100m": "1:52",
+        "avg_hr": 141,
+        "max_hr": 169,
+        "swolf": 39,
+        "strokes": 430,
+        "avg_spm": null,
+        "training_load": 70,
+        "garmin_id": 25221377340,
+        "start_time": "14:01",
+        "rpe": 6,
+        "feel": 50
+      }
+    ]
   }
 }
